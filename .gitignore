@@ -1,0 +1,5 @@
+.DS_Store
+.idea/
+code/client/node_modules/
+code/server/node_modules/
+.vscode/
