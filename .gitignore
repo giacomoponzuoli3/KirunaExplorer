@@ -4,3 +4,5 @@ code/client/node_modules/
 code/server/node_modules/
 .vscode/
 code/.DS_Store
+code/server/.DS_Store
+code/client/.DS_Store
