@@ -3,3 +3,4 @@
 code/client/node_modules/
 code/server/node_modules/
 .vscode/
+code/.DS_Store
