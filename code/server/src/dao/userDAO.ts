@@ -1,5 +1,5 @@
 import db from "../db/db"
-import { User, Role } from "../components/user"
+import { User, Role } from "../models/user"
 import crypto from "crypto"
 
 

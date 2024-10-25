@@ -31,6 +31,7 @@ class User {
 enum Role {
     PLANNER = "Urban Planner",
     RESIDENT = "Resident",
+    DEVELOPER = "Urban Developer"
 }
 
 

@@ -1,5 +1,5 @@
 import express from "express"
-import { User } from "../components/user"
+import { User } from "../models/user"
 import {UserDAO} from "../dao/userDAO"
 import Utility from "../utilities"
 const session = require('express-session')
@@ -157,6 +157,19 @@ class Authenticator {
     isPlanner(req: any, res: any, next: any) {
         if (req.isAuthenticated() && Utility.isPlanner(req.user)) return next()
         return res.status(401).json({ error: "User is not an urban planner", status: 401 })
+    }
+
+    /**
+     * Middleware function to check if the user is an urban developer.
+     * 
+     * @param req - The request object.
+     * @param res - The response object.
+     * @param next - The next middleware function.
+     * If the user is authenticated and is an urban developer, it calls the next middleware function. Otherwise, it returns a 401 error response.
+     */
+    isDeveloper(req: any, res: any, next: any) {
+        if (req.isAuthenticated() && Utility.isDeveloper(req.user)) return next()
+        return res.status(401).json({ error: "User is not an urban developer", status: 401 })
     }
 
 }
