@@ -1,8 +1,11 @@
 import express from "express"
 import ErrorHandler from "./helper"
+import { AuthRoutes } from "./routers/AuthRoutes"
+import Authenticator from "./routers/auth"
+
 
 const morgan = require("morgan")
-const prefix = "" //TODO: ADD
+const prefix = "/kiruna"
 
 /**
  * Initializes the routes for the application.
@@ -24,7 +27,11 @@ function initRoutes(app: express.Application) {
      * It is also used to protect routes by requiring users to have the correct role.
      * All routes must have the authenticator object in order to work properly.
      */
+    const authenticator = new Authenticator(app)
+    const authRoutes = new AuthRoutes(authenticator)
 
+
+    app.use(`${prefix}/sessions`, authRoutes.getRouter())
 
 
     ErrorHandler.registerErrorHandler(app)
