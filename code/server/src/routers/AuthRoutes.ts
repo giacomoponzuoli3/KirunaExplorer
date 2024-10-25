@@ -1,7 +1,7 @@
 import express, { NextFunction, Router } from "express"
 import Authenticator from "./auth"
 import { body, param } from "express-validator"
-import {User } from "../components/user"
+import {User } from "../models/user"
 import UserController from "../controllers/userController"
 import ErrorHandler from "../helper"
 

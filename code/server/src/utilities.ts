@@ -1,4 +1,4 @@
-import { User, Role } from "./components/user"
+import { User, Role } from "./models/user"
 /**
  * Represents a utility class.
  */
@@ -18,6 +18,14 @@ class Utility {
      */
     static isResident(user: User): boolean {
         return user.role === Role.RESIDENT
+    }
+    /**
+     * Checks if a user is an urban developer.
+     * @param {User} user - The user to check.
+     * @returns True if the user is an urban developer, false otherwise.
+     */
+    static isDeveloper(user: User): boolean {
+        return user.role === Role.DEVELOPER
     }
 
 }
