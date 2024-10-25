@@ -1,8 +1,6 @@
 const cors = require('cors');
-// @ts-ignore
 import express from 'express';
 import initRoutes from "./src/routes"
-// @ts-ignore
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -16,7 +14,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 initRoutes(app)
-if (require.main === module) {
+if (!module.parent) {
     app.listen(port, () => {
         console.log(`Server listening at http://localhost:${port}`);
     });
