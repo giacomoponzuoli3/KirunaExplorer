@@ -61,7 +61,7 @@ function App() {
             <Outlet/>
           </>
         }>
-          
+          <Route index />
           <Route path="/login" element={<Login message={message} isLogged={isLogged} login={handleLogin} handleBack={handleBack}/>} />
           <Route path="*" element={<NotFoundLayout/>} />
           {/* Aggiungi altre route come la dashboard */}
