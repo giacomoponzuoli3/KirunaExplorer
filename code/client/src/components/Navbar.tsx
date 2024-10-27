@@ -17,7 +17,7 @@ export default function Navbar(props: any) {
               <img
                 alt="Kimura Company"
                 src={logo}
-                className="h-12 w-auto"
+                className="h-12 w-auto rounded-full"
               />
             </div>
           </div>
