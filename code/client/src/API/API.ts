@@ -71,8 +71,94 @@ async function register(username: string, name: string, surname: string, passwor
     }
 }
 
+/** ------------------- Document APIs ------------------------ */
+async function addDocument(title: string, stakeHolders: string, scale: string, issuanceDate: string, type: string, language: string, pages: string, description: string) {
+    let response = await fetch(baseURL + "doc", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title: title, stakeHolders: stakeHolders, scale: scale, issuanceDate: issuanceDate, type: type, language: language, pages: pages, description: description },)
+    })
+    if (response.ok) {
+        return
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+
+        throw new Error("Something went wrong")
+    }
+}
+
+async function getAllDocuments() {
+    const response = await fetch(baseURL + "doc", { credentials: "include" })
+    if (response.ok) {
+        const documents = await response.json()
+        return documents
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+
+async function getDocumentById(id: string) {
+    const response = await fetch(baseURL + "doc/" + id, { credentials: "include" })
+    if (response.ok) {
+        const document = await response.json()
+        return document
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+
+async function deleteDocument(id: string) {
+    const response = await fetch(baseURL + "doc/" + id, { method: 'DELETE', credentials: "include" })
+    if (response.ok) {
+        return
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+
+async function editDocument(id: string, title: string, stakeHolders: string, scale: string, issuanceDate: string, type: string, language: string, pages: string, description: string) {
+    let response = await fetch(baseURL + "doc/" + id, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title: title, stakeHolders: stakeHolders, scale: scale, issuanceDate: issuanceDate, type: type, language: language, pages: pages, description: description },)
+    })
+    if (response.ok) {
+        return
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Something went wrong")
+    }
+}
 
 const API = {
-    login, logOut, getUserInfo, register
+    login, logOut, getUserInfo, register,
+    addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument,
 }
 export default API
