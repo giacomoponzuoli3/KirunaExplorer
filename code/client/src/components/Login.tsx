@@ -20,16 +20,13 @@ function Login(props: any) {
   };
 
   return (
-    <div className="flex h-screen">
-      {/* Immagine di sfondo a sinistra */}
+    <div className="flex h-[calc(100vh-64px)]">
       <div className="hidden lg:block lg:w-3/5 h-full relative">
         <div 
-          className="absolute inset-0 bg-cover bg-center" 
+          className="absolute inset-0 bg-cover bg-center animate-slide" 
           style={{ backgroundImage: `url(${kirunaImage})` }}
         ></div>
       </div>
-
-      {/* Form di Login a destra */}
       <div className="w-full lg:w-2/5 flex justify-center items-center bg-gray-50 overflow-hidden">
         <div className="bg-white p-8 rounded-lg shadow-lg w-96 transition-transform transform hover:scale-105">
           <h2 className="text-3xl font-semibold mb-6 text-center text-gray-800">Login</h2>

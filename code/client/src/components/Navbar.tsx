@@ -10,16 +10,21 @@ export default function Navbar(props: any) {
   const location = useLocation();
 
   return (
-    <Disclosure as="nav" className="bg-gradient-to-r from-orange-400 to-yellow-500">
-      <div className="mx-auto px-2 sm:px-6 lg:px-8">
+    <Disclosure as="nav" className="bg-blue-950">
+      <div className="mx-auto px-3 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           <div className="flex flex-1 items-center justify-left sm:items-stretch sm:justify-start">
-            <div className="flex flex-shrink-0 items-center">
-              <img
-                alt="Kimura Company"
-                src={logo}
-                className="h-12 w-auto rounded-full"
-              />
+            <div className="flex items-center space-x-4">
+                <img
+                  alt="Kimura Company"
+                  src={logo}
+                  className="h-12 w-auto rounded-full"
+                />
+                <div className="text-gray-300 font-semibold text-lg sm:text-xl">
+                  Kiruna <span className="text-blue-300">eXplorer</span>
+                </div>
+
+
             </div>
           </div>
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
