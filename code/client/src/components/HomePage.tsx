@@ -83,7 +83,7 @@ return (
 <Modal size="lg" show={showDetails} onHide={handleCloseModal} aria-labelledby="example-modal-sizes-title-lg">
         <Modal.Header closeButton style={{backgroundColor: 'rgb(250, 250, 210, 0.8)'}}>
           <Modal.Title id="example-modal-sizes-title-lg">
-            {selectedDocument.title}
+            {`${selectedDocument.title} (${selectedDocument.id})`}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body style={{backgroundColor: 'rgb(250, 250, 210, 0.2)'}}>
@@ -104,6 +104,15 @@ return (
               <p>{selectedDocument.description ? selectedDocument.description : '-'}</p>
             </Col>
           </Row>
+          <Row>
+            <Col>
+              <Link to={`documents/${selectedDocument.id}/links`}
+                className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium no-underline"
+              >
+                View connections
+              </Link>
+            </Col>
+          </Row>
           </Container>
         </Modal.Body>
       </Modal>
@@ -115,4 +124,22 @@ return (
       
 }
 
-export { HomePage };
+function ButtonHomePage(){
+  const location = useLocation();
+  const isLoginPath = location.pathname === '/';
+  return (
+    <>
+      { !isLoginPath ? (
+        <Link 
+          to={`/`}
+          className="inline-flex mr-4 items-center gap-2 bg-gray-200 hover:bg-gray-300 text-black rounded-md px-4 py-2 text-sm font-medium no-underline"
+        >
+          <i className="bi bi-house-door-fill"></i> 
+          Back Home
+        </Link>
+      ) : null }
+    </>
+  );
+}
+
+export { HomePage, ButtonHomePage };
