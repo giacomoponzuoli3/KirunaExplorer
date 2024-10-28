@@ -130,7 +130,7 @@ function ButtonHomePage(){
           className="inline-flex mr-4 items-center gap-2 bg-gray-200 hover:bg-gray-300 text-black rounded-md px-4 py-2 text-sm font-medium no-underline"
         >
           <i className="bi bi-house-door-fill"></i> 
-          Back Home
+          <span className="hidden md:inline">Back Home</span>
         </Link>
       ) : null }
     </>
