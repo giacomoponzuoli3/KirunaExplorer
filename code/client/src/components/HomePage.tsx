@@ -7,7 +7,7 @@ import { Document } from "../models/document";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { User, Role } from "../models/user";
-import { AddDocumentModal, ShowDocumentInfoModal } from "./DocumentModals";
+import { AddDocumentModal, ShowDocumentInfoModal, EditDocumentModal } from "./DocumentModals";
 
 
 interface HomepageProps {
@@ -20,6 +20,11 @@ function HomePage({documents, user} : HomepageProps) {
 const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 const [showDetails, setShowDetails] = useState<boolean>(false);
 const [showAddDocumentModal, setShowAddDocumentModal] = useState<boolean>(false);
+const [showEditDocumentModal, setShowEditDocumentModal] = useState<boolean>(false);
+
+const handleEdit = () => {
+  setShowEditDocumentModal(true);
+};
 
 const handleCloseDetailsModal = () => {
     setShowDetails(false);
@@ -87,8 +92,14 @@ return (
 </div>
 
 {/* Modal to show the document info */}
-{selectedDocument && ( <ShowDocumentInfoModal selectedDocument={selectedDocument} show={showDetails} onHide={handleCloseDetailsModal} getDocumentIcon={getDocumentIcon}/>)}
-      {/* Add Document Button */}
+{selectedDocument && ( <ShowDocumentInfoModal 
+                          selectedDocument={selectedDocument} show={showDetails} 
+                          onHide={handleCloseDetailsModal} getDocumentIcon={getDocumentIcon} 
+                          user={user} handleEdit={handleEdit}
+                        />
+                      )}
+                      
+{/* Add Document Button */}
       {user.role==="Urban Planner" ?(<Button className="bg-gradient-to-r from-orange-400 to-yellow-500"
                 style={{
                     position: 'fixed',
@@ -112,6 +123,11 @@ return (
             ):null}
 
 <AddDocumentModal show={showAddDocumentModal} onHide={() => setShowAddDocumentModal(false)}/>
+{selectedDocument && (<EditDocumentModal 
+                         document={selectedDocument} show={showEditDocumentModal} 
+                         onHide={() => setShowEditDocumentModal(false)}
+                         />
+)}
 </>
   
 );
