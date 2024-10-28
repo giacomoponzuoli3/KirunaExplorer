@@ -1,4 +1,4 @@
-import {Container, Modal, Row, Col} from "react-bootstrap"
+import {Container, Modal, Row, Col, Button} from "react-bootstrap"
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import API from '../API/API'; // Make sure the path is correct
@@ -6,19 +6,24 @@ import { Link } from 'react-router-dom';
 import { Document } from "../models/document";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { User, Role } from "../models/user";
+import { AddDocumentModal, ShowDocumentInfoModal } from "./DocumentModals";
 
 
 interface HomepageProps {
     documents: Document[];
+    user: User;
 }
 
-function HomePage({documents} : HomepageProps) {
+function HomePage({documents, user} : HomepageProps) {
 
 const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 const [showDetails, setShowDetails] = useState<boolean>(false);
+const [showAddDocumentModal, setShowAddDocumentModal] = useState<boolean>(false);
 
-const handleCloseModal = () => {
+const handleCloseDetailsModal = () => {
     setShowDetails(false);
+    setSelectedDocument(null);
 };
 
 const handleDocumentClick = (doc: Document) => {
@@ -43,8 +48,10 @@ function getDocumentIcon(type: string) {
       }
 }
 
+
 return (
 <>
+ {/* div to show the documents (this will change once the map is implemented) */}
 <div style={{ 
       display: 'flex', 
       flexWrap: 'wrap', 
@@ -77,46 +84,34 @@ return (
     }}>{doc.title}</span>
   </div>
 ))}
-
 </div>
-{selectedDocument && (
-<Modal size="lg" show={showDetails} onHide={handleCloseModal} aria-labelledby="example-modal-sizes-title-lg">
-        <Modal.Header closeButton style={{backgroundColor: 'rgb(250, 250, 210, 0.8)'}}>
-          <Modal.Title id="example-modal-sizes-title-lg">
-            {`${selectedDocument.title} (${selectedDocument.id})`}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body style={{backgroundColor: 'rgb(250, 250, 210, 0.2)'}}>
-        <Container>
-          <Row>
-            <Col xs={3} md={2}>
-            {getDocumentIcon(selectedDocument.type)}
-            </Col>
-            <Col xs={9} md={5}>
-            <p>Stakeholders: {selectedDocument.stakeHolders}</p>
-            <p>Scale: {selectedDocument.scale}</p>
-            <p>Issuance Date: {selectedDocument.issuanceDate}</p>
-            <p>Type: {selectedDocument.type}</p>
-            <p>Language: {selectedDocument.language ? selectedDocument.language : '-'}</p>
-            <p>Pages: {selectedDocument.pages ? selectedDocument.pages : '-'}</p>
-            </Col>
-            <Col xs={12} md={5}>
-              <p>{selectedDocument.description ? selectedDocument.description : '-'}</p>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <Link to={`documents/${selectedDocument.id}/links`}
-                className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium no-underline"
-              >
-                View connections
-              </Link>
-            </Col>
-          </Row>
-          </Container>
-        </Modal.Body>
-      </Modal>
-      )}
+
+{/* Modal to show the document info */}
+{selectedDocument && ( <ShowDocumentInfoModal selectedDocument={selectedDocument} show={showDetails} onHide={handleCloseDetailsModal} getDocumentIcon={getDocumentIcon}/>)}
+      {/* Add Document Button */}
+      {user.role==="Urban Planner" ?(<Button className="bg-gradient-to-r from-orange-400 to-yellow-500"
+                style={{
+                    position: 'fixed',
+                    bottom: '24px',
+                    right: '24px',
+                    borderRadius: '50%',
+                    width: '60px',
+                    height: '60px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '24px',
+                    fontWeight: 'bold',
+                    color: 'white',
+                    borderColor: 'white'
+                }}
+                onClick={() => setShowAddDocumentModal(true)}
+            >
+                +
+            </Button>
+            ):null}
+
+<AddDocumentModal show={showAddDocumentModal} onHide={() => setShowAddDocumentModal(false)}/>
 </>
   
 );

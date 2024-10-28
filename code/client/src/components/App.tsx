@@ -120,7 +120,7 @@ function App() {
             <Outlet/>
           </>
         }>
-          <Route index element={<HomePage documents={documents}/>}/>
+          <Route index element={<HomePage documents={documents} user={user}/>}/>
           <Route path="/login" element={<Login message={message} isLogged={isLogged} login={handleLogin} handleBack={handleBack}/>} />
           <Route path="*" element={<NotFoundLayout/>} />
           {/* Aggiungi altre route come la dashboard */}
