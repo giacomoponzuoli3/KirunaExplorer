@@ -109,6 +109,7 @@ function App() {
     setIsLogged(false);
     // clean up everything
     setMessage('');
+    setUser('')
   };
 
   return (
