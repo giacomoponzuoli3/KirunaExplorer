@@ -2,6 +2,7 @@
  * Represents a document.
  */
 class Document {
+    id: number
     title: string
     stakeHolders: string
     scale: string
@@ -13,6 +14,7 @@ class Document {
 
     /**
      * Creates a new instance of the Document class.
+     * @param id - The id of the document.
      * @param title - The title of the document.
      * @param stakeHolders - The stakeholders of the document.
      * @param scale - The scale of the document.
@@ -23,6 +25,7 @@ class Document {
      * @param description - The description of the document.
      */
     constructor(
+        id: number,
         title: string,
         stakeHolders: string,
         scale: string,
@@ -32,6 +35,7 @@ class Document {
         pages: string | null = null,
         description: string | null = null
     ) {
+        this.id = id
         this.title = title
         this.stakeHolders = stakeHolders
         this.scale = scale
