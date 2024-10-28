@@ -2,6 +2,7 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Link, useLocation } from 'react-router-dom'
 import { LogoutButton, LoginButton } from './Login';
+import { ButtonHomePage } from './HomePage';
 import logo from '../img/logoKiruna.png'; // Importa l'immagine
 
 
@@ -23,7 +24,7 @@ export default function Navbar(props: any) {
           </div>
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                      
-            {!props.isLogged ? <LoginButton/> : <LogoutButton logout={props.logout}/>}
+            {!props.isLogged ? <><ButtonHomePage/> <LoginButton/></> : <><ButtonHomePage/><LogoutButton className="ml-4" logout={props.logout}/></>}
           </div>
         </div>
       </div>    
