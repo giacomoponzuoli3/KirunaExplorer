@@ -29,15 +29,15 @@ const handleDocumentClick = (doc: Document) => {
 function getDocumentIcon(type: string) {
     switch (type) {
         case 'Informative document':
-          return <img src="/kiruna/list.png" alt="Informative Document" />;
+          return <img src="kiruna/img/list.png" alt="Informative Document" />;
         case 'Prescriptive document':
-          return <img src="/kiruna/sending.png" alt="Prescriptive Document" />;
+          return <img src="/kiruna/img/sending.png" alt="Prescriptive Document" />;
         case 'Material effect':
-          return <img src="/kiruna/work-in-progress.png" alt="Material Effect" />;
+          return <img src="/kiruna/img/work-in-progress.png" alt="Material Effect" />;
         case 'Design document':
-          return <img src="/kiruna/blueprint.png" alt="Design Document" />;
+          return <img src="/kiruna/img/blueprint.png" alt="Design Document" />;
         case 'Technical document':
-          return <img src="/kiruna/tecnical-service.png" alt="Technical Document" />;
+          return <img src="/kiruna/img/tecnical-service.png" alt="Technical Document" />;
         default:
           return <span>Icon Not Found</span>; // Return null if no matching type
       }

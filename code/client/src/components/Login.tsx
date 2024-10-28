@@ -77,7 +77,7 @@ function LogoutButton(props: any) {
   return (
     <>
       { !isLoginPath ? (
-        <Link className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium" to="/" onClick={props.logout}>
+        <Link className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium no-underline" to="/" onClick={props.logout}>
           Logout
         </Link>
       ) : null }
@@ -92,7 +92,7 @@ function LoginButton(props: any) {
     <>
       { !isLoginPath ? (
         <Link to={'/login'}
-        className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium"
+        className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium no-underline"
         >
           Login
         </Link>
