@@ -3,7 +3,7 @@ import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Link, useLocation } from 'react-router-dom'
 import { LogoutButton, LoginButton } from './Login';
 import { ButtonHomePage } from './HomePage';
-import logo from '../img/2.png'; // Importa l'immagine
+import logo from '../img/logoKiruna.png'; // Importa l'immagine
 
 
 export default function Navbar(props: any) {
