@@ -181,6 +181,52 @@ class DocumentDAO {
             }
         });
     }
+
+    getDocumentLinksById(id: number): Promise<Document[]> {
+        return new Promise<Document[]>((resolve, reject) => {
+            try{
+                const sql = "SELECT * FROM documents_links WHERE id_document1 = ?";
+                db.all(sql, [id, id], (err: Error | null, rows: any[]) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    if (!rows || rows.length === 0) {
+                        reject(new Error("No documents found."));
+                        return;
+                    }
+
+                    const documentsRelatedIds: number[] = rows.map((row: any) => row.id_document2);
+
+                    const sql2 = "SELECT * FROM documents WHERE id IN (?)";
+                    db.all(sql2, [documentsRelatedIds], (err: Error | null, rows: any[]) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+                        if (!rows || rows.length === 0) {
+                            reject(new Error("No documents found."));
+                            return;
+                        }
+                        const documents: Document[] = rows.map((row: any) => new Document(
+                            row.id,
+                            row.title,
+                            row.stakeholders,
+                            row.scale,
+                            row.issuance_date,
+                            row.type,
+                            row.language,
+                            row.pages,
+                            row.description
+                        ));
+                        resolve(documents);
+                    });
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
 }
 
 export {DocumentDAO}

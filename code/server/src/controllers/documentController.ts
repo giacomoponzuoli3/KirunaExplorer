@@ -67,6 +67,15 @@ class DocumentController {
     editDocument(id: number, title: string, stakeHolders: string, scale: string, issuanceDate: string, type: string, language: string, pages: string, description: string): Promise<void> {
         return this.dao.editDocument(id, title, stakeHolders, scale, issuanceDate, type, language, pages, description);
     }
+
+    /**
+     * Retrieves documents linked to a specified document by its id.
+     * @param id The id of the document whose linked documents are to be retrieved.
+     * @returns A Promise that resolves to an array of Document objects linked to the specified document.
+     */
+    getDocumentLinksById(id: number): Promise<Document[]> {
+        return this.dao.getDocumentLinksById(id);
+    }
 }
 
 export default DocumentController

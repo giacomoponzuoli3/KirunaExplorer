@@ -157,8 +157,98 @@ async function editDocument(id: number, title: string, stakeHolders: string, sca
     }
 }
 
+async function getDocumentLinksById(id: number) {
+    const response = await fetch(baseURL + "doc/" + id + "/links", { credentials: "include" })
+    if (response.ok) {
+        const documents = await response.json()
+        return documents
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+
+/** ------------------- Link APIs ------------------------ */
+
+async function addLink(idDoc1: number, idDoc2: number, name: string) {
+    const response = await fetch(baseURL + "link", { method: 'POST', credentials: "include", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idDoc1: idDoc1, idDoc2: idDoc2, name: name },) })
+    if (response.ok) {
+        return
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Something went wrong")
+    }
+}
+
+async function deleteLink(id: number) {
+    const response = await fetch(baseURL + "link/" + id, { method: 'DELETE', credentials: "include" })
+    if (response.ok) {
+        return
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+
+async function editLink(id: number, name: string) {
+    const response = await fetch(baseURL + "link/" + id, { method: 'PATCH', credentials: "include", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: name },) })
+    if (response.ok) {
+        return
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Something went wrong")
+    }
+}
+
+async function getLinkById(id: number) {
+    const response = await fetch(baseURL + "link/" + id, { credentials: "include" })
+    if (response.ok) {
+        const link = await response.json()
+        return link
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+
+async function getAllLinks() {
+    const response = await fetch(baseURL + "link", { credentials: "include" })
+    if (response.ok) {
+        const links = await response.json()
+        return links
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+
 const API = {
     login, logOut, getUserInfo, register,
-    addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument,
+    addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById,
+    addLink, deleteLink, editLink, getLinkById, getAllLinks
 }
 export default API

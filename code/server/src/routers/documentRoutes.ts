@@ -105,6 +105,20 @@ class DocumentRoutes {
                 }
             }
         );
+
+        this.router.get(
+            "/:id/links",
+            param("id").isNumeric(),
+            this.errorHandler.validateRequest,
+            async (req: any, res: any, next: any) => {
+                try {
+                    const links = await this.controller.getDocumentLinksById(req.params["id"]);
+                    res.status(200).json(links);
+                } catch (err) {
+                    next(err);
+                }
+            }
+        );
     }
 }
 
