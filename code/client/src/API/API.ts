@@ -72,7 +72,7 @@ async function register(username: string, name: string, surname: string, passwor
 }
 
 /** ------------------- Document APIs ------------------------ */
-async function addDocument(title: string, stakeHolders: string, scale: string, issuanceDate: string, type: string, language: string, pages: string, description: string) {
+async function addDocument(title: string, stakeHolders: string, scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string|null) {
     let response = await fetch(baseURL + "doc", {
         method: 'POST',
         headers: {
@@ -108,7 +108,7 @@ async function getAllDocuments() {
     }
 }
 
-async function getDocumentById(id: string) {
+async function getDocumentById(id: number) {
     const response = await fetch(baseURL + "doc/" + id, { credentials: "include" })
     if (response.ok) {
         const document = await response.json()
@@ -123,7 +123,7 @@ async function getDocumentById(id: string) {
     }
 }
 
-async function deleteDocument(id: string) {
+async function deleteDocument(id: number) {
     const response = await fetch(baseURL + "doc/" + id, { method: 'DELETE', credentials: "include" })
     if (response.ok) {
         return
@@ -137,7 +137,7 @@ async function deleteDocument(id: string) {
     }
 }
 
-async function editDocument(id: string, title: string, stakeHolders: string, scale: string, issuanceDate: string, type: string, language: string, pages: string, description: string) {
+async function editDocument(id: number, title: string, stakeHolders: string, scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string|null) {
     let response = await fetch(baseURL + "doc/" + id, {
         method: 'PATCH',
         headers: {

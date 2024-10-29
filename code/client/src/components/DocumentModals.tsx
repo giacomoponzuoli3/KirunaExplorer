@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Document } from '../models/document';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { User } from '../models/user';
+import API from '../API/API';
 
 interface RequiredLabelProps {
     text: string; // Explicitly define the type of 'text' as string
@@ -18,9 +19,10 @@ const RequiredLabel: React.FC<RequiredLabelProps> = ({ text }) => (
 interface AddDocumentModalProps {
     show: boolean;
     onHide: () => void;
+    refreshDocuments: () => void;
 }
 
-function AddDocumentModal({ show, onHide}: AddDocumentModalProps) {
+function AddDocumentModal({ show, onHide, refreshDocuments}: AddDocumentModalProps) {
     const [title, setTitle] = useState('');
     const [stakeHolders, setStakeHolders] = useState('');
     const [scale, setScale] = useState('');
@@ -53,11 +55,13 @@ function AddDocumentModal({ show, onHide}: AddDocumentModalProps) {
         console.log("Scale: "+ scale + " Type: " + type + " Language: " + language + " Pages: " + pages)
         console.log("Description: " + description)
         // Validation check
-        if (!title || !stakeHolders || !scale || !issuanceDate || !type || !language || !pages) {
+        if (!title || !stakeHolders || !scale || !issuanceDate || !type) {
             setError('Please fill in the mandatory fields marked with the red star (*).'); // Set error message
             return; // Exit the function early
         }
         //API call to add a document
+        API.addDocument(title, stakeHolders, scale, issuanceDate, type, language, pages, description);
+        refreshDocuments();
         handleClose();
     };
 
@@ -182,9 +186,10 @@ interface EditDocumentModalProps {
     document: Document;
     show: boolean;
     onHide: () => void;
+    refreshSelectedDocument: (doc: Document) => void;
 }
 
-function EditDocumentModal({ document, show, onHide}: EditDocumentModalProps) {
+function EditDocumentModal({ document, show, onHide, refreshSelectedDocument }: EditDocumentModalProps) {
     const [title, setTitle] = useState(document.title);
     const [stakeHolders, setStakeHolders] = useState(document.stakeHolders);
     const [scale, setScale] = useState(document.scale);
@@ -200,11 +205,13 @@ function EditDocumentModal({ document, show, onHide}: EditDocumentModalProps) {
         console.log("Scale: "+ scale + " Type: " + type + " Language: " + language + " Pages: " + pages)
         console.log("Description: " + description)
         // Validation check
-        if (!title || !stakeHolders || !scale || !issuanceDate || !type || !language || !pages) {
+        if (!title || !stakeHolders || !scale || !issuanceDate || !type) {
             setError('Please fill in the mandatory fields marked with the red star (*).'); // Set error message
             return;
         }
         //API call to edit a document
+        API.editDocument(document.id, title, stakeHolders, scale, issuanceDate, type, language, pages, description);
+        refreshSelectedDocument(new Document(document.id, title, stakeHolders, scale, issuanceDate, type, language, pages, description));
         onHide();
     };
 
@@ -332,13 +339,22 @@ interface ShowDocumentInfoModalProps {
     getDocumentIcon: (type: string) => JSX.Element;
     user: User;
     handleEdit: () => void;
+    refreshDocuments: () => void;
 }
 
-function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, user, handleEdit}: ShowDocumentInfoModalProps) {
+function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, user, handleEdit, refreshDocuments}: ShowDocumentInfoModalProps) {
     const handleEditClick = () => {
         handleEdit();
         //onHide()
     };
+
+    const handleDeleteClick = () => {
+        API.deleteDocument(selectedDocument.id);
+        refreshDocuments();
+        onHide()
+        refreshDocuments();
+    };
+
     return (
         <>
         <Modal size="lg" show={show} onHide={onHide} aria-labelledby="example-modal-sizes-title-lg">
@@ -353,10 +369,14 @@ function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, 
             <Col xs={3} md={2}>
             {getDocumentIcon(selectedDocument.type)}
             {user.role==="Urban Planner" ?(
-                <Button className="bg-gradient-to-r from-orange-400 to-yellow-500 mt-4" onClick={handleEditClick} style={{borderColor: 'white'}}>
-                    Edit
-                </Button>
-
+                <>
+                    <Button className="bg-gradient-to-r from-orange-400 to-yellow-500 mt-4" onClick={handleEditClick} style={{borderColor: 'white'}}>
+                        Edit
+                    </Button>
+                    <Button className="bg-gradient-to-r from-red-600 to-red-400 mt-4" onClick={handleDeleteClick} style={{borderColor: 'white'}}>
+                        Delete
+                    </Button>
+                </>
             ): null}
             </Col>
             <Col xs={9} md={5}>
