@@ -13,9 +13,10 @@ import { AddDocumentModal, ShowDocumentInfoModal, EditDocumentModal } from "./Do
 interface HomepageProps {
     documents: Document[];
     user: User;
+    refreshDocuments: () => void;
 }
 
-function HomePage({documents, user} : HomepageProps) {
+function HomePage({documents, user, refreshDocuments} : HomepageProps) {
 
 const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 const [showDetails, setShowDetails] = useState<boolean>(false);
@@ -31,11 +32,17 @@ const handleCloseDetailsModal = () => {
     setSelectedDocument(null);
 };
 
-const handleDocumentClick = (doc: Document) => {
-    setSelectedDocument(doc);
+const handleDocumentClick = async (doc: Document) => {
+    const document = await API.getDocumentById(doc.id)
+    setSelectedDocument(document);
     setShowDetails(true);
 
 }
+
+function refreshSelectedDocument(doc: Document) {
+  setSelectedDocument(doc)
+}
+
 function getDocumentIcon(type: string) {
     switch (type) {
         case 'Informative document':
@@ -95,7 +102,7 @@ return (
 {selectedDocument && ( <ShowDocumentInfoModal 
                           selectedDocument={selectedDocument} show={showDetails} 
                           onHide={handleCloseDetailsModal} getDocumentIcon={getDocumentIcon} 
-                          user={user} handleEdit={handleEdit}
+                          user={user} handleEdit={handleEdit} refreshDocuments={refreshDocuments}
                         />
                       )}
                       
@@ -122,10 +129,10 @@ return (
             </Button>
             ):null}
 
-<AddDocumentModal show={showAddDocumentModal} onHide={() => setShowAddDocumentModal(false)}/>
+<AddDocumentModal show={showAddDocumentModal} onHide={() => setShowAddDocumentModal(false)} refreshDocuments={refreshDocuments} />
 {selectedDocument && (<EditDocumentModal 
                          document={selectedDocument} show={showEditDocumentModal} 
-                         onHide={() => setShowEditDocumentModal(false)}
+                         onHide={() => setShowEditDocumentModal(false)} refreshSelectedDocument={refreshSelectedDocument}
                          />
 )}
 </>

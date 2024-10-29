@@ -29,9 +29,9 @@ class DocumentRoutes {
             body("scale").isString(),
             body("issuanceDate").isString(),
             body("type").isString(),
-            body("language").isString(),
-            body("pages").isString(),
-            body("description").isString(),
+            body("language").optional({ nullable: true }).isString(),
+            body("pages").optional({ nullable: true }).isString(),
+            body("description").optional({ nullable: true }).isString(),
             this.errorHandler.validateRequest,
                 async (req: any, res: any, next: any) => {
                 try {
@@ -58,7 +58,7 @@ class DocumentRoutes {
 
         this.router.get(
             "/:id",
-            param("id").isString(),
+            param("id").isNumeric(),
             this.errorHandler.validateRequest,
             async (req: any, res: any, next: any) => {
                 try {
@@ -72,7 +72,7 @@ class DocumentRoutes {
 
         this.router.delete(
             "/:id",
-            param("id").isString(),
+            param("id").isNumeric(),
             this.errorHandler.validateRequest,
             async (req: any, res: any, next: any) => {
                 try {
@@ -86,15 +86,15 @@ class DocumentRoutes {
 
         this.router.patch(
             "/:id",
-            param("id").isString(),
+            param("id").isNumeric(),
             body("title").isString(),
             body("stakeHolders").isString(),
             body("scale").isString(),
             body("issuanceDate").isString(),
             body("type").isString(),
-            body("language").isString(),
-            body("pages").isString(),
-            body("description").isString(),
+            body("language").optional({ nullable: true }).isString(),
+            body("pages").optional({ nullable: true }).isString(),
+            body("description").optional({ nullable: true }).isString(),
             this.errorHandler.validateRequest,
             async (req: any, res: any, next: any) => {
                 try {
