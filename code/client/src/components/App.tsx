@@ -82,7 +82,7 @@ function App() {
           <Route path="/login" element={<Login message={message} isLogged={isLogged} login={handleLogin} handleBack={handleBack}/>} />
           <Route path="*" element={<NotFoundLayout/>} />
           {/* Aggiungi altre route come la dashboard */}
-          <Route path="documents/:idDocument/links" element={<LinksDocument />} />
+          <Route path="documents/:idDocument/links" element={<LinksDocument isLogged={isLogged} />} />
         </Route>
       </Routes>
     </>
