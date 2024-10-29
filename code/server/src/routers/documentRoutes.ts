@@ -3,6 +3,7 @@ import express, {Router} from "express"
 import {body, oneOf, param, query} from "express-validator"
 import ErrorHandler from "../helper"
 import {Document} from "../models/document"
+import { link } from "fs"
 
 class DocumentRoutes {
     private controller: DocumentController
@@ -65,6 +66,7 @@ class DocumentRoutes {
                     const document = await this.controller.getDocumentById(req.params["id"]);
                     res.status(200).json(document);
                 } catch (err) {
+                    
                     next(err);
                 }
             }
@@ -115,6 +117,7 @@ class DocumentRoutes {
                     const links = await this.controller.getDocumentLinksById(req.params["id"]);
                     res.status(200).json(links);
                 } catch (err) {
+                    console.log("entrato");
                     next(err);
                 }
             }
