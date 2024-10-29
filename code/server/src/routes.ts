@@ -3,6 +3,7 @@ import ErrorHandler from "./helper"
 import { AuthRoutes } from "./routers/AuthRoutes"
 import Authenticator from "./routers/auth"
 import { DocumentRoutes } from "./routers/documentRoutes"
+import LinkRoutes from "./routers/linkRoutes"
 
 
 const morgan = require("morgan")
@@ -31,10 +32,11 @@ function initRoutes(app: express.Application) {
     const authenticator = new Authenticator(app)
     const authRoutes = new AuthRoutes(authenticator)
     const docRoutes = new DocumentRoutes();
-
+    const linkRoutes = new LinkRoutes();
 
     app.use(`${prefix}/sessions`, authRoutes.getRouter())
     app.use(`${prefix}/doc`, docRoutes.getRouter())
+    app.use(`${prefix}/link`, linkRoutes.getRouter())
 
     ErrorHandler.registerErrorHandler(app)
 }
