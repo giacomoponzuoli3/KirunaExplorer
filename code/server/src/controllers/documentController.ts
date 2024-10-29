@@ -30,7 +30,7 @@ class DocumentController {
      * @param id The id of the document to retrieve.
      * @returns A Promise that resolves to the document with the specified id.
      */
-    getDocumentById(id: string): Promise<Document> {
+    getDocumentById(id: number): Promise<Document> {
         return this.dao.getDocumentById(id);
     }
 
@@ -47,7 +47,7 @@ class DocumentController {
      * @param id The id of the document to delete.
      * @returns A Promise that resolves when the document has been deleted.
      */
-    deleteDocument(id: string): Promise<void> {
+    deleteDocument(id: number): Promise<void> {
         return this.dao.deleteDocument(id);
     }
 
@@ -64,8 +64,17 @@ class DocumentController {
      * @param description The updated description of the document.
      * @returns A Promise that resolves when the document has been updated.
      */
-    editDocument(id: string, title: string, stakeHolders: string, scale: string, issuanceDate: string, type: string, language: string, pages: string, description: string): Promise<void> {
+    editDocument(id: number, title: string, stakeHolders: string, scale: string, issuanceDate: string, type: string, language: string, pages: string, description: string): Promise<void> {
         return this.dao.editDocument(id, title, stakeHolders, scale, issuanceDate, type, language, pages, description);
+    }
+
+    /**
+     * Retrieves documents linked to a specified document by its id.
+     * @param id The id of the document whose linked documents are to be retrieved.
+     * @returns A Promise that resolves to an array of Document objects linked to the specified document.
+     */
+    getDocumentLinksById(id: number): Promise<Document[]> {
+        return this.dao.getDocumentLinksById(id);
     }
 }
 
