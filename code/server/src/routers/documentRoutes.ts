@@ -119,6 +119,61 @@ class DocumentRoutes {
                 }
             }
         );
+
+        this.router.get(
+            "/:id/title",
+            param("id").isNumeric(),
+            this.errorHandler.validateRequest,
+            async (req: any, res: any, next: any) => {
+                try {
+                    const document = await this.controller.getDocumentTitleById(req.params["id"]);
+                    res.status(200).json(document);
+                } catch (err) {
+                    next(err);
+                }
+            }
+        );
+
+        this.router.get(
+            "/:id/description",
+            param("id").isNumeric(),
+            this.errorHandler.validateRequest,
+            async (req: any, res: any, next: any) => {
+                try {
+                    const document = await this.controller.getDocumentDescriptionById(req.params["id"]);
+                    res.status(200).json(document);
+                } catch (err) {
+                    next(err);
+                }
+            }
+        );
+
+        this.router.get(
+            "/:id/issuanceDate",
+            param("id").isNumeric(),
+            this.errorHandler.validateRequest,
+            async (req: any, res: any, next: any) => {
+                try {
+                    const document = await this.controller.getDocumentIssuanceDateById(req.params["id"]);
+                    res.status(200).json(document);
+                } catch (err) {
+                    next(err);
+                }
+            }
+        );
+
+        this.router.get(
+            "/:type",
+            param("type").isString().notEmpty(),
+            async (req: any, res: any, next: any) => {
+                try {
+                    const documents = await this.controller.getAllDocumentsOfSameType(req.params["type"]);
+                    res.status(200).json(documents);
+                } catch (err) {
+                    next(err);
+                }
+            }
+        );
     }
 }
 

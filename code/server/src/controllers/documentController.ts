@@ -76,6 +76,49 @@ class DocumentController {
     getDocumentLinksById(id: number): Promise<Document[]> {
         return this.dao.getDocumentLinksById(id);
     }
+
+    
+    /**
+     * Retrieves the title of a document by its id from the database.
+     * @param id The id of the document to retrieve.
+     * @returns A Promise that resolves to the title of document with the specified id.
+     */
+    getDocumentTitleById(id: number): Promise<string> {
+        return this.dao.getDocumentTitleById(id);
+    }
+
+     /**
+     * Retrieves the description of a document by its id from the database.
+     * @param id The id of the document to retrieve.
+     * @returns A Promise that resolves to the the description of document with the specified id.
+     */
+
+    getDocumentDescriptionById(id: number): Promise<string> {
+        return this.dao.getDocumentDescriptionById(id).then((description: string | null) => {
+            //if the document does not have a description it returns a message to notify it
+            return description ?? "No description available";
+        });
+    }
+
+    /**
+     * Retrieves the issuanceDate of a document by its id from the database.
+     * @param id The id of the document to retrieve.
+     * @returns A Promise that resolves to the the issuanceDate of document with the specified id.
+     */
+
+    getDocumentIssuanceDateById(id: number): Promise<string> {
+        return this.dao.getDocumentIssuanceDateById(id);
+    }
+
+    /**
+     * Retrieves all documents of the same type from the database.
+     * @param type The type of the document to retrieve.
+     * @returns A Promise that resolves to an array of Document objects.
+     */
+
+    getAllDocumentsOfSameType(type: string): Promise<Document[]> {
+        return this.dao.getAllDocumentsOfSameType(type);
+    }
 }
 
 export default DocumentController

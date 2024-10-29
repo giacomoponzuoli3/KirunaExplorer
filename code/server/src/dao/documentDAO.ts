@@ -227,6 +227,129 @@ class DocumentDAO {
             }
         });
     }
+
+    /**
+     * Retrieves the title of a document by its id from the database.
+     * @param id The id of the document to retrieve.
+     * @returns A Promise that resolves to the title of document with the specified id.
+     */
+
+    getDocumentTitleById(id: number): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            try {
+                const sql = "SELECT title FROM documents WHERE id = ?";
+                db.get(sql, [id], (err: Error | null, row: any) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    if (!row) {
+                        reject(new Error("Document not found."));
+                        return;
+                    }
+                    resolve(row.title);
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+     /**
+     * Retrieves the description of a document by its id from the database.
+     * @param id The id of the document to retrieve.
+     * @returns A Promise that resolves to the the description of document with the specified id.
+     */
+
+    getDocumentDescriptionById(id: number): Promise<string | null> {
+        return new Promise<string | null>((resolve, reject) => {
+            try {
+                const sql = "SELECT description FROM documents WHERE id = ?";
+                db.get(sql, [id], (err: Error | null, row: any) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    if (!row) {
+                        reject(new Error("Document not found."));
+                        return;
+                    }
+                    resolve(row.description ?? null);
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    /**
+     * Retrieves the issuanceDate of a document by its id from the database.
+     * @param id The id of the document to retrieve.
+     * @returns A Promise that resolves to the the issuanceDate of document with the specified id.
+     */
+
+    getDocumentIssuanceDateById(id: number): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            try {
+                const sql = "SELECT issuanceDate FROM documents WHERE id = ?";
+                db.get(sql, [id], (err: Error | null, row: any) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    if (!row) {
+                        reject(new Error("Document not found."));
+                        return;
+                    }
+                    resolve(row.issuanceDate);
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    
+    /**
+     * Retrieves all documents of the same type from the database.
+     * @param type The type of the document to retrieve.
+     * @returns A Promise that resolves to an array of Document objects.
+     */
+
+    getAllDocumentsOfSameType(type: string): Promise<Document[]> {
+        return new Promise<Document[]>((resolve, reject) => {
+            try {
+                const sql = "SELECT * FROM documents WHERE type = ?";
+                db.all(sql, [type], (err: Error | null, rows: any[]) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    if (!rows || rows.length === 0) {
+                        reject(new Error("No documents found."));
+                        return;
+                    }
+                    const documents: Document[] = rows.map((row: any) => new Document(
+                        row.id,
+                        row.title,
+                        row.stakeholders,
+                        row.scale,
+                        row.issuance_date,
+                        row.type,
+                        row.language,
+                        row.pages,
+                        row.description
+                    ));
+                    resolve(documents);
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
 }
+
+
 
 export {DocumentDAO}

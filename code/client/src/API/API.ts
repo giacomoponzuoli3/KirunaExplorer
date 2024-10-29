@@ -172,6 +172,67 @@ async function getDocumentLinksById(id: number) {
     }
 }
 
+async function getDocumentDescriptionById(id: number) {
+    const response = await fetch(baseURL + "doc/" + id + "/description", { credentials: "include" })
+    if (response.ok) {
+        const document = await response.json()
+        return document
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+
+async function getDocumentTitleById(id: number) {
+    const response = await fetch(baseURL + "doc/" + id + "/title", { credentials: "include" })
+    if (response.ok) {
+        const document = await response.json()
+        return document
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+
+async function getDocumentIssuanceDateById(id: number) {
+    const response = await fetch(baseURL + "doc/" + id + "/issuanceDate", { credentials: "include" })
+    if (response.ok) {
+        const document = await response.json()
+        return document
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+
+async function getAllDocumentsOfSameType(type: string) {
+    const response = await fetch(baseURL + "doc/" + type, { credentials: "include" })
+    if (response.ok) {
+        const documents = await response.json()
+        return documents
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+
+
 /** ------------------- Link APIs ------------------------ */
 
 async function addLink(idDoc1: number, idDoc2: number, name: string) {
@@ -248,7 +309,7 @@ async function getAllLinks() {
 
 const API = {
     login, logOut, getUserInfo, register,
-    addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById,
+    addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType,
     addLink, deleteLink, editLink, getLinkById, getAllLinks
 }
 export default API
