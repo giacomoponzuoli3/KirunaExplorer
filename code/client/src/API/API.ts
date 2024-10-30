@@ -13,7 +13,6 @@ async function login(username: string, password: string) {
         },
         body: JSON.stringify({ username: username, password: password },)
     })
-    console.log(response);
     if (response.ok) {
         const user = await response.json()
         return user
