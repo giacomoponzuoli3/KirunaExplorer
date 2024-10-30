@@ -109,7 +109,7 @@ function LinksDocument(props: any) {
                             <tr key={index} className="border-b hover:bg-gray-50 transition duration-200 ease-in-out">
                                 <td className="p-4">{getDocumentIcon(doc.type)}</td>
                                 <td className="p-4">{doc.title}</td>
-                                <td className="p-4">{doc.stakeHolders}</td>
+                                <td className="p-4">{doc.stakeHolders.map(sh => sh.name).join(' / ')}</td>
                                 <td className="p-4">Type of link</td>
                                 {props.isLogged && props.user.role == "Urban Planner" && 
                                     <td className="p-4 flex justify-center space-x-4">

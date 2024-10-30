@@ -90,7 +90,7 @@ class DocumentRoutes {
             "/:id",
             param("id").isNumeric(),
             body("title").isString(),
-            body("stakeHolders").isString(),
+            body("stakeHolders").isArray(),
             body("scale").isString(),
             body("issuanceDate").isString(),
             body("type").isString(),
