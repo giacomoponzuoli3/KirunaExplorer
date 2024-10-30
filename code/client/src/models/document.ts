@@ -1,10 +1,12 @@
+import { Stakeholder } from "./stakeholder"
+
 /**
  * Represents a document.
  */
 class Document {
     id: number
     title: string
-    stakeHolders: string
+    stakeHolders: Stakeholder[]
     scale: string
     issuanceDate: string
     type: string
@@ -27,7 +29,7 @@ class Document {
     constructor(
         id: number,
         title: string,
-        stakeHolders: string,
+        stakeHolders: Stakeholder[],
         scale: string,
         issuanceDate: string,
         type: string,
