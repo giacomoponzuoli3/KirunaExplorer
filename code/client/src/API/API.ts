@@ -13,7 +13,6 @@ async function login(username: string, password: string) {
         },
         body: JSON.stringify({ username: username, password: password },)
     })
-    console.log(response);
     if (response.ok) {
         const user = await response.json()
         return user
@@ -159,11 +158,8 @@ async function editDocument(id: number, title: string, stakeHolders: string, sca
 
 async function getDocumentLinksById(id: number) {
     const response = await fetch(baseURL + "doc/" + id + "/links", { credentials: "include" })
-    console.log("pippo")
-    console.log(response);
     if (response.ok) {
         const documents = await response.json()
-        console.log(documents);
         return documents
     } else {
         const errDetail = await response.json();
@@ -226,7 +222,6 @@ async function getLinkById(id: number) {
         return link
     } else {
         const errDetail = await response.json();
-        console.log(errDetail);
         if (errDetail.error)
             throw errDetail.error
         if (errDetail.message)
