@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { Container, Modal, Row, Col, Form, Button, Dropdown, Alert } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Document } from '../models/document';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { User } from '../models/user';
 import API from '../API/API';
+import { Stakeholder } from '../models/stakeholder';
 
 interface RequiredLabelProps {
     text: string; // Explicitly define the type of 'text' as string
@@ -20,11 +21,12 @@ interface AddDocumentModalProps {
     show: boolean;
     onHide: () => void;
     refreshDocuments: () => void;
+    stakeholders: Stakeholder[];
 }
 
-function AddDocumentModal({ show, onHide, refreshDocuments}: AddDocumentModalProps) {
+function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders}: AddDocumentModalProps) {
     const [title, setTitle] = useState('');
-    const [stakeHolders, setStakeHolders] = useState('');
+    const [selectedStakeholders, setSelectedStakeholders] = useState<number[]>([]);
     const [scale, setScale] = useState('');
     const [issuanceDate, setIssuanceDate] = useState('');
     const [type, setType] = useState('');
@@ -35,7 +37,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments}: AddDocumentModalPro
 
     const resetForm = () => {
         setTitle('');
-        setStakeHolders('');
+        setSelectedStakeholders([]);
         setScale('');
         setIssuanceDate('');
         setType('');
@@ -50,19 +52,31 @@ function AddDocumentModal({ show, onHide, refreshDocuments}: AddDocumentModalPro
         resetForm();
     };
 
+    const toggleSelect = (option: Stakeholder) => {
+        setSelectedStakeholders((prevSelectedStakeholders) => {
+            const newSelectedStakeholders = prevSelectedStakeholders.includes(option.id)
+                ? prevSelectedStakeholders.filter((item) => item !== option.id) // Remove the ID
+                : [...prevSelectedStakeholders, option.id]; // Add the ID
+    
+            console.log('Updated Stakeholders:', newSelectedStakeholders); // Log the new state
+            return newSelectedStakeholders; // Return the new state
+        });
+    };
+
     const handleSubmit = () => {
-        console.log("Title: " + title + " Stakeholders: " + stakeHolders + " Issuance Date: " + issuanceDate)
+        console.log("Title: " + title + " Stakeholders: " + selectedStakeholders + " Issuance Date: " + issuanceDate)
         console.log("Scale: "+ scale + " Type: " + type + " Language: " + language + " Pages: " + pages)
         console.log("Description: " + description)
         // Validation check
-        if (!title || !stakeHolders || !scale || !issuanceDate || !type) {
+        if (!title || !selectedStakeholders || !scale || !issuanceDate || !type) {
             setError('Please fill in the mandatory fields marked with the red star (*).'); // Set error message
             return; // Exit the function early
         }
         //API call to add a document
-        API.addDocument(title, stakeHolders, scale, issuanceDate, type, language, pages, description);
+        API.addDocument(title, selectedStakeholders, scale, issuanceDate, type, language, pages, description);
         refreshDocuments();
         handleClose();
+        refreshDocuments();
     };
 
     return (
@@ -75,6 +89,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments}: AddDocumentModalPro
                 {error && <Alert variant="danger">{error}</Alert>} {/* Display error message */}
                     <Form>
                         <Row className="mb-3">
+                        <Col sm="8">
                             <Form.Group as={Col} controlId="formTitle">
                                 <Form.Label><RequiredLabel text="Title" /></Form.Label>
                                 <Form.Control
@@ -83,14 +98,23 @@ function AddDocumentModal({ show, onHide, refreshDocuments}: AddDocumentModalPro
                                     onChange={(e) => setTitle(e.target.value)}
                                 />
                             </Form.Group>
-                            <Form.Group as={Col} controlId="formStakeholders">
-                                <Form.Label><RequiredLabel text="Stakeholders" /></Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={stakeHolders}
-                                    onChange={(e) => setStakeHolders(e.target.value)}
-                                />
-                            </Form.Group>
+                            </Col>
+                            <Col className="mt-4" sm="4"> 
+                              <Dropdown className="mt-2">
+                                <Dropdown.Toggle variant="success" id="dropdown-basic"><RequiredLabel text="Choose Stakeholders" /></Dropdown.Toggle>
+                                   <Dropdown.Menu>
+                                      {stakeholders.map((option, index) => (
+                                       <Dropdown.Item
+                                                  key={index}
+                                                  onClick={() => toggleSelect(option)}
+                                                  active={selectedStakeholders.includes(option.id)}
+                                        >
+                                        {option.name}
+                                        </Dropdown.Item>
+                                        ))}
+                                    </Dropdown.Menu>
+                            </Dropdown>
+                            </Col>
                         </Row>
                         <Row className="mb-3">
                             <Form.Group as={Col} controlId="formScale">
@@ -210,7 +234,7 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument }: 
             return;
         }
         //API call to edit a document
-        API.editDocument(document.id, title, stakeHolders, scale, issuanceDate, type, language, pages, description);
+        //API.editDocument(document.id, title, stakeHolders, scale, issuanceDate, type, language, pages, description);
         refreshSelectedDocument(new Document(document.id, title, stakeHolders, scale, issuanceDate, type, language, pages, description));
         onHide();
     };
@@ -233,14 +257,14 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument }: 
                                     onChange={(e) => setTitle(e.target.value)}
                                 />
                             </Form.Group>
-                            <Form.Group as={Col} controlId="formStakeholders">
+                            {/*<Form.Group as={Col} controlId="formStakeholders">
                                 <Form.Label><RequiredLabel text="Stakeholders" /></Form.Label>
                                 <Form.Control
                                     type="text"
                                     value={stakeHolders}
                                     onChange={(e) => setStakeHolders(e.target.value)}
                                 />
-                            </Form.Group>
+                            </Form.Group>*/}
                         </Row>
                         <Row className="mb-3">
                             <Form.Group as={Col} controlId="formScale">
@@ -336,7 +360,7 @@ interface ShowDocumentInfoModalProps {
     selectedDocument: Document;
     show: boolean;
     onHide: () => void;
-    getDocumentIcon: (type: string) => JSX.Element;
+    getDocumentIcon: (type: string) => JSX.Element | null;
     user: User;
     handleEdit: () => void;
     refreshDocuments: () => void;
@@ -380,7 +404,7 @@ function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, 
             ): null}
             </Col>
             <Col xs={9} md={5}>
-            <p>Stakeholders: {selectedDocument.stakeHolders}</p>
+            <p>Stakeholders: {selectedDocument.stakeHolders.map(sh => sh.name).join(' / ')}</p>
             <p>Scale: {selectedDocument.scale}</p>
             <p>Issuance Date: {selectedDocument.issuanceDate}</p>
             <p>Type: {selectedDocument.type}</p>

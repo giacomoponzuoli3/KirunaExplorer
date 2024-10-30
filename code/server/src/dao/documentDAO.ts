@@ -1,5 +1,6 @@
 import db from "../db/db"
 import { Document } from "../models/document"
+import { Stakeholder } from "../models/stakeholder"
 
 class DocumentDAO {
     /**
@@ -14,25 +15,37 @@ class DocumentDAO {
      * @param description The description of the document to add.
      * @returns A Promise that resolves when the document has been added.
      */
-    addDocument(title: string, stakeHolders: string, scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string|null): Promise<void> {
+    addDocument(title: string, stakeHolders: number[], scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string|null): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try {
-                const sql = "INSERT INTO documents(title, stakeholders, scale, issuance_date, type, language, pages, description) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
-                db.run(sql, [
-                    title,
-                    stakeHolders,
-                    scale,
-                    issuanceDate,
-                    type,
-                    language,
-                    pages,
-                    description
-                ], (err: Error | null) => {
+                // Step 1: Insert the document
+                const sql = "INSERT INTO documents(title, scale, issuance_date, type, language, pages, description) VALUES(?, ?, ?, ?, ?, ?, ?)";
+                db.run(sql, [title, scale, issuanceDate, type, language, pages, description], function (err: Error | null) {
                     if (err) {
                         reject(err);
                         return;
                     }
-                    resolve();
+    
+                    const documentId = this.lastID;  // The ID of the inserted document
+    
+                    // Step 2: Insert entries into stakeholders_documents table
+                    const stakeholderSql = "INSERT INTO stakeholders_documents(id_document, id_stakeholder) VALUES(?, ?)";
+                    const stakeholderInserts = stakeHolders.map(stakeHolderId => 
+                        new Promise<void>((resolveInsert, rejectInsert) => {
+                            db.run(stakeholderSql, [documentId, stakeHolderId], (err: Error | null) => {
+                                if (err) {
+                                    rejectInsert(err);
+                                } else {
+                                    resolveInsert();
+                                }
+                            });
+                        })
+                    );
+    
+                    // Step 3: Wait for all stakeholder insertions to complete
+                    Promise.all(stakeholderInserts)
+                        .then(() => resolve())
+                        .catch(error => reject(error));
                 });
             } catch (error) {
                 reject(error);
@@ -48,20 +61,30 @@ class DocumentDAO {
     getDocumentById(id: number): Promise<Document> {
         return new Promise<Document>((resolve, reject) => {
             try {
-                const sql = "SELECT * FROM documents WHERE id = ?";
-                db.get(sql, [id], (err: Error | null, row: any) => {
+                const sql = `
+                    SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category
+                    FROM documents d
+                    JOIN stakeholders_documents sd ON d.id = sd.id_document
+                    JOIN stakeholders s ON sd.id_stakeholder = s.id
+                    WHERE d.id = ?
+                `;
+    
+                db.all(sql, [id], (err: Error | null, rows: any[]) => {
                     if (err) {
                         reject(err);
                         return;
                     }
-                    if (!row) {
+                    if (!rows || rows.length === 0) {
                         reject(new Error("Document not found."));
                         return;
                     }
+    
+                    // Initialize document with the first row's data
+                    const row = rows[0];
                     const document: Document = new Document(
                         row.id,
                         row.title,
-                        row.stakeholders,
+                        [], // Placeholder for stakeholders, populated below
                         row.scale,
                         row.issuance_date,
                         row.type,
@@ -69,7 +92,14 @@ class DocumentDAO {
                         row.pages,
                         row.description
                     );
-                    console.log(document);
+    
+                    // Populate stakeholders
+                    document.stakeHolders = rows.map(row => new Stakeholder(
+                        row.stakeholder_id,
+                        row.stakeholder_name,
+                        row.stakeholder_category
+                    ));
+    
                     resolve(document);
                 });
             } catch (error) {
@@ -77,6 +107,7 @@ class DocumentDAO {
             }
         });
     }
+    
 
     /**
      * Retrieves all documents from the database.
@@ -85,7 +116,13 @@ class DocumentDAO {
     getAllDocuments(): Promise<Document[]> {
         return new Promise<Document[]>((resolve, reject) => {
             try {
-                const sql = "SELECT * FROM documents";
+                const sql = `
+                    SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category
+                    FROM documents d
+                    JOIN stakeholders_documents sd ON d.id = sd.id_document
+                    JOIN stakeholders s ON sd.id_stakeholder = s.id
+                `;
+    
                 db.all(sql, [], (err: Error | null, rows: any[]) => {
                     if (err) {
                         reject(err);
@@ -95,17 +132,32 @@ class DocumentDAO {
                         reject(new Error("No documents found."));
                         return;
                     }
-                    const documents: Document[] = rows.map((row: any) => new Document(
-                        row.id,
-                        row.title,
-                        row.stakeholders,
-                        row.scale,
-                        row.issuance_date,
-                        row.type,
-                        row.language,
-                        row.pages,
-                        row.description
-                    ));
+    
+                    // Group rows by document and map stakeholders to each document
+                    const documentsMap = new Map<number, Document>();
+                    rows.forEach((row: any) => {
+                        const documentId = row.id;
+                        if (!documentsMap.has(documentId)) {
+                            documentsMap.set(documentId, new Document(
+                                row.id,
+                                row.title,
+                                [],  // Placeholder for stakeholders, populated below
+                                row.scale,
+                                row.issuance_date,
+                                row.type,
+                                row.language,
+                                row.pages,
+                                row.description
+                            ));
+                        }
+    
+                        // Add stakeholder (always available) to the document's stakeholders array
+                        const stakeholder = new Stakeholder(row.stakeholder_id, row.stakeholder_name, row.stakeholder_category);
+                        documentsMap.get(documentId)?.stakeHolders.push(stakeholder);
+                    });
+    
+                    // Convert map values to array
+                    const documents = Array.from(documentsMap.values());
                     resolve(documents);
                 });
             } catch (error) {
@@ -113,6 +165,7 @@ class DocumentDAO {
             }
         });
     }
+    
     
     /**
      * Deletes a document from the database.
@@ -347,6 +400,7 @@ class DocumentDAO {
             }
         });
     }
+    
 
 }
 

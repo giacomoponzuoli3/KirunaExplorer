@@ -21,7 +21,7 @@ class DocumentController {
      * @param description The description of the document to add.
      * @returns A Promise that resolves when the document has been added.
      */
-    addDocument(title: string, stakeHolders: string, scale: string, issuanceDate: string, type: string, language: string, pages: string, description: string): Promise<void> {
+    addDocument(title: string, stakeHolders: number[], scale: string, issuanceDate: string, type: string, language: string, pages: string, description: string): Promise<void> {
         return this.dao.addDocument(title, stakeHolders, scale, issuanceDate, type, language, pages, description);
     }
 
@@ -119,6 +119,7 @@ class DocumentController {
     getAllDocumentsOfSameType(type: string): Promise<Document[]> {
         return this.dao.getAllDocumentsOfSameType(type);
     }
+
 }
 
 export default DocumentController
