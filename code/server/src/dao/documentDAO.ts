@@ -239,7 +239,7 @@ class DocumentDAO {
         return new Promise<Document[]>((resolve, reject) => {
             try{
                 const sql = "SELECT * FROM documents_links WHERE id_document1 = ?";
-                db.all(sql, [id, id], (err: Error | null, rows: any[]) => {
+                db.all(sql, [id], (err: Error | null, rows: any[]) => {
                     if (err) {
                         reject(err);
                         return;
@@ -250,9 +250,8 @@ class DocumentDAO {
                     }
 
                     const documentsRelatedIds: number[] = rows.map((row: any) => row.id_document2);
-
                     const sql2 = "SELECT * FROM documents WHERE id IN (?)";
-                    db.all(sql2, [documentsRelatedIds], (err: Error | null, rows: any[]) => {
+                    db.all(sql2, documentsRelatedIds, (err: Error | null, rows: any[]) => {
                         if (err) {
                             reject(err);
                             return;

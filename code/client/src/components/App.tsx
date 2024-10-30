@@ -18,7 +18,7 @@ function App() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [stakeholders, setStakeholders] = useState<Stakeholder[]>([]);
 
-    //API call to get all the documents so we can display them
+  //API call to get all the documents so we can display them
   const getAllDocuments = async () => {
     try {
         const docs = await API.getAllDocuments();
@@ -97,7 +97,7 @@ function App() {
           <Route path="/login" element={<Login message={message} isLogged={isLogged} login={handleLogin} handleBack={handleBack}/>} />
           <Route path="*" element={<NotFoundLayout/>} />
           {/* Aggiungi altre route come la dashboard */}
-          <Route path="documents/:idDocument/links" element={<LinksDocument />} />
+          <Route path="documents/:idDocument/links" element={<LinksDocument user={user} isLogged={isLogged} />} />
         </Route>
       </Routes>
     </>
