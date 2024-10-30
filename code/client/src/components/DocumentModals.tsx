@@ -211,11 +211,12 @@ interface EditDocumentModalProps {
     show: boolean;
     onHide: () => void;
     refreshSelectedDocument: (doc: Document) => void;
+    stakeholders: Stakeholder[]
 }
 
-function EditDocumentModal({ document, show, onHide, refreshSelectedDocument }: EditDocumentModalProps) {
+function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, stakeholders }: EditDocumentModalProps) {
     const [title, setTitle] = useState(document.title);
-    const [stakeHolders, setStakeHolders] = useState(document.stakeHolders);
+    const [selectedStakeholders, setSelectedStakeholders] = useState<number[]>(document.stakeHolders.map(stakeholder => stakeholder.id));
     const [scale, setScale] = useState(document.scale);
     const [issuanceDate, setIssuanceDate] = useState(document.issuanceDate);
     const [type, setType] = useState(document.type);
@@ -224,18 +225,33 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument }: 
     const [description, setDescription] = useState<string | null>(document.description);
     const [error, setError] = useState<string | null>(null); // State for error messages
 
+    const toggleSelect = (option: Stakeholder) => {
+        setSelectedStakeholders((prevSelectedStakeholders) => {
+            const newSelectedStakeholders = prevSelectedStakeholders.includes(option.id)
+                ? prevSelectedStakeholders.filter((item) => item !== option.id) // Remove the ID
+                : [...prevSelectedStakeholders, option.id]; // Add the ID
+    
+            console.log('Updated Stakeholders:', newSelectedStakeholders); // Log the new state
+            return newSelectedStakeholders; // Return the new state
+        });
+    };
+
     const handleSubmit = () => {
-        console.log("Title: " + title + " Stakeholders: " + stakeHolders + " Issuance Date: " + issuanceDate)
+        console.log("Title: " + title + " Stakeholders: " + selectedStakeholders + " Issuance Date: " + issuanceDate)
         console.log("Scale: "+ scale + " Type: " + type + " Language: " + language + " Pages: " + pages)
         console.log("Description: " + description)
         // Validation check
-        if (!title || !stakeHolders || !scale || !issuanceDate || !type) {
+        if (!title || !selectedStakeholders || !scale || !issuanceDate || !type) {
             setError('Please fill in the mandatory fields marked with the red star (*).'); // Set error message
             return;
         }
+        const sh: Stakeholder[] = stakeholders.filter(stakeholder =>
+            selectedStakeholders.includes(stakeholder.id)
+        );
         //API call to edit a document
-        //API.editDocument(document.id, title, stakeHolders, scale, issuanceDate, type, language, pages, description);
-        refreshSelectedDocument(new Document(document.id, title, stakeHolders, scale, issuanceDate, type, language, pages, description));
+        API.editDocument(document.id, title, selectedStakeholders, scale, issuanceDate, type, language, pages, description);
+
+        refreshSelectedDocument(new Document(document.id, title, sh, scale, issuanceDate, type, language, pages, description));
         onHide();
     };
 
@@ -248,7 +264,8 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument }: 
                 <Container>
                 {error && <Alert variant="danger">{error}</Alert>} {/* Display error message */}
                     <Form>
-                        <Row className="mb-3">
+                    <Row className="mb-3">
+                        <Col sm="8">
                             <Form.Group as={Col} controlId="formTitle">
                                 <Form.Label><RequiredLabel text="Title" /></Form.Label>
                                 <Form.Control
@@ -257,14 +274,23 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument }: 
                                     onChange={(e) => setTitle(e.target.value)}
                                 />
                             </Form.Group>
-                            {/*<Form.Group as={Col} controlId="formStakeholders">
-                                <Form.Label><RequiredLabel text="Stakeholders" /></Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={stakeHolders}
-                                    onChange={(e) => setStakeHolders(e.target.value)}
-                                />
-                            </Form.Group>*/}
+                            </Col>
+                            <Col className="mt-4" sm="4"> 
+                              <Dropdown className="mt-2">
+                                <Dropdown.Toggle variant="success" id="dropdown-basic"><RequiredLabel text="Choose Stakeholders" /></Dropdown.Toggle>
+                                   <Dropdown.Menu>
+                                      {stakeholders.map((option, index) => (
+                                       <Dropdown.Item
+                                                  key={index}
+                                                  onClick={() => toggleSelect(option)}
+                                                  active={selectedStakeholders.includes(option.id)}
+                                        >
+                                        {option.name}
+                                        </Dropdown.Item>
+                                        ))}
+                                    </Dropdown.Menu>
+                            </Dropdown>
+                            </Col>
                         </Row>
                         <Row className="mb-3">
                             <Form.Group as={Col} controlId="formScale">

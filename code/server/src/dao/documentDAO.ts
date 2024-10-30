@@ -203,37 +203,59 @@ class DocumentDAO {
      * @param description The description of the document to update.
      * @returns A Promise that resolves when the document has been updated.
      */
-    editDocument(id: number, title: string, stakeHolders: string, scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string|null): Promise<void> {
+    editDocument(id: number,title: string,stakeHolders: number[],scale: string,issuanceDate: string,type: string,language: string | null,pages: string | null,description: string | null
+    ): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            try {
-                const sql = "UPDATE documents SET title = ?, stakeholders = ?, scale = ?, issuance_date = ?, type = ?, language = ?, pages = ?, description = ? WHERE id = ?";
-
-                const values = [
-                    title,
-                    stakeHolders,
-                    scale,
-                    issuanceDate,
-                    type,
-                    language,
-                    pages,
-                    description,
-                    id
-                ];
-                
-                db.run(sql, values, (err: Error | null) => {
-                    if (err) {
-                        console.log(err);
-                        reject(err);
+            const updateDocumentSql = "UPDATE documents SET title = ?, scale = ?, issuance_date = ?, type = ?, language = ?, pages = ?, description = ? WHERE id = ?";
+            const values = [
+                title,
+                scale,
+                issuanceDate,
+                type,
+                language,
+                pages,
+                description,
+                id
+            ];
+    
+            db.run(updateDocumentSql, values, (err: Error | null) => {
+                if (err) {
+                    console.log(err);
+                    reject(err);
+                    return;
+                }
+                // Step 1: Delete existing stakeholder associations for this document
+                const deleteStakeholdersSql = "DELETE FROM stakeholders_documents WHERE id_document = ?";
+                db.run(deleteStakeholdersSql, [id], (deleteErr: Error | null) => {
+                    if (deleteErr) {
+                        console.log(deleteErr);
+                        reject(deleteErr);
                         return;
                     }
-                    resolve();
+    
+                    // Step 2: Insert new stakeholder associations
+                    const insertStakeholderSql = "INSERT INTO stakeholders_documents (id_document, id_stakeholder) VALUES (?, ?)";
+                    const stakeholderInserts = stakeHolders.map(stakeholderId =>
+                        new Promise<void>((resolveInsert, rejectInsert) => {
+                            db.run(insertStakeholderSql, [id, stakeholderId], (insertErr: Error | null) => {
+                                if (insertErr) {
+                                    rejectInsert(insertErr);
+                                } else {
+                                    resolveInsert();
+                                }
+                            });
+                        })
+                    );
+    
+                    // Step 3: Wait for all stakeholder insertions to complete
+                    Promise.all(stakeholderInserts)
+                        .then(() => resolve())
+                        .catch(error => reject(error));
                 });
-            } catch (error) {
-                console.log(error);
-                reject(error);
-            }
+            });
         });
     }
+    
 
     getDocumentLinksById(id: number): Promise<Document[]> {
         return new Promise<Document[]>((resolve, reject) => {

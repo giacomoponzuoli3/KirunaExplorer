@@ -136,7 +136,7 @@ async function deleteDocument(id: number) {
     }
 }
 
-async function editDocument(id: number, title: string, stakeHolders: string, scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string|null) {
+async function editDocument(id: number, title: string, stakeHolders: number[], scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string|null) {
     let response = await fetch(baseURL + "doc/" + id, {
         method: 'PATCH',
         headers: {

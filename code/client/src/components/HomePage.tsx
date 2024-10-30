@@ -135,6 +135,7 @@ return (
 {selectedDocument && (<EditDocumentModal 
                          document={selectedDocument} show={showEditDocumentModal} 
                          onHide={() => setShowEditDocumentModal(false)} refreshSelectedDocument={refreshSelectedDocument}
+                         stakeholders={stakeholders}
                          />
 )}
 </>
