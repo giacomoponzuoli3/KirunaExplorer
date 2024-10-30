@@ -8,18 +8,32 @@ import { NotFoundLayout } from './NotFoundLayout';
 import { Container } from 'react-dom';
 import { Document } from '../models/document';
 import { LinksDocument } from './LinksDocument';
+import { Stakeholder } from '../models/stakeholder';
+import { get } from 'http';
 
 function App() {
   const [user, setUser] = useState<any>('');
   const [isLogged, setIsLogged] = useState<any>(false);
   const [message, setMessage] = useState<any>('');
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [stakeholders, setStakeholders] = useState<Stakeholder[]>([]);
 
   //API call to get all the documents so we can display them
   const getAllDocuments = async () => {
     try {
         const docs = await API.getAllDocuments();
         setDocuments(docs);
+        console.log(docs)
+    } catch (err: any) {
+        console.log(err);
+    }
+  };
+
+  const getAllStakeholders = async () => {
+    try {
+        const stakeholders = await API.getAllStakeholders();
+        setStakeholders(stakeholders);
+        console.log(stakeholders)
     } catch (err: any) {
         console.log(err);
     }
@@ -27,6 +41,7 @@ function App() {
 
   useEffect(() => {
       getAllDocuments().then();
+      getAllStakeholders().then();
   }, []);
 
   const handleBack = () => {
@@ -78,7 +93,7 @@ function App() {
             <Outlet/>
           </>
         }>
-          <Route index element={<HomePage documents={documents} user={user} refreshDocuments={getAllDocuments}/>}/>
+          <Route index element={<HomePage documents={documents} user={user} refreshDocuments={getAllDocuments} stakeholders={stakeholders}/>}/>
           <Route path="/login" element={<Login message={message} isLogged={isLogged} login={handleLogin} handleBack={handleBack}/>} />
           <Route path="*" element={<NotFoundLayout/>} />
           {/* Aggiungi altre route come la dashboard */}

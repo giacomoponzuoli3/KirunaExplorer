@@ -71,7 +71,7 @@ async function register(username: string, name: string, surname: string, passwor
 }
 
 /** ------------------- Document APIs ------------------------ */
-async function addDocument(title: string, stakeHolders: string, scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string|null) {
+async function addDocument(title: string, stakeHolders: number[], scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string|null) {
     let response = await fetch(baseURL + "doc", {
         method: 'POST',
         headers: {
@@ -136,7 +136,7 @@ async function deleteDocument(id: number) {
     }
 }
 
-async function editDocument(id: number, title: string, stakeHolders: string, scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string|null) {
+async function editDocument(id: number, title: string, stakeHolders: number[], scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string|null) {
     let response = await fetch(baseURL + "doc/" + id, {
         method: 'PATCH',
         headers: {
@@ -306,9 +306,26 @@ async function getAllLinks() {
     }
 }
 
+/** ------------------- Stakeholder APIs ------------------------ */
+
+async function getAllStakeholders() {
+    const response = await fetch(baseURL + "stakeholders", { credentials: "include" })
+    if (response.ok) {
+        const stakeholders = await response.json()
+        return stakeholders
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+
 const API = {
     login, logOut, getUserInfo, register,
     addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType,
-    addLink, deleteLink, editLink, getLinkById, getAllLinks
+    addLink, deleteLink, editLink, getLinkById, getAllLinks, getAllStakeholders
 }
 export default API

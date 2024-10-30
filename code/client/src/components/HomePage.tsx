@@ -8,15 +8,17 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { User, Role } from "../models/user";
 import { AddDocumentModal, ShowDocumentInfoModal, EditDocumentModal } from "./DocumentModals";
+import { Stakeholder } from "../models/stakeholder";
 
 
 interface HomepageProps {
     documents: Document[];
     user: User;
     refreshDocuments: () => void;
+    stakeholders: Stakeholder[];
 }
 
-function HomePage({documents, user, refreshDocuments} : HomepageProps) {
+function HomePage({documents, user, refreshDocuments, stakeholders} : HomepageProps) {
 
 const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 const [showDetails, setShowDetails] = useState<boolean>(false);
@@ -56,7 +58,7 @@ function getDocumentIcon(type: string) {
         case 'Technical document':
           return <img src="/kiruna/img/tecnical-service.png" alt="Technical Document" />;
         default:
-          return <span>Icon Not Found</span>; // Return null if no matching type
+          return null; // Return null if no matching type
       }
 }
 
@@ -129,10 +131,11 @@ return (
             </Button>
             ):null}
 
-<AddDocumentModal show={showAddDocumentModal} onHide={() => setShowAddDocumentModal(false)} refreshDocuments={refreshDocuments} />
+<AddDocumentModal show={showAddDocumentModal} onHide={() => setShowAddDocumentModal(false)} refreshDocuments={refreshDocuments} stakeholders={stakeholders}/>
 {selectedDocument && (<EditDocumentModal 
                          document={selectedDocument} show={showEditDocumentModal} 
                          onHide={() => setShowEditDocumentModal(false)} refreshSelectedDocument={refreshSelectedDocument}
+                         stakeholders={stakeholders}
                          />
 )}
 </>
