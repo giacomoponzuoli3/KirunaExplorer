@@ -272,14 +272,15 @@ class DocumentDAO {
     
                     const documents2RelatedIds: number[] = rows.map(row => row.id_document2);
                     const documents1RelatedIds: number[] = rows.map(row => row.id_document1);
-                    const uniqueDocumentIds = [...documents1RelatedIds, ...documents2RelatedIds].filter(n => n !== id);
-                    const filteredUniqueDocumentIds = [...new Set(uniqueDocumentIds)];
+                    const combinedIds: number[] = Array.from(new Set([...documents2RelatedIds, ...documents1RelatedIds]));
+                    const filteredIds: number[] = combinedIds.filter(idValue => idValue != id);
     
                     const sqlDocs = "SELECT * FROM documents WHERE id IN (?)";
-                    db.all(sqlDocs, [filteredUniqueDocumentIds], (err: Error | null, documentRows: any[]) => {
+                    db.all(sqlDocs, filteredIds, (err: Error | null, documentRows: any[]) => {
                         if (err) return reject(err);
+                        console.log(documentRows);
                         if (!documentRows || documentRows.length === 0) return reject(new Error("No documents found."));
-    
+
                         const documentPromises = documentRows.map(row => {
                             const relatedLink = rows.find(linkRow =>
                                 (linkRow.id_document1 === row.id || linkRow.id_document2 === row.id) && linkRow.id_link
