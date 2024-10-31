@@ -8,12 +8,13 @@ import { Modal } from "react-bootstrap";
 import Alert from "./Alert";
 import ConfirmModal from './ConfirmModal';
 import { AddLinkModal } from "./AddLinkModal";
+import { DocLink } from "../models/document_link";
 
 
 function getDocumentIcon(type: string) {
     switch (type) {
         case 'Informative document':
-            return <img src="kiruna/img/informativeDocument.png" alt="Informative Document" className="h-7 w-7" />;
+            return <img src="/kiruna/img/informativeDocument.png" alt="Informative Document" className="h-7 w-7" />;
         case 'Prescriptive document':
             return <img src="/kiruna/img/prescriptiveDocument.png" alt="Prescriptive Document" className="h-7 w-7" />;
         case 'Material effect':
@@ -31,7 +32,7 @@ function LinksDocument(props: any) {
     const navigate = useNavigate();
     const { idDocument } = useParams();
     const [document, setDocument] = useState('');
-    const [documentLinks, setDocumentLinks] = useState<Document[]>([]);
+    const [documentLinks, setDocumentLinks] = useState<DocLink[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [documentToDelete, setDocumentToDelete] = useState<number | null>(null);
     const [showAlert, setShowAlert] = useState(false); // alert state
@@ -39,7 +40,7 @@ function LinksDocument(props: any) {
 
     const handleDelete = async () => {
         if (documentToDelete) {
-            await API.deleteLink(documentToDelete);
+            //await API.deleteLink(documentToDelete);
             // Recharge the list of documents
             setDocumentLinks(documentLinks.filter(doc => doc.id !== documentToDelete));
             setShowModal(false);
@@ -52,8 +53,8 @@ function LinksDocument(props: any) {
                 const documentId = Number(idDocument);
                 const document = await API.getDocumentById(documentId);
                 const documentsConnections = await API.getDocumentLinksById(documentId);
-                setDocument(document);
                 console.log(documentsConnections)
+                setDocument(document);
                 setDocumentLinks(documentsConnections);
             }catch (err){
                 setShowAlert(true);
@@ -110,7 +111,7 @@ function LinksDocument(props: any) {
                                 <td className="p-4">{getDocumentIcon(doc.type)}</td>
                                 <td className="p-4">{doc.title}</td>
                                 <td className="p-4">{doc.stakeHolders.map(sh => sh.name).join(' / ')}</td>
-                                <td className="p-4">Type of link</td>
+                                <td className="p-4">{doc.relatedLink}</td>
                                 {props.isLogged && props.user.role == "Urban Planner" && 
                                     <td className="p-4 flex justify-center space-x-4">
                                         <button className="text-red-500 hover:text-red-700" onClick={() => {
