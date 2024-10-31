@@ -234,8 +234,8 @@ async function getAllDocumentsOfSameType(type: string) {
 
 /** ------------------- Link APIs ------------------------ */
 
-async function addLink(idDoc1: number, idDoc2: number, name: string) {
-    const response = await fetch(baseURL + "link", { method: 'POST', credentials: "include", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idDoc1: idDoc1, idDoc2: idDoc2, name: name },) })
+async function addLink(idDoc1: number, idDoc2: number, idLink: number) {
+    const response = await fetch(baseURL + "link", { method: 'POST', credentials: "include", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idDoc1: idDoc1, idDoc2: idDoc2, idLink: idLink },) })
     if (response.ok) {
         return
     } else {
@@ -248,8 +248,8 @@ async function addLink(idDoc1: number, idDoc2: number, name: string) {
     }
 }
 
-async function deleteLink(id: number) {
-    const response = await fetch(baseURL + "link/" + id, { method: 'DELETE', credentials: "include" })
+async function deleteLink(idDoc1: number, idDoc2: number, idLink: number) {
+    const response = await fetch(baseURL + "link/", { method: 'DELETE', credentials: "include", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idDoc1: idDoc1, idDoc2: idDoc2, idLink: idLink }) })
     if (response.ok) {
         return
     } else {
@@ -262,8 +262,8 @@ async function deleteLink(id: number) {
     }
 }
 
-async function editLink(id: number, name: string) {
-    const response = await fetch(baseURL + "link/" + id, { method: 'PATCH', credentials: "include", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: name },) })
+async function editLink(idDoc1: number, idDoc2: number, oldLinkId: number, newLinkId: number) {
+    const response = await fetch(baseURL + "link/", { method: 'PATCH', credentials: "include", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idDoc1: idDoc1, idDoc2: idDoc2, oldLinkId: oldLinkId, newLinkId: newLinkId }) })
     if (response.ok) {
         return
     } else {
@@ -273,21 +273,6 @@ async function editLink(id: number, name: string) {
         if (errDetail.message)
             throw errDetail.message
         throw new Error("Something went wrong")
-    }
-}
-
-async function getLinkById(id: number) {
-    const response = await fetch(baseURL + "link/" + id, { credentials: "include" })
-    if (response.ok) {
-        const link = await response.json()
-        return link
-    } else {
-        const errDetail = await response.json();
-        if (errDetail.error)
-            throw errDetail.error
-        if (errDetail.message)
-            throw errDetail.message
-        throw new Error("Error. Please reload the page")
     }
 }
 
@@ -326,6 +311,6 @@ async function getAllStakeholders() {
 const API = {
     login, logOut, getUserInfo, register,
     addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType,
-    addLink, deleteLink, editLink, getLinkById, getAllLinks, getAllStakeholders
+    addLink, deleteLink, editLink, getAllLinks, getAllStakeholders
 }
 export default API
