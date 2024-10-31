@@ -33,9 +33,8 @@ function AddLinkModal(props: any) {
             await API.addLink(props.idDocument, selectedDocument, selectedTypeLink);
 
         }catch(err){
+            console.log("entro");
             setShowAlert(true);
-        }finally{
-            props.onHide();
         }
     };
 
