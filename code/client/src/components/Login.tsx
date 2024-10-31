@@ -59,7 +59,7 @@ function Login(props: any) {
             <div className="flex space-x-4 mt-4">
               <Button 
                 type="submit"
-                className="flex-1 bg-blue-950 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-300"
+                className="flex-1 bg-blue-950 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition duration-300"
               >
                 Login
               </Button>

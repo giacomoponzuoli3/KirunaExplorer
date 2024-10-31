@@ -73,7 +73,7 @@ function LinksDocument(props: any) {
     }
 
 
-    if (document == '' && documentLinks.length === 0){
+    if (document == '' || documentLinks.length === 0){
         return (
             <div className="p-4">
             { showAlert &&  <Alert
@@ -152,6 +152,7 @@ function LinksDocument(props: any) {
                 <AddLinkModal  
                     show={showModalAddLink}
                     onHide={() => setShowModalAddLink(false)}
+                    idDocument={idDocument}
                 />
             </>
             }
