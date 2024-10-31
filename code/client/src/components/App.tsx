@@ -7,6 +7,7 @@ import { HomePage } from './HomePage';
 import { NotFoundLayout } from './NotFoundLayout';
 import { Container } from 'react-dom';
 import { Document } from '../models/document';
+import { DocLink } from '../models/document_link';
 import { LinksDocument } from './LinksDocument';
 import { Stakeholder } from '../models/stakeholder';
 import { get } from 'http';
