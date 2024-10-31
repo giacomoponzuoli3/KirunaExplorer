@@ -260,7 +260,13 @@ class DocumentDAO {
     getDocumentLinksById(id: number): Promise<Document[]> {
         return new Promise<Document[]>((resolve, reject) => {
             try{
-                const sql = "SELECT * FROM documents_links WHERE id_document1 = ?";
+                const sql = `
+                    SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category
+                    FROM documents d
+                    JOIN stakeholders_documents sd ON d.id = sd.id_document
+                    JOIN stakeholders s ON sd.id_stakeholder = s.id
+                    WHERE d.id = ?
+                `;
                 db.all(sql, [id], (err: Error | null, rows: any[]) => {
                     if (err) {
                         reject(err);
@@ -282,18 +288,32 @@ class DocumentDAO {
                             reject(new Error("No documents found."));
                             return;
                         }
-                        const documents: Document[] = rows.map((row: any) => new Document(
-                            row.id,
-                            row.title,
-                            row.stakeholders,
-                            row.scale,
-                            row.issuance_date,
-                            row.type,
-                            row.language,
-                            row.pages,
-                            row.description
-                        ));
-                        resolve(documents);
+                        // Group rows by document and map stakeholders to each document
+                    const documentsMap = new Map<number, Document>();
+                    rows.forEach((row: any) => {
+                        const documentId = row.id;
+                        if (!documentsMap.has(documentId)) {
+                            documentsMap.set(documentId, new Document(
+                                row.id,
+                                row.title,
+                                [],  // Placeholder for stakeholders, populated below
+                                row.scale,
+                                row.issuance_date,
+                                row.type,
+                                row.language,
+                                row.pages,
+                                row.description
+                            ));
+                        }
+    
+                        // Add stakeholder (always available) to the document's stakeholders array
+                        const stakeholder = new Stakeholder(row.stakeholder_id, row.stakeholder_name, row.stakeholder_category);
+                        documentsMap.get(documentId)?.stakeHolders.push(stakeholder);
+                    });
+    
+                    // Convert map values to array
+                    const documents = Array.from(documentsMap.values());
+                    resolve(documents);
                     });
                 });
             } catch (error) {
