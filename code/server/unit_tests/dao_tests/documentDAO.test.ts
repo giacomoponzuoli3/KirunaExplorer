@@ -17,10 +17,11 @@ describe('documentDAO', () => {
     });
 
     const dao = new DocumentDAO();
-    const testStakeholder1 = new Stakeholder(1,"John","urban developer");
-    const testStakeholder2 = new Stakeholder(2,"John","urban developer");
-    const testDocument = new Document(1,"title",[testStakeholder1,testStakeholder2],"1:1","2020-10-10","Informative document","English","300","description");
     const testId = 1;
+    const testStakeholder1 = new Stakeholder(1,"John","urban developer");
+    const testStakeholder2 = new Stakeholder(2,"Bob","urban developer");
+    const testDocument = new Document(testId,"title",[testStakeholder1,testStakeholder2],"1:1","2020-10-10","Informative document","English","300","description");
+   
 
     describe('addDocument', () => {
         test('It should successfully add a document', async () => {
@@ -170,6 +171,59 @@ describe('documentDAO', () => {
             });
 
             await expect(dao.addDocument("title", [1, 2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).rejects.toThrow(`Unexpected error`); 
+        });
+    });
+
+    describe('getDocumentById', () => {
+
+        const testRows = [
+            {
+                id: testId,
+                title: "title",
+                scale: "1:1",
+                issuance_date: "2020-10-10",
+                type: "Informative document",
+                language: "English",
+                pages: "300",
+                description: "description",
+                stakeholder_id: 1,
+                stakeholder_name: "John",
+                stakeholder_category: "urban developer"
+            },
+            {
+                id: testId,
+                title: "title",
+                scale: "1:1",
+                issuance_date: "2020-10-10",
+                type: "Informative document",
+                language: "English",
+                pages: "300",
+                description: "description",
+                stakeholder_id: 2,
+                stakeholder_name: "Bob",
+                stakeholder_category: "urban developer"
+            }
+        ];
+
+        test('It should successfully retrieve the document with the specified id', async () => {
+            jest.spyOn(db, 'all')
+            .mockImplementationOnce((sql, params, callback) => {
+                callback(null,testRows);  
+                return {} as Database;
+            })
+
+            await expect(dao.getDocumentById(testId)).resolves.toEqual(testDocument);
+
+            expect(db.get).toHaveBeenCalledWith(
+                `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category
+                FROM documents d
+                JOIN stakeholders_documents sd ON d.id = sd.id_document
+                JOIN stakeholders s ON sd.id_stakeholder = s.id
+                WHERE d.id = ?`,
+                [testId],
+                expect.any(Function)
+            );
+            
         });
     });
 });

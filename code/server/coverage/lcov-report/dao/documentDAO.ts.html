@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">13.4% </span>
+                <span class="strong">19.55% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>24/179</span>
+                <span class='fraction'>35/179</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">6.12% </span>
+                <span class="strong">10.2% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>3/49</span>
+                <span class='fraction'>5/49</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">14.81% </span>
+                <span class="strong">22.22% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>8/54</span>
+                <span class='fraction'>12/54</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">14.2% </span>
+                <span class="strong">20.11% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>24/169</span>
+                <span class='fraction'>34/169</span>
             </div>
         
             
@@ -579,9 +579,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -589,22 +589,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -614,13 +611,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1032,10 +1032,10 @@ class DocumentDAO {
      * @param id The id of the document to retrieve.
      * @returns A Promise that resolves to the document with the specified id.
      */
-<span class="fstat-no" title="function not covered" >    getDocumentById(</span>id: number): Promise&lt;Document&gt; {
-<span class="cstat-no" title="statement not covered" >        return new Promise&lt;Document&gt;(<span class="fstat-no" title="function not covered" >(r</span>esolve, reject) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >            try {</span>
-                const sql = <span class="cstat-no" title="statement not covered" >`</span>
+    getDocumentById(id: number): Promise&lt;Document&gt; {
+        return new Promise&lt;Document&gt;((resolve, reject) =&gt; {
+            try {
+                const sql = `
                     SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category
                     FROM documents d
                     JOIN stakeholders_documents sd ON d.id = sd.id_document
@@ -1043,19 +1043,19 @@ class DocumentDAO {
                     WHERE d.id = ?
                 `;
     
-<span class="cstat-no" title="statement not covered" >                db.all(sql, [id], <span class="fstat-no" title="function not covered" >(e</span>rr: Error | null, rows: any[]) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >                    <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {</span>
+                db.all(sql, [id], (err: Error | null, rows: any[]) =&gt; {
+                    <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
 <span class="cstat-no" title="statement not covered" >                        reject(err);</span>
 <span class="cstat-no" title="statement not covered" >                        return;</span>
                     }
-<span class="cstat-no" title="statement not covered" >                    <span class="missing-if-branch" title="if path not taken" >I</span>if (!rows || rows.length === 0) {</span>
+                    <span class="missing-if-branch" title="if path not taken" >I</span>if (!rows || rows.length === 0) {
 <span class="cstat-no" title="statement not covered" >                        reject(new Error("Document not found."));</span>
 <span class="cstat-no" title="statement not covered" >                        return;</span>
                     }
     
                     // Initialize document with the first row's data
-                    const row = <span class="cstat-no" title="statement not covered" >rows[0];</span>
-                    const document: Document = <span class="cstat-no" title="statement not covered" >new Document(</span>
+                    const row = rows[0];
+                    const document: Document = new Document(
                         row.id,
                         row.title,
                         [], // Placeholder for stakeholders, populated below
@@ -1068,13 +1068,13 @@ class DocumentDAO {
                     );
     
                     // Populate stakeholders
-<span class="cstat-no" title="statement not covered" >                    document.stakeHolders = rows.map(<span class="fstat-no" title="function not covered" >row </span>=&gt; <span class="cstat-no" title="statement not covered" >new Stakeholder(</span></span>
+                    document.stakeHolders = rows.map(row =&gt; new Stakeholder(
                         row.stakeholder_id,
                         row.stakeholder_name,
                         row.stakeholder_category
                     ));
     
-<span class="cstat-no" title="statement not covered" >                    resolve(document);</span>
+                    resolve(document);
                 });
             } catch (error) {
 <span class="cstat-no" title="statement not covered" >                reject(error);</span>
@@ -1432,7 +1432,7 @@ export {DocumentDAO}</pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-10-31T18:26:47.519Z
+                at 2024-10-31T19:05:42.393Z
             </div>
         <script src="../prettify.js"></script>
         <script>
