@@ -1,21 +1,21 @@
-import { Link } from "react-router-dom";
-import { useParams, useNavigate } from "react-router-dom";
+
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Document } from "../models/document";
 import API from "../API/API";
-import { TrashIcon, PencilIcon, PlusIcon } from "@heroicons/react/24/outline";
-import { Modal } from "react-bootstrap";
 import Alert from "./Alert";
-import ConfirmModal from './ConfirmModal';
-import { Container } from "react-dom";
+
 
 function AddLinkModal(props: any) {
     const navigate = useNavigate();
-    const [title, setTitle] = useState('');
-    const [stakeholders, setStakeholders] = useState('');
-    const [typesLink, setTypesLink] = useState([]);
+    const [title, setTitle] = useState(''); //title of document
+    const [stakeholders, setStakeholders] = useState([]); //vector of stakeholders
+    const [typesLink, setTypesLink] = useState([]); //vector of types of links
+    const [documents, setDocuments] = useState([]); //vector of all documents expect one
+
+    const [selectedStakeholders, setSelectedStakeholders] = useState<string[]>([]); // Selected stakeholders in the form
+
     const [showAlert, setShowAlert] = useState(false); // alert state
-    const [documents, setDocuments] = useState([]);
 
     const handleSubmit = () => {
         // Implement API call to add link, if necessary
@@ -42,13 +42,29 @@ function AddLinkModal(props: any) {
             }catch(err){
                 setShowAlert(true);
             }
-        }
+        };
 
+        //get all stakeholders
+        const getAllStakeholders = async () => {
+            try{
+                const allStakeholders = await API.getAllStakeholders();
+                setStakeholders(allStakeholders);
+            }catch(err){
+                setShowAlert(true);
+            }
+        };
+
+        getAllStakeholders();
         getTypesLink();
         getAllDocuments();
     }, [])
 
-    
+    // Update selected stakeholders when the user selects or deselects an option
+    const handleStakeholderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedOptions: string[] = Array.from(e.target.selectedOptions, option => option.value);
+        setSelectedStakeholders( selectedOptions  );
+    };
+
 
     if (!props.show) {
         return (
@@ -92,13 +108,19 @@ function AddLinkModal(props: any) {
                 
                 <div className="mb-4">
                     <label htmlFor="stakeholders" className="block text-gray-700 font-medium mb-2">Stakeholders</label>
-                    <input
-                        type="text"
+                    <select
                         id="stakeholders"
+                        multiple
                         className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        value={stakeholders}
-                        onChange={(e) => setStakeholders(e.target.value)}
-                    />
+                        value={selectedStakeholders}
+                        onChange={handleStakeholderChange}
+                    >
+                        {stakeholders.map((stakeholder: any) => (
+                            <option key={stakeholder.id} value={stakeholder.id}>
+                                {stakeholder.name} ({stakeholder.category})
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 <div className="flex justify-end">

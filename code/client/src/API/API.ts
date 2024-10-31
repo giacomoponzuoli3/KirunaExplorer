@@ -158,6 +158,7 @@ async function editDocument(id: number, title: string, stakeHolders: number[], s
 
 async function getDocumentLinksById(id: number) {
     const response = await fetch(baseURL + "doc/" + id + "/links", { credentials: "include" })
+    console.log("entrato");
     if (response.ok) {
         const documents = await response.json()
         return documents
