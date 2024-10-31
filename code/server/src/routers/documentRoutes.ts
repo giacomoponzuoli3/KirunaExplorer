@@ -117,7 +117,6 @@ class DocumentRoutes {
                     const links = await this.controller.getDocumentLinksById(req.params["id"]);
                     res.status(200).json(links);
                 } catch (err) {
-                    console.log("entrato");
                     next(err);
                 }
             }
