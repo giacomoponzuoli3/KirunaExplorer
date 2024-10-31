@@ -255,31 +255,28 @@ class DocumentDAO {
             });
         });
     }
-    
 
     getDocumentLinksById(id: number): Promise<Document[]> {
         return new Promise<Document[]>((resolve, reject) => {
-            try{
-                const sql = `
-                    SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category
-                    FROM documents d
-                    JOIN stakeholders_documents sd ON d.id = sd.id_document
-                    JOIN stakeholders s ON sd.id_stakeholder = s.id
-                    WHERE d.id = ?
-                `;
-                db.all(sql, [id], (err: Error | null, rows: any[]) => {
+            try {
+                const sql = "SELECT * FROM documents_links WHERE id_document1 = ? OR id_document2 = ?";
+                db.all(sql, [id, id], (err: Error | null, rows: any[]) => {
                     if (err) {
                         reject(err);
                         return;
                     }
                     if (!rows || rows.length === 0) {
-                        reject(new Error("No documents found."));
+                        reject(new Error("No links found."));
                         return;
                     }
 
-                    const documentsRelatedIds: number[] = rows.map((row: any) => row.id_document2);
-                    const sql2 = "SELECT * FROM documents WHERE id IN (?)";
-                    db.all(sql2, documentsRelatedIds, (err: Error | null, rows: any[]) => {
+                    const documents2RelatedIds: number[] = rows.map((row: any) => row.id_document2);
+                    const documents1RelatedIds: number[] = rows.map((row: any) => row.id_document1);
+                    const uniqueDocumentIds = [...documents1RelatedIds, ...documents2RelatedIds].filter((n)=>n !== id);
+                    const filteredUniqueDocumentIds = new Set([uniqueDocumentIds]);
+
+                    const sql = "SELECT * FROM documents WHERE id IN (?)";
+                    db.all(sql, [Array.from(filteredUniqueDocumentIds)], (err: Error | null, rows: any[]) => {
                         if (err) {
                             reject(err);
                             return;
@@ -288,38 +285,39 @@ class DocumentDAO {
                             reject(new Error("No documents found."));
                             return;
                         }
-                        // Group rows by document and map stakeholders to each document
-                    const documentsMap = new Map<number, Document>();
-                    rows.forEach((row: any) => {
-                        const documentId = row.id;
-                        if (!documentsMap.has(documentId)) {
-                            documentsMap.set(documentId, new Document(
-                                row.id,
-                                row.title,
-                                [],  // Placeholder for stakeholders, populated below
-                                row.scale,
-                                row.issuance_date,
-                                row.type,
-                                row.language,
-                                row.pages,
-                                row.description
-                            ));
-                        }
+
+                        const documents: Document[] = rows.map((row: any) => {
+                            let stakeholders: Stakeholder[] = []    
+                            const sql = `
+                            SELECT sd.id_stakeholder, s.name, s.category
+                            FROM stakeholders_documents sd
+                            JOIN stakeholders s ON s.id = sd.id_stakeholder
+                            WHERE id_document = ?
+                            `;
+                            db.all(sql, [row.id], (err: Error | null, rows: any[]) => {
+                                if (err) {
+                                    reject(err);
+                                    return;
+                                }
+                                if (!rows || rows.length === 0) {
+                                    reject(new Error("No stakeholders found."));
+                                    return;
+                                }
     
-                        // Add stakeholder (always available) to the document's stakeholders array
-                        const stakeholder = new Stakeholder(row.stakeholder_id, row.stakeholder_name, row.stakeholder_category);
-                        documentsMap.get(documentId)?.stakeHolders.push(stakeholder);
-                    });
-    
-                    // Convert map values to array
-                    const documents = Array.from(documentsMap.values());
-                    resolve(documents);
+                                 stakeholders= rows.map((row: any) => new Stakeholder(row.id_stakeholder, row.name, row.category));
+                                
+                            })
+
+                            return new Document(row.id, row.title, stakeholders, row.scale, row.issuance_date, row.type, row.language, row.pages, row.description)
+                        });
+                        resolve(documents);
                     });
                 });
-            } catch (error) {
-                reject(error);
-            }
-        });
+                } catch (error) {
+                    reject(error);
+                    return;
+                }
+        })
     }
 
     /**
