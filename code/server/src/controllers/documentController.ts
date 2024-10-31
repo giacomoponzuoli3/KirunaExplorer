@@ -1,5 +1,6 @@
 import { Document } from "../models/document";
 import { DocumentDAO } from "../dao/documentDAO";
+import { DocLink } from "../models/document_link";
 
 class DocumentController {
     private dao: DocumentDAO;
@@ -73,7 +74,7 @@ class DocumentController {
      * @param id The id of the document whose linked documents are to be retrieved.
      * @returns A Promise that resolves to an array of Document objects linked to the specified document.
      */
-    getDocumentLinksById(id: number): Promise<Document[]> {
+    getDocumentLinksById(id: number): Promise<DocLink[]> {
         return this.dao.getDocumentLinksById(id);
     }
 
