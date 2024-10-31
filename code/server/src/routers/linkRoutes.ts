@@ -23,13 +23,13 @@ class LinkRoutes {
 
         this.router.post(
             "/",
-            body("name").isString(),
             body("idDoc1").isNumeric(),
             body("idDoc2").isNumeric(),
+            body("idLink").isNumeric(),
             this.errorHandler.validateRequest,
             async (req: any, res: any, next: any) => {
                 try {
-                    await this.controller.addLink(req.body.idDoc1, req.body.idDoc2, req.body.name)
+                    await this.controller.addLink(req.body.idDoc1, req.body.idDoc2, req.body.idLink)
                     res.status(200).json({ message: "Link added successfully" })
                 } catch (err) {
                     next(err)
@@ -38,12 +38,14 @@ class LinkRoutes {
         )
 
         this.router.delete(
-            "/:id",
-            param("id").isNumeric(),
+            "/",
+            body("idDoc1").isNumeric(),
+            body("idDoc2").isNumeric(),
+            body("idLink").isNumeric(),
             this.errorHandler.validateRequest,
             async (req: any, res: any, next: any) => {
                 try {
-                    await this.controller.deleteLink(req.params.id)
+                    await this.controller.deleteLink(req.body.idDoc1, req.body.idDoc2, req.body.idLink)
                     res.status(200).json({ message: "Link deleted successfully" })
                 } catch (err) {
                     next(err)
@@ -52,32 +54,20 @@ class LinkRoutes {
         )
 
         this.router.patch(
-            "/:id",
-            param("id").isNumeric(),
-            body("name").isString(),
+            "/",
+            body("idDoc1").isNumeric(),
+            body("idDoc2").isNumeric(),
+            body("oldLinkId").isNumeric(),
+            body("newLinkId").isNumeric(),
             this.errorHandler.validateRequest,
             async (req: any, res: any, next: any) => {
                 try {
-                    await this.controller.updateLink(req.param.id, req.body.name)
+                    await this.controller.updateLink(req.body.idDoc1, req.body.idDoc2, req.body.oldLinkId, req.body.newLinkId)
                     res.status(200).json({ message: "Link updated successfully" })
                 } catch (err) {
                     next(err)
                 }
         })
-
-        this.router.get(
-            "/:id",
-            param("id").isNumeric(),
-            this.errorHandler.validateRequest,
-            async (req: any, res: any, next: any) => {
-                try {
-                    const link = await this.controller.getLinkById(req.params.id)
-                    res.status(200).json(link)
-                } catch (err) {
-                    next(err)
-                }
-            }
-        )
 
         this.router.get(
             "/",

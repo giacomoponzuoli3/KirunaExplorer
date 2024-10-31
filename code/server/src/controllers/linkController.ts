@@ -15,8 +15,8 @@ class LinkController {
      * @param name The name of the link to add.
      * @returns A Promise that resolves when the link has been added.
      */
-    async addLink(idDoc1: number, idDoc2: number, name: string): Promise<void> {
-        await this.dao.addLink(idDoc1, idDoc2, name);
+    async addLink(idDoc1: number, idDoc2: number, idLink: number): Promise<void> {
+        await this.dao.addLink(idDoc1, idDoc2, idLink);
     }
 
     /**
@@ -24,8 +24,8 @@ class LinkController {
      * @param linkId The id of the link to delete.
      * @returns A Promise that resolves when the link has been deleted.
      */
-    async deleteLink(linkId: number) {
-        await this.dao.deleteLinks(linkId);
+    async deleteLink(idDoc1: number, idDoc2: number, linkId: number) {
+        await this.dao.deleteLinks(idDoc1, idDoc2, linkId);
     }
 
     /**
@@ -34,17 +34,8 @@ class LinkController {
      * @param name The new name of the link.
      * @returns A Promise that resolves when the link has been updated.
      */
-    async updateLink(id: number, name: string) {
-        await this.dao.updateLink(id, name);
-    }
-
-    /**
-     * Retrieves a link by its id from the database.
-     * @param id The id of the link to retrieve.
-     * @returns A Promise that resolves to the link with the specified id.
-     */
-    async getLinkById(id: number): Promise<Link> {
-        return await this.dao.getLinkById(id);
+    async updateLink(idDoc1: number, idDoc2: number, oldLinkId: number, newLinkId: number) {
+        await this.dao.updateLink(idDoc1, idDoc2, oldLinkId, newLinkId);
     }
 
     /**
