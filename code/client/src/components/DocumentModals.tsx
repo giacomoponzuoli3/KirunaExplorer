@@ -81,10 +81,10 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders}: AddDo
 
     return (
         <Modal size="lg" show={show} onHide={handleClose} aria-labelledby="example-modal-sizes-title-lg">
-            <Modal.Header closeButton style={{ backgroundColor: 'rgb(250, 250, 210, 0.8)' }}>
+            <Modal.Header closeButton style={{ backgroundColor: 'rgb(167, 199, 231,0.8)' }}>
                 <Modal.Title id="example-modal-sizes-title-lg">Add New Document</Modal.Title>
             </Modal.Header>
-            <Modal.Body style={{ backgroundColor: 'rgb(250, 250, 210, 0.2)' }}>
+            <Modal.Body style={{ backgroundColor: 'rgb(167, 199, 231,0.4)' }}>
                 <Container>
                 {error && <Alert variant="danger">{error}</Alert>} {/* Display error message */}
                     <Form>
@@ -101,8 +101,10 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders}: AddDo
                             </Col>
                             <Col className="mt-4" sm="4"> 
                               <Dropdown className="mt-2">
-                                <Dropdown.Toggle variant="success" id="dropdown-basic"><RequiredLabel text="Choose Stakeholders" /></Dropdown.Toggle>
-                                   <Dropdown.Menu>
+                                <Dropdown.Toggle variant="success" id="dropdown-basic" style={{backgroundColor: 'rgb(164,135,121)'}}>
+                                    <RequiredLabel text="Choose Stakeholders" />
+                                    </Dropdown.Toggle>
+                                   <Dropdown.Menu style={{width:'200px'}}>
                                       {stakeholders.map((option, index) => (
                                        <Dropdown.Item
                                                   key={index}
@@ -135,10 +137,10 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders}: AddDo
                             </Form.Group>
                             <Col className="mt-4">
                             <Dropdown className="mt-2">
-                              <Dropdown.Toggle id="dropdown-button-dark-example1" className="bg-gradient-to-r from-orange-400 to-yellow-500" style={{borderColor: 'white'}}>
-                                  {type ? type : <RequiredLabel text="Choose a type" />}
+                              <Dropdown.Toggle id="dropdown-button-dark-example1" style={{borderColor: 'white', backgroundColor: 'rgb(164,135,121)', width:'200px'}}>
+                              <span style={{ textAlign: 'left' }}>{type ? type : <RequiredLabel text="Choose a type" />}</span>
                               </Dropdown.Toggle>
-                              <Dropdown.Menu>
+                              <Dropdown.Menu style={{width:'200px'}}>
                                   <Dropdown.Item key={0} eventKey={"Informative document"} onClick={() => {setType("Informative document")}}>
                                       Informative document
                                   </Dropdown.Item>
@@ -194,11 +196,11 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders}: AddDo
                     </Form>
                 </Container>
             </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
+            <Modal.Footer style={{ backgroundColor: 'rgb(167, 199, 231,0.8)' }}>
+                <Button variant="secondary" className="text-white rounded-md" onClick={handleClose}>
                     Cancel
                 </Button>
-                <Button className="bg-gradient-to-r from-orange-400 to-yellow-500" onClick={handleSubmit} style={{borderColor: 'white'}}>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-md" onClick={handleSubmit} style={{borderColor: 'white'}}>
                     Submit
                 </Button>
             </Modal.Footer>
@@ -257,10 +259,10 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
 
     return (
         <Modal size="lg" show={show} onHide={onHide} aria-labelledby="example-modal-sizes-title-lg">
-            <Modal.Header closeButton style={{ backgroundColor: 'rgb(250, 250, 210, 0.8)' }}>
+            <Modal.Header closeButton style={{ backgroundColor: 'rgb(167, 199, 231,0.8)' }}>
                 <Modal.Title id="example-modal-sizes-title-lg">Edit Document</Modal.Title>
             </Modal.Header>
-            <Modal.Body style={{ backgroundColor: 'rgb(250, 250, 210, 0.2)' }}>
+            <Modal.Body style={{ backgroundColor: 'rgb(167, 199, 231,0.4)' }}>
                 <Container>
                 {error && <Alert variant="danger">{error}</Alert>} {/* Display error message */}
                     <Form>
@@ -277,8 +279,10 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                             </Col>
                             <Col className="mt-4" sm="4"> 
                               <Dropdown className="mt-2">
-                                <Dropdown.Toggle variant="success" id="dropdown-basic"><RequiredLabel text="Choose Stakeholders" /></Dropdown.Toggle>
-                                   <Dropdown.Menu>
+                                <Dropdown.Toggle id="dropdown-basic" style={{ backgroundColor: 'rgb(164,135,121)'}}>
+                                    <RequiredLabel text="Choose Stakeholders" />
+                                    </Dropdown.Toggle>
+                                   <Dropdown.Menu style={{width:'200px'}}>
                                       {stakeholders.map((option, index) => (
                                        <Dropdown.Item
                                                   key={index}
@@ -311,10 +315,10 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                             </Form.Group>
                             <Col className="mt-4">
                             <Dropdown className="mt-2">
-                              <Dropdown.Toggle id="dropdown-button-dark-example1" className="bg-gradient-to-r from-orange-400 to-yellow-500" style={{borderColor: 'white'}}>
+                              <Dropdown.Toggle id="dropdown-button-dark-example1" style={{borderColor: 'white', backgroundColor: 'rgb(164,135,121)', width:'200px'}}>
                                   {type ? type : <RequiredLabel text="Choose a type" />}
                               </Dropdown.Toggle>
-                              <Dropdown.Menu>
+                              <Dropdown.Menu style={{width:'200px'}}>
                                   <Dropdown.Item key={0} eventKey={"Informative document"} onClick={() => {setType("Informative document")}}>
                                       Informative document
                                   </Dropdown.Item>
@@ -370,11 +374,11 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                     </Form>
                 </Container>
             </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={onHide}>
+            <Modal.Footer style={{ backgroundColor: 'rgb(167, 199, 231,0.8)' }}>
+                <Button variant="secondary" className="text-white rounded-md" onClick={onHide}>
                     Cancel
                 </Button>
-                <Button className="bg-gradient-to-r from-orange-400 to-yellow-500" onClick={handleSubmit} style={{borderColor: 'white'}}>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-md" onClick={handleSubmit} style={{borderColor: 'white'}}>
                     Submit
                 </Button>
             </Modal.Footer>
@@ -420,10 +424,10 @@ function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, 
             {getDocumentIcon(selectedDocument.type)}
             {user.role==="Urban Planner" ?(
                 <>
-                    <Button className="bg-gradient-to-r from-orange-400 to-yellow-500 mt-4" onClick={handleEditClick} style={{borderColor: 'white'}}>
+                    <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-md mt-4" onClick={handleEditClick} style={{borderColor: 'white', width:'70px'}}>
                         Edit
                     </Button>
-                    <Button className="bg-gradient-to-r from-red-600 to-red-400 mt-4" onClick={handleDeleteClick} style={{borderColor: 'white'}}>
+                    <Button className="bg-gradient-to-r from-red-600 to-red-400 mt-3" onClick={handleDeleteClick} style={{borderColor: 'white'}}>
                         Delete
                     </Button>
                 </>
@@ -434,6 +438,7 @@ function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, 
             <p>Scale: {selectedDocument.scale}</p>
             <p>Issuance Date: {selectedDocument.issuanceDate}</p>
             <p>Type: {selectedDocument.type}</p>
+            <p>Conections: {}</p>
             <p>Language: {selectedDocument.language ? selectedDocument.language : '-'}</p>
             <p>Pages: {selectedDocument.pages ? selectedDocument.pages : '-'}</p>
             </Col>
@@ -441,17 +446,14 @@ function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, 
               <p>{selectedDocument.description ? selectedDocument.description : '-'}</p>
             </Col>
           </Row>
-          <Row>
-            <Col>
-              <Link to={`documents/${selectedDocument.id}/links`}
-                className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium no-underline"
-              >
-                View connections
-              </Link>
-            </Col>
-          </Row>
           </Container>
         </Modal.Body>
+        <Modal.Footer style={{backgroundColor: 'rgb(250, 250, 210, 0.8)'}}>
+        <Link to={`documents/${selectedDocument.id}/links`}
+                className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium no-underline"
+              >View connections
+              </Link>
+        </Modal.Footer>
       </Modal>
       </>
     );
