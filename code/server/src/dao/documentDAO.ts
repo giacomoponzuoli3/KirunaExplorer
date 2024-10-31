@@ -1,3 +1,4 @@
+import { DocLink } from "../models/document_link";
 import db from "../db/db"
 import { Document } from "../models/document"
 import { Stakeholder } from "../models/stakeholder"
@@ -256,69 +257,74 @@ class DocumentDAO {
         });
     }
 
-    getDocumentLinksById(id: number): Promise<Document[]> {
-        return new Promise<Document[]>((resolve, reject) => {
+    getDocumentLinksById(id: number): Promise<DocLink[]> {
+        return new Promise<DocLink[]>((resolve, reject) => {
             try {
-                const sql = "SELECT * FROM documents_links WHERE id_document1 = ? OR id_document2 = ?";
+                const sql = `
+                    SELECT dl.*, l.name AS link_name 
+                    FROM documents_links dl
+                    JOIN links l ON dl.id_link = l.id
+                    WHERE dl.id_document1 = ? OR dl.id_document2 = ?
+                `;
                 db.all(sql, [id, id], (err: Error | null, rows: any[]) => {
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-                    if (!rows || rows.length === 0) {
-                        reject(new Error("No links found."));
-                        return;
-                    }
-
-                    const documents2RelatedIds: number[] = rows.map((row: any) => row.id_document2);
-                    const documents1RelatedIds: number[] = rows.map((row: any) => row.id_document1);
-                    const uniqueDocumentIds = [...documents1RelatedIds, ...documents2RelatedIds].filter((n)=>n !== id);
-                    const filteredUniqueDocumentIds = new Set([uniqueDocumentIds]);
-
-                    const sql = "SELECT * FROM documents WHERE id IN (?)";
-                    db.all(sql, [Array.from(filteredUniqueDocumentIds)], (err: Error | null, rows: any[]) => {
-                        if (err) {
-                            reject(err);
-                            return;
-                        }
-                        if (!rows || rows.length === 0) {
-                            reject(new Error("No documents found."));
-                            return;
-                        }
-
-                        const documents: Document[] = rows.map((row: any) => {
-                            let stakeholders: Stakeholder[] = []    
-                            const sql = `
-                            SELECT sd.id_stakeholder, s.name, s.category
-                            FROM stakeholders_documents sd
-                            JOIN stakeholders s ON s.id = sd.id_stakeholder
-                            WHERE id_document = ?
-                            `;
-                            db.all(sql, [row.id], (err: Error | null, rows: any[]) => {
-                                if (err) {
-                                    reject(err);
-                                    return;
-                                }
-                                if (!rows || rows.length === 0) {
-                                    reject(new Error("No stakeholders found."));
-                                    return;
-                                }
+                    if (err) return reject(err);
+                    if (!rows || rows.length === 0) return reject(new Error("No links found."));
     
-                                 stakeholders= rows.map((row: any) => new Stakeholder(row.id_stakeholder, row.name, row.category));
-                                
-                            })
-
-                            return new Document(row.id, row.title, stakeholders, row.scale, row.issuance_date, row.type, row.language, row.pages, row.description)
+                    const documents2RelatedIds: number[] = rows.map(row => row.id_document2);
+                    const documents1RelatedIds: number[] = rows.map(row => row.id_document1);
+                    const uniqueDocumentIds = [...documents1RelatedIds, ...documents2RelatedIds].filter(n => n !== id);
+                    const filteredUniqueDocumentIds = [...new Set(uniqueDocumentIds)];
+    
+                    const sqlDocs = "SELECT * FROM documents WHERE id IN (?)";
+                    db.all(sqlDocs, [filteredUniqueDocumentIds], (err: Error | null, documentRows: any[]) => {
+                        if (err) return reject(err);
+                        if (!documentRows || documentRows.length === 0) return reject(new Error("No documents found."));
+    
+                        const documentPromises = documentRows.map(row => {
+                            const relatedLink = rows.find(linkRow =>
+                                (linkRow.id_document1 === row.id || linkRow.id_document2 === row.id) && linkRow.id_link
+                            );
+    
+                            return new Promise<DocLink>((resolveDoc, rejectDoc) => {
+                                const sqlStakeholders = `
+                                    SELECT sd.id_stakeholder, s.name, s.category
+                                    FROM stakeholders_documents sd
+                                    JOIN stakeholders s ON s.id = sd.id_stakeholder
+                                    WHERE id_document = ?
+                                `;
+                                db.all(sqlStakeholders, [row.id], (err: Error | null, stakeholderRows: any[]) => {
+                                    if (err) return rejectDoc(err);
+                                    
+                                    const stakeholders = stakeholderRows ? stakeholderRows.map(stakeholderRow =>
+                                        new Stakeholder(stakeholderRow.id_stakeholder, stakeholderRow.name, stakeholderRow.category)
+                                    ) : [];
+    
+                                    resolveDoc(new DocLink(
+                                        row.id,
+                                        row.title,
+                                        stakeholders,
+                                        row.scale,
+                                        row.issuance_date,
+                                        row.type,
+                                        row.language,
+                                        row.pages,
+                                        row.description,
+                                        relatedLink.link_name 
+                                    ));
+                                });
+                            });
                         });
-                        resolve(documents);
+    
+                        Promise.all(documentPromises)
+                            .then(documents => resolve(documents))
+                            .catch(reject);
                     });
                 });
-                } catch (error) {
-                    reject(error);
-                    return;
-                }
-        })
-    }
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }    
 
     /**
      * Retrieves the title of a document by its id from the database.
