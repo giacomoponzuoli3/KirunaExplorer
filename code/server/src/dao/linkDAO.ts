@@ -12,15 +12,17 @@ class LinkDAO {
                     AND id_link = ?
                 `;
                 db.all(sqlCheckLink, [idDoc1, idDoc2, idDoc2, idDoc1, idLink], (err: Error | null, rows: any[]) => {
-                    if (err) return reject(err);
-    
+                    if (err) return reject(err)
+                    console.log(rows);
                     if (rows && rows.length > 0) {
+                        console.log("entrato")
                         return reject(new Error("Link already exists between these documents with the same name."));
                     }
-    
-                const sqlInsertDocLinks = "INSERT INTO documents_links(id_document1, id_document2, id_link) VALUES(?, ?, ?)";
+                    
+                    const sqlInsertDocLinks = "INSERT INTO documents_links(id_document1, id_document2, id_link) VALUES(?, ?, ?)";
                     db.run(sqlInsertDocLinks, [idDoc1, idDoc2, idLink], (err: Error | null) => {
-                        if (err) return reject(err);
+                        console.log("entrato2")
+                        if (err) return reject(err)
                             resolve(); 
                         });
                     });

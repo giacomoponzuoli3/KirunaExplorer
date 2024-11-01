@@ -18,7 +18,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({ show, onHide, onConfirm }) 
     return (
         <Dialog open={open} onClose={onHide} className="relative z-10">
             {/* Overlay */}
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" />
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity animate-slide-in-left" aria-hidden="true" />
 
             <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
                 <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
