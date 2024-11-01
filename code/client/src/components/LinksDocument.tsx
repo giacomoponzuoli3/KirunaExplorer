@@ -31,7 +31,7 @@ function getDocumentIcon(type: string) {
 function LinksDocument(props: any) {
     const navigate = useNavigate();
     const { idDocument } = useParams();
-    const [document, setDocument] = useState('');
+    const [document, setDocument] = useState<Document | null>(null);
     const [documentLinks, setDocumentLinks] = useState<DocLink[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [documentToDelete, setDocumentToDelete] = useState<number | null>(null);
@@ -47,14 +47,37 @@ function LinksDocument(props: any) {
         }
     };
 
+    const refreshLinks = async () => {
+        try {
+            const documentId = Number(idDocument);
+            const updatedLinks = await API.getDocumentLinksById(documentId);
+            setDocumentLinks(updatedLinks);
+        } catch (err) {
+            setShowAlert(true);
+        }
+    };
+
+
+    useEffect(() => {
+        const getDocument = async () => {
+            try{
+                const documentId = Number(idDocument);
+                const document = await API.getDocumentById(documentId);
+                setDocument(document);
+            }catch(err){
+                setShowAlert(true);
+            }
+        };
+
+        getDocument();
+    }, [idDocument])
+
     useEffect(() => {
         const getDocuments = async () => {
             try{
                 const documentId = Number(idDocument);
-                const document = await API.getDocumentById(documentId);
                 const documentsConnections = await API.getDocumentLinksById(documentId);
-                console.log(documentsConnections)
-                setDocument(document);
+        
                 setDocumentLinks(documentsConnections);
             }catch (err){
                 setShowAlert(true);
@@ -73,7 +96,7 @@ function LinksDocument(props: any) {
     }
 
 
-    if (document == '' || documentLinks.length === 0){
+    if (document == null || documentLinks.length === 0){
         return (
             <div className="p-4">
             { showAlert &&  <Alert
@@ -94,6 +117,15 @@ function LinksDocument(props: any) {
                     onClose={() => setShowAlert(false)}
                 />
             )}
+
+            {/* Title Section with enhanced contrast */}
+            <h2 className="text-xl font-normal text-gray-600 mb-1 text-center">
+                Connections of
+            </h2>
+            <h2 className="text-3xl font-bold text-green-600 text-center mb-6">
+                {document.title}
+            </h2>
+
             <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
                     <thead>
@@ -153,6 +185,7 @@ function LinksDocument(props: any) {
                     show={showModalAddLink}
                     onHide={() => setShowModalAddLink(false)}
                     idDocument={idDocument}
+                    refreshLinks={refreshLinks}
                 />
             </>
             }

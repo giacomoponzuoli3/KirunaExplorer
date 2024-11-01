@@ -31,11 +31,22 @@ function AddLinkModal(props: any) {
         try{
             // Implement API call to add link
             await API.addLink(props.idDocument, selectedDocument, selectedTypeLink);
+
             props.onHide();
+            props.refreshLinks(); // Richiama la funzione di aggiornamento
+            //reset of values
+            setSelectedDocument(null)
+            setSelectedTypeLink(null)
         }catch(err){
             setShowAlert(true);
         }
     };
+
+    const handleHide = () =>{
+        props.onHide();
+        setSelectedDocument(null);
+        setSelectedTypeLink(null);
+    }
 
     useEffect(() => {
         const getTypesLink = async () => {
@@ -197,7 +208,7 @@ function AddLinkModal(props: any) {
                 <div className="flex justify-end">
                     <button
                         className="bg-gray-300 text-gray-700 rounded-md px-4 py-2 mr-2 hover:bg-gray-400"
-                        onClick={props.onHide}
+                        onClick={handleHide}  
                     >
                         Cancel
                     </button>
