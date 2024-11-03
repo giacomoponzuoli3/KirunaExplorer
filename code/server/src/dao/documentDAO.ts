@@ -273,7 +273,7 @@ class DocumentDAO {
 
                     // Estrarre una lista di documenti correlati con i rispettivi link_name
                     const relatedDocs = rows.map(row => ({
-                        id: row.id_document1 === id ? row.id_document2 : row.id_document1,
+                        id: row.id_document1 == id ? row.id_document2 : row.id_document1,
                         link_name: row.link_name
                     }));
 
@@ -281,6 +281,7 @@ class DocumentDAO {
                     const documentPromises = relatedDocs.map(({ id: docId, link_name }) => {
                         return new Promise<DocLink>((resolveDoc, rejectDoc) => {
                             // Query per ottenere i dati del documento
+
                             const sqlDoc = `SELECT * FROM documents WHERE id = ?`;
                             db.get(sqlDoc, [docId], (err: Error | null, documentRow: any) => {
                                 if (err) return rejectDoc(err);
@@ -296,6 +297,7 @@ class DocumentDAO {
                                 db.all(sqlStakeholders, [docId], (err: Error | null, stakeholderRows: any[]) => {
                                     if (err) return rejectDoc(err);
 
+                                    console.log("entrato");
                                     // Creiamo la lista degli stakeholder
                                     const stakeholders = stakeholderRows ? stakeholderRows.map(stakeholderRow =>
                                         new Stakeholder(stakeholderRow.id_stakeholder, stakeholderRow.name, stakeholderRow.category)
@@ -314,6 +316,7 @@ class DocumentDAO {
                                         documentRow.description,
                                         link_name // Assegniamo direttamente il nome del link
                                     ));
+                                    
                                 });
                             });
                         });
