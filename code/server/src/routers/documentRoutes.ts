@@ -4,16 +4,19 @@ import {body, oneOf, param, query} from "express-validator"
 import ErrorHandler from "../helper"
 import {Document} from "../models/document"
 import { link } from "fs"
+import Authenticator from "./auth"
 
 class DocumentRoutes {
     private controller: DocumentController
     private readonly router: Router
     private errorHandler: ErrorHandler
+    private authenticator: Authenticator
 
-    constructor() {
+    constructor(authenticator: Authenticator) {
         this.controller = new DocumentController()
         this.router = express.Router()
         this.errorHandler = new ErrorHandler()
+        this.authenticator = authenticator;
         this.initRoutes()
     }
 
@@ -110,6 +113,8 @@ class DocumentRoutes {
 
         this.router.get(
             "/:id/links",
+            this.authenticator.isLoggedIn,
+            this.authenticator.isPlanner,
             param("id").isNumeric(),
             this.errorHandler.validateRequest,
             async (req: any, res: any, next: any) => {
