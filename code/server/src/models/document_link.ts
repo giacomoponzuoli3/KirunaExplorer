@@ -1,3 +1,4 @@
+import Link from "./link"
 import { Stakeholder } from "./stakeholder"
 
 /**
@@ -13,7 +14,7 @@ class DocLink {
     language: string | null
     pages: string | null
     description: string | null
-    relatedLink: string
+    relatedLink: Link
 
     /**
      * Creates a new instance of the Document class.
@@ -37,7 +38,7 @@ class DocLink {
         language: string | null = null,
         pages: string | null = null,
         description: string | null = null,
-        relatedLink: string
+        relatedLink: Link
     ) {
         this.id = id
         this.title = title

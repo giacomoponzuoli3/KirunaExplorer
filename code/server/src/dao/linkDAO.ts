@@ -35,6 +35,7 @@ class LinkDAO {
     deleteLinks(idDoc1: number, idDoc2: number, linkId: number): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try {
+                console.log("entrato")
                 const sqlDeleteDocLinks = `
                     DELETE FROM documents_links 
                     WHERE ((id_document1 = ? AND id_document2 = ?) OR (id_document1 = ? AND id_document2 = ?)) 

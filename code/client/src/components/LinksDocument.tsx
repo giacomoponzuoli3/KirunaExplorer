@@ -9,6 +9,7 @@ import Alert from "./Alert";
 import ConfirmModal from './ConfirmModal';
 import { AddLinkModal } from "./AddLinkModal";
 import { DocLink } from "../models/document_link";
+import { link } from "fs";
 
 
 function getDocumentIcon(type: string) {
@@ -35,14 +36,16 @@ function LinksDocument(props: any) {
     const [documentLinks, setDocumentLinks] = useState<DocLink[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [documentToDelete, setDocumentToDelete] = useState<number | null>(null);
+    const [linkToDelete, setLinkToDelete] = useState<number | null>(null);
     const [showAlert, setShowAlert] = useState(false); // alert state
     const [showModalAddLink, setShowModalAddLink] = useState(false);
 
+
     const handleDelete = async () => {
-        if (documentToDelete) {
-            //await API.deleteLink(documentToDelete);
+        if (document && documentToDelete && linkToDelete) {
+            await API.deleteLink(document.id , documentToDelete, linkToDelete);
             // Recharge the list of documents
-            setDocumentLinks(documentLinks.filter(doc => doc.id !== documentToDelete));
+            setDocumentLinks(documentLinks.filter(doc => (doc.id !== documentToDelete || doc.relatedLink.id !== linkToDelete)));
             setShowModal(false);
         }
     };
@@ -86,8 +89,9 @@ function LinksDocument(props: any) {
         getDocuments();
     }, [idDocument]);
 
-    const confirmDelete = (docId: number) => {
+    const confirmDelete = (docId: number, linkId: number) => {
         setDocumentToDelete(docId);
+        setLinkToDelete(linkId);
         setShowModal(true);
     };
 
@@ -143,14 +147,14 @@ function LinksDocument(props: any) {
                                 <td className="p-4">{getDocumentIcon(doc.type)}</td>
                                 <td className="p-4">{doc.title}</td>
                                 <td className="p-4">{doc.stakeHolders.map(sh => sh.name).join(' / ')}</td>
-                                <td className="p-4">{doc.relatedLink}</td>
+                                <td className="p-4">{doc.relatedLink.name}</td>
                                 {props.isLogged && props.user.role == "Urban Planner" && 
                                     <td className="p-4 flex justify-center space-x-4">
                                         <button className="text-red-500 hover:text-red-700" onClick={() => {
                                             if(documentLinks.length === 1){
                                                 setShowAlert(true);
                                             }else{
-                                                confirmDelete(doc.id)
+                                                confirmDelete(doc.id, doc.relatedLink.id)
                                                 setShowModal(true)
                                             }    
                                         }}>
