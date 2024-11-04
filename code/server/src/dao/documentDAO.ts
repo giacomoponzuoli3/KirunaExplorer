@@ -62,13 +62,7 @@ class DocumentDAO {
     getDocumentById(id: number): Promise<Document> {
         return new Promise<Document>((resolve, reject) => {
             try {
-                const sql = `
-                    SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category
-                    FROM documents d
-                    JOIN stakeholders_documents sd ON d.id = sd.id_document
-                    JOIN stakeholders s ON sd.id_stakeholder = s.id
-                    WHERE d.id = ?
-                `;
+                const sql = `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.id = ?`;
     
                 db.all(sql, [id], (err: Error | null, rows: any[]) => {
                     if (err) {
@@ -117,12 +111,7 @@ class DocumentDAO {
     getAllDocuments(): Promise<Document[]> {
         return new Promise<Document[]>((resolve, reject) => {
             try {
-                const sql = `
-                    SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category
-                    FROM documents d
-                    JOIN stakeholders_documents sd ON d.id = sd.id_document
-                    JOIN stakeholders s ON sd.id_stakeholder = s.id
-                `;
+                const sql = `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id`;
     
                 db.all(sql, [], (err: Error | null, rows: any[]) => {
                     if (err) {
