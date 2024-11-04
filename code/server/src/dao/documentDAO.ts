@@ -2,6 +2,7 @@ import { DocLink } from "../models/document_link";
 import db from "../db/db"
 import { Document } from "../models/document"
 import { Stakeholder } from "../models/stakeholder"
+import Link from "../models/link";
 
 class DocumentDAO {
     /**
@@ -261,7 +262,7 @@ class DocumentDAO {
         return new Promise<DocLink[]>((resolve, reject) => {
             try {
                 const sql = `
-                    SELECT dl.id_document1, dl.id_document2, l.name AS link_name 
+                    SELECT dl.id_document1, dl.id_document2, l.id AS link_id, l.name AS link_name 
                     FROM documents_links dl
                     JOIN links l ON dl.id_link = l.id
                     WHERE dl.id_document1 = ? OR dl.id_document2 = ?
@@ -274,11 +275,12 @@ class DocumentDAO {
                     // Estrarre una lista di documenti correlati con i rispettivi link_name
                     const relatedDocs = rows.map(row => ({
                         id: row.id_document1 == id ? row.id_document2 : row.id_document1,
-                        link_name: row.link_name
+                        link_name: row.link_name,
+                        link_id: row.link_id
                     }));
 
                     // Costruire le promesse per ogni documento correlato
-                    const documentPromises = relatedDocs.map(({ id: docId, link_name }) => {
+                    const documentPromises = relatedDocs.map(({ id: docId, link_name, link_id }) => {
                         return new Promise<DocLink>((resolveDoc, rejectDoc) => {
                             // Query per ottenere i dati del documento
 
@@ -314,7 +316,7 @@ class DocumentDAO {
                                         documentRow.language,
                                         documentRow.pages,
                                         documentRow.description,
-                                        link_name // Assegniamo direttamente il nome del link
+                                        new Link(link_id, link_name) // Assegniamo direttamente il nome del link
                                     ));
                                     
                                 });
