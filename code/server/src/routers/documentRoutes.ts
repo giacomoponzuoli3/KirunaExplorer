@@ -113,8 +113,6 @@ class DocumentRoutes {
 
         this.router.get(
             "/:id/links",
-            this.authenticator.isLoggedIn,
-            this.authenticator.isPlanner,
             param("id").isNumeric(),
             this.errorHandler.validateRequest,
             async (req: any, res: any, next: any) => {
