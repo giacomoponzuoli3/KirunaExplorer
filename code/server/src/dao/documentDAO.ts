@@ -249,12 +249,7 @@ class DocumentDAO {
     getDocumentLinksById(id: number): Promise<DocLink[]> {
         return new Promise<DocLink[]>((resolve, reject) => {
             try {
-                const sql = `
-                    SELECT dl.*, l.name AS link_name 
-                    FROM documents_links dl
-                    JOIN links l ON dl.id_link = l.id
-                    WHERE dl.id_document1 = ? OR dl.id_document2 = ?
-                `;
+                const sql = `SELECT dl.*, l.name AS link_name FROM documents_links dl JOIN links l ON dl.id_link = l.id WHERE dl.id_document1 = ? OR dl.id_document2 = ?`;
                 db.all(sql, [id, id], (err: Error | null, rows: any[]) => {
                     if (err) return reject(err);
                     if (!rows || rows.length === 0) return reject(new Error("No links found."));
@@ -263,7 +258,7 @@ class DocumentDAO {
                     const documents1RelatedIds: number[] = rows.map(row => row.id_document1);
                     const combinedIds: number[] = Array.from(new Set([...documents2RelatedIds, ...documents1RelatedIds]));
                     const filteredIds: number[] = combinedIds.filter(idValue => idValue != id);
-    
+
                     const sqlDocs = "SELECT * FROM documents WHERE id IN (?)";
                     db.all(sqlDocs, filteredIds, (err: Error | null, documentRows: any[]) => {
                         if (err) return reject(err);
@@ -274,14 +269,9 @@ class DocumentDAO {
                             const relatedLink = rows.find(linkRow =>
                                 (linkRow.id_document1 === row.id || linkRow.id_document2 === row.id) && linkRow.id_link
                             );
-    
+                            console.log(relatedLink);
                             return new Promise<DocLink>((resolveDoc, rejectDoc) => {
-                                const sqlStakeholders = `
-                                    SELECT sd.id_stakeholder, s.name, s.category
-                                    FROM stakeholders_documents sd
-                                    JOIN stakeholders s ON s.id = sd.id_stakeholder
-                                    WHERE id_document = ?
-                                `;
+                                const sqlStakeholders = `SELECT sd.id_stakeholder, s.name, s.category FROM stakeholders_documents sd JOIN stakeholders s ON s.id = sd.id_stakeholder WHERE id_document = ?`;
                                 db.all(sqlStakeholders, [row.id], (err: Error | null, stakeholderRows: any[]) => {
                                     if (err) return rejectDoc(err);
                                     
