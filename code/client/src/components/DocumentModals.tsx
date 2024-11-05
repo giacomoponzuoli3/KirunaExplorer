@@ -85,140 +85,133 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders}: AddDo
 
     return (
         <Modal size="lg" show={show} onHide={handleClose} aria-labelledby="example-modal-sizes-title-lg">
-            <Modal.Header closeButton style={{ backgroundColor: 'rgb(167, 199, 231,0.8)' }}>
-                <Modal.Title id="example-modal-sizes-title-lg">Add New Document</Modal.Title>
-            </Modal.Header>
-            <Modal.Body style={{ backgroundColor: 'rgb(167, 199, 231,0.4)' }}>
-                <Container>
-                {error && <Alert variant="danger">{error}</Alert>} {/* Display error message */}
-                    <Form>
-                        <Row className="mb-3">
-                        <Col sm="8">
-                            <Form.Group as={Col} controlId="formTitle">
-                                <Form.Label><RequiredLabel text="Title" /></Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                />
-                            </Form.Group>
-                            </Col>
-                            <Col className="mt-4" sm="4"> 
-                              <Dropdown className="mt-2">
-                                <Dropdown.Toggle variant="success" id="dropdown-basic" style={{backgroundColor: 'rgb(164,135,121)'}}>
-                                    <RequiredLabel text="Choose Stakeholders" />
-                                    </Dropdown.Toggle>
-                                   <Dropdown.Menu style={{width:'200px'}}>
-                                      { 
-                                      stakeholders.map((option, index) => (
-                                       <Dropdown.Item
-                                                  key={index}
-                                                  onClick={() => toggleSelect(option)}
-                                                  active={selectedStakeholders.includes(option.id)}
-                                        >
-                                        {option.name}
-                                        </Dropdown.Item>
-                                        ))}
-                                    </Dropdown.Menu>
-                            </Dropdown>
-                            </Col>
-                        </Row>
-                        <Row className="mb-3">
-                            <Form.Group as={Col} controlId="formScale">
-                                <Form.Label><RequiredLabel text="Scale" /></Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={scale}
-                                    onChange={(e) => setScale(e.target.value)}
-                                />
-                            </Form.Group>
-                            <Form.Group as={Col} controlId="formIssuanceDate">
-                                <Form.Label> <RequiredLabel text="Issuance Date" /></Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={issuanceDate}
-                                    onChange={(e) => setIssuanceDate(e.target.value)}
-                                />
-                            </Form.Group>
-                            <Col className="mt-4">
-                            <Dropdown className="mt-2">
-                              <Dropdown.Toggle id="dropdown-button-dark-example1" style={{borderColor: 'white', backgroundColor: 'rgb(164,135,121)', width:'200px'}}>
-                              <span style={{ textAlign: 'left' }}>{type ? type : <RequiredLabel text="Choose a type" />}</span>
-                              </Dropdown.Toggle>
-                              <Dropdown.Menu style={{width:'200px'}}>
-                                  <Dropdown.Item key={0} eventKey={"Informative document"} onClick={() => {setType("Informative document")}}>
-                                      Informative document
-                                  </Dropdown.Item>
-                                  <Dropdown.Item key={1} eventKey={"Prescriptive document"} onClick={() => {setType("Prescriptive document")}}>
-                                      Prescriptive document
-                                  </Dropdown.Item>
-                                  <Dropdown.Item key={2} eventKey={"Design document"} onClick={() => {setType("Design document")}}>
-                                      Design document
-                                  </Dropdown.Item>
-                                  <Dropdown.Item key={3} eventKey={"Technical document"} onClick={() => {setType("Technical document")}}>
-                                      Technical document
-                                  </Dropdown.Item>
-                                  <Dropdown.Item key={4} eventKey={"Material effect"} onClick={() => {setType("Material effect")}}>
-                                       Material effect
-                                  </Dropdown.Item>
-                                  <Dropdown.Item key={5} eventKey={"Agreement"} onClick={() => {setType("Agreement")}}>
-                                        Agreement
-                                  </Dropdown.Item>
-                                  <Dropdown.Item key={6} eventKey={"Conflict"} onClick={() => {setType("Conflict")}}>
-                                        Conflict
-                                  </Dropdown.Item>
-                                  <Dropdown.Item key={7} eventKey={"Consultation"} onClick={() => {setType("Consultation")}}>
-                                        Consultation
-                                  </Dropdown.Item>
-                              </Dropdown.Menu>
-                            </Dropdown>
-                            </Col>
-                        </Row>
-                        <Row className="mb-3">
-                            <Form.Group as={Col} controlId="formDescription">
-                                <Form.Label>Description</Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    rows={3}
-                                    value={description || ''}
-                                    onChange={(e) => setDescription(e.target.value ? e.target.value : null)}
-                                />
-                            </Form.Group>
-                            <Col>
-                            <Form.Group as={Row} controlId="formLanguage" className="mb-3 mt-4">
-                                <Form.Label column sm="3">Language</Form.Label>
-                                <Col sm="9">
-                                <Form.Control
-                                    type="text"
-                                    value={language || ''}
-                                    onChange={(e) => setLanguage(e.target.value ? e.target.value : null)}
-                                />
-                                </Col>
-                            </Form.Group>
-                            <Form.Group as={Row} controlId="formPages" className="mb-3">
-                                <Form.Label column sm="3">Pages</Form.Label>
-                                <Col sm="9">
-                                <Form.Control
-                                    type="text"
-                                    value={pages || ''}
-                                    onChange={(e) => setPages(e.target.value ? e.target.value : null)}
-                                />
-                                </Col>
-                            </Form.Group>
-                            </Col>
-                        </Row>
-                    </Form>
-                </Container>
-            </Modal.Body>
-            <Modal.Footer style={{ backgroundColor: 'rgb(167, 199, 231,0.8)' }}>
-                <Button variant="secondary" className="text-white rounded-md" onClick={handleClose}>
-                    Cancel
-                </Button>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-md" onClick={handleSubmit} style={{borderColor: 'white'}}>
-                    Submit
-                </Button>
-            </Modal.Footer>
-        </Modal>
+            <Modal.Header closeButton style={{ backgroundColor: 'rgba(167, 199, 231, 0.8)' }}>
+        <Modal.Title id="example-modal-sizes-title-lg">Add New Document</Modal.Title>
+      </Modal.Header>
+      <Modal.Body style={{ backgroundColor: 'rgba(167, 199, 231, 0.4)' }}>
+      <Container>
+          {error && <Alert variant="danger">{error}</Alert>}
+          <Form>
+            <Row className="mb-3">
+                <Form.Group as={Row} controlId="formTitle">
+                  <Form.Label column md={2}><RequiredLabel text="Title" /></Form.Label>
+                  <Col md={10}>
+                  <Form.Control
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    style={{ width: '100%' }}
+                  />
+                </Col>
+                </Form.Group>
+            </Row>
+            <Row className="mb-3">
+              <Col md={6} className='mt-4'>
+                 <Form.Group as={Row} controlId="formScale" className="mb-3">
+                 <Form.Label column md={5}><RequiredLabel text="Scale" /></Form.Label>
+                 <Col md={7}>
+                   <Form.Control
+                      type="text"
+                      value={scale}
+                      onChange={(e) => setScale(e.target.value)}
+                      style={{ width: '100%' }}/>
+                  </Col>
+                  </Form.Group>
+                 <Form.Group as={Row} controlId="formIssuanceDate" className="mb-3">
+                 <Form.Label column md={5}><RequiredLabel text="Issuance Date" /></Form.Label>
+                  <Col md={7}>
+                    <Form.Control
+                    type="text"
+                    value={issuanceDate}
+                    onChange={(e) => setIssuanceDate(e.target.value)}
+                    style={{ width: '100%' }}/>
+                  </Col>
+                  </Form.Group>
+              </Col>
+              <Col xs={12} md={4} className="mt-3 ml-5">
+              <Row>
+                <Dropdown className="mt-2">
+                  <Dropdown.Toggle variant="success" id="dropdown-basic" 
+                    style={{ backgroundColor: 'rgb(164,135,121)', 
+                   }}>
+                    <span><RequiredLabel text="Choose Stakeholders" /></span>
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu style={{  width:'200px' }}>
+                    {stakeholders.map((option, index) => (
+                      <Dropdown.Item
+                        key={index}
+                        onClick={() => toggleSelect(option)}
+                        active={selectedStakeholders.includes(option.id)}
+                      >
+                        {option.name}
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Dropdown>
+                </Row>
+                <Row>
+                <Dropdown className="w-100 mt-3">
+                  <Dropdown.Toggle id="dropdown-button-dark-example1" 
+                  style={{ backgroundColor: 'rgb(164,135,121)', width:'200px'}}>
+                    {type ? type : <RequiredLabel text="Choose a type" />}
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu style={{  width:'200px' }}>
+                    <Dropdown.Item onClick={() => setType("Informative document")}>Informative document</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setType("Prescriptive document")}>Prescriptive document</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setType("Design document")}>Design document</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setType("Technical document")}>Technical document</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setType("Material effect")}>Material effect</Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </Row>
+             </Col>
+              </Row>
+    <Row className="mb-3">
+    <Form.Group as={Col} md={6} controlId="formDescription">
+        <Form.Label>Description</Form.Label>
+        <Form.Control
+            as="textarea"
+            rows={3}
+            value={description || ''}
+            onChange={(e) => setDescription(e.target.value ? e.target.value : null)}
+        />
+    </Form.Group>
+    <Col md={6} className='mt-4'>
+        <Form.Group as={Row} controlId="formLanguage" className="mb-3">
+            <Form.Label column md={4}>Language</Form.Label>
+            <Col md={8}>
+                <Form.Control
+                    type="text"
+                    value={language || ''}
+                    onChange={(e) => setLanguage(e.target.value ? e.target.value : null)}
+                />
+            </Col>
+        </Form.Group>
+        <Form.Group as={Row} controlId="formPages" className="mb-3">
+            <Form.Label column md={4}>Pages</Form.Label>
+            <Col md={8}>
+                <Form.Control
+                    type="text"
+                    value={pages || ''}
+                    onChange={(e) => setPages(e.target.value ? e.target.value : null)}
+                />
+            </Col>
+        </Form.Group>
+    </Col>
+   </Row>
+
+          </Form>
+        </Container>
+      </Modal.Body>
+      <Modal.Footer style={{ backgroundColor: 'rgba(167, 199, 231,0.8)' }}>
+        <Button variant="secondary" className="text-white rounded-md" onClick={handleClose}>
+          Cancel
+        </Button>
+        <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-md" onClick={handleSubmit} style={{ borderColor: 'white' }}>
+          Submit
+        </Button>
+      </Modal.Footer>
+    </Modal>
     );
 }
 
@@ -277,116 +270,119 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                 <Modal.Title id="example-modal-sizes-title-lg">Edit Document</Modal.Title>
             </Modal.Header>
             <Modal.Body style={{ backgroundColor: 'rgb(167, 199, 231,0.4)' }}>
-                <Container>
-                {error && <Alert variant="danger">{error}</Alert>} {/* Display error message */}
-                    <Form>
-                    <Row className="mb-3">
-                        <Col sm="8">
-                            <Form.Group as={Col} controlId="formTitle">
-                                <Form.Label><RequiredLabel text="Title" /></Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                />
-                            </Form.Group>
-                            </Col>
-                            <Col className="mt-4" sm="4"> 
-                              <Dropdown className="mt-2">
-                                <Dropdown.Toggle id="dropdown-basic" style={{ backgroundColor: 'rgb(164,135,121)'}}>
-                                    <RequiredLabel text="Choose Stakeholders" />
-                                    </Dropdown.Toggle>
-                                   <Dropdown.Menu style={{width:'200px'}}>
-                                      {stakeholders.map((option, index) => (
-                                       <Dropdown.Item
-                                                  key={index}
-                                                  onClick={() => toggleSelect(option)}
-                                                  active={selectedStakeholders.includes(option.id)}
-                                        >
-                                        {option.name}
-                                        </Dropdown.Item>
-                                        ))}
-                                    </Dropdown.Menu>
-                            </Dropdown>
-                            </Col>
-                        </Row>
-                        <Row className="mb-3">
-                            <Form.Group as={Col} controlId="formScale">
-                                <Form.Label><RequiredLabel text="Scale" /></Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={scale}
-                                    onChange={(e) => setScale(e.target.value)}
-                                />
-                            </Form.Group>
-                            <Form.Group as={Col} controlId="formIssuanceDate">
-                                <Form.Label> <RequiredLabel text="Issuance Date" /></Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={issuanceDate}
-                                    onChange={(e) => setIssuanceDate(e.target.value)}
-                                />
-                            </Form.Group>
-                            <Col className="mt-4">
-                            <Dropdown className="mt-2">
-                              <Dropdown.Toggle id="dropdown-button-dark-example1" style={{borderColor: 'white', backgroundColor: 'rgb(164,135,121)', width:'200px'}}>
-                                  {type ? type : <RequiredLabel text="Choose a type" />}
-                              </Dropdown.Toggle>
-                              <Dropdown.Menu style={{width:'200px'}}>
-                                  <Dropdown.Item key={0} eventKey={"Informative document"} onClick={() => {setType("Informative document")}}>
-                                      Informative document
-                                  </Dropdown.Item>
-                                  <Dropdown.Item key={1} eventKey={"Prescriptive document"} onClick={() => {setType("Prescriptive document")}}>
-                                      Prescriptive document
-                                  </Dropdown.Item>
-                                  <Dropdown.Item key={2} eventKey={"Design document"} onClick={() => {setType("Design document")}}>
-                                      Design document
-                                  </Dropdown.Item>
-                                  <Dropdown.Item key={3} eventKey={"Technical document"} onClick={() => {setType("Technical document")}}>
-                                      Technical document
-                                  </Dropdown.Item>
-                                  <Dropdown.Item key={4} eventKey={"Material effect"} onClick={() => {setType("Material effect")}}>
-                                       Material effect
-                                  </Dropdown.Item>
-                              </Dropdown.Menu>
-                            </Dropdown>
-                            </Col>
-                        </Row>
-                        <Row className="mb-3">
-                            <Form.Group as={Col} controlId="formDescription">
-                                <Form.Label>Description</Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    rows={3}
-                                    value={description || ''}
-                                    onChange={(e) => setDescription(e.target.value ? e.target.value : null)}
-                                />
-                            </Form.Group>
-                            <Col>
-                            <Form.Group as={Row} controlId="formLanguage" className="mb-3 mt-4">
-                                <Form.Label column sm="3">Language</Form.Label>
-                                <Col sm="9">
-                                <Form.Control
-                                    type="text"
-                                    value={language || ''}
-                                    onChange={(e) => setLanguage(e.target.value ? e.target.value : null)}
-                                />
-                                </Col>
-                            </Form.Group>
-                            <Form.Group as={Row} controlId="formPages" className="mb-3">
-                                <Form.Label column sm="3">Pages</Form.Label>
-                                <Col sm="9">
-                                <Form.Control
-                                    type="text"
-                                    value={pages || ''}
-                                    onChange={(e) => setPages(e.target.value ? e.target.value : null)}
-                                />
-                                </Col>
-                            </Form.Group>
-                            </Col>
-                        </Row>
-                    </Form>
-                </Container>
+            <Container>
+          {error && <Alert variant="danger">{error}</Alert>}
+          <Form>
+            <Row className="mb-3">
+                <Form.Group as={Row} controlId="formTitle">
+                  <Form.Label column md={2}><RequiredLabel text="Title" /></Form.Label>
+                  <Col md={10}>
+                  <Form.Control
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    style={{ width: '100%' }}
+                  />
+                </Col>
+                </Form.Group>
+            </Row>
+            <Row className="mb-3">
+              <Col md={6} className='mt-4'>
+                 <Form.Group as={Row} controlId="formScale" className="mb-3">
+                 <Form.Label column md={5}><RequiredLabel text="Scale" /></Form.Label>
+                 <Col md={7}>
+                   <Form.Control
+                      type="text"
+                      value={scale}
+                      onChange={(e) => setScale(e.target.value)}
+                      style={{ width: '100%' }}/>
+                  </Col>
+                  </Form.Group>
+                 <Form.Group as={Row} controlId="formIssuanceDate" className="mb-3">
+                 <Form.Label column md={5}><RequiredLabel text="Issuance Date" /></Form.Label>
+                  <Col md={7}>
+                    <Form.Control
+                    type="text"
+                    value={issuanceDate}
+                    onChange={(e) => setIssuanceDate(e.target.value)}
+                    style={{ width: '100%' }}/>
+                  </Col>
+                  </Form.Group>
+              </Col>
+              <Col xs={12} md={4} className="mt-3 ml-5">
+              <Row>
+                <Dropdown className="mt-2">
+                  <Dropdown.Toggle variant="success" id="dropdown-basic" 
+                    style={{ backgroundColor: 'rgb(164,135,121)', 
+                   }}>
+                    <span><RequiredLabel text="Choose Stakeholders" /></span>
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu style={{  width:'200px' }}>
+                    {stakeholders.map((option, index) => (
+                      <Dropdown.Item
+                        key={index}
+                        onClick={() => toggleSelect(option)}
+                        active={selectedStakeholders.includes(option.id)}
+                      >
+                        {option.name}
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Dropdown>
+                </Row>
+                <Row>
+                <Dropdown className="w-100 mt-3">
+                  <Dropdown.Toggle id="dropdown-button-dark-example1" 
+                  style={{ backgroundColor: 'rgb(164,135,121)', width:'200px' }}>
+                    {type ? type : <RequiredLabel text="Choose a type" />}
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu style={{  width:'200px' }}>
+                    <Dropdown.Item onClick={() => setType("Informative document")}>Informative document</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setType("Prescriptive document")}>Prescriptive document</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setType("Design document")}>Design document</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setType("Technical document")}>Technical document</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setType("Material effect")}>Material effect</Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </Row>
+             </Col>
+              </Row>
+    <Row className="mb-3">
+    <Form.Group as={Col} md={6} controlId="formDescription">
+        <Form.Label>Description</Form.Label>
+        <Form.Control
+            as="textarea"
+            rows={3}
+            value={description || ''}
+            onChange={(e) => setDescription(e.target.value ? e.target.value : null)}
+        />
+    </Form.Group>
+    <Col md={6} className='mt-4'>
+        <Form.Group as={Row} controlId="formLanguage" className="mb-3">
+            <Form.Label column md={4}>Language</Form.Label>
+            <Col md={8}>
+                <Form.Control
+                    type="text"
+                    value={language || ''}
+                    onChange={(e) => setLanguage(e.target.value ? e.target.value : null)}
+                />
+            </Col>
+        </Form.Group>
+        <Form.Group as={Row} controlId="formPages" className="mb-3">
+            <Form.Label column md={4}>Pages</Form.Label>
+            <Col md={8}>
+                <Form.Control
+                    type="text"
+                    value={pages || ''}
+                    onChange={(e) => setPages(e.target.value ? e.target.value : null)}
+                />
+            </Col>
+        </Form.Group>
+    </Col>
+   </Row>
+
+          </Form>
+        </Container>
             </Modal.Body>
             <Modal.Footer style={{ backgroundColor: 'rgb(167, 199, 231,0.8)' }}>
                 <Button variant="secondary" className="text-white rounded-md" onClick={onHide}>
@@ -454,7 +450,7 @@ function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, 
                                     </div>
                                 ) : null}
                             </Col>
-            <Col xs={9} md={5}>
+            <Col xs={9} md={3}>
             <p>Stakeholders: {selectedDocument.stakeHolders.map(sh => sh.name).join(' / ')}</p>
             <p>Scale: {selectedDocument.scale}</p>
             <p>Issuance Date: {selectedDocument.issuanceDate}</p>
@@ -463,7 +459,7 @@ function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, 
             <p>Language: {selectedDocument.language ? selectedDocument.language : '-'}</p>
             <p>Pages: {selectedDocument.pages ? selectedDocument.pages : '-'}</p>
             </Col>
-            <Col xs={12} md={8}>
+            <Col xs={12} md={7}>
               <p>Description:</p>
               <p>{selectedDocument.description ? selectedDocument.description : '-'}</p>
             </Col>
