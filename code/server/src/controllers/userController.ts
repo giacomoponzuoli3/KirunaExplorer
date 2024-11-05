@@ -1,5 +1,5 @@
-import { User } from "../models/user"
 import {UserDAO} from "../dao/userDAO"
+import {User} from "../models/user";
 
 /**
  * Represents a controller for managing users.
@@ -14,14 +14,14 @@ class UserController {
 
     /**
      * Creates a new user.
-     * @param username - The username of the new user. It must not be null and it must not be already taken.
+     * @param username - The username of the new user. It must not be null, and it must not be already taken.
      * @param name - The name of the new user. It must not be null.
      * @param surname - The surname of the new user. It must not be null.
      * @param password - The password of the new user. It must not be null.
-     * @param role - The role of the new user. It must not be null and it can only be one of the three allowed types ("Manager", "Customer", "Admin")
+     * @param role - The role of the new user. It must not be null, and it can only be one of the three allowed types ("Manager", "Customer", "Admin")
      * @returns A Promise that resolves to true if the user has been created.
      */
-    async createUser(username: string, name: string, surname: string, password: string, role: string) /**:Promise<Boolean> */ {
+    async createUser(username: string, name: string, surname: string, password: string, role: string): Promise<boolean> {
         return this.dao.createUser(username, name, surname, password, role)
     }
 
@@ -34,7 +34,7 @@ class UserController {
      * @param username - The username of the user to retrieve. The user must exist.
      * @returns A Promise that resolves to the user with the specified username.
      */
-    async getUserByUsername(user: User, username: string) /**:Promise<User> */ {
+    async getUserByUsername(username: string): Promise<User> {
         return this.dao.getUserByUsername(username)
      }
 

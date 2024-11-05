@@ -1,3 +1,5 @@
+// noinspection DuplicatedCode
+
 import Link from "./link"
 import { Stakeholder } from "./stakeholder"
 
@@ -27,6 +29,7 @@ class DocLink {
      * @param language - The language of the document.
      * @param pages - The number of pages in the document.
      * @param description - The description of the document.
+     * @param relatedLink - The related Link object
      */
     constructor(
         id: number,
@@ -53,8 +56,8 @@ class DocLink {
     }
 }
 /**
- * Represents the type of a document.
- * The values present in this enum are the only valid values for the type of a document.
+ * Represents the type of document.
+ * The values present in this enum are the only valid values for the type of document.
  */
 enum Type {
     INFORMATIVE = "Informative document",

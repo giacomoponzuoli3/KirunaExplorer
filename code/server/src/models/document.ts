@@ -1,3 +1,5 @@
+// noinspection DuplicatedCode
+
 import { Stakeholder } from "./stakeholder"
 
 /**
@@ -49,8 +51,8 @@ class Document {
     }
 }
 /**
- * Represents the type of a document.
- * The values present in this enum are the only valid values for the type of a document.
+ * Represents the type of document.
+ * The values present in this enum are the only valid values for the type of document.
  */
 enum Type {
     INFORMATIVE = "Informative document",

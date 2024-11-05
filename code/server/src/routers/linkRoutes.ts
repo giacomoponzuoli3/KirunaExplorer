@@ -1,7 +1,8 @@
 import { LinkController } from "../controllers/linkController"
 import express, {Router} from "express"
-import {body, oneOf, param, query} from "express-validator"
+import {body} from "express-validator"
 import ErrorHandler from "../helper"
+import Link from "../models/link";
 
 class LinkRoutes {
     private controller: LinkController
@@ -27,10 +28,11 @@ class LinkRoutes {
             body("idDoc2").isNumeric(),
             body("idLink").isNumeric(),
             this.errorHandler.validateRequest,
-            async (req: any, res: any, next: any) => {
+            (req: any, res: any, next: any) => {
                 try {
-                    await this.controller.addLink(req.body.idDoc1, req.body.idDoc2, req.body.idLink)
-                    res.status(200).json({ message: "Link added successfully" })
+                    this.controller.addLink(req.body.idDoc1, req.body.idDoc2, req.body.idLink)
+                        .then(() => res.status(200).json({ message: "Link added successfully" }))
+                        .catch((err: Error) => next(err))
                 } catch (err) {
                     next(err)
                 }
@@ -43,10 +45,11 @@ class LinkRoutes {
             body("idDoc2").isNumeric(),
             body("idLink").isNumeric(),
             this.errorHandler.validateRequest,
-            async (req: any, res: any, next: any) => {
+            (req: any, res: any, next: any) => {
                 try {
-                    await this.controller.deleteLink(req.body.idDoc1, req.body.idDoc2, req.body.idLink)
-                    res.status(200).json({ message: "Link deleted successfully" })
+                    this.controller.deleteLink(req.body.idDoc1, req.body.idDoc2, req.body.idLink)
+                        .then(() => res.status(200).json({ message: "Link deleted successfully" }))
+                        .catch((err: Error) => next(err))
                 } catch (err) {
                     next(err)
                 }
@@ -60,10 +63,11 @@ class LinkRoutes {
             body("oldLinkId").isNumeric(),
             body("newLinkId").isNumeric(),
             this.errorHandler.validateRequest,
-            async (req: any, res: any, next: any) => {
+            (req: any, res: any, next: any) => {
                 try {
-                    await this.controller.updateLink(req.body.idDoc1, req.body.idDoc2, req.body.oldLinkId, req.body.newLinkId)
-                    res.status(200).json({ message: "Link updated successfully" })
+                    this.controller.updateLink(req.body.idDoc1, req.body.idDoc2, req.body.oldLinkId, req.body.newLinkId)
+                        .then(() => res.status(200).json({ message: "Link updated successfully" }))
+                        .catch((err: Error) => next(err))
                 } catch (err) {
                     next(err)
                 }
@@ -71,10 +75,11 @@ class LinkRoutes {
 
         this.router.get(
             "/",
-            async (req: any, res: any, next: any) => {
+            (_req: any, res: any, next: any) => {
                 try {
-                    const links = await this.controller.getAllLinks()
-                    res.status(200).json(links)
+                    this.controller.getAllLinks()
+                        .then((links: Link[]) => res.status(200).json(links))
+                        .catch((err: Error) => next(err))
                 } catch (err) {
                     next(err)
                 }

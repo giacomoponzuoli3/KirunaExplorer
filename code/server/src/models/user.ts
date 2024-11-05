@@ -13,8 +13,6 @@ class User {
      * @param name - The name of the user.
      * @param surname - The surname of the user.
      * @param role - The role of the user. This can be ""
-     * @param address - The address of the user. Is null when the user is created, can be updated later.
-     * @param birthdate - The birthdate of the user. Is null when the user is created, can be updated later.
      */
     constructor(username: string, name: string, surname: string, role: string) {
         this.username = username
