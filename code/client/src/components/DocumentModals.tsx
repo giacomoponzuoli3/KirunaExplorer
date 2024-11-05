@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { User } from '../models/user';
 import API from '../API/API';
 import { Stakeholder } from '../models/stakeholder';
+import { TrashIcon, PencilIcon } from "@heroicons/react/24/outline";
 
 interface RequiredLabelProps {
     text: string; // Explicitly define the type of 'text' as string
@@ -421,18 +422,25 @@ function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, 
         <Container>
           <Row>
             <Col xs={3} md={2}>
-            {getDocumentIcon(selectedDocument.type)}
-            {user.role==="Urban Planner" ?(
-                <>
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-md mt-4" onClick={handleEditClick} style={{borderColor: 'white', width:'70px'}}>
-                        Edit
-                    </Button>
-                    <Button className="bg-gradient-to-r from-red-600 to-red-400 mt-3" onClick={handleDeleteClick} style={{borderColor: 'white'}}>
-                        Delete
-                    </Button>
-                </>
-            ): null}
+                {getDocumentIcon(selectedDocument.type)}
+                {user.role === "Urban Planner" ? (
+                    <div className="flex space-x-2 mt-4">
+                        <button
+                            className="p-2 rounded-full bg-red-100 text-red-500 hover:bg-red-200 hover:text-red-700 transition-colors duration-200"
+                            onClick={handleDeleteClick}
+                        >
+                            <TrashIcon className="h-5 w-5" />
+                        </button>
+                        <button
+                            className="p-2 rounded-full bg-blue-100 text-blue-500 hover:bg-blue-200 hover:text-blue-700 transition-colors duration-200"
+                            onClick={handleEditClick}
+                        >
+                            <PencilIcon className="h-5 w-5" />
+                        </button>
+                    </div>
+                ) : null}
             </Col>
+
             <Col xs={9} md={5}>
             <p>Stakeholders: {selectedDocument.stakeHolders.map(sh => sh.name).join(' / ')}</p>
             <p>Scale: {selectedDocument.scale}</p>
