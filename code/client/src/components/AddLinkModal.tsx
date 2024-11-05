@@ -61,7 +61,7 @@ function AddLinkModal(props: any) {
         const getAllDocuments = async () => {
             try {
                 const allDocuments = await API.getAllDocuments();
-                const documents = allDocuments.filter((d: Document) => d.id !== props.idDocument);
+                const documents = allDocuments.filter((d: Document) => d.id != props.idDocument);
                 setDocuments(documents);
             } catch (err) {
                 setShowAlert(true);

@@ -270,7 +270,7 @@ class DocumentDAO {
                 
                 db.all(sql, [id, id], (err: Error | null, rows: any[]) => {
                     if (err) return reject(err);
-                    if (!rows || rows.length === 0) return reject(new Error("No links found."));
+                    if (!rows || rows.length === 0) return resolve([]);
 
                     // Estrarre una lista di documenti correlati con i rispettivi link_name
                     const relatedDocs = rows.map(row => ({
@@ -299,7 +299,6 @@ class DocumentDAO {
                                 db.all(sqlStakeholders, [docId], (err: Error | null, stakeholderRows: any[]) => {
                                     if (err) return rejectDoc(err);
 
-                                    console.log("entrato");
                                     // Creiamo la lista degli stakeholder
                                     const stakeholders = stakeholderRows ? stakeholderRows.map(stakeholderRow =>
                                         new Stakeholder(stakeholderRow.id_stakeholder, stakeholderRow.name, stakeholderRow.category)

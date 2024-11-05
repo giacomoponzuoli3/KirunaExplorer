@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Document } from "../models/document";
 import API from "../API/API";
-import { TrashIcon, PencilIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, PencilIcon, PlusIcon, FaceFrownIcon } from "@heroicons/react/24/outline";
 import { Modal } from "react-bootstrap";
 import Alert from "./Alert";
 import ConfirmModal from './ConfirmModal';
@@ -100,7 +100,7 @@ function LinksDocument(props: any) {
     }
 
 
-    if (document == null || documentLinks.length === 0){
+    if (document == null){
         return (
             <div className="p-4">
             { showAlert &&  <Alert
@@ -115,12 +115,6 @@ function LinksDocument(props: any) {
     }else{
       return (
         <div className="p-4">
-            {showAlert && (
-                <Alert
-                    message="You cannot delete the only connection present! A document must have at least one connection!"
-                    onClose={() => setShowAlert(false)}
-                />
-            )}
 
             {/* Title Section with enhanced contrast */}
             <h2 className="text-xl font-normal text-gray-600 mb-1 text-center">
@@ -130,46 +124,54 @@ function LinksDocument(props: any) {
                 {document.title}
             </h2>
 
-            <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
-                    <thead>
-                        <tr className="bg-gray-100 border-b">
-                            <th className="p-4 text-left text-gray-600 font-semibold">Icon</th>
-                            <th className="p-4 text-left text-gray-600 font-semibold">Title</th>
-                            <th className="p-4 text-left text-gray-600 font-semibold">Stakeholder(s)</th>
-                            <th className="p-4 text-left text-gray-600 font-semibold">Type of Link</th>
-                            {props.isLogged && props.user.role == "Urban Planner" && <th className="p-4 text-center text-gray-600 font-semibold">Actions</th>}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {documentLinks.map((doc, index) => (
-                            <tr key={index} className="border-b hover:bg-gray-50 transition duration-200 ease-in-out">
-                                <td className="p-4">{getDocumentIcon(doc.type)}</td>
-                                <td className="p-4">{doc.title}</td>
-                                <td className="p-4">{doc.stakeHolders.map(sh => sh.name).join(' / ')}</td>
-                                <td className="p-4">{doc.relatedLink.name}</td>
-                                {props.isLogged && props.user.role == "Urban Planner" && 
-                                    <td className="p-4 flex justify-center space-x-4">
-                                        <button className="text-red-500 hover:text-red-700" onClick={() => {
-                                            if(documentLinks.length === 1){
-                                                setShowAlert(true);
-                                            }else{
-                                                confirmDelete(doc.id, doc.relatedLink.id)
-                                                setShowModal(true)
-                                            }    
-                                        }}>
-                                            <TrashIcon className="h-5 w-5" />
-                                        </button>
-                                    </td>
+            {documentLinks.length === 0 ? (
+                    <div className="flex flex-col items-center mt-6">
+                        <FaceFrownIcon className="h-10 w-10 text-gray-400" />
+                        <p className="text-lg text-gray-500 mt-2">No links available</p>
+                        {props.isLogged && props.user.role == "Urban Planner" && (
+                            <button
+                                className="flex items-center justify-center bg-green-600 text-white rounded px-4 py-2 hover:bg-green-600 transition duration-200 mt-4"
+                                onClick={handleAddLink}
+                            >
+                                <PlusIcon className="h-5 w-5 mr-2" />
+                                <span>Add Link</span>
+                            </button>
+                        )}
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
+                            <thead>
+                                <tr className="bg-gray-100 border-b">
+                                    <th className="p-4 text-left text-gray-600 font-semibold">Icon</th>
+                                    <th className="p-4 text-left text-gray-600 font-semibold">Title</th>
+                                    <th className="p-4 text-left text-gray-600 font-semibold">Stakeholder(s)</th>
+                                    <th className="p-4 text-left text-gray-600 font-semibold">Type of Link</th>
+                                    {props.isLogged && props.user.role == "Urban Planner" && <th className="p-4 text-center text-gray-600 font-semibold">Actions</th>}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {documentLinks.map((doc, index) => (
+                                    <tr key={index} className="border-b hover:bg-gray-50 transition duration-200 ease-in-out">
+                                        <td className="p-4">{getDocumentIcon(doc.type)}</td>
+                                        <td className="p-4">{doc.title}</td>
+                                        <td className="p-4">{doc.stakeHolders.map(sh => sh.name).join(' / ')}</td>
+                                        <td className="p-4">{doc.relatedLink.name}</td>
+                                        {props.isLogged && props.user.role == "Urban Planner" &&
+                                            <td className="p-4 flex justify-center space-x-4">
+                                                <button className="text-red-500 hover:text-red-700" onClick={() => confirmDelete(doc.id, doc.relatedLink.id)}>
+                                                    <TrashIcon className="h-5 w-5" />
+                                                </button>
+                                            </td>
+                                        }
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
 
-                                }
-                                
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-            {props.isLogged && props.user.role == "Urban Planner" && <>
+            {documentLinks.length !== 0 && props.isLogged && props.user.role == "Urban Planner" && <>
                 <div className="mt-4 text-center"> {/* Contenitore per il pulsante sotto la tabella */}
                     <button 
                         className="flex items-center justify-center bg-green-600 text-white rounded px-4 py-2 hover:bg-green-600 transition duration-200"  
