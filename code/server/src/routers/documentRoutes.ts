@@ -6,6 +6,7 @@ import Authenticator from "./auth"
 import {Document} from "../models/document";
 import {DocLink} from "../models/document_link";
 
+
 class DocumentRoutes {
     private controller: DocumentController
     private readonly router: Router
@@ -197,11 +198,10 @@ class DocumentRoutes {
         this.router.get(
             "/:type",
             param("type").isString().notEmpty(),
-            (req: any, res: any, next: any) => {
+            async (req: any, res: any, next: any) => {
                 try {
-                    this.controller.getAllDocumentsOfSameType(req.params["type"])
-                        .then((documents: Document[]) => res.status(200).json(documents))
-                        .catch((err: Error) => next(err))
+                    const documents = await this.controller.getAllDocumentsOfSameType(req.params["type"]);
+                    res.status(200).json(documents);
                 } catch (err) {
                     next(err);
                 }

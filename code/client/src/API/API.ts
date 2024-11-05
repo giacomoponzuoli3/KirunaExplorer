@@ -208,7 +208,13 @@ async function getDocumentIssuanceDateById(id: number) {
 }
 
 async function getAllDocumentsOfSameType(type: string) {
-    const response = await fetch(baseURL + "doc/" + type, { credentials: "include" })
+    let response = await fetch(baseURL + "doc", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ type: type},)
+    })
     if (response.ok) {
         return await response.json()
     } else {
