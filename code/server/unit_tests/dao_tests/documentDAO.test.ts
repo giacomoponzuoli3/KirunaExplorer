@@ -5,6 +5,7 @@ import { Document } from "../../src/models/document"
 import { Stakeholder } from "../../src/models/stakeholder"
 import { DocLink } from "../../src/models/document_link"
 import { Database } from "sqlite3";
+import Link from "../../src/models/link"
 
 jest.mock("../../src/db/db.ts");
 
@@ -22,7 +23,7 @@ describe('documentDAO', () => {
     const testStakeholder2 = new Stakeholder(2, "Bob", "urban developer");
     const testDocument = new Document(testId, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
     const testDocument2 = new Document(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2");
-    const testDocument3 = new Document(3, "title 3", [testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description 3");
+    const testDocument3 = new Document(3, "title 3", [testStakeholder2], "1:1", "2020-10-10", "Material effect", "English", "300", "description 3");
 
     describe('addDocument', () => {
         test('It should successfully add a document', async () => {
@@ -311,7 +312,7 @@ describe('documentDAO', () => {
 
         });
 
-        test('It should reject if there is no dcuments', async () => {
+        test('It should reject if there is no documents', async () => {
             jest.spyOn(db, 'all')
                 .mockImplementationOnce((sql, params, callback) => {
                     callback(null, null);
@@ -623,39 +624,460 @@ describe('documentDAO', () => {
     describe(' getDocumentLinksById', () => {
 
         const rows = [
-            { id_document1: 1, id_document2: 2, link_name: 'Link A' },
-            { id_document1: 1, id_document2: 3, link_name: 'Link B' },
+            { id_document1: 1, id_document2: 2, link_id: 1, link_name: 'Link A' },
+            { id_document1: 1, id_document2: 3, link_id: 2, link_name: 'Link B' },
         ]
 
-        test("It should retrieve all the docLinks connected to a document with the specified", async () => {
+        const rowGet1 =  {
+            id: 2,
+            title: "title 2",
+            stakeholder_id: 1,
+            stakeholder_name: "John",
+            stakeholder_category: "urban developer",
+            scale: "1:1",
+            issuance_date: "2020-10-10",
+            type: "Informative document",
+            language: "English",
+            pages: "300",
+            description: "description 2",
+        };
+
+        const rowGet2 =  {
+            id: 3,
+            title: "title 3",
+            stakeholder_id: 2,
+            stakeholder_name: "Bob",
+            stakeholder_category: "urban developer",
+            scale: "1:1",
+            issuance_date: "2020-10-10",
+            type: "Material effect",
+            language: "English",
+            pages: "300",
+            description: "description 3",
+        };
+
+        test("It should retrieve all the DocLinks connected to a document with the specified id", async () => {
 
             jest.spyOn(db, 'all')
-            .mockImplementationOnce((sql, params, callback) => {
-                callback(null, rows);
-                return {} as Database;
-            })
-            .mockImplementationOnce((sql, params, callback) => {
-                callback(null, [testDocument2,testDocument3]);
-                return {} as Database;
-            })
-            .mockImplementationOnce((sql, params, callback) => {
-                callback(null, [
-                    { id_stakeholder: 1, name: "John", category: "urban developer" },
-                ]);
-                return {} as Database;
-            }).mockImplementationOnce((sql, params, callback) => {
-                callback(null, [
-                    { id_stakeholder: 2, name: "Bob", category: "urban developer" },
-                ]);
-                return {} as Database;
-            });
-    
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, rows);
+                    return {} as Database;
+                })
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, [
+                        { id_stakeholder: 1, name: "John", category: "urban developer" },
+                    ]);
+                    return {} as Database;
+                }).mockImplementationOnce((sql, params, callback) => {
+                    callback(null, [
+                        { id_stakeholder: 2, name: "Bob", category: "urban developer" },
+                    ]);
+                    return {} as Database;
+                });
+
+            jest.spyOn(db, 'get')
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, rowGet1);
+                    return {} as Database;
+                })
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, rowGet2);
+                    return {} as Database;
+                });
             const result = await dao.getDocumentLinksById(testId);
-    
+
             expect(result).toEqual([
-                new DocLink(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2", "Link A"),
-                new DocLink(3, "title 3", [testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description 3", "Link B")
+                new DocLink(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2", new Link(1, "Link A")),
+                new DocLink(3, "title 3", [testStakeholder2], "1:1", "2020-10-10", "Material effect", "English", "300", "description 3", new Link(2, "Link B"))
             ]);
+
+            expect(db.all).toHaveBeenNthCalledWith(
+                1,
+                'SELECT dl.id_document1, dl.id_document2, l.id AS link_id, l.name AS link_name FROM documents_links dl JOIN links l ON dl.id_link = l.id WHERE dl.id_document1 = ? OR dl.id_document2 = ?',
+                [testId, testId],
+                expect.any(Function)
+            );
+
+            expect(db.all).toHaveBeenNthCalledWith(
+                2,
+                'SELECT sd.id_stakeholder, s.name, s.category FROM stakeholders_documents sd JOIN stakeholders s ON s.id = sd.id_stakeholder WHERE id_document = ?',
+                [testDocument2.id],
+                expect.any(Function)
+            );
+
+            expect(db.all).toHaveBeenNthCalledWith(
+                3,
+                'SELECT sd.id_stakeholder, s.name, s.category FROM stakeholders_documents sd JOIN stakeholders s ON s.id = sd.id_stakeholder WHERE id_document = ?',
+                [testDocument3.id],
+                expect.any(Function)
+            );
+
+            expect(db.get).toHaveBeenNthCalledWith(
+                1,
+                'SELECT * FROM documents WHERE id = ?',
+                [testDocument2.id],
+                expect.any(Function)
+            );
+
+            expect(db.get).toHaveBeenNthCalledWith(
+                2,
+                'SELECT * FROM documents WHERE id = ?',
+                [testDocument3.id],
+                expect.any(Function)
+            );
+        });
+
+        test("It should reject if there is a link error", async () => {
+
+            jest.spyOn(db, 'all')
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(new Error("Link Error"));
+                    return {} as Database;
+                })
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, [
+                        { id_stakeholder: 1, name: "John", category: "urban developer" },
+                    ]);
+                    return {} as Database;
+                }).mockImplementationOnce((sql, params, callback) => {
+                    callback(null, [
+                        { id_stakeholder: 2, name: "Bob", category: "urban developer" },
+                    ]);
+                    return {} as Database;
+                });
+
+            jest.spyOn(db, 'get')
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, rowGet1);
+                    return {} as Database;
+                })
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, rowGet2);
+                    return {} as Database;
+                });
+
+            await expect(dao.getDocumentLinksById(testId)).rejects.toThrow("Link Error");
+
+            expect(db.all).toHaveBeenNthCalledWith(
+                1,
+                'SELECT dl.id_document1, dl.id_document2, l.id AS link_id, l.name AS link_name FROM documents_links dl JOIN links l ON dl.id_link = l.id WHERE dl.id_document1 = ? OR dl.id_document2 = ?',
+                [testId, testId],
+                expect.any(Function)
+            );
+
+        });
+
+        test("It should reject if there are no links", async () => {
+
+            jest.spyOn(db, 'all')
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, []);
+                    return {} as Database;
+                })
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, [
+                        { id_stakeholder: 1, name: "John", category: "urban developer" },
+                    ]);
+                    return {} as Database;
+                }).mockImplementationOnce((sql, params, callback) => {
+                    callback(null, [
+                        { id_stakeholder: 2, name: "Bob", category: "urban developer" },
+                    ]);
+                    return {} as Database;
+                });
+
+            jest.spyOn(db, 'get')
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, rowGet1);
+                    return {} as Database;
+                })
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, rowGet2);
+                    return {} as Database;
+                });
+
+            await expect(dao.getDocumentLinksById(testId)).rejects.toThrow("No links found.");
+
+            expect(db.all).toHaveBeenNthCalledWith(
+                1,
+                'SELECT dl.id_document1, dl.id_document2, l.id AS link_id, l.name AS link_name FROM documents_links dl JOIN links l ON dl.id_link = l.id WHERE dl.id_document1 = ? OR dl.id_document2 = ?',
+                [testId, testId],
+                expect.any(Function)
+            );
+
+        });
+
+        test("It should reject if there is a first document error", async () => {
+
+            jest.spyOn(db, 'all')
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, rows);
+                    return {} as Database;
+                })
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, [
+                        { id_stakeholder: 1, name: "John", category: "urban developer" },
+                    ]);
+                    return {} as Database;
+                }).mockImplementationOnce((sql, params, callback) => {
+                    callback(null, [
+                        { id_stakeholder: 2, name: "Bob", category: "urban developer" },
+                    ]);
+                    return {} as Database;
+                });
+
+            jest.spyOn(db, 'get')
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(new Error("First Document Error"));
+                    return {} as Database;
+                })
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, rowGet2);
+                    return {} as Database;
+                });
+
+            await expect(dao.getDocumentLinksById(testId)).rejects.toThrow("First Document Error");
+
+            expect(db.all).toHaveBeenNthCalledWith(
+                1,
+                'SELECT dl.id_document1, dl.id_document2, l.id AS link_id, l.name AS link_name FROM documents_links dl JOIN links l ON dl.id_link = l.id WHERE dl.id_document1 = ? OR dl.id_document2 = ?',
+                [testId, testId],
+                expect.any(Function)
+            );
+
+            expect(db.get).toHaveBeenNthCalledWith(
+                1,
+                'SELECT * FROM documents WHERE id = ?',
+                [testDocument2.id],
+                expect.any(Function)
+            );
+
+        });
+
+        test("It should reject if there is a second document error", async () => {
+
+            jest.spyOn(db, 'all')
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, rows);
+                    return {} as Database;
+                })
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, [
+                        { id_stakeholder: 1, name: "John", category: "urban developer" },
+                    ]);
+                    return {} as Database;
+                }).mockImplementationOnce((sql, params, callback) => {
+                    callback(null, [
+                        { id_stakeholder: 2, name: "Bob", category: "urban developer" },
+                    ]);
+                    return {} as Database;
+                });
+
+            jest.spyOn(db, 'get')
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, rowGet1);
+                    return {} as Database;
+                })
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(new Error("Second Document Error"));
+                    return {} as Database;
+                });
+
+            await expect(dao.getDocumentLinksById(testId)).rejects.toThrow("Second Document Error");
+
+            expect(db.all).toHaveBeenNthCalledWith(
+                1,
+                'SELECT dl.id_document1, dl.id_document2, l.id AS link_id, l.name AS link_name FROM documents_links dl JOIN links l ON dl.id_link = l.id WHERE dl.id_document1 = ? OR dl.id_document2 = ?',
+                [testId, testId],
+                expect.any(Function)
+            );
+
+            expect(db.get).toHaveBeenNthCalledWith(
+                1,
+                'SELECT * FROM documents WHERE id = ?',
+                [testDocument2.id],
+                expect.any(Function)
+            );
+            expect(db.get).toHaveBeenNthCalledWith(
+                2,
+                'SELECT * FROM documents WHERE id = ?',
+                [testDocument3.id],
+                expect.any(Function)
+            );
+        });
+
+        test("It should reject if there is a no document", async () => {
+
+            jest.spyOn(db, 'all')
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, rows);
+                    return {} as Database;
+                })
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, [
+                        { id_stakeholder: 1, name: "John", category: "urban developer" },
+                    ]);
+                    return {} as Database;
+                }).mockImplementationOnce((sql, params, callback) => {
+                    callback(null, [
+                        { id_stakeholder: 2, name: "Bob", category: "urban developer" },
+                    ]);
+                    return {} as Database;
+                });
+
+            jest.spyOn(db, 'get')
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, null);
+                    return {} as Database;
+                })
+
+            await expect(dao.getDocumentLinksById(testId)).rejects.toThrow("Document not found.");
+
+            expect(db.all).toHaveBeenNthCalledWith(
+                1,
+                'SELECT dl.id_document1, dl.id_document2, l.id AS link_id, l.name AS link_name FROM documents_links dl JOIN links l ON dl.id_link = l.id WHERE dl.id_document1 = ? OR dl.id_document2 = ?',
+                [testId, testId],
+                expect.any(Function)
+            );
+
+            expect(db.get).toHaveBeenNthCalledWith(
+                1,
+                'SELECT * FROM documents WHERE id = ?',
+                [testDocument2.id],
+                expect.any(Function)
+            );
+
+        });
+
+        test('It should reject if there is a first stakeholder error', async () => {
+            jest.spyOn(db, 'all')
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, rows);
+                    return {} as Database;
+                })
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(new Error("First Stakeholder Error"));
+                    return {} as Database;
+                }).mockImplementationOnce((sql, params, callback) => {
+                    callback(null, [
+                        { id_stakeholder: 2, name: "Bob", category: "urban developer" },
+                    ]);
+                    return {} as Database;
+                });
+
+            jest.spyOn(db, 'get')
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, rowGet1);
+                    return {} as Database;
+                })
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, rowGet2);
+                    return {} as Database;
+                });
+
+            await expect(dao.getDocumentLinksById(testId)).rejects.toThrow("First Stakeholder Error");
+
+            expect(db.all).toHaveBeenNthCalledWith(
+                1,
+                'SELECT dl.id_document1, dl.id_document2, l.id AS link_id, l.name AS link_name FROM documents_links dl JOIN links l ON dl.id_link = l.id WHERE dl.id_document1 = ? OR dl.id_document2 = ?',
+                [testId, testId],
+                expect.any(Function)
+            );
+
+            expect(db.all).toHaveBeenNthCalledWith(
+                2,
+                'SELECT sd.id_stakeholder, s.name, s.category FROM stakeholders_documents sd JOIN stakeholders s ON s.id = sd.id_stakeholder WHERE id_document = ?',
+                [testDocument2.id],
+                expect.any(Function)
+            );
+
+            expect(db.all).toHaveBeenNthCalledWith(
+                3,
+                'SELECT sd.id_stakeholder, s.name, s.category FROM stakeholders_documents sd JOIN stakeholders s ON s.id = sd.id_stakeholder WHERE id_document = ?',
+                [testDocument3.id],
+                expect.any(Function)
+            );
+
+            expect(db.get).toHaveBeenNthCalledWith(
+                1,
+                'SELECT * FROM documents WHERE id = ?',
+                [testDocument2.id],
+                expect.any(Function)
+            );
+        });
+
+        test('It should reject if there is a second stakeholder error', async () => {
+            jest.spyOn(db, 'all')
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, rows);
+                    return {} as Database;
+                })
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, [
+                        { id_stakeholder: 1, name: "John", category: "urban developer" },
+                    ]);
+                    return {} as Database;
+                }).mockImplementationOnce((sql, params, callback) => {
+                    callback(new Error("Second Stakeholder Error"));
+                    return {} as Database;
+                });
+
+            jest.spyOn(db, 'get')
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, rowGet1);
+                    return {} as Database;
+                })
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(null, rowGet2);
+                    return {} as Database;
+                });
+
+            await expect(dao.getDocumentLinksById(testId)).rejects.toThrow("Second Stakeholder Error");
+
+            expect(db.all).toHaveBeenNthCalledWith(
+                1,
+                'SELECT dl.id_document1, dl.id_document2, l.id AS link_id, l.name AS link_name FROM documents_links dl JOIN links l ON dl.id_link = l.id WHERE dl.id_document1 = ? OR dl.id_document2 = ?',
+                [testId, testId],
+                expect.any(Function)
+            );
+
+            expect(db.all).toHaveBeenNthCalledWith(
+                2,
+                'SELECT sd.id_stakeholder, s.name, s.category FROM stakeholders_documents sd JOIN stakeholders s ON s.id = sd.id_stakeholder WHERE id_document = ?',
+                [testDocument2.id],
+                expect.any(Function)
+            );
+
+            expect(db.all).toHaveBeenNthCalledWith(
+                3,
+                'SELECT sd.id_stakeholder, s.name, s.category FROM stakeholders_documents sd JOIN stakeholders s ON s.id = sd.id_stakeholder WHERE id_document = ?',
+                [testDocument3.id],
+                expect.any(Function)
+            );
+
+            expect(db.get).toHaveBeenNthCalledWith(
+                1,
+                'SELECT * FROM documents WHERE id = ?',
+                [testDocument2.id],
+                expect.any(Function)
+            );
+
+            expect(db.get).toHaveBeenNthCalledWith(
+                2,
+                'SELECT * FROM documents WHERE id = ?',
+                [testDocument3.id],
+                expect.any(Function)
+            );
+        });
+
+        test("It should reject with error if an unexpected error occurs", async () => {
+
+            const unexpectedError = new Error("Unexpected error");
+            (db.all as jest.Mock).mockImplementation(() => {
+                throw unexpectedError;
+            });
+
+            await expect(dao.getDocumentLinksById(testId)).rejects.toThrow("Unexpected error");
         });
 
     });
@@ -676,6 +1098,270 @@ describe('documentDAO', () => {
                 expect.any(Function)
             );
 
+        });
+
+        test("It should reject if there is an error with select", async () => {
+            jest.spyOn(db, 'get').mockImplementationOnce((sql, params, callback) => {
+                callback(new Error("Select Error"));
+                return {} as Database;
+            })
+
+            await expect(dao.getDocumentTitleById(testId)).rejects.toThrow("Select Error");
+
+            expect(db.get).toHaveBeenCalledWith(
+                'SELECT title FROM documents WHERE id = ?',
+                [testId],
+                expect.any(Function)
+            );
+
+        });
+
+        test("It should reject if there is no document with the specified id", async () => {
+            jest.spyOn(db, 'get').mockImplementationOnce((sql, params, callback) => {
+                callback(null, null);
+                return {} as Database;
+            })
+
+            await expect(dao.getDocumentTitleById(testId)).rejects.toThrow("Document not found.");
+
+            expect(db.get).toHaveBeenCalledWith(
+                'SELECT title FROM documents WHERE id = ?',
+                [testId],
+                expect.any(Function)
+            );
+
+        });
+
+        test("It should reject with error if an unexpected error occurs", async () => {
+
+            const unexpectedError = new Error("Unexpected error");
+            (db.get as jest.Mock).mockImplementation(() => {
+                throw unexpectedError;
+            });
+
+            await expect(dao.getDocumentTitleById(testId)).rejects.toThrow("Unexpected error");
+        });
+    });
+
+    describe(' getDocumentDescriptionById', () => {
+
+        test("It should retrieve the description of a document with the specified id", async () => {
+            jest.spyOn(db, 'get').mockImplementationOnce((sql, params, callback) => {
+                callback(null, { description: "description" });
+                return {} as Database;
+            })
+
+            await expect(dao.getDocumentDescriptionById(testId)).resolves.toEqual("description");
+
+            expect(db.get).toHaveBeenCalledWith(
+                'SELECT description FROM documents WHERE id = ?',
+                [testId],
+                expect.any(Function)
+            );
+
+        });
+
+        
+        test("It should return null if there is no description", async () => {
+            jest.spyOn(db, 'get').mockImplementationOnce((sql, params, callback) => {
+                callback(null, { description: null });
+                return {} as Database;
+            })
+
+            await expect(dao.getDocumentDescriptionById(testId)).resolves.toBeNull();
+
+            expect(db.get).toHaveBeenCalledWith(
+                'SELECT description FROM documents WHERE id = ?',
+                [testId],
+                expect.any(Function)
+            );
+
+        });
+
+
+        test("It should reject if there is an error with select", async () => {
+            jest.spyOn(db, 'get').mockImplementationOnce((sql, params, callback) => {
+                callback(new Error("Select Error"));
+                return {} as Database;
+            })
+
+            await expect(dao.getDocumentDescriptionById(testId)).rejects.toThrow("Select Error");
+
+            expect(db.get).toHaveBeenCalledWith(
+                'SELECT description FROM documents WHERE id = ?',
+                [testId],
+                expect.any(Function)
+            );
+
+        });
+
+        test("It should reject if there is no document with the specified id", async () => {
+            jest.spyOn(db, 'get').mockImplementationOnce((sql, params, callback) => {
+                callback(null, null);
+                return {} as Database;
+            })
+
+            await expect(dao.getDocumentDescriptionById(testId)).rejects.toThrow("Document not found.");
+
+            expect(db.get).toHaveBeenCalledWith(
+                'SELECT description FROM documents WHERE id = ?',
+                [testId],
+                expect.any(Function)
+            );
+
+        });
+
+        test("It should reject with error if an unexpected error occurs", async () => {
+
+            const unexpectedError = new Error("Unexpected error");
+            (db.get as jest.Mock).mockImplementation(() => {
+                throw unexpectedError;
+            });
+
+            await expect(dao.getDocumentDescriptionById(testId)).rejects.toThrow("Unexpected error");
+
+        });
+    });
+    
+    describe(' getDocumentIssuanceDateById', () => {
+
+        test("It should retrieve the IssuanceDate of a document with the specified id", async () => {
+            jest.spyOn(db, 'get').mockImplementationOnce((sql, params, callback) => {
+                callback(null, { issuance_date: "issuanceDate" });
+                return {} as Database;
+            })
+
+            await expect(dao.getDocumentIssuanceDateById(testId)).resolves.toEqual("issuanceDate");
+
+            expect(db.get).toHaveBeenCalledWith(
+                'SELECT issuance_date FROM documents WHERE id = ?',
+                [testId],
+                expect.any(Function)
+            );
+
+        });
+
+        test("It should reject if there is an error with select", async () => {
+            jest.spyOn(db, 'get').mockImplementationOnce((sql, params, callback) => {
+                callback(new Error("Select Error"));
+                return {} as Database;
+            })
+
+            await expect(dao.getDocumentIssuanceDateById(testId)).rejects.toThrow("Select Error");
+
+            expect(db.get).toHaveBeenCalledWith(
+                'SELECT issuance_date FROM documents WHERE id = ?',
+                [testId],
+                expect.any(Function)
+            );
+
+        });
+
+        test("It should reject if there is no document with the specified id", async () => {
+            jest.spyOn(db, 'get').mockImplementationOnce((sql, params, callback) => {
+                callback(null, null);
+                return {} as Database;
+            })
+
+            await expect(dao.getDocumentIssuanceDateById(testId)).rejects.toThrow("Document not found.");
+
+            expect(db.get).toHaveBeenCalledWith(
+                'SELECT issuance_date FROM documents WHERE id = ?',
+                [testId],
+                expect.any(Function)
+            );
+
+        });
+
+        test("It should reject with error if an unexpected error occurs", async () => {
+
+            const unexpectedError = new Error("Unexpected error");
+            (db.get as jest.Mock).mockImplementation(() => {
+                throw unexpectedError;
+            });
+
+            await expect(dao.getDocumentIssuanceDateById(testId)).rejects.toThrow("Unexpected error");
+            
+        });
+    });
+
+    describe(' getAllDocumentsOfSameType', () => {
+
+        test("It should retrieve all the documents with the same type", async () => {
+
+            const testRows = [
+                {
+                    id: 3,
+                    title: "title 3",
+                    stakeholder_id: 2,
+                    stakeholder_name: "Bob",
+                    stakeholder_category: "urban developer",
+                    scale: "1:1",
+                    issuance_date: "2020-10-10",
+                    type: "Material effect",
+                    language: "English",
+                    pages: "300",
+                    description: "description 3",
+                }
+            ];
+
+            jest.spyOn(db, 'all').mockImplementationOnce((sql, params, callback) => {
+                callback(null, testRows);
+                return {} as Database;
+            })
+
+            await expect(dao.getAllDocumentsOfSameType("Material effect")).resolves.toEqual([testDocument3]);
+
+            expect(db.all).toHaveBeenCalledWith(
+                'SELECT * FROM documents WHERE type = ?',
+                ["Material effect"],
+                expect.any(Function)
+            );
+
+        });
+
+        test("It should reject if there is an error with select", async () => {
+
+            jest.spyOn(db, 'all').mockImplementationOnce((sql, params, callback) => {
+                callback(new Error("Select Error"));
+                return {} as Database;
+            })
+
+            await expect(dao.getAllDocumentsOfSameType("Material effect")).rejects.toThrow("Select Error");
+
+            expect(db.all).toHaveBeenCalledWith(
+                'SELECT * FROM documents WHERE type = ?',
+                ["Material effect"],
+                expect.any(Function)
+            );
+
+        });
+
+        test("It should reject if there are no documents with the specified type", async () => {
+            jest.spyOn(db, 'all').mockImplementationOnce((sql, params, callback) => {
+                callback(null, null);
+                return {} as Database;
+            })
+
+            await expect(dao.getAllDocumentsOfSameType("Material effect")).rejects.toThrow("No documents found.");
+
+            expect(db.all).toHaveBeenCalledWith(
+                'SELECT * FROM documents WHERE type = ?',
+                ["Material effect"],
+                expect.any(Function)
+            );
+
+        });
+
+        test("It should reject with error if an unexpected error occurs", async () => {
+
+            const unexpectedError = new Error("Unexpected error");
+            (db.all as jest.Mock).mockImplementation(() => {
+                throw unexpectedError;
+            });
+
+            await expect(dao.getAllDocumentsOfSameType("Material effect")).rejects.toThrow("Unexpected error");
+    
         });
     });
 });

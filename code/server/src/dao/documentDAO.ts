@@ -2,6 +2,7 @@ import { DocLink } from "../models/document_link";
 import db from "../db/db"
 import { Document } from "../models/document"
 import { Stakeholder } from "../models/stakeholder"
+import Link from "../models/link";
 
 class DocumentDAO {
     /**
@@ -87,7 +88,6 @@ class DocumentDAO {
                         row.pages,
                         row.description
                     );
-    
                     // Populate stakeholders
                     document.stakeHolders = rows.map(row => new Stakeholder(
                         row.stakeholder_id,
@@ -249,62 +249,70 @@ class DocumentDAO {
     getDocumentLinksById(id: number): Promise<DocLink[]> {
         return new Promise<DocLink[]>((resolve, reject) => {
             try {
-                const sql = `SELECT dl.*, l.name AS link_name FROM documents_links dl JOIN links l ON dl.id_link = l.id WHERE dl.id_document1 = ? OR dl.id_document2 = ?`;
+                const sql = `SELECT dl.id_document1, dl.id_document2, l.id AS link_id, l.name AS link_name FROM documents_links dl JOIN links l ON dl.id_link = l.id WHERE dl.id_document1 = ? OR dl.id_document2 = ?`;
+                
                 db.all(sql, [id, id], (err: Error | null, rows: any[]) => {
                     if (err) return reject(err);
                     if (!rows || rows.length === 0) return reject(new Error("No links found."));
-    
-                    const documents2RelatedIds: number[] = rows.map(row => row.id_document2);
-                    const documents1RelatedIds: number[] = rows.map(row => row.id_document1);
-                    const combinedIds: number[] = Array.from(new Set([...documents2RelatedIds, ...documents1RelatedIds]));
-                    const filteredIds: number[] = combinedIds.filter(idValue => idValue != id);
 
-                    const sqlDocs = "SELECT * FROM documents WHERE id IN (?)";
-                    db.all(sqlDocs, filteredIds, (err: Error | null, documentRows: any[]) => {
-                        if (err) return reject(err);
-                        console.log(documentRows);
-                        if (!documentRows || documentRows.length === 0) return reject(new Error("No documents found."));
+                    // Estrarre una lista di documenti correlati con i rispettivi link_name
+                    const relatedDocs = rows.map(row => ({
+                        id: row.id_document1 == id ? row.id_document2 : row.id_document1,
+                        link_name: row.link_name,
+                        link_id: row.link_id
+                    }));
 
-                        const documentPromises = documentRows.map(row => {
-                            const relatedLink = rows.find(linkRow =>
-                                (linkRow.id_document1 === row.id || linkRow.id_document2 === row.id) && linkRow.id_link
-                            );
-                            console.log(relatedLink);
-                            return new Promise<DocLink>((resolveDoc, rejectDoc) => {
+                    // Costruire le promesse per ogni documento correlato
+                    const documentPromises = relatedDocs.map(({ id: docId, link_name, link_id }) => {
+                        return new Promise<DocLink>((resolveDoc, rejectDoc) => {
+                            // Query per ottenere i dati del documento
+
+                            const sqlDoc = `SELECT * FROM documents WHERE id = ?`;
+                            db.get(sqlDoc, [docId], (err: Error | null, documentRow: any) => {
+                                if (err) return rejectDoc(err);
+                                if (!documentRow) return rejectDoc(new Error("Document not found."));
+
+                                // Query per ottenere gli stakeholder associati
                                 const sqlStakeholders = `SELECT sd.id_stakeholder, s.name, s.category FROM stakeholders_documents sd JOIN stakeholders s ON s.id = sd.id_stakeholder WHERE id_document = ?`;
-                                db.all(sqlStakeholders, [row.id], (err: Error | null, stakeholderRows: any[]) => {
+                                db.all(sqlStakeholders, [docId], (err: Error | null, stakeholderRows: any[]) => {
                                     if (err) return rejectDoc(err);
-                                    
+
+                                    console.log("entrato");
+                                    // Creiamo la lista degli stakeholder
                                     const stakeholders = stakeholderRows ? stakeholderRows.map(stakeholderRow =>
                                         new Stakeholder(stakeholderRow.id_stakeholder, stakeholderRow.name, stakeholderRow.category)
                                     ) : [];
-    
+
+                                    // Creiamo l'oggetto DocLink
                                     resolveDoc(new DocLink(
-                                        row.id,
-                                        row.title,
+                                        documentRow.id,
+                                        documentRow.title,
                                         stakeholders,
-                                        row.scale,
-                                        row.issuance_date,
-                                        row.type,
-                                        row.language,
-                                        row.pages,
-                                        row.description,
-                                        relatedLink.link_name 
+                                        documentRow.scale,
+                                        documentRow.issuance_date,
+                                        documentRow.type,
+                                        documentRow.language,
+                                        documentRow.pages,
+                                        documentRow.description,
+                                        new Link(link_id, link_name) // Assegniamo direttamente il nome del link
                                     ));
+                                    
                                 });
                             });
                         });
-    
-                        Promise.all(documentPromises)
-                            .then(documents => resolve(documents))
-                            .catch(reject);
                     });
+
+                    // Risolviamo tutte le promesse e otteniamo l'array di DocLink
+                    Promise.all(documentPromises)
+                        .then(documents => resolve(documents))
+                        .catch(reject);
                 });
             } catch (error) {
                 reject(error);
             }
         });
-    }    
+    }
+
 
     /**
      * Retrieves the title of a document by its id from the database.
@@ -369,7 +377,7 @@ class DocumentDAO {
     getDocumentIssuanceDateById(id: number): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             try {
-                const sql = "SELECT issuanceDate FROM documents WHERE id = ?";
+                const sql = "SELECT issuance_date FROM documents WHERE id = ?";
                 db.get(sql, [id], (err: Error | null, row: any) => {
                     if (err) {
                         reject(err);
@@ -379,7 +387,8 @@ class DocumentDAO {
                         reject(new Error("Document not found."));
                         return;
                     }
-                    resolve(row.issuanceDate);
+
+                    resolve(row.issuance_date);
                 });
             } catch (error) {
                 reject(error);
@@ -407,10 +416,15 @@ class DocumentDAO {
                         reject(new Error("No documents found."));
                         return;
                     }
+
                     const documents: Document[] = rows.map((row: any) => new Document(
                         row.id,
                         row.title,
-                        row.stakeholders,
+                        row.stakeHolders = rows.map(row => new Stakeholder(
+                            row.stakeholder_id,
+                            row.stakeholder_name,
+                            row.stakeholder_category
+                        )),
                         row.scale,
                         row.issuance_date,
                         row.type,
@@ -418,6 +432,7 @@ class DocumentDAO {
                         row.pages,
                         row.description
                     ));
+
                     resolve(documents);
                 });
             } catch (error) {
