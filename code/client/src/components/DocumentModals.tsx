@@ -6,6 +6,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { User } from '../models/user';
 import API from '../API/API';
 import { Stakeholder } from '../models/stakeholder';
+import { DocLink } from '../models/document_link';
+import '../modal.css'
 
 interface RequiredLabelProps {
     text: string; // Explicitly define the type of 'text' as string
@@ -394,9 +396,10 @@ interface ShowDocumentInfoModalProps {
     user: User;
     handleEdit: () => void;
     refreshDocuments: () => void;
+    documentLinks: DocLink[];
 }
 
-function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, user, handleEdit, refreshDocuments}: ShowDocumentInfoModalProps) {
+function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, user, handleEdit, refreshDocuments, documentLinks}: ShowDocumentInfoModalProps) {
     const handleEditClick = () => {
         handleEdit();
         //onHide()
@@ -411,16 +414,16 @@ function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, 
 
     return (
         <>
-        <Modal size="lg" show={show} onHide={onHide} aria-labelledby="example-modal-sizes-title-lg">
-        <Modal.Header closeButton style={{backgroundColor: 'rgb(250, 250, 210, 0.8)'}}>
-          <Modal.Title id="example-modal-sizes-title-lg">
+        <Modal show={show} onHide={onHide}  dialogClassName="custom-modal-width" aria-labelledby="example-custom-modal-styling-title">
+        <Modal.Header closeButton style={{backgroundColor: 'rgb(148, 137, 121,0.4)'}}>
+          <Modal.Title id="example-custom-modal-styling-title">
             {`${selectedDocument.title} (${selectedDocument.id})`}
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{backgroundColor: 'rgb(250, 250, 210, 0.2)'}}>
+        <Modal.Body style={{backgroundColor: 'rgb(148, 137, 121,0.2)'}}>
         <Container>
           <Row>
-            <Col xs={3} md={2}>
+            <Col xs={3} md={1}>
             {getDocumentIcon(selectedDocument.type)}
             {user.role==="Urban Planner" ?(
                 <>
@@ -433,22 +436,23 @@ function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, 
                 </>
             ): null}
             </Col>
-            <Col xs={9} md={5}>
+            <Col xs={9} md={3}>
             <p>Stakeholders: {selectedDocument.stakeHolders.map(sh => sh.name).join(' / ')}</p>
             <p>Scale: {selectedDocument.scale}</p>
             <p>Issuance Date: {selectedDocument.issuanceDate}</p>
             <p>Type: {selectedDocument.type}</p>
-            <p>Conections: {}</p>
+            <p>Conections: {documentLinks.length!=0 ? documentLinks.length : '-'}</p>
             <p>Language: {selectedDocument.language ? selectedDocument.language : '-'}</p>
             <p>Pages: {selectedDocument.pages ? selectedDocument.pages : '-'}</p>
             </Col>
-            <Col xs={12} md={5}>
+            <Col xs={12} md={8}>
+              <p>Description:</p>
               <p>{selectedDocument.description ? selectedDocument.description : '-'}</p>
             </Col>
           </Row>
           </Container>
         </Modal.Body>
-        <Modal.Footer style={{backgroundColor: 'rgb(250, 250, 210, 0.8)'}}>
+        <Modal.Footer style={{backgroundColor: 'rgb(148, 137, 121,0.2)'}}>
         <Link to={`documents/${selectedDocument.id}/links`}
                 className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium no-underline"
               >View connections
