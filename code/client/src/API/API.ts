@@ -1,5 +1,3 @@
-import { User } from "../models/user";
-
 const baseURL = "http://localhost:3001/kiruna/"
 
 /** ------------------- Access APIs ------------------------ */
@@ -14,8 +12,7 @@ async function login(username: string, password: string) {
         body: JSON.stringify({ username: username, password: password },)
     })
     if (response.ok) {
-        const user = await response.json()
-        return user
+        return await response.json()
     } else {
         const errDetail = await response.json();
         if (errDetail.error)
@@ -34,8 +31,7 @@ async function logOut() {
 async function getUserInfo() {
     const response = await fetch(baseURL + 'sessions/current', { credentials: "include" })
     if (response.ok) {
-        const user = await response.json()
-        return user;
+        return await response.json();
     } else {
         const errDetail = await response.json();
         if (errDetail.error)
@@ -95,8 +91,7 @@ async function addDocument(title: string, stakeHolders: number[], scale: string,
 async function getAllDocuments() {
     const response = await fetch(baseURL + "doc", { credentials: "include" })
     if (response.ok) {
-        const documents = await response.json()
-        return documents
+        return await response.json()
     } else {
         const errDetail = await response.json();
         if (errDetail.error)
@@ -110,8 +105,7 @@ async function getAllDocuments() {
 async function getDocumentById(id: number) {
     const response = await fetch(baseURL + "doc/" + id, { credentials: "include" })
     if (response.ok) {
-        const document = await response.json()
-        return document
+        return await response.json()
     } else {
         const errDetail = await response.json();
         if (errDetail.error)
@@ -160,8 +154,7 @@ async function getDocumentLinksById(id: number) {
     const response = await fetch(baseURL + "doc/" + id + "/links", { credentials: "include" })
 
     if (response.ok) {
-        const documents = await response.json()
-        return documents
+        return await response.json()
     } else {
         const errDetail = await response.json();
         if (errDetail.error)
@@ -175,8 +168,7 @@ async function getDocumentLinksById(id: number) {
 async function getDocumentDescriptionById(id: number) {
     const response = await fetch(baseURL + "doc/" + id + "/description", { credentials: "include" })
     if (response.ok) {
-        const document = await response.json()
-        return document
+        return await response.json()
     } else {
         const errDetail = await response.json();
         if (errDetail.error)
@@ -190,8 +182,7 @@ async function getDocumentDescriptionById(id: number) {
 async function getDocumentTitleById(id: number) {
     const response = await fetch(baseURL + "doc/" + id + "/title", { credentials: "include" })
     if (response.ok) {
-        const document = await response.json()
-        return document
+        return await response.json()
     } else {
         const errDetail = await response.json();
         if (errDetail.error)
@@ -205,8 +196,7 @@ async function getDocumentTitleById(id: number) {
 async function getDocumentIssuanceDateById(id: number) {
     const response = await fetch(baseURL + "doc/" + id + "/issuanceDate", { credentials: "include" })
     if (response.ok) {
-        const document = await response.json()
-        return document
+        return await response.json()
     } else {
         const errDetail = await response.json();
         if (errDetail.error)
@@ -220,8 +210,7 @@ async function getDocumentIssuanceDateById(id: number) {
 async function getAllDocumentsOfSameType(type: string) {
     const response = await fetch(baseURL + "doc/" + type, { credentials: "include" })
     if (response.ok) {
-        const documents = await response.json()
-        return documents
+        return await response.json()
     } else {
         const errDetail = await response.json();
         if (errDetail.error)
@@ -280,8 +269,7 @@ async function editLink(idDoc1: number, idDoc2: number, oldLinkId: number, newLi
 async function getAllLinks() {
     const response = await fetch(baseURL + "link", { credentials: "include" })
     if (response.ok) {
-        const links = await response.json()
-        return links
+        return await response.json()
     } else {
         const errDetail = await response.json();
         if (errDetail.error)
@@ -297,8 +285,7 @@ async function getAllLinks() {
 async function getAllStakeholders() {
     const response = await fetch(baseURL + "stakeholders", { credentials: "include" })
     if (response.ok) {
-        const stakeholders = await response.json()
-        return stakeholders
+        return await response.json()
     } else {
         const errDetail = await response.json();
         if (errDetail.error)

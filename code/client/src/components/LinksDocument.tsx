@@ -1,15 +1,12 @@
-import { Link } from "react-router-dom";
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Document } from "../models/document";
 import API from "../API/API";
-import { TrashIcon, PencilIcon, PlusIcon, FaceFrownIcon } from "@heroicons/react/24/outline";
-import { Modal } from "react-bootstrap";
+import { TrashIcon, PlusIcon, FaceFrownIcon } from "@heroicons/react/24/outline";
 import Alert from "./Alert";
 import ConfirmModal from './ConfirmModal';
 import { AddLinkModal } from "./AddLinkModal";
 import { DocLink } from "../models/document_link";
-import { link } from "fs";
 
 interface TruncatedTextProps {
   text: string;
@@ -96,7 +93,7 @@ function LinksDocument(props: any) {
             }
         };
 
-        getDocument();
+        getDocument().then();
     }, [idDocument])
 
     useEffect(() => {
@@ -110,7 +107,7 @@ function LinksDocument(props: any) {
                 setShowAlert(true);
             }
         };
-        getDocuments();
+        getDocuments().then();
     }, [idDocument]);
 
     const confirmDelete = (docId: number, linkId: number) => {

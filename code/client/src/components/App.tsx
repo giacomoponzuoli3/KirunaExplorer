@@ -1,16 +1,13 @@
 import { useEffect, useState } from 'react';
 import {Navbar} from "./Navbar"
 import API from '../API/API';
-import { Routes, Route, Navigate, Outlet, Link } from 'react-router-dom';
-import {Login} from './Login'; // Assicurati che il percorso sia corretto
+import { Routes, Route, Outlet } from 'react-router-dom';
+import {Login} from './Login';
 import { HomePage } from './HomePage';
 import { NotFoundLayout } from './NotFoundLayout';
-import { Container } from 'react-dom';
 import { Document } from '../models/document';
-import { DocLink } from '../models/document_link';
 import { LinksDocument } from './LinksDocument';
 import { Stakeholder } from '../models/stakeholder';
-import { get } from 'http';
 
 function App() {
   const [user, setUser] = useState<any>('');
@@ -61,7 +58,7 @@ function App() {
         setIsLogged(false);
       }
     };
-    checkAuth();
+    checkAuth().then();
   }, []);
 
   //gestione del login

@@ -8,7 +8,7 @@ class DocumentDAO {
     /**
      * Adds a document to the database.
      * @param title The title of the document to add.
-     * @param stakeHolders The stake holders of the document to add.
+     * @param stakeHolders The stakeholders of the document to add.
      * @param scale The scale of the document to add.
      * @param issuanceDate The issuance date of the document to add.
      * @param type The type of the document to add.
@@ -196,7 +196,7 @@ class DocumentDAO {
      * Edits a document in the database.
      * @param id The id of the document to edit.
      * @param title The title of the document to update.
-     * @param stakeHolders The stake holders of the document to update.
+     * @param stakeHolders The stakeholders of the document to update.
      * @param scale The scale of the document to update.
      * @param issuanceDate The issuance date of the document to update.
      * @param type The type of the document to update.
@@ -365,7 +365,7 @@ class DocumentDAO {
      /**
      * Retrieves the description of a document by its id from the database.
      * @param id The id of the document to retrieve.
-     * @returns A Promise that resolves to the the description of document with the specified id.
+     * @returns A Promise that resolves to the description of document with the specified id.
      */
 
     getDocumentDescriptionById(id: number): Promise<string | null> {
@@ -392,7 +392,7 @@ class DocumentDAO {
     /**
      * Retrieves the issuanceDate of a document by its id from the database.
      * @param id The id of the document to retrieve.
-     * @returns A Promise that resolves to the the issuanceDate of document with the specified id.
+     * @returns A Promise that resolves to the issuanceDate of document with the specified id.
      */
 
     getDocumentIssuanceDateById(id: number): Promise<string> {
