@@ -13,7 +13,7 @@ class DocumentController {
     /**
      * Adds a document to the database.
      * @param title The title of the document to add.
-     * @param stakeHolders The stake holders of the document to add.
+     * @param stakeHolders The stakeholders of the document to add.
      * @param scale The scale of the document to add.
      * @param issuanceDate The issuance date of the document to add.
      * @param type The type of the document to add.
@@ -56,7 +56,7 @@ class DocumentController {
      * Edits a document in the database.
      * @param id The id of the document to edit.
      * @param title The new title of the document.
-     * @param stakeHolders The updated stake holders of the document.
+     * @param stakeHolders The updated stakeholders of the document.
      * @param scale The new scale of the document.
      * @param issuanceDate The updated issuance date of the document.
      * @param type The new type of the document.
@@ -91,7 +91,7 @@ class DocumentController {
      /**
      * Retrieves the description of a document by its id from the database.
      * @param id The id of the document to retrieve.
-     * @returns A Promise that resolves to the the description of document with the specified id.
+     * @returns A Promise that resolves to the description of document with the specified id.
      */
 
     getDocumentDescriptionById(id: number): Promise<string> {
@@ -104,7 +104,7 @@ class DocumentController {
     /**
      * Retrieves the issuanceDate of a document by its id from the database.
      * @param id The id of the document to retrieve.
-     * @returns A Promise that resolves to the the issuanceDate of document with the specified id.
+     * @returns A Promise that resolves to the issuanceDate of document with the specified id.
      */
 
     getDocumentIssuanceDateById(id: number): Promise<string> {

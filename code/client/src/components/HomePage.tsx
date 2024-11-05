@@ -1,12 +1,12 @@
-import {Container, Modal, Row, Col, Button} from "react-bootstrap"
-import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import API from '../API/API'; // Make sure the path is correct
+import {Button} from "react-bootstrap"
+import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import API from '../API/API';
 import { Link } from 'react-router-dom';
 import { Document } from "../models/document";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { User, Role } from "../models/user";
+import { User } from "../models/user";
 import { AddDocumentModal, ShowDocumentInfoModal, EditDocumentModal } from "./DocumentModals";
 import { Stakeholder } from "../models/stakeholder";
 import { DocLink } from "../models/document_link";

@@ -10,9 +10,9 @@ class LinkController {
 
     /**
      * Adds a link to the database.
-     * @param idDoc1 The ID of the first document.
-     * @param idDoc2 The ID of the second document.
-     * @param name The name of the link to add.
+     * @param idDoc1 - The ID of the first document.
+     * @param idDoc2 - The ID of the second document.
+     * @param idLink - The ID of the link type.
      * @returns A Promise that resolves when the link has been added.
      */
     async addLink(idDoc1: number, idDoc2: number, idLink: number): Promise<void> {
@@ -21,7 +21,9 @@ class LinkController {
 
     /**
      * Deletes a link from the database.
-     * @param linkId The id of the link to delete.
+     * @param idDoc1 - The ID of the first document.
+     * @param idDoc2 - The ID of the second document.
+     * @param linkId - The ID of the link type.
      * @returns A Promise that resolves when the link has been deleted.
      */
     async deleteLink(idDoc1: number, idDoc2: number, linkId: number) {
@@ -30,8 +32,10 @@ class LinkController {
 
     /**
      * Updates a link in the database.
-     * @param id The id of the link to update.
-     * @param name The new name of the link.
+     * @param idDoc1 - The ID of the first document.
+     * @param idDoc2 - The ID of the second document.
+     * @param oldLinkId - The ID of the old link type.
+     * @param newLinkId - The ID of the new link type.
      * @returns A Promise that resolves when the link has been updated.
      */
     async updateLink(idDoc1: number, idDoc2: number, oldLinkId: number, newLinkId: number) {

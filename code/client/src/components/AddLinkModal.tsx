@@ -68,8 +68,8 @@ function AddLinkModal(props: any) {
             }
         };
 
-        getTypesLink();
-        getAllDocuments();
+        getTypesLink().then();
+        getAllDocuments().then();
     }, []);
 
     // Handle document selection

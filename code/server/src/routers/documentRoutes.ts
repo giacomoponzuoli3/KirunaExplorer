@@ -1,10 +1,10 @@
 import DocumentController from "../controllers/documentController"
 import express, {Router} from "express"
-import {body, oneOf, param, query} from "express-validator"
+import {body, param} from "express-validator"
 import ErrorHandler from "../helper"
-import {Document} from "../models/document"
-import { link } from "fs"
 import Authenticator from "./auth"
+import {Document} from "../models/document";
+import {DocLink} from "../models/document_link";
 
 class DocumentRoutes {
     private controller: DocumentController
@@ -37,10 +37,20 @@ class DocumentRoutes {
             body("pages").optional({ nullable: true }).isString(),
             body("description").optional({ nullable: true }).isString(),
             this.errorHandler.validateRequest,
-                async (req: any, res: any, next: any) => {
+            (req: any, res: any, next: any) => {
                 try {
-                    await this.controller.addDocument(req.body["title"], req.body["stakeHolders"], req.body["scale"], req.body["issuanceDate"], req.body["type"], req.body["language"], req.body["pages"], req.body["description"]);
-                    res.status(200).json({ message: "Document added successfully" });
+                    this.controller.addDocument(
+                        req.body["title"],
+                        req.body["stakeHolders"],
+                        req.body["scale"],
+                        req.body["issuanceDate"],
+                        req.body["type"],
+                        req.body["language"],
+                        req.body["pages"],
+                        req.body["description"]
+                    )
+                        .then(() => res.status(200).json({ message: "Document added successfully" }))
+                        .catch((err: Error) => next(err))
                 } catch (err) {
                     next(err);
                 }
@@ -50,10 +60,11 @@ class DocumentRoutes {
 
         this.router.get(
             "/",
-            async (req: any, res: any, next: any) => {
+            (_req: any, res: any, next: any) => {
                 try {
-                    const documents = await this.controller.getAllDocuments();
-                    res.status(200).json(documents);
+                    this.controller.getAllDocuments()
+                        .then((documents: Document[]) => res.status(200).json(documents))
+                        .catch((err: Error) => next(err))
                 } catch (err) {
                     next(err);
                 }
@@ -64,12 +75,12 @@ class DocumentRoutes {
             "/:id",
             param("id").isNumeric(),
             this.errorHandler.validateRequest,
-            async (req: any, res: any, next: any) => {
+            (req: any, res: any, next: any) => {
                 try {
-                    const document = await this.controller.getDocumentById(req.params["id"]);
-                    res.status(200).json(document);
+                    this.controller.getDocumentById(req.params["id"])
+                        .then((document: Document) => res.status(200).json(document))
+                        .catch((err: Error) => next(err))
                 } catch (err) {
-                    
                     next(err);
                 }
             }
@@ -79,10 +90,11 @@ class DocumentRoutes {
             "/:id",
             param("id").isNumeric(),
             this.errorHandler.validateRequest,
-            async (req: any, res: any, next: any) => {
+            (req: any, res: any, next: any) => {
                 try {
-                    await this.controller.deleteDocument(req.params["id"]);
-                    res.status(200).json({ message: "Document deleted successfully" });
+                    this.controller.deleteDocument(req.params["id"])
+                        .then(() => res.status(200).json({ message: "Document deleted successfully" }))
+                        .catch((err: Error) => next(err))
                 } catch (err) {
                     next(err);
                 }
@@ -101,10 +113,21 @@ class DocumentRoutes {
             body("pages").optional({ nullable: true }).isString(),
             body("description").optional({ nullable: true }).isString(),
             this.errorHandler.validateRequest,
-            async (req: any, res: any, next: any) => {
+            (req: any, res: any, next: any) => {
                 try {
-                    await this.controller.editDocument(req.params["id"], req.body["title"], req.body["stakeHolders"], req.body["scale"], req.body["issuanceDate"], req.body["type"], req.body["language"], req.body["pages"], req.body["description"]);
-                    res.status(200).json({ message: "Document updated successfully" });
+                    this.controller.editDocument(
+                        req.params["id"],
+                        req.body["title"],
+                        req.body["stakeHolders"],
+                        req.body["scale"],
+                        req.body["issuanceDate"],
+                        req.body["type"],
+                        req.body["language"],
+                        req.body["pages"],
+                        req.body["description"]
+                    )
+                        .then(() => res.status(200).json({ message: "Document updated successfully" }))
+                        .catch((err: Error) => next(err))
                 } catch (err) {
                     next(err);
                 }
@@ -115,10 +138,11 @@ class DocumentRoutes {
             "/:id/links",
             param("id").isNumeric(),
             this.errorHandler.validateRequest,
-            async (req: any, res: any, next: any) => {
+            (req: any, res: any, next: any) => {
                 try {
-                    const links = await this.controller.getDocumentLinksById(req.params["id"]);
-                    res.status(200).json(links);
+                    this.controller.getDocumentLinksById(req.params["id"])
+                        .then((links: DocLink[]) => res.status(200).json(links))
+                        .catch((err: Error) => next(err))
                 } catch (err) {
                     next(err);
                 }
@@ -129,10 +153,11 @@ class DocumentRoutes {
             "/:id/title",
             param("id").isNumeric(),
             this.errorHandler.validateRequest,
-            async (req: any, res: any, next: any) => {
+            (req: any, res: any, next: any) => {
                 try {
-                    const document = await this.controller.getDocumentTitleById(req.params["id"]);
-                    res.status(200).json(document);
+                    this.controller.getDocumentTitleById(req.params["id"])
+                        .then((title: string) => res.status(200).json(title))
+                        .catch((err: Error) => next(err))
                 } catch (err) {
                     next(err);
                 }
@@ -143,10 +168,11 @@ class DocumentRoutes {
             "/:id/description",
             param("id").isNumeric(),
             this.errorHandler.validateRequest,
-            async (req: any, res: any, next: any) => {
+            (req: any, res: any, next: any) => {
                 try {
-                    const document = await this.controller.getDocumentDescriptionById(req.params["id"]);
-                    res.status(200).json(document);
+                    this.controller.getDocumentDescriptionById(req.params["id"])
+                        .then((description: string) => res.status(200).json(description))
+                        .catch((err: Error) => next(err))
                 } catch (err) {
                     next(err);
                 }
@@ -157,10 +183,11 @@ class DocumentRoutes {
             "/:id/issuanceDate",
             param("id").isNumeric(),
             this.errorHandler.validateRequest,
-            async (req: any, res: any, next: any) => {
+            (req: any, res: any, next: any) => {
                 try {
-                    const document = await this.controller.getDocumentIssuanceDateById(req.params["id"]);
-                    res.status(200).json(document);
+                    this.controller.getDocumentIssuanceDateById(req.params["id"])
+                        .then((date: string) => res.status(200).json(date))
+                        .catch((err: Error) => next(err))
                 } catch (err) {
                     next(err);
                 }
@@ -170,10 +197,11 @@ class DocumentRoutes {
         this.router.get(
             "/:type",
             param("type").isString().notEmpty(),
-            async (req: any, res: any, next: any) => {
+            (req: any, res: any, next: any) => {
                 try {
-                    const documents = await this.controller.getAllDocumentsOfSameType(req.params["type"]);
-                    res.status(200).json(documents);
+                    this.controller.getAllDocumentsOfSameType(req.params["type"])
+                        .then((documents: Document[]) => res.status(200).json(documents))
+                        .catch((err: Error) => next(err))
                 } catch (err) {
                     next(err);
                 }

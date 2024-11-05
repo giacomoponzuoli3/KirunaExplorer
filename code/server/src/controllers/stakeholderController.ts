@@ -8,8 +8,6 @@ class StakeholderController {
         this.dao = new StakeholderDAO();
     }
 
-    
-
     /**
      * Retrieves all stakeholders from the database.
      * @returns A Promise that resolves to an array of Stakeholders objects.
