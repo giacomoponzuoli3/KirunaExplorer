@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for controllers/documentController.ts</title>
+    <title>Code coverage report for server/src/routers/AuthRoutes.ts</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../prettify.css" />
-    <link rel="stylesheet" href="../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../favicon.png" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../sort-arrow-sprite.png);
+            background-image: url(../../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../index.html">All files</a> / <a href="index.html">controllers</a> documentController.ts</h1>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">server/src/routers</a> AuthRoutes.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">52% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>14/14</span>
+                <span class='fraction'>13/25</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>4/4</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">20% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>12/12</span>
+                <span class='fraction'>3/15</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">52% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>14/14</span>
+                <span class='fraction'>13/25</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -179,21 +179,9 @@
 <a name='L114'></a><a href='#L114'>114</a>
 <a name='L115'></a><a href='#L115'>115</a>
 <a name='L116'></a><a href='#L116'>116</a>
-<a name='L117'></a><a href='#L117'>117</a>
-<a name='L118'></a><a href='#L118'>118</a>
-<a name='L119'></a><a href='#L119'>119</a>
-<a name='L120'></a><a href='#L120'>120</a>
-<a name='L121'></a><a href='#L121'>121</a>
-<a name='L122'></a><a href='#L122'>122</a>
-<a name='L123'></a><a href='#L123'>123</a>
-<a name='L124'></a><a href='#L124'>124</a>
-<a name='L125'></a><a href='#L125'>125</a>
-<a name='L126'></a><a href='#L126'>126</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L117'></a><a href='#L117'>117</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -212,17 +200,20 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -230,7 +221,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -239,7 +229,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -247,7 +237,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -256,18 +250,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -275,9 +272,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -285,176 +285,149 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">import { Document } from "../models/document";
-import { DocumentDAO } from "../dao/documentDAO";
-import { DocLink } from "../models/document_link";
+<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">import express, { NextFunction, Router } from "express"
+import Authenticator from "./auth"
+import { body, param } from "express-validator"
+import {User } from "../models/user"
+import UserController from "../controllers/userController"
+import ErrorHandler from "../helper"
 &nbsp;
-class DocumentController {
-    private dao: DocumentDAO;
+/**
+ * Represents a class that defines the authentication routes for the application.
+ */
+class AuthRoutes {
+    private router: Router
+    private errorHandler: ErrorHandler
+    private authService: Authenticator
+    private controller: UserController
 &nbsp;
-    constructor() {
-        this.dao = new DocumentDAO();
+    /**
+     * Constructs a new instance of the UserRoutes class.
+     * @param authenticator - The authenticator object used for authentication.
+     */
+    constructor(authenticator: Authenticator) {
+        this.authService = authenticator
+        this.errorHandler = new ErrorHandler()
+        this.router = express.Router();
+        this.initRoutes();
     }
 &nbsp;
-    
-    /**
-     * Adds a document to the database.
-     * @param title The title of the document to add.
-     * @param stakeHolders The stake holders of the document to add.
-     * @param scale The scale of the document to add.
-     * @param issuanceDate The issuance date of the document to add.
-     * @param type The type of the document to add.
-     * @param language The language of the document to add.
-     * @param pages The pages of the document to add.
-     * @param description The description of the document to add.
-     * @returns A Promise that resolves when the document has been added.
-     */
-    addDocument(title: string, stakeHolders: number[], scale: string, issuanceDate: string, type: string, language: string, pages: string, description: string): Promise&lt;void&gt; {
-        return this.dao.addDocument(title, stakeHolders, scale, issuanceDate, type, language, pages, description);
+    getRouter(): Router {
+        return this.router
     }
 &nbsp;
     /**
-     * Retrieves a document by its id from the database. 
-     * @param id The id of the document to retrieve.
-     * @returns A Promise that resolves to the document with the specified id.
+     * Initializes the authentication routes.
+     * 
+     * @remarks
+     * This method sets up the HTTP routes for login, logout, and retrieval of the logged in user.
+     * It can (and should!) apply authentication, authorization, and validation middlewares to protect the routes.
      */
-    getDocumentById(id: number): Promise&lt;Document&gt; {
-        return this.dao.getDocumentById(id);
+    initRoutes() {
+&nbsp;
+        /**
+         * Route for creating a user.
+         * It does not require authentication.
+         * It requires the following body parameters:
+         * - username: string. It cannot be empty and it must be unique (an existing username cannot be used to create a new user)
+         * - name: string. It cannot be empty.
+         * - surname: string. It cannot be empty.
+         * - password: string. It cannot be empty.
+         * It returns a 200 status code.
+         */
+        this.router.post(
+            "/register",
+            [body('username').notEmpty(),
+                body('name').notEmpty(),
+                body('surname').notEmpty(),
+                body('password').notEmpty(),
+                body('role').isIn(['Resident','Urban Planner'])
+            ],
+<span class="fstat-no" title="function not covered" >            (r</span>eq: any, res: any, next: any) =&gt; <span class="cstat-no" title="statement not covered" >this.errorHandler.validateRequest(req, res, next),</span>
+<span class="fstat-no" title="function not covered" >            (r</span>eq: any, res: any, next: any) =&gt; <span class="cstat-no" title="statement not covered" >this.controller.createUser(req.body.username, req.body.name, req.body.surname, req.body.password, req.body.role)</span>
+                .then(<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >res.status(200).end())</span>
+                .catch(<span class="fstat-no" title="function not covered" >(e</span>rr) =&gt; {
+<span class="cstat-no" title="statement not covered" >                    next(err)</span>
+                })
+        )
+&nbsp;
+&nbsp;
+        /**
+         * Route for logging in a user.
+         * It does not require authentication.
+         * It expects the following parameters:
+         * - username: string. It cannot be empty.
+         * - password: string. It cannot be empty.
+         * It returns an error if the username represents a non-existing user or if the password is incorrect.
+         * It returns the logged in user.
+         */
+        this.router.post( 
+            "/",
+            [
+                body('username').notEmpty(),
+                body('password').notEmpty()
+            ],
+<span class="fstat-no" title="function not covered" >            (r</span>eq: any, res: any, next: any) =&gt; <span class="cstat-no" title="statement not covered" >this.errorHandler.validateRequest(req, res, next),</span>
+<span class="fstat-no" title="function not covered" >            (r</span>eq: any, res: any, next: any) =&gt; <span class="cstat-no" title="statement not covered" >this.authService.login(req, res, next)</span>
+                .then(<span class="fstat-no" title="function not covered" >(u</span>ser: User) =&gt; <span class="cstat-no" title="statement not covered" >res.status(200).json(user))</span>
+                .catch(<span class="fstat-no" title="function not covered" >(e</span>rr: any) =&gt; { <span class="cstat-no" title="statement not covered" >res.status(401).json(err) }</span>)
+        )
+&nbsp;
+        /**
+         * Route for logging out the currently logged in user.
+         * It expects the user to be logged in.
+         * It returns a 200 status code.
+         */
+        this.router.delete(
+            "/current",
+            this.authService.isLoggedIn,
+<span class="fstat-no" title="function not covered" >            (r</span>eq, res, next) =&gt; <span class="cstat-no" title="statement not covered" >this.authService.logout(req, res, next)</span>
+                .then(<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >res.status(200).end())</span>
+                .catch(<span class="fstat-no" title="function not covered" >(e</span>rr: any) =&gt; <span class="cstat-no" title="statement not covered" >next(err))</span>
+        )
+&nbsp;
+        /**
+         * Route for retrieving the currently logged in user.
+         * It expects the user to be logged in.
+         * It returns the logged in user.
+         */
+        this.router.get(
+            "/current",
+            this.authService.isLoggedIn,
+<span class="fstat-no" title="function not covered" >            (r</span>eq: any, res: any) =&gt; <span class="cstat-no" title="statement not covered" >res.status(200).json(req.user)</span>
+        )
+&nbsp;
+        
     }
-&nbsp;
-    /**
-     * Retrieves all documents from the database.
-     * @returns A Promise that resolves to an array of Document objects.
-     */
-    getAllDocuments(): Promise&lt;Document[]&gt; {
-        return this.dao.getAllDocuments();
-    }
-&nbsp;
-    /**
-     * Deletes a document from the database.
-     * @param id The id of the document to delete.
-     * @returns A Promise that resolves when the document has been deleted.
-     */
-    deleteDocument(id: number): Promise&lt;void&gt; {
-        return this.dao.deleteDocument(id);
-    }
-&nbsp;
-    /**
-     * Edits a document in the database.
-     * @param id The id of the document to edit.
-     * @param title The new title of the document.
-     * @param stakeHolders The updated stake holders of the document.
-     * @param scale The new scale of the document.
-     * @param issuanceDate The updated issuance date of the document.
-     * @param type The new type of the document.
-     * @param language The updated language of the document.
-     * @param pages The new pages of the document.
-     * @param description The updated description of the document.
-     * @returns A Promise that resolves when the document has been updated.
-     */
-    editDocument(id: number, title: string, stakeHolders: number[], scale: string, issuanceDate: string, type: string, language: string, pages: string, description: string): Promise&lt;void&gt; {
-        return this.dao.editDocument(id, title, stakeHolders, scale, issuanceDate, type, language, pages, description);
-    }
-&nbsp;
-    /**
-     * Retrieves documents linked to a specified document by its id.
-     * @param id The id of the document whose linked documents are to be retrieved.
-     * @returns A Promise that resolves to an array of Document objects linked to the specified document.
-     */
-    getDocumentLinksById(id: number): Promise&lt;DocLink[]&gt; {
-        return this.dao.getDocumentLinksById(id);
-    }
-&nbsp;
-    
-    /**
-     * Retrieves the title of a document by its id from the database.
-     * @param id The id of the document to retrieve.
-     * @returns A Promise that resolves to the title of document with the specified id.
-     */
-    getDocumentTitleById(id: number): Promise&lt;string&gt; {
-        return this.dao.getDocumentTitleById(id);
-    }
-&nbsp;
-     /**
-     * Retrieves the description of a document by its id from the database.
-     * @param id The id of the document to retrieve.
-     * @returns A Promise that resolves to the the description of document with the specified id.
-     */
-&nbsp;
-    getDocumentDescriptionById(id: number): Promise&lt;string&gt; {
-        return this.dao.getDocumentDescriptionById(id).then((description: string | null) =&gt; {
-            //if the document does not have a description it returns a message to notify it
-            return description ?? "No description available";
-        });
-    }
-&nbsp;
-    /**
-     * Retrieves the issuanceDate of a document by its id from the database.
-     * @param id The id of the document to retrieve.
-     * @returns A Promise that resolves to the the issuanceDate of document with the specified id.
-     */
-&nbsp;
-    getDocumentIssuanceDateById(id: number): Promise&lt;string&gt; {
-        return this.dao.getDocumentIssuanceDateById(id);
-    }
-&nbsp;
-    /**
-     * Retrieves all documents of the same type from the database.
-     * @param type The type of the document to retrieve.
-     * @returns A Promise that resolves to an array of Document objects.
-     */
-&nbsp;
-    getAllDocumentsOfSameType(type: string): Promise&lt;Document[]&gt; {
-        return this.dao.getAllDocumentsOfSameType(type);
-    }
-&nbsp;
 }
 &nbsp;
-export default DocumentController</pre></td></tr></table></pre>
+export { AuthRoutes }</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-11-05T16:48:36.545Z
+                at 2024-11-05T18:50:14.595Z
             </div>
-        <script src="../prettify.js"></script>
+        <script src="../../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../sorter.js"></script>
-        <script src="../block-navigation.js"></script>
+        <script src="../../../sorter.js"></script>
+        <script src="../../../block-navigation.js"></script>
     </body>
 </html>
     

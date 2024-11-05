@@ -210,7 +210,6 @@ class DocumentDAO {
     
             db.run(updateDocumentSql, values, (err: Error | null) => {
                 if (err) {
-                    console.log(err);
                     reject(err);
                     return;
                 }
@@ -218,7 +217,6 @@ class DocumentDAO {
                 const deleteStakeholdersSql = "DELETE FROM stakeholders_documents WHERE id_document = ?";
                 db.run(deleteStakeholdersSql, [id], (deleteErr: Error | null) => {
                     if (deleteErr) {
-                        console.log(deleteErr);
                         reject(deleteErr);
                         return;
                     }
@@ -277,7 +275,6 @@ class DocumentDAO {
                                 db.all(sqlStakeholders, [docId], (err: Error | null, stakeholderRows: any[]) => {
                                     if (err) return rejectDoc(err);
 
-                                    console.log("entrato");
                                     // Creiamo la lista degli stakeholder
                                     const stakeholders = stakeholderRows ? stakeholderRows.map(stakeholderRow =>
                                         new Stakeholder(stakeholderRow.id_stakeholder, stakeholderRow.name, stakeholderRow.category)
