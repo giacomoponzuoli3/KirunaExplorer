@@ -6,7 +6,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { User } from '../models/user';
 import API from '../API/API';
 import { Stakeholder } from '../models/stakeholder';
-import { TrashIcon, PencilIcon } from "@heroicons/react/24/outline";
+import { DocLink } from '../models/document_link';
+import '../modal.css'
 
 interface RequiredLabelProps {
     text: string; // Explicitly define the type of 'text' as string
@@ -395,9 +396,10 @@ interface ShowDocumentInfoModalProps {
     user: User;
     handleEdit: () => void;
     refreshDocuments: () => void;
+    documentLinks: DocLink[];
 }
 
-function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, user, handleEdit, refreshDocuments}: ShowDocumentInfoModalProps) {
+function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, user, handleEdit, refreshDocuments, documentLinks}: ShowDocumentInfoModalProps) {
     const handleEditClick = () => {
         handleEdit();
         //onHide()
@@ -412,51 +414,45 @@ function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, 
 
     return (
         <>
-        <Modal size="lg" show={show} onHide={onHide} aria-labelledby="example-modal-sizes-title-lg">
-        <Modal.Header closeButton style={{backgroundColor: 'rgb(250, 250, 210, 0.8)'}}>
-          <Modal.Title id="example-modal-sizes-title-lg">
+        <Modal show={show} onHide={onHide}  dialogClassName="custom-modal-width" aria-labelledby="example-custom-modal-styling-title">
+        <Modal.Header closeButton style={{backgroundColor: 'rgb(148, 137, 121,0.4)'}}>
+          <Modal.Title id="example-custom-modal-styling-title">
             {`${selectedDocument.title} (${selectedDocument.id})`}
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{backgroundColor: 'rgb(250, 250, 210, 0.2)'}}>
+        <Modal.Body style={{backgroundColor: 'rgb(148, 137, 121,0.2)'}}>
         <Container>
           <Row>
             <Col xs={3} md={2}>
-                {getDocumentIcon(selectedDocument.type)}
-                {user.role === "Urban Planner" ? (
-                    <div className="flex space-x-2 mt-4">
-                        <button
-                            className="p-2 rounded-full bg-red-100 text-red-500 hover:bg-red-200 hover:text-red-700 transition-colors duration-200"
-                            onClick={handleDeleteClick}
-                        >
-                            <TrashIcon className="h-5 w-5" />
-                        </button>
-                        <button
-                            className="p-2 rounded-full bg-blue-100 text-blue-500 hover:bg-blue-200 hover:text-blue-700 transition-colors duration-200"
-                            onClick={handleEditClick}
-                        >
-                            <PencilIcon className="h-5 w-5" />
-                        </button>
-                    </div>
-                ) : null}
+            {getDocumentIcon(selectedDocument.type)}
+            {user.role==="Urban Planner" ?(
+                <>
+                    <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-md mt-4" onClick={handleEditClick} style={{borderColor: 'white', width:'70px'}}>
+                        Edit
+                    </Button>
+                    <Button className="bg-gradient-to-r from-red-600 to-red-400 mt-3" onClick={handleDeleteClick} style={{borderColor: 'white'}}>
+                        Delete
+                    </Button>
+                </>
+            ): null}
             </Col>
-
             <Col xs={9} md={5}>
             <p>Stakeholders: {selectedDocument.stakeHolders.map(sh => sh.name).join(' / ')}</p>
             <p>Scale: {selectedDocument.scale}</p>
             <p>Issuance Date: {selectedDocument.issuanceDate}</p>
             <p>Type: {selectedDocument.type}</p>
-            <p>Conections: {}</p>
+            <p>Conections: {documentLinks.length!=0 ? documentLinks.length : '-'}</p>
             <p>Language: {selectedDocument.language ? selectedDocument.language : '-'}</p>
             <p>Pages: {selectedDocument.pages ? selectedDocument.pages : '-'}</p>
             </Col>
-            <Col xs={12} md={5}>
+            <Col xs={12} md={8}>
+              <p>Description:</p>
               <p>{selectedDocument.description ? selectedDocument.description : '-'}</p>
             </Col>
           </Row>
           </Container>
         </Modal.Body>
-        <Modal.Footer style={{backgroundColor: 'rgb(250, 250, 210, 0.8)'}}>
+        <Modal.Footer style={{backgroundColor: 'rgb(148, 137, 121,0.2)'}}>
         <Link to={`documents/${selectedDocument.id}/links`}
                 className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium no-underline"
               >View connections
