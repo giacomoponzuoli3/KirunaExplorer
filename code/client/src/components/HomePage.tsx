@@ -9,6 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { User, Role } from "../models/user";
 import { AddDocumentModal, ShowDocumentInfoModal, EditDocumentModal } from "./DocumentModals";
 import { Stakeholder } from "../models/stakeholder";
+import { DocLink } from "../models/document_link";
 
 
 interface HomepageProps {
@@ -21,6 +22,7 @@ interface HomepageProps {
 function HomePage({documents, user, refreshDocuments, stakeholders} : HomepageProps) {
 
 const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+const [documentLinks, setDocumentLinks] = useState<DocLink[]>([]);
 const [showDetails, setShowDetails] = useState<boolean>(false);
 const [showAddDocumentModal, setShowAddDocumentModal] = useState<boolean>(false);
 const [showEditDocumentModal, setShowEditDocumentModal] = useState<boolean>(false);
@@ -35,8 +37,10 @@ const handleCloseDetailsModal = () => {
 };
 
 const handleDocumentClick = async (doc: Document) => {
-    const document = await API.getDocumentById(doc.id)
+    const document = await API.getDocumentById(doc.id);
     setSelectedDocument(document);
+    const docLinks = await API.getDocumentLinksById(doc.id);
+    setDocumentLinks(docLinks);
     setShowDetails(true);
 
 }
@@ -48,15 +52,15 @@ function refreshSelectedDocument(doc: Document) {
 function getDocumentIcon(type: string) {
     switch (type) {
         case 'Informative document':
-          return <img src="kiruna/img/list.png" alt="Informative Document" />;
+          return <img src="kiruna/img/informativeDocument.png" alt="Informative Document" />;
         case 'Prescriptive document':
-          return <img src="/kiruna/img/sending.png" alt="Prescriptive Document" />;
+          return <img src="/kiruna/img/prescriptiveDocument.png" alt="Prescriptive Document" />;
         case 'Material effect':
-          return <img src="/kiruna/img/work-in-progress.png" alt="Material Effect" />;
+          return <img src="/kiruna/img/construction.png" alt="Material Effect" />;
         case 'Design document':
-          return <img src="/kiruna/img/blueprint.png" alt="Design Document" />;
+          return <img src="/kiruna/img/designDocument.png" alt="Design Document" />;
         case 'Technical document':
-          return <img src="/kiruna/img/tecnical-service.png" alt="Technical Document" />;
+          return <img src="/kiruna/img/technicalDocument.png" alt="Technical Document" />;
         default:
           return null; // Return null if no matching type
       }
@@ -105,11 +109,12 @@ return (
                           selectedDocument={selectedDocument} show={showDetails} 
                           onHide={handleCloseDetailsModal} getDocumentIcon={getDocumentIcon} 
                           user={user} handleEdit={handleEdit} refreshDocuments={refreshDocuments}
+                          documentLinks={documentLinks}
                         />
                       )}
                       
 {/* Add Document Button */}
-      {user.role==="Urban Planner" ?(<Button className="bg-gradient-to-r from-orange-400 to-yellow-500"
+      {user.role==="Urban Planner" ?(<Button className="bg-blue-600"
                 style={{
                     position: 'fixed',
                     bottom: '24px',
@@ -127,7 +132,7 @@ return (
                 }}
                 onClick={() => setShowAddDocumentModal(true)}
             >
-                +
+                <img src="kiruna/img/addDocument.png" alt="addDocument icon" />
             </Button>
             ):null}
 
