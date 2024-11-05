@@ -61,6 +61,12 @@ function getDocumentIcon(type: string) {
           return <img src="/kiruna/img/designDocument.png" alt="Design Document" />;
         case 'Technical document':
           return <img src="/kiruna/img/technicalDocument.png" alt="Technical Document" />;
+        case 'Agreement':
+          return <img src="/kiruna/img/agreement.png" alt="Technical Document" />;
+        case 'Conflict':
+          return <img src="/kiruna/img/conflict.png" alt="Technical Document" />;
+        case 'Consultation':
+          return <img src="/kiruna/img/consultation.png" alt="Technical Document" />;
         default:
           return null; // Return null if no matching type
       }

@@ -8,6 +8,7 @@ import API from '../API/API';
 import { Stakeholder } from '../models/stakeholder';
 import { DocLink } from '../models/document_link';
 import '../modal.css'
+import { TrashIcon, PencilIcon } from "@heroicons/react/24/outline";
 
 interface RequiredLabelProps {
     text: string; // Explicitly define the type of 'text' as string
@@ -54,6 +55,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders}: AddDo
         resetForm();
     };
 
+    console.log(stakeholders);
     const toggleSelect = (option: Stakeholder) => {
         setSelectedStakeholders((prevSelectedStakeholders) => {
             const newSelectedStakeholders = prevSelectedStakeholders.includes(option.id)
@@ -107,7 +109,8 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders}: AddDo
                                     <RequiredLabel text="Choose Stakeholders" />
                                     </Dropdown.Toggle>
                                    <Dropdown.Menu style={{width:'200px'}}>
-                                      {stakeholders.map((option, index) => (
+                                      { 
+                                      stakeholders.map((option, index) => (
                                        <Dropdown.Item
                                                   key={index}
                                                   onClick={() => toggleSelect(option)}
@@ -157,6 +160,15 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders}: AddDo
                                   </Dropdown.Item>
                                   <Dropdown.Item key={4} eventKey={"Material effect"} onClick={() => {setType("Material effect")}}>
                                        Material effect
+                                  </Dropdown.Item>
+                                  <Dropdown.Item key={5} eventKey={"Agreement"} onClick={() => {setType("Agreement")}}>
+                                        Agreement
+                                  </Dropdown.Item>
+                                  <Dropdown.Item key={6} eventKey={"Conflict"} onClick={() => {setType("Conflict")}}>
+                                        Conflict
+                                  </Dropdown.Item>
+                                  <Dropdown.Item key={7} eventKey={"Consultation"} onClick={() => {setType("Consultation")}}>
+                                        Consultation
                                   </Dropdown.Item>
                               </Dropdown.Menu>
                             </Dropdown>
@@ -423,19 +435,25 @@ function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, 
         <Modal.Body style={{backgroundColor: 'rgb(148, 137, 121,0.2)'}}>
         <Container>
           <Row>
-            <Col xs={3} md={2}>
-            {getDocumentIcon(selectedDocument.type)}
-            {user.role==="Urban Planner" ?(
-                <>
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-md mt-4" onClick={handleEditClick} style={{borderColor: 'white', width:'70px'}}>
-                        Edit
-                    </Button>
-                    <Button className="bg-gradient-to-r from-red-600 to-red-400 mt-3" onClick={handleDeleteClick} style={{borderColor: 'white'}}>
-                        Delete
-                    </Button>
-                </>
-            ): null}
-            </Col>
+          <Col xs={3} md={2}>
+                                {getDocumentIcon(selectedDocument.type)}
+                                {user.role === "Urban Planner" ? (
+                                    <div className="flex space-x-2 mt-4">
+                                        <button
+                                            className="p-2 rounded-full border-2 bg-red-400 text-white hover:bg-red-700 transition-colors duration-200"
+                                            onClick={handleDeleteClick}
+                                        >
+                                            <TrashIcon className="h-5 w-5" />
+                                        </button>
+                                        <button
+                                            className="p-2 rounded-full border-2 bg-blue-400 text-white hover:bg-blue-700 transition-colors duration-200"
+                                            onClick={handleEditClick}
+                                        >
+                                            <PencilIcon className="h-5 w-5" />
+                                        </button>
+                                    </div>
+                                ) : null}
+                            </Col>
             <Col xs={9} md={5}>
             <p>Stakeholders: {selectedDocument.stakeHolders.map(sh => sh.name).join(' / ')}</p>
             <p>Scale: {selectedDocument.scale}</p>
