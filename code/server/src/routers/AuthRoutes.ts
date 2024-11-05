@@ -1,6 +1,6 @@
-import express, { NextFunction, Router } from "express"
+import express, { Router } from "express"
 import Authenticator from "./auth"
-import { body, param } from "express-validator"
+import { body } from "express-validator"
 import {User } from "../models/user"
 import UserController from "../controllers/userController"
 import ErrorHandler from "../helper"
@@ -9,7 +9,7 @@ import ErrorHandler from "../helper"
  * Represents a class that defines the authentication routes for the application.
  */
 class AuthRoutes {
-    private router: Router
+    private readonly router: Router
     private errorHandler: ErrorHandler
     private authService: Authenticator
     private controller: UserController
@@ -33,7 +33,7 @@ class AuthRoutes {
      * Initializes the authentication routes.
      * 
      * @remarks
-     * This method sets up the HTTP routes for login, logout, and retrieval of the logged in user.
+     * This method sets up the HTTP routes for login, logout, and retrieval of the logged-in user.
      * It can (and should!) apply authentication, authorization, and validation middlewares to protect the routes.
      */
     initRoutes() {
@@ -42,7 +42,7 @@ class AuthRoutes {
          * Route for creating a user.
          * It does not require authentication.
          * It requires the following body parameters:
-         * - username: string. It cannot be empty and it must be unique (an existing username cannot be used to create a new user)
+         * - username: string. It cannot be empty, and it must be unique (an existing username cannot be used to create a new user)
          * - name: string. It cannot be empty.
          * - surname: string. It cannot be empty.
          * - password: string. It cannot be empty.
@@ -50,18 +50,21 @@ class AuthRoutes {
          */
         this.router.post(
             "/register",
-            [body('username').notEmpty(),
-                body('name').notEmpty(),
-                body('surname').notEmpty(),
-                body('password').notEmpty(),
-                body('role').isIn(['Resident','Urban Planner'])
-            ],
-            (req: any, res: any, next: any) => this.errorHandler.validateRequest(req, res, next),
-            (req: any, res: any, next: any) => this.controller.createUser(req.body.username, req.body.name, req.body.surname, req.body.password, req.body.role)
-                .then(() => res.status(200).end())
-                .catch((err) => {
-                    next(err)
-                })
+            body('username').notEmpty(),
+            body('name').notEmpty(),
+            body('surname').notEmpty(),
+            body('password').notEmpty(),
+            body('role').isIn(['Resident','Urban Planner']),
+            this.errorHandler.validateRequest,
+            (req: any, res: any, next: any) => {
+                try {
+                    this.controller.createUser(req.body.username, req.body.name, req.body.surname, req.body.password, req.body.role)
+                        .then(() => res.status(200).end())
+                        .catch((err) => next(err))
+                } catch (e) {
+                    next(e);
+                }
+            }
         )
 
 
@@ -72,37 +75,47 @@ class AuthRoutes {
          * - username: string. It cannot be empty.
          * - password: string. It cannot be empty.
          * It returns an error if the username represents a non-existing user or if the password is incorrect.
-         * It returns the logged in user.
+         * It returns the logged-in user.
          */
-        this.router.post( 
+        this.router.post(
             "/",
-            [
-                body('username').notEmpty(),
-                body('password').notEmpty()
-            ],
-            (req: any, res: any, next: any) => this.errorHandler.validateRequest(req, res, next),
-            (req: any, res: any, next: any) => this.authService.login(req, res, next)
-                .then((user: User) => res.status(200).json(user))
-                .catch((err: any) => { res.status(401).json(err) })
+            body('username').notEmpty(),
+            body('password').notEmpty(),
+            this.errorHandler.validateRequest,
+            (req: any, res: any, next: any) => {
+                try {
+                    this.authService.login(req, res, next)
+                        .then((user: User) => res.status(200).json(user))
+                        .catch((err: any) => res.status(401).json(err))
+                } catch (e) {
+                    next(e);
+                }
+            }
         )
 
         /**
-         * Route for logging out the currently logged in user.
+         * Route for logging out the currently logged-in user.
          * It expects the user to be logged in.
          * It returns a 200 status code.
          */
         this.router.delete(
             "/current",
             this.authService.isLoggedIn,
-            (req, res, next) => this.authService.logout(req, res, next)
-                .then(() => res.status(200).end())
-                .catch((err: any) => next(err))
+            (req, res, next) => {
+                try {
+                    this.authService.logout(req, res, next)
+                        .then(() => res.status(200).end())
+                        .catch((err: any) => next(err))
+                } catch (e) {
+                    next(e);
+                }
+            }
         )
 
         /**
-         * Route for retrieving the currently logged in user.
+         * Route for retrieving the currently logged-in user.
          * It expects the user to be logged in.
-         * It returns the logged in user.
+         * It returns the logged-in user.
          */
         this.router.get(
             "/current",

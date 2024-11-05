@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react';
+import React, { useState } from 'react';
 import { Container, Modal, Row, Col, Form, Button, Dropdown, Alert } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Document } from '../models/document';
@@ -77,7 +77,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders}: AddDo
             return; // Exit the function early
         }
         //API call to add a document
-        API.addDocument(title, selectedStakeholders, scale, issuanceDate, type, language, pages, description);
+        API.addDocument(title, selectedStakeholders, scale, issuanceDate, type, language, pages, description).then();
         refreshDocuments();
         handleClose();
         refreshDocuments();
@@ -258,7 +258,7 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
             selectedStakeholders.includes(stakeholder.id)
         );
         //API call to edit a document
-        API.editDocument(document.id, title, selectedStakeholders, scale, issuanceDate, type, language, pages, description);
+        API.editDocument(document.id, title, selectedStakeholders, scale, issuanceDate, type, language, pages, description).then();
 
         refreshSelectedDocument(new Document(document.id, title, sh, scale, issuanceDate, type, language, pages, description));
         onHide();
@@ -414,7 +414,7 @@ function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, 
     };
 
     const handleDeleteClick = () => {
-        API.deleteDocument(selectedDocument.id);
+        API.deleteDocument(selectedDocument.id).then();
         refreshDocuments();
         onHide()
         refreshDocuments();

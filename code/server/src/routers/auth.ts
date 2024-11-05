@@ -87,9 +87,9 @@ class Authenticator {
      * @param {any} req - The request object.
      * @param {any} res - The response object.
      * @param {any} next - The next function.
-     * @returns A Promise that resolves to the logged in user or rejects with an error message.
+     * @returns A Promise that resolves to the logged-in user or rejects with an error message.
      * @remarks This method uses the passport.authenticate method to log in a user.
-     * It returns a Promise that resolves to the logged in user or rejects with an error message.
+     * It returns a Promise that resolves to the logged-in user or rejects with an error message.
      * If the user is logged in, the user is serialized to the session.
      * If the user is not logged in, an error message is returned.
      */

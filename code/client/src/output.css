@@ -193,6 +193,7 @@ hr {
 Add the correct text decoration in Chrome, Edge, and Safari.
 */
 
+/*noinspection ALL*/
 abbr:where([title]) {
   -webkit-text-decoration: underline dotted;
           text-decoration: underline dotted;

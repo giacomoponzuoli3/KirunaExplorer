@@ -1,5 +1,4 @@
 import db from "../db/db"
-import { Document } from "../models/document"
 import Link from "../models/link"
 
 class LinkDAO {

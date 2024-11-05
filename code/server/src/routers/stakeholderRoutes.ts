@@ -1,8 +1,7 @@
 import express, {Router} from "express"
-import {body, oneOf, param, query} from "express-validator"
 import ErrorHandler from "../helper"
-import {Document} from "../models/document"
 import StakeholderController from "../controllers/stakeholderController"
+import {Stakeholder} from "../models/stakeholder";
 
 class StakeholderRoutes {
     private controller: StakeholderController
@@ -21,15 +20,14 @@ class StakeholderRoutes {
     }
 
     initRoutes() {
-        
-       
 
         this.router.get(
             "/",
-            async (req: any, res: any, next: any) => {
+            (_req: any, res: any, next: any) => {
                 try {
-                    const stakeholders = await this.controller.getAllStakeholders();
-                    res.status(200).json(stakeholders);
+                    this.controller.getAllStakeholders()
+                        .then((stakeholders: Stakeholder[]) => res.status(200).json(stakeholders))
+                        .catch((err: Error) => next(err))
                 } catch (err) {
                     next(err);
                 }
