@@ -767,7 +767,7 @@ describe('documentDAO', () => {
 
         });
 
-        test("It should reject if there are no links", async () => {
+        test("It should return an empty array if there are no links", async () => {
 
             jest.spyOn(db, 'all')
                 .mockImplementationOnce((sql, params, callback) => {
@@ -796,7 +796,7 @@ describe('documentDAO', () => {
                     return {} as Database;
                 });
 
-            await expect(dao.getDocumentLinksById(testId)).rejects.toThrow("No links found.");
+            await expect(dao.getDocumentLinksById(testId)).resolves.toEqual([]);
 
             expect(db.all).toHaveBeenNthCalledWith(
                 1,
