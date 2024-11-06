@@ -442,7 +442,14 @@ function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, 
         <>
         <Modal show={show} onHide={onHide}  dialogClassName="custom-modal-width" aria-labelledby="example-custom-modal-styling-title">
         <Modal.Header closeButton style={{backgroundColor: 'rgb(148, 137, 121,0.4)'}}>
-          <Modal.Title id="example-custom-modal-styling-title">
+          <Modal.Title id="example-custom-modal-styling-title"
+          style={{
+            whiteSpace: 'normal',         // Allows text to wrap onto multiple lines
+            wordWrap: 'break-word',       // Breaks long words onto a new line if necessary
+            overflowWrap: 'break-word',   // Ensures that even very long words will break 
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+          }}>
             {`${selectedDocument.title} (${selectedDocument.id})`}
           </Modal.Title>
         </Modal.Header>
