@@ -44,19 +44,32 @@ class LinkDAO {
     updateLink(idDoc1: number, idDoc2: number, oldLinkId: number, newLinkId: number): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try {
-                const sqlCheckLink = `SELECT * FROM documents_links WHERE ((id_document1 = ? AND id_document2 = ?) OR (id_document1 = ? AND id_document2 = ?)) AND id_link = ?`;
-                db.all(sqlCheckLink, [idDoc1, idDoc2, idDoc2, idDoc1, oldLinkId], (err: Error | null, rows: any[]) => {
+                // Verifica se esiste già un collegamento con il nuovo id_link
+                const sqlCheckNewLink = `SELECT * FROM documents_links WHERE ((id_document1 = ? AND id_document2 = ?) OR (id_document1 = ? AND id_document2 = ?)) AND id_link = ?`;
+                db.all(sqlCheckNewLink, [idDoc1, idDoc2, idDoc2, idDoc1, newLinkId], (err: Error | null, rows: any[]) => {
                     if (err) return reject(err);
     
-                    if (!rows || rows.length === 0) {
-                        return reject(new Error("Link not found with the specified id."));
+                    if (rows && rows.length > 0) {
+                        // Se esiste già un link con newLinkId, rifiuta l'operazione
+                        return reject(new Error("A link with the specified new link already exists between the documents."));
                     }
     
-                    const sqlUpdateLink = `UPDATE documents_links SET id_link = ? WHERE ((id_document1 = ? AND id_document2 = ?) OR (id_document1 = ? AND id_document2 = ?)) AND id_link = ?`;
-                    db.run(sqlUpdateLink, [newLinkId, idDoc1, idDoc2, idDoc2, idDoc1, oldLinkId], function (err: Error | null) {
+                    // Se non esiste un link con newLinkId, procedi con la verifica dell'esistenza del vecchio link
+                    const sqlCheckLink = `SELECT * FROM documents_links WHERE ((id_document1 = ? AND id_document2 = ?) OR (id_document1 = ? AND id_document2 = ?)) AND id_link = ?`;
+                    db.all(sqlCheckLink, [idDoc1, idDoc2, idDoc2, idDoc1, oldLinkId], (err: Error | null, rows: any[]) => {
                         if (err) return reject(err);
     
-                        resolve(); 
+                        if (!rows || rows.length === 0) {
+                            return reject(new Error("Link not found with the specified id."));
+                        }
+    
+                        // Se il link esiste, esegui l'aggiornamento
+                        const sqlUpdateLink = `UPDATE documents_links SET id_link = ? WHERE ((id_document1 = ? AND id_document2 = ?) OR (id_document1 = ? AND id_document2 = ?)) AND id_link = ?`;
+                        db.run(sqlUpdateLink, [newLinkId, idDoc1, idDoc2, idDoc2, idDoc1, oldLinkId], function (err: Error | null) {
+                            if (err) return reject(err);
+    
+                            resolve(); 
+                        });
                     });
                 });
             } catch (error) {
@@ -64,6 +77,7 @@ class LinkDAO {
             }
         });
     }
+    
 
     getAllLinks(): Promise<Link[]> {
         return new Promise<Link[]>((resolve, reject) => {
