@@ -73,8 +73,9 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
 
     const handleSubmit = () => {
         // Validation check
-        if (!title || !selectedStakeholders || !scale || !issuanceDate || !type) {
-          setShowAlert(true);
+        console.log(selectedStakeholders)
+        if (!title || selectedStakeholders.length===0 || !scale || !issuanceDate || !type) {
+            setShowAlert(true);
             return; // Exit the function early
         }
         //API call to add a document
@@ -256,7 +257,7 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
 
     const handleSubmit = () => {
         // Validation check
-        if (!title || !selectedStakeholders || !scale || !issuanceDate || !type) {
+        if (!title || selectedStakeholders.length===0 || !scale || !issuanceDate || !type) {
             setShowAlert(true);
             return;
         }
