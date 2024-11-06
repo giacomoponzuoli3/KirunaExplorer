@@ -23,6 +23,29 @@ const RequiredLabel: React.FC<RequiredLabelProps> = ({ text }) => (
     </span>
 );
 
+interface TruncatedTextProps {
+  text: string;
+  maxLength: number;
+}
+
+const TruncatedText: React.FC<TruncatedTextProps> = ({ text, maxLength }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className="relative">
+      <span className={isExpanded ? '' : 'line-clamp-3'}>
+        {text}
+      </span>
+      <button
+        className="text-blue-600 mt-1"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        {isExpanded ? 'Show less' : 'Show more'}
+      </button>
+    </div>
+  );
+};
+
 interface AddDocumentModalProps {
     show: boolean;
     onHide: () => void;
@@ -455,40 +478,111 @@ function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, 
         </Modal.Header>
         <Modal.Body style={{backgroundColor: 'rgb(148, 137, 121,0.2)'}}>
         <Container>
+        <div className="hidden md:block">
           <Row>
           <Col xs={3} md={2}>
-                                {getDocumentIcon(selectedDocument.type)}
-                                {user.role === "Urban Planner" ? (
-                                    <div className="flex space-x-2 mt-4">
-                                        <button
-                                            className="p-2 rounded-full border-2 bg-red-400 text-white hover:bg-red-700 transition-colors duration-200"
-                                            onClick={handleDeleteClick}
-                                        >
-                                            <TrashIcon className="h-5 w-5" />
-                                        </button>
-                                        <button
-                                            className="p-2 rounded-full border-2 bg-blue-400 text-white hover:bg-blue-700 transition-colors duration-200"
-                                            onClick={handleEditClick}
-                                        >
-                                            <PencilIcon className="h-5 w-5" />
-                                        </button>
-                                    </div>
-                                ) : null}
-                            </Col>
+          {getDocumentIcon(selectedDocument.type)}
+          {user.role === "Urban Planner" ? (
+              <div className="flex space-x-2 mt-4">
+                <button
+                  className="p-2 rounded-full border-2 bg-red-400 text-white hover:bg-red-700 transition-colors duration-200"
+                  onClick={handleDeleteClick}
+                >
+                <TrashIcon className="h-5 w-5" />
+              </button>
+              <button
+                className="p-2 rounded-full border-2 bg-blue-400 text-white hover:bg-blue-700 transition-colors duration-200"
+                  onClick={handleEditClick}
+              >
+              <PencilIcon className="h-5 w-5" />
+              </button>
+              </div>
+            ) : null}
+          </Col>
             <Col xs={9} md={3}>
-            <p>Stakeholders: {selectedDocument.stakeHolders.map(sh => sh.name).join(' / ')}</p>
-            <p>Scale: {selectedDocument.scale}</p>
-            <p>Issuance Date: {selectedDocument.issuanceDate}</p>
-            <p>Type: {selectedDocument.type}</p>
-            <p>Conections: {documentLinks.length!=0 ? documentLinks.length : '-'}</p>
-            <p>Language: {selectedDocument.language ? selectedDocument.language : '-'}</p>
-            <p>Pages: {selectedDocument.pages ? selectedDocument.pages : '-'}</p>
+            <p className="text-sm text-gray-600"><strong>Stakeholders: </strong> 
+              {selectedDocument.stakeHolders.map(sh => sh.name).join(' / ')}
+            </p>
+            <p className="text-sm text-gray-600"><strong>Scale: </strong> 
+              {selectedDocument.scale}
+            </p>
+            <p className="text-sm text-gray-600"><strong>Issuance Date: </strong> 
+              {selectedDocument.issuanceDate}
+            </p>
+            <p className="text-sm text-gray-600"><strong>Type: </strong> 
+              {selectedDocument.type}
+            </p>
+            <p className="text-sm text-gray-600"><strong>Conections: </strong> 
+                {documentLinks.length!=0 ? documentLinks.length : '-'}
+            </p>
+            <p className="text-sm text-gray-600"><strong>Language: </strong> 
+            {selectedDocument.language ? selectedDocument.language : '-'}
+            </p>
+            <p className="text-sm text-gray-600"><strong>Pages:</strong> 
+            {selectedDocument.pages ? selectedDocument.pages : '-'}
+            </p>
             </Col>
             <Col xs={12} md={7}>
-              <p>Description:</p>
+              <p><strong>Description:</strong></p>
               <p>{selectedDocument.description ? selectedDocument.description : '-'}</p>
             </Col>
           </Row>
+          </div>
+           {/* Card view visibile solo su schermi piccoli */}
+               <div className="block md:hidden">
+                      <div className="bg-white shadow-md rounded-lg p-4 mb-4">
+                        <div className="flex mb-4">
+                        <div className="mr-4 mt-2">{getDocumentIcon(selectedDocument.type)}</div>
+                          <div style={{
+                           whiteSpace: 'normal',         // Allows text to wrap onto multiple lines
+                           wordWrap: 'break-word',       // Breaks long words onto a new line if necessary
+                           overflowWrap: 'break-word',   // Ensures that even very long words will break 
+                           textOverflow: 'ellipsis',
+                           overflow: 'hidden',
+                          }}>
+                            <p className="text-sm text-gray-600"><strong>Stakeholders: </strong> 
+                              {selectedDocument.stakeHolders.map(sh => sh.name).join(' / ')}
+                              </p>
+                            <p className="text-sm text-gray-600"><strong>Scale: </strong> 
+                              {selectedDocument.scale}
+                              </p>
+                            <p className="text-sm text-gray-600"><strong>Issuance Date: </strong> 
+                            {selectedDocument.issuanceDate}
+                            </p>
+                            <p className="text-sm text-gray-600"><strong>Type: </strong> 
+                            {selectedDocument.type}
+                            </p>
+                            <p className="text-sm text-gray-600"><strong>Conections: </strong> 
+                            {documentLinks.length!=0 ? documentLinks.length : '-'}
+                            </p>
+                            <p className="text-sm text-gray-600"><strong>Language: </strong> 
+                            {selectedDocument.language ? selectedDocument.language : '-'}
+                            </p>
+                            <p className="text-sm text-gray-600"><strong>Pages:</strong> 
+                            {selectedDocument.pages ? selectedDocument.pages : '-'}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="mt-2">
+                            <p className="text-sm text-gray-500"><strong>Description:</strong></p>
+                            <TruncatedText text={selectedDocument.description ?? 'No description available'} maxLength={100} />
+                        </div>
+                          <div className="mt-4 flex justify-end">
+                          <button 
+                          className="p-2 rounded-full border-2 bg-red-400 text-white hover:bg-red-700 transition-colors duration-200"
+                          onClick={handleDeleteClick}
+                          >
+                          <TrashIcon className="h-5 w-5" />
+                          </button>
+                          <button
+                            className="p-2 rounded-full border-2 bg-blue-400 text-white hover:bg-blue-700 transition-colors duration-200"
+                            onClick={handleEditClick}
+                          >
+                          <PencilIcon className="h-5 w-5" />
+                          </button>
+                          </div>
+                      </div>
+            </div>
           </Container>
         </Modal.Body>
         <Modal.Footer style={{backgroundColor: 'rgb(148, 137, 121,0.2)'}}>

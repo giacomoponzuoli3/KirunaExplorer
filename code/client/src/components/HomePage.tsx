@@ -74,7 +74,6 @@ function getDocumentIcon(type: string) {
       }
 }
 
-
 return (
 <>
  {/* div to show the documents (this will change once the map is implemented) */}
