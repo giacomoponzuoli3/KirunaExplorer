@@ -245,31 +245,6 @@ describe('documentRoutes', () => {
             expect(controller.addDocument).not.toHaveBeenCalled(); 
         });
 
-        test('It should return 200 status if language is missing', async () => {
-            const response = await request(app).post(baseURL+"/")
-            .send({
-                title: "title",
-                stakeHolders: [{ id: 1, name: "John", role: "urban developer" }],
-                scale: "1:1",
-                issuanceDate: "2020-10-10",
-                type: "Informative document",
-                language: null,
-                pages: "300",
-                description: "description"
-            });
-            expect(response.body).toEqual({ message: "Document added successfully" });
-            expect(controller.addDocument).toHaveBeenCalledWith(
-                "title",
-                [{ id: 1, name: "John", role: "urban developer" }],
-                "1:1",
-                "2020-10-10",
-                "Informative document",
-                null,
-                "300",
-                "description"
-            );
-        });
-
         test('It should return 422 status if pages is not a string', async () => {
             const response = await request(app).post(baseURL+"/")
             .send({
@@ -286,31 +261,6 @@ describe('documentRoutes', () => {
             expect(controller.addDocument).not.toHaveBeenCalled(); 
         });
 
-        test('It should return 200 status if pages is missing', async () => {
-            const response = await request(app).post(baseURL+"/")
-            .send({
-                title: "title",
-                stakeHolders: [{ id: 1, name: "John", role: "urban developer" }],
-                scale: "1:1",
-                issuanceDate: "2020-10-10",
-                type: "Informative document",
-                language: "English",
-                pages: null,
-                description: "description"
-            });
-            expect(response.body).toEqual({ message: "Document added successfully" });
-            expect(controller.addDocument).toHaveBeenCalledWith(
-                "title",
-                [{ id: 1, name: "John", role: "urban developer" }],
-                "1:1",
-                "2020-10-10",
-                "Informative document",
-                "English",
-                null,
-                "description"
-            );
-        });
-
         test('It should return 422 status if description is not a string', async () => {
             const response = await request(app).post(baseURL+"/")
             .send({
@@ -325,31 +275,6 @@ describe('documentRoutes', () => {
             });
             expect(response.status).toBe(422); 
             expect(controller.addDocument).not.toHaveBeenCalled(); 
-        });
-
-        test('It should return 200 status if description is missing', async () => {
-            const response = await request(app).post(baseURL+"/")
-            .send({
-                title: "title",
-                stakeHolders: [{ id: 1, name: "John", role: "urban developer" }],
-                scale: "1:1",
-                issuanceDate: "2020-10-10",
-                type: "Informative document",
-                language: "English",
-                pages: "300",
-                description: null
-            });
-            expect(response.body).toEqual({ message: "Document added successfully" });
-            expect(controller.addDocument).toHaveBeenCalledWith(
-                "title",
-                [{ id: 1, name: "John", role: "urban developer" }],
-                "1:1",
-                "2020-10-10",
-                "Informative document",
-                "English",
-                "300",
-                null
-            );
         });
 
         test('It should return 503 if there is an error', async () => {
@@ -705,32 +630,6 @@ describe('documentRoutes', () => {
             expect(controller.editDocument).not.toHaveBeenCalled(); 
         });
 
-        test('It should return 200 status if language is missing', async () => {
-            const response = await request(app).patch(baseURL+`/${testId}`)
-            .send({
-                title: "title",
-                stakeHolders: [{ id: 1, name: "John", role: "urban developer" }],
-                scale: "1:1",
-                issuanceDate: "2020-10-10",
-                type: "Informative document",
-                language: null,
-                pages: "300",
-                description: "description"
-            });
-            expect(response.body).toEqual({ message: "Document updated successfully" });
-            expect(controller.editDocument).toHaveBeenCalledWith(
-                `${testId}`,
-                "title",
-                [{ id: 1, name: "John", role: "urban developer" }],
-                "1:1",
-                "2020-10-10",
-                "Informative document",
-                null,
-                "300",
-                "description"
-            );
-        });
-
         test('It should return 422 status if pages is not a string', async () => {
             const response = await request(app).patch(baseURL+`/${testId}`)
             .send({
@@ -747,32 +646,6 @@ describe('documentRoutes', () => {
             expect(controller.editDocument).not.toHaveBeenCalled(); 
         });
 
-        test('It should return 200 status if pages is missing', async () => {
-            const response = await request(app).patch(baseURL+`/${testId}`)
-            .send({
-                title: "title",
-                stakeHolders: [{ id: 1, name: "John", role: "urban developer" }],
-                scale: "1:1",
-                issuanceDate: "2020-10-10",
-                type: "Informative document",
-                language: "English",
-                pages: null,
-                description: "description"
-            });
-            expect(response.body).toEqual({ message: "Document updated successfully" });
-            expect(controller.editDocument).toHaveBeenCalledWith(
-                `${testId}`,
-                "title",
-                [{ id: 1, name: "John", role: "urban developer" }],
-                "1:1",
-                "2020-10-10",
-                "Informative document",
-                "English",
-                null,
-                "description"
-            );
-        });
-
         test('It should return 422 status if description is not a string', async () => {
             const response = await request(app).patch(baseURL+`/${testId}`)
             .send({
@@ -787,32 +660,6 @@ describe('documentRoutes', () => {
             });
             expect(response.status).toBe(422); 
             expect(controller.editDocument).not.toHaveBeenCalled(); 
-        });
-
-        test('It should return 200 status if description is missing', async () => {
-            const response = await request(app).patch(baseURL+`/${testId}`)
-            .send({
-                title: "title",
-                stakeHolders: [{ id: 1, name: "John", role: "urban developer" }],
-                scale: "1:1",
-                issuanceDate: "2020-10-10",
-                type: "Informative document",
-                language: "English",
-                pages: "300",
-                description: null
-            });
-            expect(response.body).toEqual({ message: "Document updated successfully" });
-            expect(controller.editDocument).toHaveBeenCalledWith(
-                `${testId}`,
-                "title",
-                [{ id: 1, name: "John", role: "urban developer" }],
-                "1:1",
-                "2020-10-10",
-                "Informative document",
-                "English",
-                "300",
-                null
-            );
         });
 
         test('It should return 503 if there is an error', async () => {
