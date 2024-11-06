@@ -30,9 +30,7 @@ function App() {
   const getAllStakeholders = async () => {
     try {
         const stakeholders = await API.getAllStakeholders();
-        console.log(stakeholders);
         setStakeholders(stakeholders);
-        //console.log(stakeholders)
     } catch (err: any) {
         console.log(err);
     }

@@ -8,7 +8,7 @@ import Link from "../models/link";
 
 function AddLinkModal(props: any) {
     const navigate = useNavigate();
-    const [title, setTitle] = useState(''); // title of document
+
     const [typesLink, setTypesLink] = useState<Link[]>([]); // vector of types of links
     const [documents, setDocuments] = useState<Document[]>([]); // vector of all documents except one
 
