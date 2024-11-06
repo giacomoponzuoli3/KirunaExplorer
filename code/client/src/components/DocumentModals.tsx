@@ -59,7 +59,6 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
         resetForm();
     };
 
-    console.log(stakeholders);
     const toggleSelect = (option: Stakeholder) => {
         setSelectedStakeholders((prevSelectedStakeholders) => {
             const newSelectedStakeholders = prevSelectedStakeholders.includes(option.id)
@@ -73,7 +72,6 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
 
     const handleSubmit = () => {
         // Validation check
-        console.log(selectedStakeholders)
         if (!title || selectedStakeholders.length===0 || !scale || !issuanceDate || !type 
           || title.trim() === '' || scale.trim() === '' || issuanceDate.trim() === '') {
             setShowAlert(true);
@@ -533,7 +531,6 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocuments, doc
           try {
               const types = await API.getAllLinks();
               setTypesLink(types);
-              console.log(types);
           } catch (err) {
               console.log('kurac');
               setShowAlert(true);
