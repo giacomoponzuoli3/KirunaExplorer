@@ -140,7 +140,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
                 </Form.Group>
             </Row>
             <Row className="mb-3">
-              <Col md={6} className='mt-4'>
+              <Col md={6} className='mt-4 mr-5'>
                  <Form.Group as={Row} controlId="formScale" className="mb-3">
                  <Form.Label column md={5}><RequiredLabel text="Scale" /></Form.Label>
                  <Col md={7}>
@@ -162,7 +162,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
                   </Col>
                   </Form.Group>
               </Col>
-              <Col xs={12} md={4} className="mt-3 ml-5">
+              <Col xs={12} md={4} className="mt-3">
               <Row>
                 <Dropdown className="mt-2">
                   <Dropdown.Toggle id="dropdown-basic" 
@@ -327,7 +327,7 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                 </Form.Group>
             </Row>
             <Row className="mb-3">
-              <Col md={6} className='mt-4'>
+              <Col md={6} className='mt-4 mr-5'>
                  <Form.Group as={Row} controlId="formScale" className="mb-3">
                  <Form.Label column md={5}><RequiredLabel text="Scale" /></Form.Label>
                  <Col md={7}>
@@ -349,7 +349,7 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                   </Col>
                   </Form.Group>
               </Col>
-              <Col xs={12} md={4} className="mt-3 ml-5">
+              <Col xs={12} md={4} className="mt-3">
               <Row>
                 <Dropdown className="mt-2">
                   <Dropdown.Toggle variant="success" id="dropdown-basic" 
