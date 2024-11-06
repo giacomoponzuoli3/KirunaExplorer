@@ -44,7 +44,7 @@ function DocumentLegend() {
           {documentTypes.map((item, index) => (
             <div
               key={index}
-              className="flex items-center space-x-2 text-sm cursor-pointer hover:bg-gray-100 rounded-md py-1 px-2"
+              className="flex items-center space-x-2 text-sm py-1 px-2"
             >
               <img
                 src={`/kiruna/img/${item.icon}`}
