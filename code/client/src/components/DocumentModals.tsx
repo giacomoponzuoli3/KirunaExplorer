@@ -74,7 +74,8 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
     const handleSubmit = () => {
         // Validation check
         console.log(selectedStakeholders)
-        if (!title || selectedStakeholders.length===0 || !scale || !issuanceDate || !type) {
+        if (!title || selectedStakeholders.length===0 || !scale || !issuanceDate || !type 
+          || title.trim() === '' || scale.trim() === '' || issuanceDate.trim() === '') {
             setShowAlert(true);
             return; // Exit the function early
         }
@@ -141,7 +142,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
               <Col xs={12} md={4} className="mt-3 ml-5">
               <Row>
                 <Dropdown className="mt-2">
-                  <Dropdown.Toggle variant="success" id="dropdown-basic" 
+                  <Dropdown.Toggle id="dropdown-basic" 
                     style={{ backgroundColor: 'rgb(164,135,121)', 
                    }}>
                     <span><RequiredLabel text="Choose Stakeholders" /></span>
@@ -257,7 +258,9 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
 
     const handleSubmit = () => {
         // Validation check
-        if (!title || selectedStakeholders.length===0 || !scale || !issuanceDate || !type) {
+        if (!title || selectedStakeholders.length===0 || !scale || !issuanceDate || !type
+          || title.trim() === '' || scale.trim() === '' || issuanceDate.trim() === ''
+        ) {
             setShowAlert(true);
             return;
         }
