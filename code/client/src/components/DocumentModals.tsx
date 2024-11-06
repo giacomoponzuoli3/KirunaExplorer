@@ -739,6 +739,8 @@ const confirmDelete = (documentId:number | null, linkId: number | null) => {
         </div>
           </Col>
           <Col xs={12} md={8}>
+          {/* Tabella visibile solo su schermi grandi */}
+          <div className="hidden md:block overflow-x-auto">
            <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
            <thead>
              <tr className="bg-gray-100 border-b">
@@ -761,6 +763,26 @@ const confirmDelete = (documentId:number | null, linkId: number | null) => {
              ))}
            </tbody>
          </table>
+         </div>
+
+         {/* Card view visibile solo su schermi piccoli */}
+         <div className="block md:hidden">
+                    {documentLinks.map((doc, index) => (
+                      <div key={index} className="bg-white shadow-md rounded-lg p-4 mb-4">
+                        <div className="flex items-center mb-4">
+                          <div>
+                            <h3 className="text-lg font-semibold">{doc.documentName}</h3>
+                            <p className="text-sm text-gray-600"><strong>Type of link:</strong> {doc.linkName}</p>
+                          </div>
+                        </div>
+                          <div className="mt-4 flex justify-end">
+                            <button className="text-red-500 hover:text-red-700" onClick={() => confirmDelete(doc.documentId, doc.linkId)}>
+                              <TrashIcon className="h-5 w-5" />
+                            </button>
+                          </div>
+                      </div>
+                    ))}
+                  </div>
           </Col>
         </Row>
         </Container>
