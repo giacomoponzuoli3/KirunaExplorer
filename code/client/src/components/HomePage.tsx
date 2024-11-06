@@ -7,7 +7,7 @@ import { Document } from "../models/document";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { User } from "../models/user";
-import { AddDocumentModal, ShowDocumentInfoModal, EditDocumentModal } from "./DocumentModals";
+import { AddDocumentModal, ShowDocumentInfoModal, EditDocumentModal, AddNewDocumentLinksModal } from "./DocumentModals";
 import { Stakeholder } from "../models/stakeholder";
 import { DocLink } from "../models/document_link";
 
@@ -26,6 +26,7 @@ const [documentLinks, setDocumentLinks] = useState<DocLink[]>([]);
 const [showDetails, setShowDetails] = useState<boolean>(false);
 const [showAddDocumentModal, setShowAddDocumentModal] = useState<boolean>(false);
 const [showEditDocumentModal, setShowEditDocumentModal] = useState<boolean>(false);
+const [showAddLinks, setShowAddLinks] = useState<boolean>(false);
 
 const handleEdit = () => {
   setShowEditDocumentModal(true);
@@ -142,13 +143,20 @@ return (
             </Button>
             ):null}
 
-<AddDocumentModal show={showAddDocumentModal} onHide={() => setShowAddDocumentModal(false)} refreshDocuments={refreshDocuments} stakeholders={stakeholders}/>
+<AddDocumentModal show={showAddDocumentModal} 
+onHide={() => setShowAddDocumentModal(false)} refreshDocuments={refreshDocuments} 
+stakeholders={stakeholders} showAddNewDocumentLinksModal={() => setShowAddLinks(true)}/>
+
 {selectedDocument && (<EditDocumentModal 
                          document={selectedDocument} show={showEditDocumentModal} 
                          onHide={() => setShowEditDocumentModal(false)} refreshSelectedDocument={refreshSelectedDocument}
                          stakeholders={stakeholders}
                          />
 )}
+
+<AddNewDocumentLinksModal document={documents[documents.length-1]} show={showAddLinks} 
+onHide={() => setShowAddLinks(false)} refreshDocuments={refreshDocuments}
+docs={documents}/>
 </>
   
 );

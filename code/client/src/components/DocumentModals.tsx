@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Container, Modal, Row, Col, Form, Button, Dropdown, Alert } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import React, { useState,useEffect } from 'react';
+import { Container, Modal, Row, Col, Form, Button, Dropdown, ListGroup } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import { Document } from '../models/document';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { User } from '../models/user';
@@ -9,6 +9,9 @@ import { Stakeholder } from '../models/stakeholder';
 import { DocLink } from '../models/document_link';
 import '../modal.css'
 import { TrashIcon, PencilIcon } from "@heroicons/react/24/outline";
+import Link from '../models/link'; 
+import Alert from "./Alert";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 interface RequiredLabelProps {
     text: string; // Explicitly define the type of 'text' as string
@@ -25,9 +28,10 @@ interface AddDocumentModalProps {
     onHide: () => void;
     refreshDocuments: () => void;
     stakeholders: Stakeholder[];
+    showAddNewDocumentLinksModal: () => void;
 }
 
-function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders}: AddDocumentModalProps) {
+function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAddNewDocumentLinksModal}: AddDocumentModalProps) {
     const [title, setTitle] = useState('');
     const [selectedStakeholders, setSelectedStakeholders] = useState<number[]>([]);
     const [scale, setScale] = useState('');
@@ -36,7 +40,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders}: AddDo
     const [language, setLanguage] = useState<string | null>(null);
     const [pages, setPages] = useState<string | null>(null);
     const [description, setDescription] = useState<string | null>(null);
-    const [error, setError] = useState<string | null>(null); // State for error messages
+    const [showAlert, setShowAlert] = useState(false); // alert state
 
     const resetForm = () => {
         setTitle('');
@@ -47,7 +51,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders}: AddDo
         setLanguage(null);
         setPages(null);
         setDescription(null);
-        setError(null);
+        setShowAlert(false);
     };
 
     const handleClose = () => {
@@ -68,12 +72,9 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders}: AddDo
     };
 
     const handleSubmit = () => {
-        console.log("Title: " + title + " Stakeholders: " + selectedStakeholders + " Issuance Date: " + issuanceDate)
-        console.log("Scale: "+ scale + " Type: " + type + " Language: " + language + " Pages: " + pages)
-        console.log("Description: " + description)
         // Validation check
         if (!title || !selectedStakeholders || !scale || !issuanceDate || !type) {
-            setError('Please fill in the mandatory fields marked with the red star (*).'); // Set error message
+          setShowAlert(true);
             return; // Exit the function early
         }
         //API call to add a document
@@ -81,6 +82,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders}: AddDo
         refreshDocuments();
         handleClose();
         refreshDocuments();
+        showAddNewDocumentLinksModal();
     };
 
     return (
@@ -90,7 +92,14 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders}: AddDo
       </Modal.Header>
       <Modal.Body style={{ backgroundColor: 'rgba(167, 199, 231, 0.4)' }}>
       <Container>
-          {error && <Alert variant="danger">{error}</Alert>}
+      {showAlert &&
+                <Alert
+                    message="Please fill in the mandatory fields marked with the red star (*)."
+                    onClose={() => {
+                        setShowAlert(false);
+                    }}
+                />
+            }
           <Form>
             <Row className="mb-3">
                 <Form.Group as={Row} controlId="formTitle">
@@ -232,7 +241,7 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
     const [language, setLanguage] = useState<string | null>(document.language);
     const [pages, setPages] = useState<string | null>(document.pages);
     const [description, setDescription] = useState<string | null>(document.description);
-    const [error, setError] = useState<string | null>(null); // State for error messages
+    const [showAlert, setShowAlert] = useState(false); // alert state
 
     const toggleSelect = (option: Stakeholder) => {
         setSelectedStakeholders((prevSelectedStakeholders) => {
@@ -246,12 +255,9 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
     };
 
     const handleSubmit = () => {
-        console.log("Title: " + title + " Stakeholders: " + selectedStakeholders + " Issuance Date: " + issuanceDate)
-        console.log("Scale: "+ scale + " Type: " + type + " Language: " + language + " Pages: " + pages)
-        console.log("Description: " + description)
         // Validation check
         if (!title || !selectedStakeholders || !scale || !issuanceDate || !type) {
-            setError('Please fill in the mandatory fields marked with the red star (*).'); // Set error message
+            setShowAlert(true);
             return;
         }
         const sh: Stakeholder[] = stakeholders.filter(stakeholder =>
@@ -271,7 +277,14 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
             </Modal.Header>
             <Modal.Body style={{ backgroundColor: 'rgb(167, 199, 231,0.4)' }}>
             <Container>
-          {error && <Alert variant="danger">{error}</Alert>}
+            {showAlert &&
+                <Alert
+                    message="Please fill in the mandatory fields marked with the red star (*)."
+                    onClose={() => {
+                        setShowAlert(false);
+                    }}
+                />
+            }
           <Form>
             <Row className="mb-3">
                 <Form.Group as={Row} controlId="formTitle">
@@ -408,7 +421,8 @@ interface ShowDocumentInfoModalProps {
 }
 
 function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, user, handleEdit, refreshDocuments, documentLinks}: ShowDocumentInfoModalProps) {
-    const handleEditClick = () => {
+  const navigate = useNavigate();  
+  const handleEditClick = () => {
         handleEdit();
         //onHide()
     };
@@ -467,14 +481,301 @@ function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, 
           </Container>
         </Modal.Body>
         <Modal.Footer style={{backgroundColor: 'rgb(148, 137, 121,0.2)'}}>
-        <Link to={`documents/${selectedDocument.id}/links`}
-                className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium no-underline"
-              >View connections
-              </Link>
+        <button onClick={() => navigate(`/documents/${selectedDocument.id}/links`)}
+         className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium"
+         >
+               View connections
+         </button>
         </Modal.Footer>
       </Modal>
       </>
     );
 }
 
-export { AddDocumentModal, ShowDocumentInfoModal, EditDocumentModal };
+interface AddNewDocumentLinksModalProps {
+  document: Document;
+  show: boolean;
+  onHide: () => void;
+  refreshDocuments: () => void;
+  docs: Document[];
+}
+
+function AddNewDocumentLinksModal({ document,show, onHide, refreshDocuments, docs}: AddNewDocumentLinksModalProps) {
+    const [typesLink, setTypesLink] = useState<Link[]>([]); // vector of types of links
+    const [documents, setDocuments] = useState<Document[]>(docs.filter((d: Document) => d.id != document.id)); // vector of all documents except one
+
+    const [selectedDocument, setSelectedDocument] = useState<number | null>(null); // Selected document
+    const [selectedTypeLink, setSelectedTypeLink] = useState<number | null>(null); // Selected type of link
+
+    const [selectedDocumentName, setSelectedDocumentName] = useState<string>(''); // Selected document
+    const [selectedTypeLinkName, setSelectedTypeLinkName] = useState<string>(''); // Selected type of link
+    const [alertMessage, setAlertMessage] = useState<string>(''); // Selected type of link
+
+    const [showAlert, setShowAlert] = useState(false); // alert state
+    const [showDocumentDropdown, setShowDocumentDropdown] = useState(false); // State to show document dropdown
+    const [showTypeLinkDropdown, setShowTypeLinkDropdown] = useState(false); // State to show type link dropdown
+
+    type DocumentLink = {
+      documentName: string;
+      documentId: number | null;
+      linkId: number | null;
+      linkName: string;
+    };
+    
+    const [documentLinks, setDocumentLinks] = useState<DocumentLink[]>([]);
+
+    useEffect(() => {
+      const getTypesLink = async () => {
+          try {
+              const types = await API.getAllLinks();
+              setTypesLink(types);
+              console.log(types);
+          } catch (err) {
+              console.log('kurac');
+              setShowAlert(true);
+          }
+      };
+
+      getTypesLink().then();
+      
+  }, []);
+
+  // Handle document selection
+  const handleDocumentChange = (id: number,title: string) => {
+      setSelectedDocument(id);
+      setSelectedDocumentName(title);
+      setShowDocumentDropdown(false); // Close dropdown after selection
+  };
+
+  // Handle type link selection
+  const handleTypeLinkChange = (id: number,typeName: string) => {
+      setSelectedTypeLink(id);
+      setSelectedTypeLinkName(typeName);
+      setShowTypeLinkDropdown(false); // Close dropdown after selection
+
+  };
+
+  const handleAdd = () => {
+    if (!selectedDocument || !selectedTypeLink) {
+      setShowAlert(true);
+      setAlertMessage('Please fill in the mandatory fields marked with the red star (*). ')
+      return; // Prevent submission if there are errors
+    }
+    if(documentLinks.some(link => link.documentId === selectedDocument && link.linkId === selectedTypeLink)){
+      setAlertMessage('Sorry, the connection already exists...')
+      setShowAlert(true);
+      return; // Prevent submission if there are errors
+    }
+    setDocumentLinks(prevLinks => [
+      ...prevLinks,
+      {
+        documentName: selectedDocumentName,
+        documentId: selectedDocument,
+        linkId: selectedTypeLink,
+        linkName: selectedTypeLinkName
+      }
+    ]);
+    setSelectedDocument(null)
+    setSelectedTypeLink(null)
+    setSelectedDocumentName('')
+    setSelectedTypeLinkName('')
+  };
+
+  const handleLink = () => {
+    // Check for errors
+    if (documentLinks.length === 0) {
+      setAlertMessage('Choose documents to link before linking')
+      setShowAlert(true);
+      return; // Prevent submission if there are errors
+  }
+
+  try{
+      // Implement API call to add link
+      documentLinks.forEach(async link => {
+        if(link.documentId && link.linkId){
+        await API.addLink(document.id, link.documentId, link.linkId);
+        }
+        console.log(link); // This will log each link object to the console
+      });
+
+      onHide();
+      refreshDocuments();
+      setSelectedDocument(null)
+      setSelectedTypeLink(null)
+      setSelectedDocumentName('')
+      setSelectedTypeLinkName('')
+  }catch(err){
+      setShowAlert(true);
+      setAlertMessage('Something went wrong...')
+  }
+};
+
+const confirmDelete = (documentId:number | null, linkId: number | null) => {
+  setDocumentLinks(prevLinks => 
+    prevLinks.filter(link => !(link.documentId === documentId && link.linkId === linkId))
+  );
+  console.log(documentLinks);
+};
+
+  return (
+      <>
+      <Modal show={show} onHide={onHide}  dialogClassName="custom-modal-width" aria-labelledby="example-custom-modal-styling-title">
+      <Modal.Header closeButton style={{backgroundColor: 'rgb(148, 137, 121,0.4)'}}>
+        <Modal.Title id="example-custom-modal-styling-title">
+          Would you like to add links to the new document?
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body style={{backgroundColor: 'rgb(148, 137, 121,0.2)'}}>
+      <Container>
+        <Row>
+          <Col xs={12} md={4}>
+          <div className=" flex items-center justify-center" style={{backgroundColor: 'rgb(148, 137, 121,0.2)'}}>
+            {showAlert &&
+                <Alert
+                    message={alertMessage}
+                    onClose={() => {
+                        setShowAlert(false);
+                    }}
+                />
+            }
+            <div className="rounded-lg p-6 w-full max-w-md mx-4">
+                <h2 className="text-xl font-semibold mb-2 text-center">Add New Link</h2>
+                {/* Separator Line */}
+                <hr className="border-gray-300 my-4" />
+
+                {/* Document Selection Dropdown */}
+                <div className="relative mb-4">
+                    <label className="block text-gray-700 font-medium mb-2">
+                        <b>1.</b> Select Document <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                        <button
+                            onClick={() => {
+                                setShowDocumentDropdown(!showDocumentDropdown);
+                                setShowTypeLinkDropdown(false); // Close types of link dropdown
+                            }}
+                            className={`w-full border rounded-md p-2 flex items-center justify-between focus:outline-none border-gray-300}`}
+                        >
+                            <span>
+                                {selectedDocument
+                                    ? documents.find(doc => doc.id === selectedDocument)?.title || 'Select a document'
+                                    : 'Select a document'}
+                            </span>
+                            <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+                        </button>
+
+                        {showDocumentDropdown && (
+                            <div className="absolute left-0 right-0 bg-white border border-gray-200 rounded-md mt-1 shadow-lg max-h-60 overflow-y-auto z-10 animate-dropdown-open">
+                                {documents.length === 0 ? (
+                                    <div className="p-2 text-gray-500">No documents available</div>
+                                ) : (
+                                    documents.map((document) => (
+                                        <label
+                                            key={document.id}
+                                            className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
+                                            onClick={() => handleDocumentChange(document.id,document.title)}
+                                        >
+                                            <span className="text-gray-700">{document.title}</span>
+                                        </label>
+                                    ))
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Type of Link Selection Dropdown */}
+                <div className="relative mb-4">
+                    <label className="block text-gray-700 font-medium mb-2">
+                    <b>2.</b> Select Link Type <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                        <button
+                            onClick={() => {
+                                if(selectedDocument){
+                                    setShowTypeLinkDropdown(!showTypeLinkDropdown);
+                                    setShowDocumentDropdown(false); // Close document dropdown
+                                }
+                            }}
+                            className={`w-full border rounded-md p-2 flex items-center justify-between focus:outline-none border-gray-300}`}
+                            style={{ backgroundColor: !selectedDocument ? 'gray' : 'white' }} // Change background color based on document selection
+                        >
+                            <span>
+                                {selectedTypeLink
+                                    ? typesLink.find(type => type.id === selectedTypeLink)?.name || 'Select a type'
+                                    : 'Select a type'}
+                            </span>
+                            <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+                        </button>
+
+                        {showTypeLinkDropdown && (
+                            <div className="absolute left-0 right-0 bg-white border border-gray-200 rounded-md mt-1 shadow-lg max-h-60 overflow-y-auto z-10 animate-dropdown-open">
+                                {typesLink.length === 0 ? (
+                                    <div className="p-2 text-gray-500">No types available</div>
+                                ) : (
+                                    typesLink.map((type) => (
+                                        <label
+                                            key={type.id}
+                                            className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
+                                            onClick={() => handleTypeLinkChange(type.id,type.name)}
+                                        >
+                                            <span className="text-gray-700">{type.name}</span>
+                                        </label>
+                                    ))
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+                <div className="flex justify-end">
+                    <button
+                        className="bg-blue-950 text-white rounded-md px-4 py-2 hover:bg-blue-700"
+                        onClick={handleAdd}
+                    >
+                        Add Link
+                    </button>
+                </div>
+            </div>
+        </div>
+          </Col>
+          <Col xs={12} md={8}>
+           <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
+           <thead>
+             <tr className="bg-gray-100 border-b">
+               <th className="p-4 text-left text-gray-600 font-semibold">Title</th>
+               <th className="p-4 text-left text-gray-600 font-semibold">Type of Link</th>
+               <th className="p-4 text-center text-gray-600 font-semibold">Actions</th>
+             </tr>
+           </thead>
+           <tbody>
+             {documentLinks.map((doc, index) => (
+               <tr key={index} className="border-b hover:bg-gray-50 transition duration-200 ease-in-out">
+                 <td className="p-4">{doc.documentName}</td>
+                 <td className="p-4">{doc.linkName}</td>
+                   <td className="p-4 flex justify-center space-x-4">
+                     <button className="text-red-500 hover:text-red-700" onClick={() => confirmDelete(doc.documentId, doc.linkId)}>
+                       <TrashIcon className="h-5 w-5" />
+                     </button>
+                   </td>
+               </tr>
+             ))}
+           </tbody>
+         </table>
+          </Col>
+        </Row>
+        </Container>
+      </Modal.Body>
+      <Modal.Footer style={{ backgroundColor: 'rgb(148, 137, 121,0.4)' }}>
+                <Button variant="secondary" className="text-white rounded-md" onClick={onHide}>
+                    Cancel
+                </Button>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-md" onClick={handleLink} style={{borderColor: 'white'}}>
+                    Link
+                </Button>
+      </Modal.Footer>
+    </Modal>
+    </>
+  );
+}
+
+export { AddDocumentModal, ShowDocumentInfoModal, EditDocumentModal, AddNewDocumentLinksModal };
