@@ -251,7 +251,9 @@ class DocumentDAO {
                 
                 db.all(sql, [id, id], (err: Error | null, rows: any[]) => {
                     if (err) return reject(err);
-                    if (!rows || rows.length === 0) return reject(new Error("No links found."));
+                    if (!rows || rows.length === 0) {
+                        return resolve([]);
+                    }
 
                     // Estrarre una lista di documenti correlati con i rispettivi link_name
                     const relatedDocs = rows.map(row => ({

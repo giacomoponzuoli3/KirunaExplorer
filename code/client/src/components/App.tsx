@@ -21,7 +21,7 @@ function App() {
     try {
         const docs = await API.getAllDocuments();
         setDocuments(docs);
-        console.log(docs)
+        //console.log(docs)
     } catch (err: any) {
         console.log(err);
     }
@@ -32,7 +32,7 @@ function App() {
         const stakeholders = await API.getAllStakeholders();
         console.log(stakeholders);
         setStakeholders(stakeholders);
-        console.log(stakeholders)
+        //console.log(stakeholders)
     } catch (err: any) {
         console.log(err);
     }
