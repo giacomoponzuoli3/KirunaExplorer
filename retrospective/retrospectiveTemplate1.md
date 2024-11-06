@@ -97,6 +97,8 @@ sections:
 
  ***Negative Lessons***:
 
+ 1. **-**
+
 - Which improvement goals set in the previous retrospective were you able to achieve? 
   
   1. **Implement and Testing the user stories in priority order**: In this sprint we correctly managed to implement and testing the user stories in priority order, starting from the user story with the higher business value.
