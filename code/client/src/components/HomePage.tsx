@@ -82,7 +82,8 @@ return (
   display: 'flex',
   justifyContent: 'center', // Center horizontally
   alignItems: 'center', // Center vertically
-  height: '100vh', // Full viewport height
+  paddingTop: '100px',
+  boxSizing: 'border-box'
 }}>
   <div style={{
     display: 'flex',
