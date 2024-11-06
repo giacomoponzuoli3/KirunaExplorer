@@ -11,6 +11,7 @@ import { AddDocumentModal, ShowDocumentInfoModal, EditDocumentModal, AddNewDocum
 import { Stakeholder } from "../models/stakeholder";
 import { DocLink } from "../models/document_link";
 import { title } from "process";
+import {DocumentLegend} from "./DocumentLegend"
 
 
 interface HomepageProps {
@@ -76,6 +77,9 @@ function getDocumentIcon(type: string) {
 
 return (
 <>
+    {/* Show the Legend of document types */}
+    <DocumentLegend />
+
  {/* div to show the documents (this will change once the map is implemented) */}
  <div style={{ 
   display: 'flex',
@@ -166,6 +170,7 @@ return (
 <AddDocumentModal show={showAddDocumentModal} 
 onHide={() => setShowAddDocumentModal(false)} refreshDocuments={refreshDocuments} 
 stakeholders={stakeholders} showAddNewDocumentLinksModal={() => setShowAddLinks(true)}/>
+
 
 {selectedDocument && (<EditDocumentModal 
                          document={selectedDocument} show={showEditDocumentModal} 
