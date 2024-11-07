@@ -77,8 +77,9 @@ function getDocumentIcon(type: string) {
 
 return (
 <>
-    {/* Show the Legend of document types */}
-    <DocumentLegend />
+
+  {/* Show the Legend of document types */}
+  <DocumentLegend />
 
  {/* div to show the documents (this will change once the map is implemented) */}
  <div className="mt-3" style={{ 
