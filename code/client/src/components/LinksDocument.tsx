@@ -45,7 +45,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({ text, maxWords }) => {
 function getDocumentIcon(type: string) {
   switch (type) {
       case 'Informative document':
-        return <img src="kiruna/img/informativeDocument.png" alt="Informative Document" />;
+        return <img src="/kiruna/img/informativeDocument.png" alt="Informative Document" />;
       case 'Prescriptive document':
         return <img src="/kiruna/img/prescriptiveDocument.png" alt="Prescriptive Document" />;
       case 'Material effect':
