@@ -455,8 +455,8 @@ function ShowDocumentInfoModal({ getDocumentIcon,selectedDocument,show, onHide, 
         //onHide()
     };
 
-    const handleDeleteClick = () => {
-        API.deleteDocument(selectedDocument.id).then();
+    const handleDeleteClick = async () => {
+        await API.deleteDocument(selectedDocument.id).then();
         refreshDocuments();
         onHide()
         refreshDocuments();
