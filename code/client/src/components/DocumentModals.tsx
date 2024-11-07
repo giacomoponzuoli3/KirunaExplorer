@@ -706,6 +706,7 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocuments, doc
       setSelectedTypeLink(null)
       setSelectedDocumentName('')
       setSelectedTypeLinkName('')
+      setDocumentLinks([])
   }catch(err){
       setShowAlert(true);
       setAlertMessage('Something went wrong...')
