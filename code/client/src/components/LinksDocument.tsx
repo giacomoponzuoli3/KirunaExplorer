@@ -7,79 +7,85 @@ import Alert from "./Alert";
 import ConfirmModal from './ConfirmModal';
 import { AddLinkModal } from "./AddLinkModal";
 import { DocLink } from "../models/document_link";
+import { EditLinkModal } from "./EditLinkModal";
 
 interface TruncatedTextProps {
   text: string;
-  maxLength: number;
+  maxWords: number;
 }
 
-const TruncatedText: React.FC<TruncatedTextProps> = ({ text, maxLength }) => {
+const TruncatedText: React.FC<TruncatedTextProps> = ({ text, maxWords }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Dividi il testo in un array di parole
+  const words = text.split(" ");
+  const shouldTruncate = words.length > maxWords;
+
+  // Mostra solo il numero massimo di parole se non espanso
+  const displayText = isExpanded ? text : words.slice(0, maxWords).join(" ") + '...';
 
   return (
     <div className="relative">
-      <span className={isExpanded ? '' : 'line-clamp-3'}>
-        {text}
+      <span className={isExpanded ? '' : 'line-clamp-none'}>
+        {displayText}
       </span>
-      <button
-        className="text-blue-600 mt-1"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        {isExpanded ? 'Show less' : 'Show more'}
-      </button>
+      {shouldTruncate && (
+        <button
+          className="text-blue-600 mt-1 ml-2"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          {isExpanded ? 'Show less' : 'Show more'}
+        </button>
+      )}
     </div>
   );
 };
 
 
-
 function getDocumentIcon(type: string) {
-  console.log(type);
   switch (type) {
       case 'Informative document':
-        return <img src="/kiruna/img/informativeDocument.png" alt="Informative Document" className="h-8 w-8"/>;
+        return <img src="kiruna/img/informativeDocument.png" alt="Informative Document" />;
       case 'Prescriptive document':
-        return <img src="/kiruna/img/prescriptiveDocument.png" alt="Prescriptive Document" className="h-8 w-8"/>;
+        return <img src="/kiruna/img/prescriptiveDocument.png" alt="Prescriptive Document" />;
       case 'Material effect':
-        return <img src="/kiruna/img/construction.png" alt="Material Effect" className="h-8 w-8"/>;
+        return <img src="/kiruna/img/construction.png" alt="Material Effect" />;
       case 'Design document':
-        return <img src="/kiruna/img/designDocument.png" alt="Design Document" className="h-8 w-8"/>;
+        return <img src="/kiruna/img/designDocument.png" alt="Design Document" />;
       case 'Technical document':
-        return <img src="/kiruna/img/technicalDocument.png" alt="Technical Document" className="h-8 w-8"/>;
+        return <img src="/kiruna/img/technicalDocument.png" alt="Technical Document" />;
       case 'Agreement':
-        return <img src="/kiruna/img/agreement.png" alt="Technical Document" className="h-8 w-8"/>;
+        return <img src="/kiruna/img/agreement.png" alt="Technical Document" />;
       case 'Conflict':
-        return <img src="/kiruna/img/conflict.png" alt="Technical Document" className="h-8 w-8"/>;
+        return <img src="/kiruna/img/conflict.png" alt="Technical Document" />;
       case 'Consultation':
-        return <img src="/kiruna/img/consultation.png" alt="Technical Document" className="h-8 w-8"/>;
+        return <img src="/kiruna/img/consultation.png" alt="Technical Document" />;
       default:
         return null; // Return null if no matching type
     }
 }
 
 function LinksDocument(props: any) {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  const { idDocument } = useParams();
-  const [document, setDocument] = useState<Document | null>(null);
-  const [documentLinks, setDocumentLinks] = useState<DocLink[]>([]);
-  const [showModal, setShowModal] = useState(false);
-  //delete
-  const [documentToDelete, setDocumentToDelete] = useState<number | null>(null);
-  const [linkToDelete, setLinkToDelete] = useState<number | null>(null);
+    const { idDocument } = useParams();
+    const [document, setDocument] = useState<Document | null>(null);
+    const [documentLinks, setDocumentLinks] = useState<DocLink[]>([]);
+    const [showModal, setShowModal] = useState(false);
+    //delete
+    const [documentToDelete, setDocumentToDelete] = useState<number | null>(null);
+    const [linkToDelete, setLinkToDelete] = useState<number | null>(null);
 
-  //update    
-  const [documentToUpdate, setDocumentToUpdate] = useState<DocLink | null>(null);
+    //update    
+    const [documentToUpdate, setDocumentToUpdate] = useState<DocLink | null>(null);
 
-  //modal
-  const [showAlert, setShowAlert] = useState(false); // alert state
-  const [showModalAddLink, setShowModalAddLink] = useState(false);
-  const [showModalEditLink, setShowModalEditLink] = useState(false);
+    //modal
+    const [showAlert, setShowAlert] = useState(false); // alert state
+    const [showModalAddLink, setShowModalAddLink] = useState(false);
+    const [showModalEditLink, setShowModalEditLink] = useState(false);
 
-  //loading
-  const [loading, setLoading] = useState(true);  // stato di caricamento
-
-
+    //loading
+    const [loading, setLoading] = useState(true);  // stato di caricamento
 
     const handleDelete = async () => {
         if (document && documentToDelete && linkToDelete) {
@@ -89,6 +95,7 @@ function LinksDocument(props: any) {
             setShowModal(false);
         }
     };
+
 
     const refreshLinks = async () => {
         try {
@@ -104,11 +111,14 @@ function LinksDocument(props: any) {
     useEffect(() => {
         const getDocument = async () => {
             try{
+                setLoading(true);  // Imposta lo stato di caricamento a true
                 const documentId = Number(idDocument);
                 const document = await API.getDocumentById(documentId);
                 setDocument(document);
             }catch(err){
                 setShowAlert(true);
+            } finally {
+              setLoading(false);  // Imposta lo stato di caricamento a false dopo la chiamata API
             }
         };
 
@@ -148,9 +158,9 @@ function LinksDocument(props: any) {
       return <div>Loading...</div>; 
     }
 
-
     if (document == null){
         return (
+          
             <div className="p-4">
             { showAlert &&  <Alert
                     message="Sorry, something went wrong..."
@@ -209,7 +219,7 @@ function LinksDocument(props: any) {
                             <td className="p-4">{doc.title}</td>
                             <td className="p-4">{doc.stakeHolders.map(sh => sh.name).join(' / ')}</td>
                             <td className="p-4">
-                                <TruncatedText text={doc.description ?? 'No description available'} maxLength={100}  />
+                                <TruncatedText text={doc.description ?? 'No description available'} maxWords={20}  />
                             </td>
                             <td className="p-4">{doc.relatedLink.name}</td>
                             {props.isLogged && props.user.role == "Urban Planner" && (
@@ -244,14 +254,20 @@ function LinksDocument(props: any) {
                         </div>
                         <div className="mt-2">
                             <p className="text-sm text-gray-500"><strong>Description:</strong></p>
-                            <TruncatedText text={doc.description ?? 'No description available'} maxLength={100} />
+                            <TruncatedText text={doc.description ?? 'No description available'} maxWords={20} />
                         </div>
-                        {props.isLogged && props.user.role == "Urban Planner" && (
+                        {props.isLogged && props.user.role == "Urban Planner" && (<>
                           <div className="mt-4 flex justify-end">
                             <button className="text-red-500 hover:text-red-700" onClick={() => confirmDelete(doc.id, doc.relatedLink.id)}>
                               <TrashIcon className="h-5 w-5" />
                             </button>
+                            <button className="text-blue-500 hover:text-blue-700 ml-2" onClick={() => handleUpdate(doc)}>
+                              <PencilIcon className="h-5 w-5" />
+                            </button>
                           </div>
+                          
+                          
+                          </>
                         )}
                       </div>
                     ))}
@@ -284,6 +300,17 @@ function LinksDocument(props: any) {
                     idDocument={idDocument}
                     refreshLinks={refreshLinks}
                   />
+
+                  {document !== null && documentToUpdate !== null && showModalEditLink &&<EditLinkModal
+                    show={showModalEditLink}
+                    onHide={() => setShowModalEditLink(false)}
+
+                    firstDocument={document}
+                    secondDocument={documentToUpdate}
+
+                    refreshLinks={refreshLinks}
+                  />}
+                 
                 </>
               )}
             </div>
