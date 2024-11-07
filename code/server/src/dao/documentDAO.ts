@@ -119,7 +119,7 @@ class DocumentDAO {
                         return;
                     }
                     if (!rows || rows.length === 0) {
-                        reject(new Error("No documents found."));
+                        resolve([]);
                         return;
                     }
     
@@ -168,6 +168,8 @@ class DocumentDAO {
                 const sql = "DELETE FROM documents WHERE id = ?";
                 db.run(sql, [id], (err: Error | null) => {
                     if (err) {
+                        console.log("entrato");
+                        console.log(err);
                         reject(err);
                         return;
                     }
