@@ -56,7 +56,7 @@ function DocumentLegend() {
           ))}
         </div>
       )}
-
+      
       {/* Legend for larger screens */}
       <div className="hidden sm:flex items-center justify-start bg-white p-3 shadow-md fixed top-16 left-0 right-0 z-50 space-x-6">
         <span className="text-gray-700 text-sm font-medium mr-4">Document Type Legend</span>

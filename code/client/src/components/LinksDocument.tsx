@@ -238,13 +238,16 @@ function LinksDocument(props: any) {
               {props.isLogged && props.user.role == "Urban Planner" && (
                 <>
                   <div className="mt-4 text-center">
+                  {documentLinks.length !== 0 && 
                     <button 
-                      className="flex items-center justify-center bg-green-600 text-white rounded px-4 py-2 hover:bg-green-600 transition duration-200"  
-                      onClick={handleAddLink}
-                    >
+                    className="flex items-center justify-center bg-green-600 text-white rounded px-4 py-2 hover:bg-green-600 transition duration-200"  
+                    onClick={handleAddLink}
+                    > 
                       <PlusIcon className="h-5 w-5 mr-2" />
                       <span>Add Link</span>
                     </button>
+                  }
+                    
                   </div>
                   <ConfirmModal
                     show={showModal}
