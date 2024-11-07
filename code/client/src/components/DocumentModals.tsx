@@ -193,6 +193,9 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
                     <Dropdown.Item onClick={() => setType("Design document")}>Design document</Dropdown.Item>
                     <Dropdown.Item onClick={() => setType("Technical document")}>Technical document</Dropdown.Item>
                     <Dropdown.Item onClick={() => setType("Material effect")}>Material effect</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setType("Agreement")}>Agreement</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setType("Conflict")}>Conflict</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setType("Consultation")}>Consultation</Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>
               </Row>
