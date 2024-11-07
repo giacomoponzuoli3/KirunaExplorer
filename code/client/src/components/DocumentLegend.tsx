@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+
 function DocumentLegend() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   const documentTypes = [
     { type: 'Informative document', icon: 'informativeDocument.png' },
     { type: 'Prescriptive document', icon: 'prescriptiveDocument.png' },
@@ -11,6 +13,7 @@ function DocumentLegend() {
     { type: 'Conflict', icon: 'conflict.png' },
     { type: 'Consultation', icon: 'consultation.png' },
   ];
+
   return (
     <div className="relative">
       {/* Dropdown button */}
@@ -34,6 +37,7 @@ function DocumentLegend() {
           />
         </svg>
       </button>
+
       {/* Dropdown menu for small screens */}
       {isDropdownOpen && (
         <div className="sm:hidden absolute bg-white border border-gray-300 rounded-md shadow-lg mt-2 w-full p-2 space-y-2 z-50">
@@ -52,6 +56,7 @@ function DocumentLegend() {
           ))}
         </div>
       )}
+      
       {/* Legend for larger screens */}
       <div className="hidden sm:flex items-center justify-start bg-white p-3 shadow-md fixed top-16 left-0 right-0 z-50 space-x-6">
         <span className="text-gray-700 text-sm font-medium mr-4">Document Type Legend</span>
@@ -69,4 +74,5 @@ function DocumentLegend() {
     </div>
   );
 }
+
 export { DocumentLegend };
