@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { Document } from "../models/document";
 import API from "../API/API";
-import { TrashIcon, PlusIcon, FaceFrownIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, PlusIcon, FaceFrownIcon, PencilIcon } from "@heroicons/react/24/outline";
 import Alert from "./Alert";
 import ConfirmModal from './ConfirmModal';
 import { AddLinkModal } from "./AddLinkModal";
@@ -58,15 +58,27 @@ function getDocumentIcon(type: string) {
 }
 
 function LinksDocument(props: any) {
-    const navigate = useNavigate();
-    const { idDocument } = useParams();
-    const [document, setDocument] = useState<Document | null>(null);
-    const [documentLinks, setDocumentLinks] = useState<DocLink[]>([]);
-    const [showModal, setShowModal] = useState(false);
-    const [documentToDelete, setDocumentToDelete] = useState<number | null>(null);
-    const [linkToDelete, setLinkToDelete] = useState<number | null>(null);
-    const [showAlert, setShowAlert] = useState(false); // alert state
-    const [showModalAddLink, setShowModalAddLink] = useState(false);
+  const navigate = useNavigate();
+
+  const { idDocument } = useParams();
+  const [document, setDocument] = useState<Document | null>(null);
+  const [documentLinks, setDocumentLinks] = useState<DocLink[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  //delete
+  const [documentToDelete, setDocumentToDelete] = useState<number | null>(null);
+  const [linkToDelete, setLinkToDelete] = useState<number | null>(null);
+
+  //update    
+  const [documentToUpdate, setDocumentToUpdate] = useState<DocLink | null>(null);
+
+  //modal
+  const [showAlert, setShowAlert] = useState(false); // alert state
+  const [showModalAddLink, setShowModalAddLink] = useState(false);
+  const [showModalEditLink, setShowModalEditLink] = useState(false);
+
+  //loading
+  const [loading, setLoading] = useState(true);  // stato di caricamento
+
 
 
     const handleDelete = async () => {
@@ -125,6 +137,15 @@ function LinksDocument(props: any) {
 
     const handleAddLink = () => {
         setShowModalAddLink(true);
+    }
+
+    const handleUpdate = async (documentUpdate: DocLink) => {
+      setDocumentToUpdate(documentUpdate);
+      setShowModalEditLink(true);
+    }
+
+    if (loading) {
+      return <div>Loading...</div>; 
     }
 
 
@@ -196,6 +217,9 @@ function LinksDocument(props: any) {
                                 <button className="text-red-500 hover:text-red-700" onClick={() => confirmDelete(doc.id, doc.relatedLink.id)}>
                                   <TrashIcon className="h-5 w-5" />
                                 </button>
+                                <button className="text-blue-500 hover:text-blue-700 ml-2" onClick={() => handleUpdate(doc)}>
+                                  <PencilIcon className="h-5 w-5" />
+                                </button> 
                               </td>
                             )}
                           </tr>
