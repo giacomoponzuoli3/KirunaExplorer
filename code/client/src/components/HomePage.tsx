@@ -11,6 +11,7 @@ import { AddDocumentModal, ShowDocumentInfoModal, EditDocumentModal, AddNewDocum
 import { Stakeholder } from "../models/stakeholder";
 import { DocLink } from "../models/document_link";
 import { title } from "process";
+import {DocumentLegend} from "./DocumentLegend"
 
 
 interface HomepageProps {
@@ -76,15 +77,19 @@ function getDocumentIcon(type: string) {
 
 return (
 <>
+
+  {/* Show the Legend of document types */}
+  <DocumentLegend />
+
  {/* div to show the documents (this will change once the map is implemented) */}
- <div style={{ 
+ <div className="mt-3" style={{ 
   display: 'flex',
   justifyContent: 'center', // Center horizontally
   alignItems: 'center', // Center vertically
   paddingTop: '100px',
   boxSizing: 'border-box'
 }}>
-  <div style={{
+  <div className="mt-5" style={{
     display: 'flex',
     flexWrap: 'wrap',
     gap: '16px',
