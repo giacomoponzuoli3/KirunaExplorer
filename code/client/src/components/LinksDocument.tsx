@@ -155,7 +155,7 @@ function LinksDocument(props: any) {
     }
 
     if (loading) {
-      return <div>Loading...</div>;  // Indicatore di caricamento (puoi personalizzarlo)
+      return <div>Loading...</div>; 
     }
 
     if (document == null){
@@ -229,7 +229,7 @@ function LinksDocument(props: any) {
                                 </button>
                                 <button className="text-blue-500 hover:text-blue-700 ml-2" onClick={() => handleUpdate(doc)}>
                                   <PencilIcon className="h-5 w-5" />
-                                </button>
+                                </button> 
                               </td>
                             )}
                           </tr>
