@@ -12,6 +12,8 @@ import { TrashIcon, PencilIcon } from "@heroicons/react/24/outline";
 import Link from '../models/link'; 
 import Alert from "./Alert";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import Select from 'react-select';
+import ISO6391 from 'iso-639-1';  // Utilizziamo ISO 639-1 per ottenere le lingue
 
 interface RequiredLabelProps {
     text: string; // Explicitly define the type of 'text' as string
@@ -88,6 +90,9 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({ text, maxLength }) => {
   );
 };
 
+
+
+
 function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAddNewDocumentLinksModal}: AddDocumentModalProps) {
     const [title, setTitle] = useState('');
     const [selectedStakeholders, setSelectedStakeholders] = useState<number[]>([]);
@@ -141,6 +146,12 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
         refreshDocuments();
         showAddNewDocumentLinksModal();
     };
+
+    // Ottieni tutte le lingue disponibili da ISO 639-1
+    const languageOptions = ISO6391.getAllCodes().map(code => ({
+      value: code,
+      label: ISO6391.getName(code),
+    }));
 
     return (
       <Modal size="lg" show={show} onHide={handleClose} aria-labelledby="example-modal-sizes-title-lg">
@@ -249,16 +260,17 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
                     />
                   </Form.Group>
                   <Col md={6} className='mt-4'>
-                    <Form.Group as={Row} controlId="formLanguage" className="mb-3">
-                      <Form.Label column md={4}>Language</Form.Label>
-                      <Col md={8}>
-                        <Form.Control
-                            type="text"
-                            value={language || ''}
-                            onChange={(e) => setLanguage(e.target.value ? e.target.value : null)}
-                        />
-                      </Col>
-                    </Form.Group>
+                  <Form.Group as={Row} controlId="formLanguage" className="mb-3">
+                    <Form.Label column md={4}>Language</Form.Label>
+                    <Col md={8}>
+                      <Select
+                        options={languageOptions}
+                        value={language ? languageOptions.find(lang => lang.value === language) : null}
+                        onChange={(selectedOption) => setLanguage(selectedOption ? selectedOption.label : null)}
+                        placeholder="Select Language"
+                      />
+                    </Col>
+                  </Form.Group>
                     <Form.Group as={Row} controlId="formPages" className="mb-3">
                       <Form.Label column md={4}>Pages</Form.Label>
                       <Col md={8}>
@@ -327,6 +339,12 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
         onHide();
     };
 
+    // Ottieni tutte le lingue disponibili da ISO 639-1
+    const languageOptions = ISO6391.getAllCodes().map(code => ({
+      value: code,
+      label: ISO6391.getName(code),
+    }));
+    
     return (
         <Modal size="lg" show={show} onHide={onHide} aria-labelledby="example-modal-sizes-title-lg">
             <Modal.Header closeButton style={{ backgroundColor: 'rgb(167, 199, 231,0.8)' }}>
@@ -432,14 +450,15 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                             </Form.Group>
                             <Col md={6} className="mt-4">
                                 <Form.Group as={Row} controlId="formLanguage" className="mb-3">
-                                    <Form.Label column md={4}>Language</Form.Label>
-                                    <Col md={8}>
-                                        <Form.Control
-                                            type="text"
-                                            value={language || ''}
-                                            onChange={(e) => setLanguage(e.target.value ? e.target.value : null)}
-                                        />
-                                    </Col>
+                                <Form.Label column md={4}>Language</Form.Label>
+                                <Col md={8}>
+                                  <Select
+                                    options={languageOptions}
+                                    value={language ? languageOptions.find(lang => lang.value === language) : null}
+                                    onChange={(selectedOption) => setLanguage(selectedOption ? selectedOption.label : null)}
+                                    placeholder="Select Language"
+                                  />
+                                </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} controlId="formPages" className="mb-3">
                                     <Form.Label column md={4}>Pages</Form.Label>
