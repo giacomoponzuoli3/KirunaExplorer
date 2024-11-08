@@ -53,13 +53,13 @@ sections:
 
 - **Hours per task average, standard deviation (estimate and actual)**
 
- estimate hours per task average: $$ \mu _{est}=\frac{hours _{est}}{{N _{r}tasks}}=\frac{112}{27} ≈ 4h$$
+   estimate hours per task average: 4h
 
- actual hours per task average: $$\mu _{act}=\frac{hours _{act}}{{N _{r}tasks}}=\frac{120,25}{27} ≈ 4h 30m $$
+   actual hours per task average: 4h 30m 
 
- estimed standard deviation: $$\sigma _{est} = \sqrt{\frac{\sum_{i=1}^{N} (estimation_{task_i} - \mu _{est})^2}{N _{r} tasks}} = 3,771$$
+   estimed standard deviation: 3,771
 
- actual standard deviation:  $$\sigma _{act} = \sqrt{\frac{\sum_{i=1}^{N} (spent_{task_i} - \mu _{act})^2}{N _{r}tasks}} = 4,101$$
+   actual standard deviation: 4,101
 
 - **Total estimation error ratio: sum of total hours spent / sum of total hours effort - 1**
 
