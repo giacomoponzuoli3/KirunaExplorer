@@ -58,7 +58,6 @@ interface ShowDocumentInfoModalProps {
   user: User;
   handleEdit: () => void;
   refreshDocuments: () => void;
-  documentLinks: DocLink[];
 }
 
 interface AddNewDocumentLinksModalProps {
@@ -487,7 +486,7 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
     );
 }
 
-function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, show, onHide, user, handleEdit, refreshDocuments, documentLinks }: ShowDocumentInfoModalProps) {
+function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, show, onHide, user, handleEdit, refreshDocuments }: ShowDocumentInfoModalProps) {
   const navigate = useNavigate();  
 
   const handleEditClick = () => {
@@ -560,9 +559,6 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, show, onHide
                                   <p className="text-sm text-gray-600"><strong>Type: </strong> 
                                       {selectedDocument.type}
                                   </p>
-                                  <p className="text-sm text-gray-600"><strong>Connections: </strong> 
-                                      {documentLinks.length !== 0 ? documentLinks.length : '-'}
-                                  </p>
                                   <p className="text-sm text-gray-600"><strong>Language: </strong> 
                                       {selectedDocument.language ? selectedDocument.language : '-'}
                                   </p>
@@ -600,9 +596,6 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, show, onHide
                                       </p>
                                       <p className="text-sm text-gray-600"><strong>Type: </strong> 
                                           {selectedDocument.type}
-                                      </p>
-                                      <p className="text-sm text-gray-600"><strong>Connections: </strong> 
-                                          {documentLinks.length !== 0 ? documentLinks.length : '-'}
                                       </p>
                                       <p className="text-sm text-gray-600"><strong>Language: </strong> 
                                           {selectedDocument.language ? selectedDocument.language : '-'}
