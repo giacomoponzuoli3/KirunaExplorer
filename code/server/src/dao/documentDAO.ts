@@ -17,8 +17,8 @@ class DocumentDAO {
      * @param description The description of the document to add.
      * @returns A Promise that resolves when the document has been added.
      */
-    addDocument(title: string, stakeHolders: number[], scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string|null): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
+    addDocument(title: string, stakeHolders: number[], scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string|null): Promise<Document> {
+        return new Promise<Document>((resolve, reject) => {
             try {
                 // Step 1: Insert the document
                 const sql = "INSERT INTO documents(title, scale, issuance_date, type, language, pages, description) VALUES(?, ?, ?, ?, ?, ?, ?)";
@@ -43,10 +43,12 @@ class DocumentDAO {
                             });
                         })
                     );
+
+                    const doc = new Document(documentId, title, [], scale, issuanceDate, type, language, pages, description);
     
                     // Step 3: Wait for all stakeholder insertions to complete
                     Promise.all(stakeholderInserts)
-                        .then(() => resolve())
+                        .then(() => resolve(doc))
                         .catch(error => reject(error));
                 });
             } catch (error) {
@@ -196,8 +198,8 @@ class DocumentDAO {
      * @returns A Promise that resolves when the document has been updated.
      */
     editDocument(id: number,title: string,stakeHolders: number[],scale: string,issuanceDate: string,type: string,language: string | null,pages: string | null,description: string | null
-    ): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
+    ): Promise<Document> {
+        return new Promise<Document>((resolve, reject) => {
             const updateDocumentSql = "UPDATE documents SET title = ?, scale = ?, issuance_date = ?, type = ?, language = ?, pages = ?, description = ? WHERE id = ?";
             const values = [
                 title,
@@ -236,10 +238,12 @@ class DocumentDAO {
                             });
                         })
                     );
+
+                    const doc = new Document(id, title, [], scale, issuanceDate, type, language, pages, description);
     
                     // Step 3: Wait for all stakeholder insertions to complete
                     Promise.all(stakeholderInserts)
-                        .then(() => resolve())
+                        .then(() => resolve(doc))
                         .catch(error => reject(error));
                 });
             });
