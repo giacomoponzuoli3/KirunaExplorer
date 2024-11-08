@@ -21,7 +21,7 @@ function App() {
     try {
         const docs = await API.getAllDocuments();
         setDocuments(docs);
-        console.log(docs)
+        //console.log(docs)
     } catch (err: any) {
         console.log(err);
     }

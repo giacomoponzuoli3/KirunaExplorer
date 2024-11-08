@@ -34,7 +34,7 @@ interface AddDocumentModalProps {
     onHide: () => void;
     refreshDocuments: () => void;
     stakeholders: Stakeholder[];
-    showAddNewDocumentLinksModal: () => void;
+    showAddNewDocumentLinksModal: (doc: Document) => void;
 }
 
 interface EditDocumentModalProps {
@@ -125,13 +125,11 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
             const newSelectedStakeholders = prevSelectedStakeholders.includes(option.id)
                 ? prevSelectedStakeholders.filter((item) => item !== option.id) // Remove the ID
                 : [...prevSelectedStakeholders, option.id]; // Add the ID
-    
-            console.log('Updated Stakeholders:', newSelectedStakeholders); // Log the new state
             return newSelectedStakeholders; // Return the new state
         });
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         // Validation check
         if (!title || selectedStakeholders.length===0 || !scale || !issuanceDate || !type 
           || title.trim() === '' || scale.trim() === '' || issuanceDate.trim() === '' || description.trim() === '') {
@@ -139,11 +137,12 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
             return; // Exit the function early
         }
         //API call to add a document
-        API.addDocument(title, selectedStakeholders, scale, issuanceDate, type, language, pages, description).then();
+        const doc = await API.addDocument(title, selectedStakeholders, scale, issuanceDate, type, language, pages, description).then();
+         console.log(doc.id);
         refreshDocuments();
         handleClose();
         refreshDocuments();
-        showAddNewDocumentLinksModal();
+        showAddNewDocumentLinksModal(doc);
     };
 
     // Ottieni tutte le lingue disponibili da ISO 639-1
@@ -320,7 +319,7 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
         });
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         // Validation check
         if (!title || selectedStakeholders.length === 0 || !scale || !issuanceDate || !type ||
             title.trim() === '' || scale.trim() === '' || issuanceDate.trim() === ''|| description.trim() === ''
@@ -332,9 +331,10 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
             selectedStakeholders.includes(stakeholder.id)
         );
         // API call to edit a document
-        API.editDocument(document.id, title, selectedStakeholders, scale, issuanceDate, type, language, pages,  description).then();
-
-        refreshSelectedDocument(new Document(document.id, title, sh, scale, issuanceDate, type, language, pages, description));
+        const doc: Document = await API.editDocument(document.id, title, selectedStakeholders, scale, issuanceDate, type, language, pages,  description).then();
+        console.log(doc)
+        doc.stakeHolders = sh;
+        refreshSelectedDocument(doc);
         onHide();
     };
 
@@ -672,7 +672,6 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocuments, doc
               const types = await API.getAllLinks();
               setTypesLink(types);
           } catch (err) {
-              console.log('kurac');
               setShowAlert(true);
           }
       };
@@ -728,9 +727,9 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocuments, doc
       setAlertMessage('Choose documents to link before linking')
       setShowAlert(true);
       return; // Prevent submission if there are errors
-  }
-
-  try{
+    }
+     console.log(document)
+    try{
       // Implement API call to add link
       documentLinks.forEach(async link => {
         if(link.documentId && link.linkId){

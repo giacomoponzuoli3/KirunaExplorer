@@ -28,6 +28,7 @@ const [showDetails, setShowDetails] = useState<boolean>(false);
 const [showAddDocumentModal, setShowAddDocumentModal] = useState<boolean>(false);
 const [showEditDocumentModal, setShowEditDocumentModal] = useState<boolean>(false);
 const [showAddLinks, setShowAddLinks] = useState<boolean>(false);
+const [newDocument, setNewDocument] = useState<Document | null>(null);
 
 const handleEdit = () => {
   setShowEditDocumentModal(true);
@@ -165,8 +166,8 @@ return (
             ):null}
 
 <AddDocumentModal show={showAddDocumentModal} 
-onHide={() => setShowAddDocumentModal(false)} refreshDocuments={refreshDocuments} 
-stakeholders={stakeholders} showAddNewDocumentLinksModal={() => setShowAddLinks(true)}/>
+onHide={() => setShowAddDocumentModal(false)} refreshDocuments={refreshDocuments} stakeholders={stakeholders} 
+showAddNewDocumentLinksModal={(doc: Document) => {setNewDocument(doc); setShowAddLinks(true); }}/>
 
 
 {selectedDocument && (<EditDocumentModal 
@@ -176,9 +177,10 @@ stakeholders={stakeholders} showAddNewDocumentLinksModal={() => setShowAddLinks(
                          />
 )}
 
-<AddNewDocumentLinksModal document={documents[documents.length-1]} show={showAddLinks} 
+{newDocument && (<AddNewDocumentLinksModal document={newDocument} show={showAddLinks} 
 onHide={() => setShowAddLinks(false)} refreshDocuments={refreshDocuments}
 docs={documents}/>
+)}
 </>
   
 );
