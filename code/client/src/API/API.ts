@@ -73,6 +73,7 @@ async function addDocument(title: string, stakeHolders: number[], scale: string,
         headers: {
             'Content-Type': 'application/json',
         },
+        credentials: "include",
         body: JSON.stringify({ title: title, stakeHolders: stakeHolders, scale: scale, issuanceDate: issuanceDate, type: type, language: language, pages: pages, description: description },)
     })
     if (response.ok) {
@@ -136,6 +137,7 @@ async function editDocument(id: number, title: string, stakeHolders: number[], s
         headers: {
             'Content-Type': 'application/json',
         },
+        credentials: "include",
         body: JSON.stringify({ title: title, stakeHolders: stakeHolders, scale: scale, issuanceDate: issuanceDate, type: type, language: language, pages: pages, description: description },)
     })
     if (response.ok) {
@@ -213,6 +215,7 @@ async function getAllDocumentsOfSameType(type: string) {
         headers: {
             'Content-Type': 'application/json',
         },
+        credentials: "include",
         body: JSON.stringify({ type: type},)
     })
     if (response.ok) {
