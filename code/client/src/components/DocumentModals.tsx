@@ -254,7 +254,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
                     <Form.Control
                         as="textarea"
                         rows={3}
-                        value={description || ''}
+                        value={description}
                         onChange={(e) => setDescription(e.target.value)}
                     />
                   </Form.Group>
@@ -443,7 +443,7 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                                 <Form.Control
                                     as="textarea"
                                     rows={3}
-                                    value={description || ''}
+                                    value={description}
                                     onChange={(e) => setDescription(e.target.value)}
                                 />
                             </Form.Group>
