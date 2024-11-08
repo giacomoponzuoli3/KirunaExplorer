@@ -14,7 +14,7 @@ class Document {
     type: string
     language: string | null
     pages: string | null
-    description: string | null
+    description: string
 
     /**
      * Creates a new instance of the Document class.
@@ -37,7 +37,7 @@ class Document {
         type: string,
         language: string | null = null,
         pages: string | null = null,
-        description: string | null = null
+        description: string
     ) {
         this.id = id
         this.title = title
