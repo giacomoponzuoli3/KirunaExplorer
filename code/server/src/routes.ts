@@ -33,7 +33,7 @@ function initRoutes(app: express.Application) {
     const authenticator = new Authenticator(app)
     const authRoutes = new AuthRoutes(authenticator)
     const docRoutes = new DocumentRoutes(authenticator);
-    const linkRoutes = new LinkRoutes();
+    const linkRoutes = new LinkRoutes(authenticator);
     const stakeholderRoutes = new StakeholderRoutes();
 
     app.use(`${prefix}/sessions`, authRoutes.getRouter())

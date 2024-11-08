@@ -29,6 +29,8 @@ class DocumentRoutes {
         
         this.router.post(
             "/",
+            this.authenticator.isLoggedIn, //error 401
+            this.authenticator.isPlanner, //error 401
             body("title").isString(),
             body("stakeHolders").isArray(),
             body("scale").isString(),
@@ -89,6 +91,8 @@ class DocumentRoutes {
 
         this.router.delete(
             "/:id",
+            this.authenticator.isLoggedIn, //error 401
+            this.authenticator.isPlanner, //error 401
             param("id").isNumeric(),
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
@@ -104,6 +108,8 @@ class DocumentRoutes {
 
         this.router.patch(
             "/:id",
+            this.authenticator.isLoggedIn, //error 401
+            this.authenticator.isPlanner, //error 401
             param("id").isNumeric(),
             body("title").isString(),
             body("stakeHolders").isArray(),

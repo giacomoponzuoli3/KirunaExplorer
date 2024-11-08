@@ -3,16 +3,19 @@ import express, {Router} from "express"
 import {body} from "express-validator"
 import ErrorHandler from "../helper"
 import Link from "../models/link";
+import Authenticator from "./auth";
 
 class LinkRoutes {
     private controller: LinkController
     private readonly router: Router
     private errorHandler: ErrorHandler
+    private authenticator: Authenticator
 
-    constructor() {
+    constructor(authenticator: Authenticator) {
         this.controller = new LinkController()
         this.router = express.Router()
         this.errorHandler = new ErrorHandler()
+        this.authenticator = authenticator;
         this.initRoutes()
     }
 
@@ -22,8 +25,10 @@ class LinkRoutes {
 
     initRoutes() {
 
-        this.router.post(
+        this.router.post( 
             "/",
+            this.authenticator.isLoggedIn, //error 401
+            this.authenticator.isPlanner, //error 401
             body("idDoc1").isNumeric(),
             body("idDoc2").isNumeric(),
             body("idLink").isNumeric(),
@@ -41,6 +46,8 @@ class LinkRoutes {
 
         this.router.delete(
             "/",
+            this.authenticator.isLoggedIn, //error 401
+            this.authenticator.isPlanner, //error 401
             body("idDoc1").isNumeric(),
             body("idDoc2").isNumeric(),
             body("idLink").isNumeric(),
@@ -58,6 +65,8 @@ class LinkRoutes {
 
         this.router.patch(
             "/",
+            this.authenticator.isLoggedIn, //error 401
+            this.authenticator.isPlanner, //error 401
             body("idDoc1").isNumeric(),
             body("idDoc2").isNumeric(),
             body("oldLinkId").isNumeric(),
