@@ -229,7 +229,6 @@ async function getAllDocumentsOfSameType(type: string) {
 
 
 /** ------------------- Link APIs ------------------------ */
-
 async function addLink(idDoc1: number, idDoc2: number, idLink: number) {
     const response = await fetch(baseURL + "link", { method: 'POST', credentials: "include", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idDoc1: idDoc1, idDoc2: idDoc2, idLink: idLink },) })
     if (response.ok) {
