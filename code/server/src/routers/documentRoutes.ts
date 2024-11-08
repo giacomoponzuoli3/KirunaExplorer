@@ -52,7 +52,7 @@ class DocumentRoutes {
                         req.body["pages"],
                         req.body["description"]
                     )
-                        .then(() => res.status(200).json({ message: "Document added successfully" }))
+                        .then((document: Document) => res.status(200).json(document))
                         .catch((err: Error) => next(err))
                 } catch (err) {
                     next(err);
@@ -133,7 +133,7 @@ class DocumentRoutes {
                         req.body["pages"],
                         req.body["description"]
                     )
-                        .then(() => res.status(200).json({ message: "Document updated successfully" }))
+                        .then((document: Document) => res.status(200).json(document))
                         .catch((err: Error) => next(err))
                 } catch (err) {
                     next(err);
