@@ -17,7 +17,7 @@ class DocumentDAO {
      * @param description The description of the document to add.
      * @returns A Promise that resolves when the document has been added.
      */
-    addDocument(title: string, stakeHolders: number[], scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string|null): Promise<Document> {
+    addDocument(title: string, stakeHolders: number[], scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string): Promise<Document> {
         return new Promise<Document>((resolve, reject) => {
             try {
                 // Step 1: Insert the document
@@ -197,7 +197,7 @@ class DocumentDAO {
      * @param description The description of the document to update.
      * @returns A Promise that resolves when the document has been updated.
      */
-    editDocument(id: number,title: string,stakeHolders: number[],scale: string,issuanceDate: string,type: string,language: string | null,pages: string | null,description: string | null
+    editDocument(id: number,title: string,stakeHolders: number[],scale: string,issuanceDate: string,type: string,language: string | null,pages: string | null,description: string
     ): Promise<Document> {
         return new Promise<Document>((resolve, reject) => {
             const updateDocumentSql = "UPDATE documents SET title = ?, scale = ?, issuance_date = ?, type = ?, language = ?, pages = ?, description = ? WHERE id = ?";

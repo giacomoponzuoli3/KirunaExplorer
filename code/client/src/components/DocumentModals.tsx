@@ -100,7 +100,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
     const [type, setType] = useState('');
     const [language, setLanguage] = useState<string | null>(null);
     const [pages, setPages] = useState<string | null>(null);
-    const [description, setDescription] = useState<string | null>(null);
+    const [description, setDescription] = useState('');
     const [showAlert, setShowAlert] = useState(false); // alert state
 
     const resetForm = () => {
@@ -111,7 +111,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
         setType('');
         setLanguage(null);
         setPages(null);
-        setDescription(null);
+        setDescription('');
         setShowAlert(false);
     };
 
@@ -134,7 +134,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
     const handleSubmit = () => {
         // Validation check
         if (!title || selectedStakeholders.length===0 || !scale || !issuanceDate || !type 
-          || title.trim() === '' || scale.trim() === '' || issuanceDate.trim() === '') {
+          || title.trim() === '' || scale.trim() === '' || issuanceDate.trim() === '' || description.trim() === '') {
             setShowAlert(true);
             return; // Exit the function early
         }
@@ -250,12 +250,12 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
                 </Row>
                 <Row className="mb-3">
                   <Form.Group as={Col} md={6} controlId="formDescription">
-                    <Form.Label>Description</Form.Label>
+                    <Form.Label><RequiredLabel text="Description" /></Form.Label>
                     <Form.Control
                         as="textarea"
                         rows={3}
                         value={description || ''}
-                        onChange={(e) => setDescription(e.target.value ? e.target.value : null)}
+                        onChange={(e) => setDescription(e.target.value)}
                     />
                   </Form.Group>
                   <Col md={6} className='mt-4'>
@@ -306,7 +306,7 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
     const [type, setType] = useState(document.type);
     const [language, setLanguage] = useState<string | null>(document.language);
     const [pages, setPages] = useState<string | null>(document.pages);
-    const [description, setDescription] = useState<string | null>(document.description);
+    const [description, setDescription] = useState(document.description);
     const [showAlert, setShowAlert] = useState(false); // alert state
 
     const toggleSelect = (option: Stakeholder) => {
@@ -323,7 +323,7 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
     const handleSubmit = () => {
         // Validation check
         if (!title || selectedStakeholders.length === 0 || !scale || !issuanceDate || !type ||
-            title.trim() === '' || scale.trim() === '' || issuanceDate.trim() === ''
+            title.trim() === '' || scale.trim() === '' || issuanceDate.trim() === ''|| description.trim() === ''
         ) {
             setShowAlert(true);
             return;
@@ -332,7 +332,7 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
             selectedStakeholders.includes(stakeholder.id)
         );
         // API call to edit a document
-        API.editDocument(document.id, title, selectedStakeholders, scale, issuanceDate, type, language, pages, description).then();
+        API.editDocument(document.id, title, selectedStakeholders, scale, issuanceDate, type, language, pages,  description).then();
 
         refreshSelectedDocument(new Document(document.id, title, sh, scale, issuanceDate, type, language, pages, description));
         onHide();
@@ -439,12 +439,12 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                         </Row>
                         <Row className="mb-3">
                             <Form.Group as={Col} md={6} controlId="formDescription">
-                                <Form.Label>Description</Form.Label>
+                                <Form.Label><RequiredLabel text="Description" /></Form.Label>
                                 <Form.Control
                                     as="textarea"
                                     rows={3}
                                     value={description || ''}
-                                    onChange={(e) => setDescription(e.target.value ? e.target.value : null)}
+                                    onChange={(e) => setDescription(e.target.value)}
                                 />
                             </Form.Group>
                             <Col md={6} className="mt-4">
