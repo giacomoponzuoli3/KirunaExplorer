@@ -51,13 +51,22 @@ sections:
 > story `#0` is for technical tasks, leave out story points (not applicable in this case)
 
 
-- Hours per task average, standard deviation (estimate and actual)
-- Total estimation error ratio: sum of total hours spent / sum of total hours effort - 1
+- **Hours per task average, standard deviation (estimate and actual)**
+
+ estimate hours per task average: $$ \mu _{est}=\frac{hours _{est}}{{N _{r}tasks}}=\frac{112}{27} ≈ 4h$$
+
+ actual hours per task average: $$\mu _{act}=\frac{hours _{act}}{{N _{r}tasks}}=\frac{120,25}{27} ≈ 4h 30m $$
+
+ estimed standard deviation: $$\sigma _{est} = \sqrt{\frac{\sum_{i=1}^{N} (estimation_{task_i} - \mu _{est})^2}{N _{r} tasks}} = 3,771$$
+
+ actual standard deviation:  $$\sigma _{act} = \sqrt{\frac{\sum_{i=1}^{N} (spent_{task_i} - \mu _{act})^2}{N _{r}tasks}} = 4,101$$
+
+- **Total estimation error ratio: sum of total hours spent / sum of total hours effort - 1**
 
 
     $$\frac{\sum_i spent_{task_i}}{\sum_i estimation_{task_i}} - 1 = \frac{120,25}{112} - 1 = 0,07366 $$ 
     
-- Absolute relative task estimation error: sum( abs( spent-task-i / estimation-task-i - 1))/n
+- **Absolute relative task estimation error: sum( abs( spent-task-i / estimation-task-i - 1))/n**
 
 
     $$\frac{1}{n}\sum_i^n \left| \frac{spent_{task_i}}{estimation_task_i}-1 \right| = \frac{1}{3} (0,0255 + 0,3333 + 0,0769 ) = 0,1452  $$
