@@ -24,7 +24,6 @@ interface HomepageProps {
 function HomePage({documents, user, refreshDocuments, stakeholders} : HomepageProps) {
 
 const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
-const [documentLinks, setDocumentLinks] = useState<DocLink[]>([]);
 const [showDetails, setShowDetails] = useState<boolean>(false);
 const [showAddDocumentModal, setShowAddDocumentModal] = useState<boolean>(false);
 const [showEditDocumentModal, setShowEditDocumentModal] = useState<boolean>(false);
@@ -42,8 +41,6 @@ const handleCloseDetailsModal = () => {
 const handleDocumentClick = async (doc: Document) => {
     const document = await API.getDocumentById(doc.id);
     setSelectedDocument(document);
-    const docLinks = await API.getDocumentLinksById(doc.id);
-    setDocumentLinks(docLinks);
     setShowDetails(true);
 
 }
@@ -141,7 +138,6 @@ return (
                           selectedDocument={selectedDocument} show={showDetails} 
                           onHide={handleCloseDetailsModal} getDocumentIcon={getDocumentIcon} 
                           user={user} handleEdit={handleEdit} refreshDocuments={refreshDocuments}
-                          documentLinks={documentLinks}
                         />
                       )}
                       
