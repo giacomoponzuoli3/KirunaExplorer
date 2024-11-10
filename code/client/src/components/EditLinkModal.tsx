@@ -90,16 +90,25 @@ function EditLinkModal(props: any) {
                     </p>
                 </div>
 
-                {/* Main content of the modal */}
-                <h3 className="text-2xl font-semibold text-gray-800 mb-4 text-center">
-                    <span className="text-green-600 text-2xl block">{props.firstDocument.title}</span>
-                    <span className="text-gray-500 text-sm block my-2">is linked with</span>
-                    <span className="text-red-600 text-2xl block">{props.secondDocument.title}</span>
-                    <div className="mt-2 text-center text-sm text-gray-500">
-                        <span>Current link type: </span>
-                        <span className="font-semibold text-blue-600">{props.secondDocument.relatedLink?.name || 'None'}</span>
+                <h3 className="text-xl font-semibold text-gray-700 mb-6 text-center">
+                    <span className="text-blue-600 text-xl block">
+                        {props.firstDocument.title}
+                    </span>
+                    <span className="text-gray-500 text-sm block mt-2">
+                        is linked with
+                    </span>
+                    <span className="text-gray-700 text-xl block mt-2">
+                        {props.secondDocument.title}
+                    </span>
+
+                    <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-md text-center text-sm text-gray-600">
+                        <span className="font-medium text-gray-700">Current link type: </span>
+                        <span className="font-medium text-blue-700">
+                        {props.secondDocument.relatedLink?.name || 'None'}
+                        </span>
                     </div>
                 </h3>
+
 
                 <div className="mb-6">
                     <label className="block text-gray-700 text-sm font-bold mb-2">
