@@ -329,9 +329,6 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
             setShowAlert(true);
             return;
         }
-        // const sh: Stakeholder[] = stakeholders.filter(stakeholder =>
-        //     selectedStakeholders.includes(stakeholder.id)
-        // );
         // API call to edit a document
         const doc: Document = await API.editDocument(document.id, title, selectedStakeholders, scale, issuanceDate, type, language, pages,  description).then();
         console.log(doc)
