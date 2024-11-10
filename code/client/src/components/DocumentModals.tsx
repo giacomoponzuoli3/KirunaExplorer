@@ -94,7 +94,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({ text, maxLength }) => {
 
 function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAddNewDocumentLinksModal}: AddDocumentModalProps) {
     const [title, setTitle] = useState('');
-    const [selectedStakeholders, setSelectedStakeholders] = useState<number[]>([]);
+    const [selectedStakeholders, setSelectedStakeholders] = useState<Stakeholder[]>([]);
     const [scale, setScale] = useState('');
     const [issuanceDate, setIssuanceDate] = useState('');
     const [type, setType] = useState('');
@@ -122,9 +122,9 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
 
     const toggleSelect = (option: Stakeholder) => {
         setSelectedStakeholders((prevSelectedStakeholders) => {
-            const newSelectedStakeholders = prevSelectedStakeholders.includes(option.id)
-                ? prevSelectedStakeholders.filter((item) => item !== option.id) // Remove the ID
-                : [...prevSelectedStakeholders, option.id]; // Add the ID
+            const newSelectedStakeholders = prevSelectedStakeholders.includes(option)
+                ? prevSelectedStakeholders.filter((item) => item !== option)
+                : [...prevSelectedStakeholders, option]; 
             return newSelectedStakeholders; // Return the new state
         });
     };
@@ -218,7 +218,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
                             <Dropdown.Item
                               key={index}
                               onClick={() => toggleSelect(option)}
-                              active={selectedStakeholders.includes(option.id)}
+                              active={selectedStakeholders.includes(option)}
                             >
                               {option.name}
                             </Dropdown.Item>
@@ -299,7 +299,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
 
 function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, stakeholders }: EditDocumentModalProps) {
     const [title, setTitle] = useState(document.title);
-    const [selectedStakeholders, setSelectedStakeholders] = useState<number[]>(document.stakeHolders.map(stakeholder => stakeholder.id));
+    const [selectedStakeholders, setSelectedStakeholders] = useState<Stakeholder[]>(document.stakeHolders);
     const [scale, setScale] = useState(document.scale);
     const [issuanceDate, setIssuanceDate] = useState(document.issuanceDate);
     const [type, setType] = useState(document.type);
@@ -309,14 +309,16 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
     const [showAlert, setShowAlert] = useState(false); // alert state
 
     const toggleSelect = (option: Stakeholder) => {
-        setSelectedStakeholders((prevSelectedStakeholders) => {
-            const newSelectedStakeholders = prevSelectedStakeholders.includes(option.id)
-                ? prevSelectedStakeholders.filter((item) => item !== option.id) // Remove the ID
-                : [...prevSelectedStakeholders, option.id]; // Add the ID
+      setSelectedStakeholders((prevSelectedStakeholders) => {
+        const isSelected = prevSelectedStakeholders.some((item) => item.id === option.id); // Check if the stakeholder is already selected
+        
+        const newSelectedStakeholders = isSelected
+            ? prevSelectedStakeholders.filter((item) => item.id !== option.id) // Remove by ID
+            : [...prevSelectedStakeholders, option]; // Add by ID
 
-            console.log('Updated Stakeholders:', newSelectedStakeholders); // Log the new state
-            return newSelectedStakeholders; // Return the new state
-        });
+        console.log('Updated Stakeholders:', newSelectedStakeholders); // Log the new state
+        return newSelectedStakeholders; // Return the new state
+    });
     };
 
     const handleSubmit = async () => {
@@ -327,13 +329,13 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
             setShowAlert(true);
             return;
         }
-        const sh: Stakeholder[] = stakeholders.filter(stakeholder =>
-            selectedStakeholders.includes(stakeholder.id)
-        );
+        // const sh: Stakeholder[] = stakeholders.filter(stakeholder =>
+        //     selectedStakeholders.includes(stakeholder.id)
+        // );
         // API call to edit a document
         const doc: Document = await API.editDocument(document.id, title, selectedStakeholders, scale, issuanceDate, type, language, pages,  description).then();
         console.log(doc)
-        doc.stakeHolders = sh;
+        //doc.stakeHolders = sh;
         refreshSelectedDocument(doc);
         onHide();
     };
@@ -411,7 +413,7 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                                                 <Dropdown.Item
                                                     key={index}
                                                     onClick={() => toggleSelect(option)}
-                                                    active={selectedStakeholders.includes(option.id)}
+                                                    active={selectedStakeholders.some(stakeholder => stakeholder.id === option.id)}
                                                 >
                                                     {option.name}
                                                 </Dropdown.Item>

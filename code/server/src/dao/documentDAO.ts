@@ -17,7 +17,7 @@ class DocumentDAO {
      * @param description The description of the document to add.
      * @returns A Promise that resolves when the document has been added.
      */
-    addDocument(title: string, stakeHolders: number[], scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string): Promise<Document> {
+    addDocument(title: string, stakeHolders: Stakeholder[], scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string): Promise<Document> {
         return new Promise<Document>((resolve, reject) => {
             try {
                 // Step 1: Insert the document
@@ -32,9 +32,9 @@ class DocumentDAO {
     
                     // Step 2: Insert entries into stakeholders_documents table
                     const stakeholderSql = "INSERT INTO stakeholders_documents(id_document, id_stakeholder) VALUES(?, ?)";
-                    const stakeholderInserts = stakeHolders.map(stakeHolderId => 
+                    const stakeholderInserts = stakeHolders.map(stakeHolder => 
                         new Promise<void>((resolveInsert, rejectInsert) => {
-                            db.run(stakeholderSql, [documentId, stakeHolderId], (err: Error | null) => {
+                            db.run(stakeholderSql, [documentId, stakeHolder.id], (err: Error | null) => {
                                 if (err) {
                                     rejectInsert(err);
                                 } else {
@@ -44,7 +44,7 @@ class DocumentDAO {
                         })
                     );
 
-                    const doc = new Document(documentId, title, [], scale, issuanceDate, type, language, pages, description);
+                    const doc = new Document(documentId, title, stakeHolders, scale, issuanceDate, type, language, pages, description);
     
                     // Step 3: Wait for all stakeholder insertions to complete
                     Promise.all(stakeholderInserts)
@@ -197,7 +197,7 @@ class DocumentDAO {
      * @param description The description of the document to update.
      * @returns A Promise that resolves when the document has been updated.
      */
-    editDocument(id: number,title: string,stakeHolders: number[],scale: string,issuanceDate: string,type: string,language: string | null,pages: string | null,description: string
+    editDocument(id: number,title: string,stakeHolders: Stakeholder[],scale: string,issuanceDate: string,type: string,language: string | null,pages: string | null,description: string
     ): Promise<Document> {
         return new Promise<Document>((resolve, reject) => {
             const updateDocumentSql = "UPDATE documents SET title = ?, scale = ?, issuance_date = ?, type = ?, language = ?, pages = ?, description = ? WHERE id = ?";
@@ -227,9 +227,9 @@ class DocumentDAO {
     
                     // Step 2: Insert new stakeholder associations
                     const insertStakeholderSql = "INSERT INTO stakeholders_documents (id_document, id_stakeholder) VALUES (?, ?)";
-                    const stakeholderInserts = stakeHolders.map(stakeholderId =>
+                    const stakeholderInserts = stakeHolders.map(stakeholder =>
                         new Promise<void>((resolveInsert, rejectInsert) => {
-                            db.run(insertStakeholderSql, [id, stakeholderId], (insertErr: Error | null) => {
+                            db.run(insertStakeholderSql, [id, stakeholder.id], (insertErr: Error | null) => {
                                 if (insertErr) {
                                     rejectInsert(insertErr);
                                 } else {
@@ -239,7 +239,7 @@ class DocumentDAO {
                         })
                     );
 
-                    const doc = new Document(id, title, [], scale, issuanceDate, type, language, pages, description);
+                    const doc = new Document(id, title, stakeHolders, scale, issuanceDate, type, language, pages, description);
     
                     // Step 3: Wait for all stakeholder insertions to complete
                     Promise.all(stakeholderInserts)
