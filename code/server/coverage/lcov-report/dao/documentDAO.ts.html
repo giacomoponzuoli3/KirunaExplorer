@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>174/174</span>
+                <span class='fraction'>175/175</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>166/166</span>
+                <span class='fraction'>168/168</span>
             </div>
         
             
@@ -511,7 +511,12 @@
 <a name='L446'></a><a href='#L446'>446</a>
 <a name='L447'></a><a href='#L447'>447</a>
 <a name='L448'></a><a href='#L448'>448</a>
-<a name='L449'></a><a href='#L449'>449</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
@@ -557,6 +562,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -681,6 +688,8 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -725,13 +734,11 @@
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -749,6 +756,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
@@ -767,6 +776,8 @@
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">12x</span>
@@ -790,7 +801,6 @@
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">6x</span>
@@ -969,7 +979,7 @@ class DocumentDAO {
     /**
      * Adds a document to the database.
      * @param title The title of the document to add.
-     * @param stakeHolders The stake holders of the document to add.
+     * @param stakeHolders The stakeholders of the document to add.
      * @param scale The scale of the document to add.
      * @param issuanceDate The issuance date of the document to add.
      * @param type The type of the document to add.
@@ -978,8 +988,8 @@ class DocumentDAO {
      * @param description The description of the document to add.
      * @returns A Promise that resolves when the document has been added.
      */
-    addDocument(title: string, stakeHolders: number[], scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string|null): Promise&lt;void&gt; {
-        return new Promise&lt;void&gt;((resolve, reject) =&gt; {
+    addDocument(title: string, stakeHolders: Stakeholder[], scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string): Promise&lt;Document&gt; {
+        return new Promise&lt;Document&gt;((resolve, reject) =&gt; {
             try {
                 // Step 1: Insert the document
                 const sql = "INSERT INTO documents(title, scale, issuance_date, type, language, pages, description) VALUES(?, ?, ?, ?, ?, ?, ?)";
@@ -993,9 +1003,9 @@ class DocumentDAO {
     
                     // Step 2: Insert entries into stakeholders_documents table
                     const stakeholderSql = "INSERT INTO stakeholders_documents(id_document, id_stakeholder) VALUES(?, ?)";
-                    const stakeholderInserts = stakeHolders.map(stakeHolderId =&gt; 
+                    const stakeholderInserts = stakeHolders.map(stakeHolder =&gt; 
                         new Promise&lt;void&gt;((resolveInsert, rejectInsert) =&gt; {
-                            db.run(stakeholderSql, [documentId, stakeHolderId], (err: Error | null) =&gt; {
+                            db.run(stakeholderSql, [documentId, stakeHolder.id], (err: Error | null) =&gt; {
                                 if (err) {
                                     rejectInsert(err);
                                 } else {
@@ -1004,10 +1014,12 @@ class DocumentDAO {
                             });
                         })
                     );
+&nbsp;
+                    const doc = new Document(documentId, title, stakeHolders, scale, issuanceDate, type, language, pages, description);
     
                     // Step 3: Wait for all stakeholder insertions to complete
                     Promise.all(stakeholderInserts)
-                        .then(() =&gt; resolve())
+                        .then(() =&gt; resolve(doc))
                         .catch(error =&gt; reject(error));
                 });
             } catch (error) {
@@ -1080,7 +1092,7 @@ class DocumentDAO {
                         return;
                     }
                     if (!rows || rows.length === 0) {
-                        reject(new Error("No documents found."));
+                        resolve([]);
                         return;
                     }
     
@@ -1129,6 +1141,8 @@ class DocumentDAO {
                 const sql = "DELETE FROM documents WHERE id = ?";
                 db.run(sql, [id], (err: Error | null) =&gt; {
                     if (err) {
+                        console.log("entrato");
+                        console.log(err);
                         reject(err);
                         return;
                     }
@@ -1145,7 +1159,7 @@ class DocumentDAO {
      * Edits a document in the database.
      * @param id The id of the document to edit.
      * @param title The title of the document to update.
-     * @param stakeHolders The stake holders of the document to update.
+     * @param stakeHolders The stakeholders of the document to update.
      * @param scale The scale of the document to update.
      * @param issuanceDate The issuance date of the document to update.
      * @param type The type of the document to update.
@@ -1154,9 +1168,9 @@ class DocumentDAO {
      * @param description The description of the document to update.
      * @returns A Promise that resolves when the document has been updated.
      */
-    editDocument(id: number,title: string,stakeHolders: number[],scale: string,issuanceDate: string,type: string,language: string | null,pages: string | null,description: string | null
-    ): Promise&lt;void&gt; {
-        return new Promise&lt;void&gt;((resolve, reject) =&gt; {
+    editDocument(id: number,title: string,stakeHolders: Stakeholder[],scale: string,issuanceDate: string,type: string,language: string | null,pages: string | null,description: string
+    ): Promise&lt;Document&gt; {
+        return new Promise&lt;Document&gt;((resolve, reject) =&gt; {
             const updateDocumentSql = "UPDATE documents SET title = ?, scale = ?, issuance_date = ?, type = ?, language = ?, pages = ?, description = ? WHERE id = ?";
             const values = [
                 title,
@@ -1171,7 +1185,6 @@ class DocumentDAO {
     
             db.run(updateDocumentSql, values, (err: Error | null) =&gt; {
                 if (err) {
-                    console.log(err);
                     reject(err);
                     return;
                 }
@@ -1179,16 +1192,15 @@ class DocumentDAO {
                 const deleteStakeholdersSql = "DELETE FROM stakeholders_documents WHERE id_document = ?";
                 db.run(deleteStakeholdersSql, [id], (deleteErr: Error | null) =&gt; {
                     if (deleteErr) {
-                        console.log(deleteErr);
                         reject(deleteErr);
                         return;
                     }
     
                     // Step 2: Insert new stakeholder associations
                     const insertStakeholderSql = "INSERT INTO stakeholders_documents (id_document, id_stakeholder) VALUES (?, ?)";
-                    const stakeholderInserts = stakeHolders.map(stakeholderId =&gt;
+                    const stakeholderInserts = stakeHolders.map(stakeholder =&gt;
                         new Promise&lt;void&gt;((resolveInsert, rejectInsert) =&gt; {
-                            db.run(insertStakeholderSql, [id, stakeholderId], (insertErr: Error | null) =&gt; {
+                            db.run(insertStakeholderSql, [id, stakeholder.id], (insertErr: Error | null) =&gt; {
                                 if (insertErr) {
                                     rejectInsert(insertErr);
                                 } else {
@@ -1197,10 +1209,12 @@ class DocumentDAO {
                             });
                         })
                     );
+&nbsp;
+                    const doc = new Document(id, title, stakeHolders, scale, issuanceDate, type, language, pages, description);
     
                     // Step 3: Wait for all stakeholder insertions to complete
                     Promise.all(stakeholderInserts)
-                        .then(() =&gt; resolve())
+                        .then(() =&gt; resolve(doc))
                         .catch(error =&gt; reject(error));
                 });
             });
@@ -1214,7 +1228,9 @@ class DocumentDAO {
                 
                 db.all(sql, [id, id], (err: Error | null, rows: any[]) =&gt; {
                     if (err) return reject(err);
-                    if (!rows || rows.length === 0) return reject(new Error("No links found."));
+                    if (!rows || rows.length === 0) {
+                        return resolve([]);
+                    }
 &nbsp;
                     // Estrarre una lista di documenti correlati con i rispettivi link_name
                     const relatedDocs = rows.map(row =&gt; ({
@@ -1238,7 +1254,6 @@ class DocumentDAO {
                                 db.all(sqlStakeholders, [docId], (err: Error | null, stakeholderRows: any[]) =&gt; {
                                     if (err) return rejectDoc(err);
 &nbsp;
-                                    console.log("entrato");
                                     // Creiamo la lista degli stakeholder
                                     const stakeholders = stakeholderRows ? stakeholderRows.map(stakeholderRow =&gt;
                                         new Stakeholder(stakeholderRow.id_stakeholder, stakeholderRow.name, stakeholderRow.category)
@@ -1305,7 +1320,7 @@ class DocumentDAO {
      /**
      * Retrieves the description of a document by its id from the database.
      * @param id The id of the document to retrieve.
-     * @returns A Promise that resolves to the the description of document with the specified id.
+     * @returns A Promise that resolves to the description of document with the specified id.
      */
 &nbsp;
     getDocumentDescriptionById(id: number): Promise&lt;string | null&gt; {
@@ -1332,7 +1347,7 @@ class DocumentDAO {
     /**
      * Retrieves the issuanceDate of a document by its id from the database.
      * @param id The id of the document to retrieve.
-     * @returns A Promise that resolves to the the issuanceDate of document with the specified id.
+     * @returns A Promise that resolves to the issuanceDate of document with the specified id.
      */
 &nbsp;
     getDocumentIssuanceDateById(id: number): Promise&lt;string&gt; {
@@ -1414,7 +1429,7 @@ export {DocumentDAO}</pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-11-05T16:48:36.545Z
+                at 2024-11-10T12:37:14.994Z
             </div>
         <script src="../prettify.js"></script>
         <script>

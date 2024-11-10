@@ -26,10 +26,12 @@ describe('documentController', () => {
     describe('addDocument', () => {
         test('It should successfully add a document', async () => {
 
-            jest.spyOn(dao, 'addDocument').mockResolvedValue(undefined)
+            jest.spyOn(dao, 'addDocument').mockResolvedValue(testDocument)
 
-            await expect(controller.addDocument("title", [1, 2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toBeUndefined();
-            expect(dao.addDocument).toHaveBeenCalledWith("title", [1, 2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
+            await expect(controller.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toBe(
+                testDocument
+            );
+            expect(dao.addDocument).toHaveBeenCalledWith("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
 
         });
 
@@ -37,16 +39,16 @@ describe('documentController', () => {
 
             jest.spyOn(dao, 'addDocument').mockRejectedValue('Document insertion error');
 
-            await expect(controller.addDocument("title", [1, 2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).rejects.toEqual('Document insertion error');
-            expect(dao.addDocument).toHaveBeenCalledWith("title", [1, 2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
+            await expect(controller.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).rejects.toEqual('Document insertion error');
+            expect(dao.addDocument).toHaveBeenCalledWith("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
         });
 
         test('It should reject if there is an error in first stakeholder insertion', async () => {
 
             jest.spyOn(dao, 'addDocument').mockRejectedValue('First stakeholder insertion error');
 
-            await expect(controller.addDocument("title", [1, 2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).rejects.toEqual('First stakeholder insertion error');
-            expect(dao.addDocument).toHaveBeenCalledWith("title", [1, 2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
+            await expect(controller.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).rejects.toEqual('First stakeholder insertion error');
+            expect(dao.addDocument).toHaveBeenCalledWith("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
 
         });
 
@@ -54,8 +56,8 @@ describe('documentController', () => {
 
             jest.spyOn(dao, 'addDocument').mockRejectedValue('Second stakeholder insertion error');
 
-            await expect(controller.addDocument("title", [1, 2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).rejects.toEqual('Second stakeholder insertion error');
-            expect(dao.addDocument).toHaveBeenCalledWith("title", [1, 2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
+            await expect(controller.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).rejects.toEqual('Second stakeholder insertion error');
+            expect(dao.addDocument).toHaveBeenCalledWith("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
 
         });
 
@@ -63,8 +65,8 @@ describe('documentController', () => {
 
             jest.spyOn(dao, 'addDocument').mockRejectedValue('Unexpected error');
 
-            await expect(controller.addDocument("title", [1, 2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).rejects.toEqual(`Unexpected error`);
-            expect(dao.addDocument).toHaveBeenCalledWith("title", [1, 2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
+            await expect(controller.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).rejects.toEqual(`Unexpected error`);
+            expect(dao.addDocument).toHaveBeenCalledWith("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
 
         });
     });
@@ -164,48 +166,50 @@ describe('documentController', () => {
     describe('editDocument', () => {
         test('It should successfully edit a document with the specified id and informations', async () => {
 
-            jest.spyOn(dao, 'editDocument').mockResolvedValue(undefined);;
+            jest.spyOn(dao, 'editDocument').mockResolvedValue(testDocument);;
 
-            await expect(controller.editDocument(testId, "", [1, 2], "", "", "", "", "", "")).resolves.toBeUndefined();
-            expect(dao.editDocument).toBeCalledWith(testId, "", [1, 2], "", "", "", "", "", "");
+            await expect(controller.editDocument(testId, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toBe(
+                testDocument
+            );
+            expect(dao.editDocument).toBeCalledWith(testId, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
 
         });
 
         test('It should reject if there is an error in document update', async () => {
             jest.spyOn(dao, 'editDocument').mockRejectedValue("Update Error");
 
-            await expect(controller.editDocument(testId, "", [1, 2], "", "", "", "", "", "")).rejects.toEqual("Update Error");
-            expect(dao.editDocument).toBeCalledWith(testId, "", [1, 2], "", "", "", "", "", "");
+            await expect(controller.editDocument(testId, "", [testStakeholder1, testStakeholder2], "", "", "", "", "", "")).rejects.toEqual("Update Error");
+            expect(dao.editDocument).toBeCalledWith(testId, "", [testStakeholder1, testStakeholder2], "", "", "", "", "", "");
             
         });
 
         test('It should reject if there is an error in document delete', async () => {
             jest.spyOn(dao, 'editDocument').mockRejectedValue("Delete Error");
 
-            await expect(controller.editDocument(testId, "", [1, 2], "", "", "", "", "", "")).rejects.toEqual("Delete Error");
-            expect(dao.editDocument).toBeCalledWith(testId, "", [1, 2], "", "", "", "", "", "");
+            await expect(controller.editDocument(testId, "", [testStakeholder1, testStakeholder2], "", "", "", "", "", "")).rejects.toEqual("Delete Error");
+            expect(dao.editDocument).toBeCalledWith(testId, "", [testStakeholder1, testStakeholder2], "", "", "", "", "", "");
 
         });
 
         test('It should reject if there is an error in first stakeholder insertion', async () => {
             jest.spyOn(dao, 'editDocument').mockRejectedValue('First stakeholder insertion error');
 
-            await expect(controller.editDocument(testId, "", [1, 2], "", "", "", "", "", "")).rejects.toEqual('First stakeholder insertion error');
-            expect(dao.editDocument).toBeCalledWith(testId, "", [1, 2], "", "", "", "", "", "");
+            await expect(controller.editDocument(testId, "", [testStakeholder1, testStakeholder2], "", "", "", "", "", "")).rejects.toEqual('First stakeholder insertion error');
+            expect(dao.editDocument).toBeCalledWith(testId, "", [testStakeholder1, testStakeholder2], "", "", "", "", "", "");
         });
 
         test('It should reject if there is an error in second stakeholder insertion', async () => {
             jest.spyOn(dao, 'editDocument').mockRejectedValue('Second stakeholder insertion error');
 
-            await expect(controller.editDocument(testId, "", [1, 2], "", "", "", "", "", "")).rejects.toEqual('Second stakeholder insertion error');
-            expect(dao.editDocument).toBeCalledWith(testId, "", [1, 2], "", "", "", "", "", "");
+            await expect(controller.editDocument(testId, "", [testStakeholder1, testStakeholder2], "", "", "", "", "", "")).rejects.toEqual('Second stakeholder insertion error');
+            expect(dao.editDocument).toBeCalledWith(testId, "", [testStakeholder1, testStakeholder2], "", "", "", "", "", "");
         });
 
         test("It should reject with error if an unexpected error occurs", async () => {
             jest.spyOn(dao, 'editDocument').mockRejectedValue("Unexpected error");
 
-            await expect(controller.editDocument(testId, "", [1, 2], "", "", "", "", "", "")).rejects.toEqual("Unexpected error");
-            expect(dao.editDocument).toBeCalledWith(testId, "", [1, 2], "", "", "", "", "", "");
+            await expect(controller.editDocument(testId, "", [testStakeholder1, testStakeholder2], "", "", "", "", "", "")).rejects.toEqual("Unexpected error");
+            expect(dao.editDocument).toBeCalledWith(testId, "", [testStakeholder1, testStakeholder2], "", "", "", "", "", "");
 
         });
     });
