@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { Document } from "../models/document";
 import API from "../API/API";
-import { TrashIcon, PlusIcon, FaceFrownIcon, PencilIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, PlusIcon, FaceFrownIcon, PencilIcon,ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
 import Alert from "./Alert";
 import ConfirmModal from './ConfirmModal';
 import { AddLinkModal } from "./AddLinkModal";
@@ -87,6 +87,36 @@ function LinksDocument(props: any) {
     //loading
     const [loading, setLoading] = useState(true);  // stato di caricamento
 
+    const [currentPage, setCurrentPage] = useState(1);  // Track the current page
+    const [paginatedLinks, setPaginatedLinks] = useState<DocLink[]>([]);
+    const itemsPerPage = 4; // Number of items to show per page
+
+    // Calculate total pages
+    const totalPages = Math.ceil(documentLinks.length / itemsPerPage);
+
+
+    // Handle pagination button clicks
+    const handleNextPage = () => {
+     if (currentPage < totalPages) {
+       console.log(paginatedLinks)
+       setPaginatedLinks(documentLinks.slice(
+        (currentPage) * itemsPerPage, 
+        (currentPage + 1) * itemsPerPage
+      ))
+       setCurrentPage(currentPage + 1);
+     }
+    };
+
+    const handlePrevPage = () => {
+     if (currentPage > 1) {
+      setPaginatedLinks(documentLinks.slice(
+        (currentPage - 2) * itemsPerPage, 
+        (currentPage - 1) * itemsPerPage
+      ))
+       setCurrentPage(currentPage - 1);
+     }
+    };
+
     const handleDelete = async () => {
         if (document && documentToDelete && linkToDelete) {
             await API.deleteLink(document.id , documentToDelete, linkToDelete);
@@ -132,6 +162,10 @@ function LinksDocument(props: any) {
                 const documentsConnections = await API.getDocumentLinksById(documentId);
         
                 setDocumentLinks(documentsConnections);
+                setPaginatedLinks(documentsConnections.slice(
+                  (currentPage - 1) * itemsPerPage, 
+                  currentPage * itemsPerPage
+                ))
             }catch (err){
                 setShowAlert(true);
             }
@@ -213,7 +247,7 @@ function LinksDocument(props: any) {
                         </tr>
                       </thead>
                       <tbody>
-                        {documentLinks.map((doc, index) => (
+                        {paginatedLinks.map((doc, index) => (
                           <tr key={index} className="border-b hover:bg-gray-50 transition duration-200 ease-in-out">
                             <td className="p-4">{getDocumentIcon(doc.type)}</td>
                             <td className="p-4">{doc.title}</td>
@@ -240,7 +274,7 @@ function LinksDocument(props: any) {
           
                   {/* Card view visibile solo su schermi piccoli */}
                   <div className="block lg:hidden">
-                    {documentLinks.map((doc, index) => (
+                    {paginatedLinks.map((doc, index) => (
                       <div key={index} className="bg-white shadow-md rounded-lg p-4 mb-4">
                         <div className="flex items-center mb-4">
                           <div className="mr-4">{getDocumentIcon(doc.type)}</div>
@@ -272,6 +306,24 @@ function LinksDocument(props: any) {
                       </div>
                     ))}
                   </div>
+                  {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                      <div className="flex justify-center space-x-4 mt-4">
+                       <button onClick={handlePrevPage}
+                         className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                         disabled={currentPage === 1}
+                        >
+                          <ChevronLeftIcon className="h-5 w-5" />
+                        </button>
+                        <span className="text-gray-700 mt-2">Page {currentPage} of {totalPages}</span>
+                        <button onClick={handleNextPage}
+                         className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                         disabled={currentPage === totalPages}
+                        >
+                          <ChevronRightIcon className="h-5 w-5" />
+                        </button>
+                      </div>
+                    )}
                 </>
               )}
           
