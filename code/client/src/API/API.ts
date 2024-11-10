@@ -1,3 +1,5 @@
+import { Stakeholder } from "../models/stakeholder";
+
 const baseURL = "http://localhost:3001/kiruna/"
 
 /** ------------------- Access APIs ------------------------ */
@@ -67,7 +69,7 @@ async function register(username: string, name: string, surname: string, passwor
 }
 
 /** ------------------- Document APIs ------------------------ */
-async function addDocument(title: string, stakeHolders: number[], scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string) {
+async function addDocument(title: string, stakeHolders: Stakeholder[], scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string) {
     let response = await fetch(baseURL + "doc", {
         method: 'POST',
         headers: {
@@ -131,7 +133,7 @@ async function deleteDocument(id: number) {
     }
 }
 
-async function editDocument(id: number, title: string, stakeHolders: number[], scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string) {
+async function editDocument(id: number, title: string, stakeHolders: Stakeholder[], scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string) {
     let response = await fetch(baseURL + "doc/" + id, {
         method: 'PATCH',
         headers: {
