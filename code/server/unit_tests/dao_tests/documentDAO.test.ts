@@ -42,7 +42,9 @@ describe('documentDAO', () => {
                     return {} as Database;
                 });
 
-            await expect(dao.addDocument("title", [1, 2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toBeUndefined();
+            await expect(dao.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(
+                testDocument
+            );
 
             expect(db.run).toHaveBeenNthCalledWith(
                 1,
@@ -82,7 +84,7 @@ describe('documentDAO', () => {
                     return {} as Database;
                 });
 
-            await expect(dao.addDocument("title", [1, 2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).rejects.toThrow(`Document insertion error`);
+            await expect(dao.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).rejects.toThrow(`Document insertion error`);
 
             expect(db.run).toHaveBeenNthCalledWith(
                 1,
@@ -108,7 +110,7 @@ describe('documentDAO', () => {
                     return {} as Database;
                 });
 
-            await expect(dao.addDocument("title", [1, 2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).rejects.toThrow(`First stakeholder insertion error`);
+            await expect(dao.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).rejects.toThrow(`First stakeholder insertion error`);
 
             expect(db.run).toHaveBeenNthCalledWith(
                 1,
@@ -141,7 +143,7 @@ describe('documentDAO', () => {
                     return {} as Database;
                 });
 
-            await expect(dao.addDocument("title", [1, 2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).rejects.toThrow(`Second stakeholder insertion error`);
+            await expect(dao.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).rejects.toThrow(`Second stakeholder insertion error`);
 
             expect(db.run).toHaveBeenNthCalledWith(
                 1,
@@ -172,7 +174,7 @@ describe('documentDAO', () => {
                 throw new Error('Unexpected error');
             });
 
-            await expect(dao.addDocument("title", [1, 2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).rejects.toThrow(`Unexpected error`);
+            await expect(dao.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).rejects.toThrow(`Unexpected error`);
         });
     });
 
@@ -312,14 +314,14 @@ describe('documentDAO', () => {
 
         });
 
-        test('It should reject if there is no documents', async () => {
+        test('It should resolve an empty array if there is no documents', async () => {
             jest.spyOn(db, 'all')
                 .mockImplementationOnce((sql, params, callback) => {
                     callback(null, null);
                     return {} as Database;
                 })
 
-            await expect(dao.getAllDocuments()).rejects.toThrow(`No documents found.`);
+            await expect(dao.getAllDocuments()).resolves.toEqual([]);
 
             expect(db.all).toHaveBeenCalledWith(
                 `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id`,
@@ -421,12 +423,14 @@ describe('documentDAO', () => {
                     return {} as Database;
                 });
 
-            await expect(dao.editDocument(testId, "", [1, 2], "", "", "", "", "", "")).resolves.toBeUndefined();
+            await expect(dao.editDocument(testId, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(
+                testDocument
+            );
 
             expect(db.run).toHaveBeenNthCalledWith(
                 1,
                 'UPDATE documents SET title = ?, scale = ?, issuance_date = ?, type = ?, language = ?, pages = ?, description = ? WHERE id = ?',
-                ["", "", "", "", "", "", "", testId],
+                ["title", "1:1", "2020-10-10", "Informative document", "English", "300", "description", testId],
                 expect.any(Function)
             );
 
@@ -470,7 +474,7 @@ describe('documentDAO', () => {
                     return {} as Database;
                 });
 
-            await expect(dao.editDocument(testId, "", [1, 2], "", "", "", "", "", "")).rejects.toThrow("Update Error");
+            await expect(dao.editDocument(testId, "", [testStakeholder1, testStakeholder2], "", "", "", "", "", "")).rejects.toThrow("Update Error");
 
             expect(db.run).toHaveBeenNthCalledWith(
                 1,
@@ -499,7 +503,7 @@ describe('documentDAO', () => {
                     return {} as Database;
                 });
 
-            await expect(dao.editDocument(testId, "", [1, 2], "", "", "", "", "", "")).rejects.toThrow("Delete Error");
+            await expect(dao.editDocument(testId, "", [testStakeholder1, testStakeholder2], "", "", "", "", "", "")).rejects.toThrow("Delete Error");
 
             expect(db.run).toHaveBeenNthCalledWith(
                 1,
@@ -536,7 +540,7 @@ describe('documentDAO', () => {
                     return {} as Database;
                 });
 
-            await expect(dao.editDocument(testId, "", [1, 2], "", "", "", "", "", "")).rejects.toThrow("First stakeholder insertion error");
+            await expect(dao.editDocument(testId, "", [testStakeholder1, testStakeholder2], "", "", "", "", "", "")).rejects.toThrow("First stakeholder insertion error");
 
             expect(db.run).toHaveBeenNthCalledWith(
                 1,
@@ -579,7 +583,7 @@ describe('documentDAO', () => {
                     return {} as Database;
                 });
 
-            await expect(dao.editDocument(testId, "", [1, 2], "", "", "", "", "", "")).rejects.toThrow("Second stakeholder insertion error");
+            await expect(dao.editDocument(testId, "", [testStakeholder1, testStakeholder2], "", "", "", "", "", "")).rejects.toThrow("Second stakeholder insertion error");
 
             expect(db.run).toHaveBeenNthCalledWith(
                 1,
@@ -617,7 +621,7 @@ describe('documentDAO', () => {
                 throw unexpectedError;
             });
 
-            await expect(dao.editDocument(testId, "", [1, 2], "", "", "", "", "", "")).rejects.toThrow("Unexpected error");
+            await expect(dao.editDocument(testId, "", [testStakeholder1, testStakeholder2], "", "", "", "", "", "")).rejects.toThrow("Unexpected error");
         });
     });
 

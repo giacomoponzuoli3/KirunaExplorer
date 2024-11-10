@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for server/src/routes.ts</title>
+    <title>Code coverage report for controllers/linkController.ts</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../prettify.css" />
-    <link rel="stylesheet" href="../../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../../sort-arrow-sprite.png);
+            background-image: url(../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,13 +19,13 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">server/src</a> routes.ts</h1>
+        <h1><a href="../index.html">All files</a> / <a href="index.html">controllers</a> linkController.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">85.71% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>23/23</span>
+                <span class='fraction'>6/7</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">80% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>4/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">85.71% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>23/23</span>
+                <span class='fraction'>6/7</span>
             </div>
         
             
@@ -109,31 +109,21 @@
 <a name='L44'></a><a href='#L44'>44</a>
 <a name='L45'></a><a href='#L45'>45</a>
 <a name='L46'></a><a href='#L46'>46</a>
-<a name='L47'></a><a href='#L47'>47</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -141,83 +131,114 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">import express from "express"
-import ErrorHandler from "./helper"
-import { AuthRoutes } from "./routers/AuthRoutes"
-import Authenticator from "./routers/auth"
-import { DocumentRoutes } from "./routers/documentRoutes"
-import LinkRoutes from "./routers/linkRoutes"
-import { StakeholderRoutes } from "./routers/stakeholderRoutes"
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">import { LinkDAO } from "../dao/linkDAO";
+import Link from "../models/link";
 &nbsp;
+class LinkController {
+    private dao: LinkDAO;
 &nbsp;
-const morgan = require("morgan")
-const prefix = "/kiruna"
-&nbsp;
-/**
- * Initializes the routes for the application.
- * 
- * @remarks
- * This function sets up the routes for the application.
- * It defines the routes for the user, authentication, product, and cart resources.
- * 
- * @param {express.Application} app - The express application instance.
- */
-function initRoutes(app: express.Application) {
-    app.use(morgan("dev")) // Log requests to the console
-    app.use(express.json({ limit: "25mb" }))
-    app.use(express.urlencoded({ limit: '25mb', extended: true }))
+    constructor() {
+        this.dao = new LinkDAO();
+    }
 &nbsp;
     /**
-     * The authenticator object is used to authenticate users.
-     * It is used to protect the routes by requiring users to be logged in.
-     * It is also used to protect routes by requiring users to have the correct role.
-     * All routes must have the authenticator object in order to work properly.
+     * Adds a link to the database.
+     * @param idDoc1 - The ID of the first document.
+     * @param idDoc2 - The ID of the second document.
+     * @param idLink - The ID of the link type.
+     * @returns A Promise that resolves when the link has been added.
      */
-    const authenticator = new Authenticator(app)
-    const authRoutes = new AuthRoutes(authenticator)
-    const docRoutes = new DocumentRoutes(authenticator);
-    const linkRoutes = new LinkRoutes(authenticator);
-    const stakeholderRoutes = new StakeholderRoutes();
+    async <span class="fstat-no" title="function not covered" >addLink(</span>idDoc1: number, idDoc2: number, idLink: number): Promise&lt;void&gt; {
+<span class="cstat-no" title="statement not covered" >        await this.dao.addLink(idDoc1, idDoc2, idLink);</span>
+    }
 &nbsp;
-    app.use(`${prefix}/sessions`, authRoutes.getRouter())
-    app.use(`${prefix}/doc`, docRoutes.getRouter())
-    app.use(`${prefix}/link`, linkRoutes.getRouter())
-    app.use(`${prefix}/stakeholders`, stakeholderRoutes.getRouter())
+    /**
+     * Deletes a link from the database.
+     * @param idDoc1 - The ID of the first document.
+     * @param idDoc2 - The ID of the second document.
+     * @param linkId - The ID of the link type.
+     * @returns A Promise that resolves when the link has been deleted.
+     */
+    async deleteLink(idDoc1: number, idDoc2: number, linkId: number) {
+        await this.dao.deleteLinks(idDoc1, idDoc2, linkId);
+    }
 &nbsp;
-    ErrorHandler.registerErrorHandler(app)
+    /**
+     * Updates a link in the database.
+     * @param idDoc1 - The ID of the first document.
+     * @param idDoc2 - The ID of the second document.
+     * @param oldLinkId - The ID of the old link type.
+     * @param newLinkId - The ID of the new link type.
+     * @returns A Promise that resolves when the link has been updated.
+     */
+    async updateLink(idDoc1: number, idDoc2: number, oldLinkId: number, newLinkId: number) {
+        await this.dao.updateLink(idDoc1, idDoc2, oldLinkId, newLinkId);
+    }
+&nbsp;
+    /**
+     * Retrieves all links from the database.
+     * @returns A Promise that resolves to an array of Link objects.
+     */
+    async getAllLinks(): Promise&lt;Link[]&gt; {
+        return await this.dao.getAllLinks();
+    }
 }
 &nbsp;
-export default initRoutes</pre></td></tr></table></pre>
+export { LinkController }</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-11-10T13:26:59.002Z
+                at 2024-11-10T12:37:14.994Z
             </div>
-        <script src="../../prettify.js"></script>
+        <script src="../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../../sorter.js"></script>
-        <script src="../../block-navigation.js"></script>
+        <script src="../sorter.js"></script>
+        <script src="../block-navigation.js"></script>
     </body>
 </html>
     

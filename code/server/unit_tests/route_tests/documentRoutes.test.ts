@@ -6,6 +6,8 @@ import { DocLink } from "../../src/models/document_link"
 import Link from "../../src/models/link"
 import { app } from "../../index";
 import request from 'supertest';
+import Authenticator from "../../src/routers/auth"
+import { User } from "../../src/models/user"
 
 const baseURL = "/kiruna/doc"
 
@@ -20,6 +22,7 @@ describe('documentRoutes', () => {
     });
 
     const controller = DocumentController.prototype;
+    const u = new User("urban_planner","urban","planner","Urban Planner");
     const testId = 1;
     const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
     const testStakeholder2 = new Stakeholder(2, "Bob", "urban developer");
@@ -33,26 +36,37 @@ describe('documentRoutes', () => {
 
     describe('POST /', () => {
 
-        test('It should register a document and return 200 status', async () => {
-            jest.spyOn(controller, "addDocument").mockResolvedValueOnce(undefined);
 
-            const response = await request(app).post(baseURL+"/")
+        test('It should register a document and return 200 status', async () => {
+
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+            jest.spyOn(controller, "addDocument").mockResolvedValueOnce(testDocument);
+            console.log("pocnav")
+            const response = await request(app).post(baseURL + '/')
             .send({
                 title: "title",
-                stakeHolders: [{ id: 1, name: "John", role: "urban developer" }],
+                stakeHolders: [testStakeholder1, testStakeholder2],
                 scale: "1:1",
                 issuanceDate: "2020-10-10",
                 type: "Informative document",
                 language: "English",
                 pages: "300",
                 description: "description"
-            });
-
+            }).timeout({ deadline: 5000 });
+            console.log("wooo")
             expect(response.status).toBe(200);
-            expect(response.body).toEqual({ message: "Document added successfully" });
+            expect(response.body).toEqual(testDocument);
             expect(controller.addDocument).toHaveBeenCalledWith(
                 "title",
-                [{ id: 1, name: "John", role: "urban developer" }],
+                [testStakeholder1, testStakeholder2],
                 "1:1",
                 "2020-10-10",
                 "Informative document",
@@ -63,6 +77,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if the body is missing', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).post(baseURL+"/")
                 .send({});
             expect(response.status).toBe(422); 
@@ -70,6 +93,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if title is not a string', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).post(baseURL+"/")
             .send({
                 title: 1,
@@ -86,6 +118,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if title is missing', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).post(baseURL+"/")
             .send({
                 title: null,
@@ -102,6 +143,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if stakeHolders is not an array', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).post(baseURL+"/")
             .send({
                 title: "title",
@@ -118,6 +168,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if stakeHolders is missing', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).post(baseURL+"/")
             .send({
                 title: "title",
@@ -134,6 +193,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if scale is not a string', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).post(baseURL+"/")
             .send({
                 title: "title",
@@ -150,6 +218,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if scale is missing', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).post(baseURL+"/")
             .send({
                 title: "title",
@@ -166,6 +243,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if issuanceDate is not a string', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).post(baseURL+"/")
             .send({
                 title: "title",
@@ -182,6 +268,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if issuanceDate is missing', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).post(baseURL+"/")
             .send({
                 title: "title",
@@ -198,6 +293,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if type is not a string', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).post(baseURL+"/")
             .send({
                 title: "title",
@@ -214,6 +318,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if type is missing', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).post(baseURL+"/")
             .send({
                 title: "title",
@@ -230,6 +343,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if language is not a string', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).post(baseURL+"/")
             .send({
                 title: "title",
@@ -246,6 +368,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if pages is not a string', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).post(baseURL+"/")
             .send({
                 title: "title",
@@ -262,6 +393,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if description is not a string', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).post(baseURL+"/")
             .send({
                 title: "title",
@@ -278,6 +418,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 503 if there is an error', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             jest.spyOn(controller, 'addDocument').mockRejectedValueOnce(new Error('Internal Server Error'));
            
             const response = await request(app).post(baseURL+"/")
@@ -368,6 +517,15 @@ describe('documentRoutes', () => {
 
     describe('DELETE /:id', () => {
         test('It should delete the document with the specified id and return 200 status', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             jest.spyOn(controller, "deleteDocument").mockResolvedValueOnce(undefined);
 
             const response = await request(app).delete(baseURL+`/${testId}`);
@@ -379,6 +537,15 @@ describe('documentRoutes', () => {
 
         
         test('It should return 422 status if the param is not numeric', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).delete(baseURL + `/abc`);
 
             expect(response.status).toBe(422);
@@ -386,6 +553,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if the param is null', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).delete(baseURL + `/` + null);
 
             expect(response.status).toBe(422);
@@ -393,6 +569,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 503 if there is an error', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             jest.spyOn(controller, "deleteDocument").mockRejectedValueOnce(new Error('Internal Server Error'));
 
             const response = await request(app).delete(baseURL+`/${testId}`);
@@ -404,12 +589,31 @@ describe('documentRoutes', () => {
 
     describe('PATCH /:id', () => {
         test('It should edit the document with the specified id and return 200 status', async () => {
-            jest.spyOn(controller, "editDocument").mockResolvedValueOnce(undefined);
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+            jest.spyOn(controller, "editDocument").mockResolvedValueOnce({
+                id: testId,
+                title: "title",
+                stakeHolders: [testStakeholder1, testStakeholder2],
+                scale: "1:1",
+                issuanceDate: "2020-10-10",
+                type: "Informative document",
+                language: "English",
+                pages: "300",
+                description: "description"
+            });
 
             const response = await request(app).patch(baseURL+`/${testId}`)
             .send({
                 title: "title",
-                stakeHolders: [{ id: 1, name: "John", role: "urban developer" }],
+                stakeHolders: [testStakeholder1, testStakeholder2],
                 scale: "1:1",
                 issuanceDate: "2020-10-10",
                 type: "Informative document",
@@ -419,11 +623,21 @@ describe('documentRoutes', () => {
             });
 
             expect(response.status).toBe(200);
-            expect(response.body).toEqual({ message: "Document updated successfully" });
+            expect(response.body).toEqual({
+                id: testId,
+                title: "title",
+                stakeHolders: [testStakeholder1, testStakeholder2],
+                scale: "1:1",
+                issuanceDate: "2020-10-10",
+                type: "Informative document",
+                language: "English",
+                pages: "300",
+                description: "description"
+            });
             expect(controller.editDocument).toHaveBeenCalledWith(
                 `${testId}`,
                 "title",
-                [{ id: 1, name: "John", role: "urban developer" }],
+                [testStakeholder1, testStakeholder2],
                 "1:1",
                 "2020-10-10",
                 "Informative document",
@@ -434,6 +648,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if the param is not numeric', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).patch(baseURL + `/abc`);
 
             expect(response.status).toBe(422);
@@ -441,6 +664,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if the param is null', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).patch(baseURL + `/` + null);
 
             expect(response.status).toBe(422);
@@ -448,6 +680,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if the body is missing', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).patch(baseURL+`/${testId}`)
                 .send({});
             expect(response.status).toBe(422); 
@@ -455,6 +696,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if title is not a string', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).patch(baseURL+`/${testId}`)
             .send({
                 title: 1,
@@ -471,6 +721,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if title is missing', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).patch(baseURL+`/${testId}`)
             .send({
                 title: null,
@@ -487,6 +746,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if stakeHolders is not an array', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).patch(baseURL+`/${testId}`)
             .send({
                 title: "title",
@@ -503,6 +771,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if stakeHolders is missing', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).patch(baseURL+`/${testId}`)
             .send({
                 title: "title",
@@ -519,6 +796,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if scale is not a string', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).patch(baseURL+`/${testId}`)
             .send({
                 title: "title",
@@ -535,6 +821,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if scale is missing', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).patch(baseURL+`/${testId}`)
             .send({
                 title: "title",
@@ -551,6 +846,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if issuanceDate is not a string', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).patch(baseURL+`/${testId}`)
             .send({
                 title: "title",
@@ -567,6 +871,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if issuanceDate is missing', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).patch(baseURL+`/${testId}`)
             .send({
                 title: "title",
@@ -583,6 +896,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if type is not a string', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).patch(baseURL+`/${testId}`)
             .send({
                 title: "title",
@@ -599,6 +921,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if type is missing', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).patch(baseURL+`/${testId}`)
             .send({
                 title: "title",
@@ -615,6 +946,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if language is not a string', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).patch(baseURL+`/${testId}`)
             .send({
                 title: "title",
@@ -631,6 +971,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if pages is not a string', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).patch(baseURL+`/${testId}`)
             .send({
                 title: "title",
@@ -647,6 +996,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if description is not a string', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             const response = await request(app).patch(baseURL+`/${testId}`)
             .send({
                 title: "title",
@@ -663,6 +1021,15 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 503 if there is an error', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
             jest.spyOn(controller, 'editDocument').mockRejectedValueOnce(new Error('Internal Server Error'));
            
             const response = await request(app).patch(baseURL+`/${testId}`)

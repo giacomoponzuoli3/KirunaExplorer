@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">42.85% </span>
+                <span class="strong">85.71% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>3/7</span>
+                <span class='fraction'>6/7</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">20% </span>
+                <span class="strong">80% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/5</span>
+                <span class='fraction'>4/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">42.85% </span>
+                <span class="strong">85.71% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>3/7</span>
+                <span class='fraction'>6/7</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -112,25 +112,20 @@
 <a name='L47'></a><a href='#L47'>47</a>
 <a name='L48'></a><a href='#L48'>48</a>
 <a name='L49'></a><a href='#L49'>49</a>
-<a name='L50'></a><a href='#L50'>50</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -149,7 +144,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -157,11 +153,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">import { LinkDAO } from "../dao/linkDAO";
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span></td><td class="text"><pre class="prettyprint lang-js">import { LinkDAO } from "../dao/linkDAO";
 import Link from "../models/link";
 &nbsp;
 class LinkController {
@@ -173,9 +181,9 @@ class LinkController {
 &nbsp;
     /**
      * Adds a link to the database.
-     * @param idDoc1 The ID of the first document.
-     * @param idDoc2 The ID of the second document.
-     * @param name The name of the link to add.
+     * @param idDoc1 - The ID of the first document.
+     * @param idDoc2 - The ID of the second document.
+     * @param idLink - The ID of the link type.
      * @returns A Promise that resolves when the link has been added.
      */
     async <span class="fstat-no" title="function not covered" >addLink(</span>idDoc1: number, idDoc2: number, idLink: number): Promise&lt;void&gt; {
@@ -184,29 +192,33 @@ class LinkController {
 &nbsp;
     /**
      * Deletes a link from the database.
-     * @param linkId The id of the link to delete.
+     * @param idDoc1 - The ID of the first document.
+     * @param idDoc2 - The ID of the second document.
+     * @param linkId - The ID of the link type.
      * @returns A Promise that resolves when the link has been deleted.
      */
-    async <span class="fstat-no" title="function not covered" >deleteLink(</span>idDoc1: number, idDoc2: number, linkId: number) {
-<span class="cstat-no" title="statement not covered" >        await this.dao.deleteLinks(idDoc1, idDoc2, linkId);</span>
+    async deleteLink(idDoc1: number, idDoc2: number, linkId: number) {
+        await this.dao.deleteLinks(idDoc1, idDoc2, linkId);
     }
 &nbsp;
     /**
      * Updates a link in the database.
-     * @param id The id of the link to update.
-     * @param name The new name of the link.
+     * @param idDoc1 - The ID of the first document.
+     * @param idDoc2 - The ID of the second document.
+     * @param oldLinkId - The ID of the old link type.
+     * @param newLinkId - The ID of the new link type.
      * @returns A Promise that resolves when the link has been updated.
      */
-    async <span class="fstat-no" title="function not covered" >updateLink(</span>idDoc1: number, idDoc2: number, oldLinkId: number, newLinkId: number) {
-<span class="cstat-no" title="statement not covered" >        await this.dao.updateLink(idDoc1, idDoc2, oldLinkId, newLinkId);</span>
+    async updateLink(idDoc1: number, idDoc2: number, oldLinkId: number, newLinkId: number) {
+        await this.dao.updateLink(idDoc1, idDoc2, oldLinkId, newLinkId);
     }
 &nbsp;
     /**
      * Retrieves all links from the database.
      * @returns A Promise that resolves to an array of Link objects.
      */
-    async <span class="fstat-no" title="function not covered" >getAllLinks(</span>): Promise&lt;Link[]&gt; {
-<span class="cstat-no" title="statement not covered" >        return await this.dao.getAllLinks();</span>
+    async getAllLinks(): Promise&lt;Link[]&gt; {
+        return await this.dao.getAllLinks();
     }
 }
 &nbsp;
@@ -217,7 +229,7 @@ export { LinkController }</pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-11-05T18:50:14.595Z
+                at 2024-11-10T13:26:59.002Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
