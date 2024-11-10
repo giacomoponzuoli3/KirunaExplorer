@@ -162,16 +162,36 @@ function LinksDocument(props: any) {
                 const documentsConnections = await API.getDocumentLinksById(documentId);
         
                 setDocumentLinks(documentsConnections);
-                setPaginatedLinks(documentsConnections.slice(
-                  (currentPage - 1) * itemsPerPage, 
-                  currentPage * itemsPerPage
-                ))
+                // setPaginatedLinks(documentsConnections.slice(
+                //   (currentPage - 1) * itemsPerPage, 
+                //   currentPage * itemsPerPage
+                // ))
             }catch (err){
                 setShowAlert(true);
             }
         };
         getDocuments().then();
     }, [idDocument]);
+
+    useEffect(() => {
+      // Check if we need to update the current page
+      const isLastPage = totalPages < currentPage;
+  
+      // If the current page is the last page and we're deleting the last link on it, go to the previous page
+      if (isLastPage && currentPage > 1) {
+        setPaginatedLinks(documentLinks.slice(
+          (currentPage - 2) * itemsPerPage, 
+          (currentPage - 1) * itemsPerPage
+        ))
+        setCurrentPage(prevPage => prevPage - 1); // Decrement the page
+      }else{
+        setPaginatedLinks(documentLinks.slice(
+          (currentPage - 1) * itemsPerPage, 
+          currentPage * itemsPerPage
+        ))
+      }
+      
+    }, [documentLinks]);
 
     const confirmDelete = (docId: number, linkId: number) => {
         setDocumentToDelete(docId);
