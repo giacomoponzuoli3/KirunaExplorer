@@ -1,5 +1,5 @@
 import {Button} from "react-bootstrap"
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import API from '../API/API';
 import { Link } from 'react-router-dom';
@@ -10,13 +10,15 @@ import { User } from "../models/user";
 import { useEffect } from "react";
 import { AddDocumentModal, ShowDocumentInfoModal, EditDocumentModal, AddNewDocumentLinksModal } from "./DocumentModals";
 import { Stakeholder } from "../models/stakeholder";
-import { DocLink } from "../models/document_link";
-import { title } from "process";
 import {DocumentLegend} from "./DocumentLegend"
-import { MapContainer, TileLayer, Marker, Popup, useMap,  Marker as LeafletMarker, MarkerProps } from 'react-leaflet';
-import { LatLngExpression, LatLngTuple, LatLngBounds, Icon } from 'leaflet'; // Import del tipo corretto
+
+import { MapContainer, useMap } from 'react-leaflet';
+import { LatLngTuple, LatLngBounds } from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import 'leaflet-draw/dist/leaflet.draw.css';
+import 'leaflet-draw';
+
 
 interface HomepageProps {
     documents: Document[];
@@ -25,10 +27,11 @@ interface HomepageProps {
     stakeholders: Stakeholder[];
 }
 
-// Componente per impostare il centro e il livello di zoom della mappa
-// Funzione per impostare il centro e il livello di zoom
+// Componente per la costruzione dell mappa
 function SetMapView(props: any) {
-  const map = useMap(); // Ottieni l'istanza della mappa
+
+  // Ottieni l'istanza della mappa
+  const map = useMap(); 
 
   // Coordinate di Kiruna, Svezia
   const position: LatLngTuple = [67.8558, 20.2253];
@@ -39,8 +42,62 @@ function SetMapView(props: any) {
     [67.9358, 20.3503]   // Nord-est
   );
 
+  // Definisci l'icona personalizzata per i marker disegnati
+  const customIcon = L.icon({
+    iconUrl: '/kiruna/img/informativeDocument.png', // Percorso dell'icona personalizzata
+    iconSize: [20, 20], // Dimensioni dell'icona
+    iconAnchor: [10, 10], // Punto dell'icona che si allinea alla posizione del marker
+    popupAnchor: [0, -10], // Punto per l'apertura del popup rispetto al marker
+  });
+    
+
+  // Configurazione strumenti di disegno
+  const drawControl = new L.Control.Draw({
+    draw: {
+      marker: {icon: customIcon}, // Abilita l'opzione di aggiungere punti
+      polygon: {
+        shapeOptions: {
+          color: '#3388ff', // Colore del bordo
+          weight: 2,        // Spessore del bordo
+          opacity: 0.8,     // Opacità del bordo
+          fillColor: '#3388ff', // Colore di riempimento
+          fillOpacity: 0.3, // Opacità del riempimento
+          dashArray: '5,5', // Linea tratteggiata (opzionale)
+        },
+      }, // Abilita l'opzione di aggiungere poligoni
+      polyline: false, // Disabilita linee per questo esempio
+      rectangle: false, // Disabilita rettangoli
+      circle: false, // Disabilita cerchi
+      circlemarker: false, // Disabilita marker circolari
+    },
+  });
+
+  // Gestire gli eventi di creazione delle geometrie
+  map.on(L.Draw.Event.CREATED, (event: any) => {
+    const layer = event.layer;
+    
+    if (event.layerType === 'polygon') {
+      layer.editing.disable(); // Disabilita l'editing del poligono
+      layer.options.interactive = false; // Disabilita l'interazione (clic, hover) sul poligono
+      
+      // Ottieni le coordinate del poligono
+      const coordinates = layer.getLatLngs(); // Questo restituirà un array di coordinate
+
+    }
+
+    // Aggiungi il layer creato alla mappa
+    layer.addTo(map);
+  });
+
+  // Configurazione layer satellitare alla mappa
+  const satelliteLayer = L.tileLayer(
+    'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', 
+    { attribution: '&copy; <a href="https://www.opentopomap.org">OpenTopoMap</a>' }
+  );
+
 
   useEffect(() => {
+
     // Impostare la vista iniziale solo al primo rendering
     if (map.getZoom() === undefined) {
       map.setView(position, 12);
@@ -53,14 +110,32 @@ function SetMapView(props: any) {
     // Limita l'area visibile della mappa alla bounding box di Kiruna
     map.setMaxBounds(kirunaBounds);
 
+    //inserisco le opzioni di disegno
+    map.addControl(drawControl);
+
     // Aggiungi il layer satellitare alla mappa
-    const satelliteLayer = L.tileLayer(
-      'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', 
-      { attribution: '&copy; <a href="https://www.opentopomap.org">OpenTopoMap</a>' }
-    );
     satelliteLayer.addTo(map);
 
-    // Creazione e aggiunta di un marker personalizzato
+
+    // Pulizia dei listener e degli elementi aggiunti quando il componente viene smontato
+    return () => {
+      // Rimuovi il controllo di disegno quando il componente viene smontato
+      map.eachLayer((layer) => {
+        if (layer instanceof L.Control.Draw) {
+          map.removeControl(layer); // Rimuove il controllo di disegno
+        }
+      });
+
+      map.eachLayer((layer) => {
+        if (layer !== satelliteLayer) map.removeLayer(layer);
+      });
+    };
+
+  }, [map]); 
+
+  useEffect(() => {
+
+    // Creazione e aggiunta dei marker personalizzati
     props.documents.forEach((doc: any) => {
       const marker = L.marker([doc.coordinates.lat, doc.coordinates.lng], {
         icon: L.divIcon({
@@ -79,15 +154,7 @@ function SetMapView(props: any) {
         props.onMarkerClick(doc);
       });
     });
-
-
-    // Pulizia dei listener e degli elementi aggiunti quando il componente viene smontato
-    return () => {
-      map.eachLayer((layer) => {
-        if (layer !== satelliteLayer) map.removeLayer(layer);
-      });
-    };
-  }, [map, props.documents]); 
+  }, [props.documents])
 
   return null;
 }
@@ -96,11 +163,14 @@ function SetMapView(props: any) {
 function HomePage({documents, user, refreshDocuments, stakeholders} : HomepageProps) {
 
   const [selectedDocument, setSelectedDocument] = useState<any | null>(null);
+  const [newDocument, setNewDocument] = useState<Document | null>(null);
+
+  //modals
   const [showDetails, setShowDetails] = useState<boolean>(false);
   const [showAddDocumentModal, setShowAddDocumentModal] = useState<boolean>(false);
   const [showEditDocumentModal, setShowEditDocumentModal] = useState<boolean>(false);
   const [showAddLinks, setShowAddLinks] = useState<boolean>(false);
-  const [newDocument, setNewDocument] = useState<Document | null>(null);
+  
 
   // Dati di test per i documenti con coordinate all'interno di Kiruna
   const testDocuments = [
