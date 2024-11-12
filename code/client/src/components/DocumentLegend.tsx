@@ -44,7 +44,6 @@ function DocumentLegend() {
         </svg>
       </button>
 
-
       {/* Overlay for closing legend */}
       {isLegendVisible && <div className="fixed inset-0 bg-black opacity-25 z-40"></div>}
 

@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.leaflet-div-icon.leaflet-editing-icon {
+    width: 6px !important;   /* Riduci la larghezza */
+    height: 6px !important;  /* Riduci l'altezza */
+    background-color: #3388ff; /* Cambia colore se vuoi */
+    border-radius: 50%;       /* Rendi i punti circolari */
+    border: 1px solid #ffffff; /* Bordi per una migliore visibilità */
+}
