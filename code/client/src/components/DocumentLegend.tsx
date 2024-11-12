@@ -36,7 +36,7 @@ function DocumentLegend() {
       <button
         id="toggle-button"
         onClick={toggleLegend}
-        className="fixed bottom-4 left-4 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition duration-200"
+        className="fixed bottom-4 left-4 z-[1000] bg-blue-950 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition duration-200"
         aria-label="Toggle Legend"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -52,7 +52,8 @@ function DocumentLegend() {
       {isLegendVisible && (
         <div
           id="legend-box"
-          className="fixed bottom-16 left-4 max-w-sm w-full bg-white rounded-lg shadow-lg p-4 border border-gray-200 z-50 animate-rotate-in"
+          className="fixed bottom-16 left-4 max-w-sm w-full bg-white rounded-lg shadow-lg p-4 border border-gray-200 z-[1000] animate-rotate-in"
+          style={{ zIndex: 1000 }}
         >
           <h3 className="text-center text-lg font-semibold text-gray-800 mb-3">Document Type Legend</h3>
           <div className="space-y-3">
