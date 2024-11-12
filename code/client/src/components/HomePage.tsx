@@ -27,28 +27,12 @@ interface HomepageProps {
 
 // Componente per impostare il centro e il livello di zoom della mappa
 // Funzione per impostare il centro e il livello di zoom
-function SetMapView() {
+function SetMapView(props: any) {
   const map = useMap(); // Ottieni l'istanza della mappa
-  
-  const [zoomLevel, setZoomLevel] = useState(10); // Stato per il livello di zoom
-
-  // Funzione per aggiornare dinamicamente il livello di zoom
-  const handleZoomChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setZoomLevel(Number(event.target.value));
-};
 
   // Coordinate di Kiruna, Svezia
   const position: LatLngTuple = [67.8558, 20.2253];
 
-  // Correzione delle icone di Leaflet
-  const customIcon = new L.Icon({
-    iconUrl: '/kiruna/img/informativeDocument.png',
-    iconSize: [25, 41],  // Dimensioni dell'icona
-    iconAnchor: [12, 41], // Punto di ancoraggio dell'icona
-    popupAnchor: [1, -34], // Punto da cui si apre il popup
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-    shadowSize: [41, 41]  // Dimensioni dell'ombra
-  });
 
   const kirunaBounds = new LatLngBounds(
     [67.7758, 20.1003],  // Sud-ovest
@@ -57,8 +41,10 @@ function SetMapView() {
 
 
   useEffect(() => {
-    // Imposta la vista iniziale una sola volta senza fare reset durante lo zoom
-    map.setView(position, 12);
+    // Impostare la vista iniziale solo al primo rendering
+    if (map.getZoom() === undefined) {
+      map.setView(position, 12);
+    }
 
     // Imposta i limiti di zoom
     map.setMaxZoom(16);
@@ -75,27 +61,33 @@ function SetMapView() {
     satelliteLayer.addTo(map);
 
     // Creazione e aggiunta di un marker personalizzato
-    const marker = L.marker(position, {
-      icon: L.divIcon({
-        html: `
-          <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95">
-            <img src="/kiruna/img/informativeDocument.png" alt="Marker Icon" class="w-5 h-5">
-          </div>
-        `,
-        iconSize: [20, 20],
-        className: '',
-      }),
-    }).addTo(map);
+    props.documents.forEach((doc: any) => {
+      const marker = L.marker([doc.coordinates.lat, doc.coordinates.lng], {
+        icon: L.divIcon({
+          html: `
+            <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95">
+              <img src="/kiruna/img/informativeDocument.png" alt="Marker Icon" class="w-5 h-5">
+            </div>
+          `,
+          iconSize: [20, 20],
+          className: '',
+        }),
+      }).addTo(map);
 
-    // Popup opzionale per il marker
-    marker.bindPopup("<h3 class='font-semibold text-lg text-gray-800'>Informative Document</h3><p class='text-gray-600'>Questo è un marker interattivo.</p>");
+      // Listener per aprire il componente ShowDocumentInfoModal al clic del marker
+      marker.on('click', () => {
+        props.onMarkerClick(doc);
+      });
+    });
+
 
     // Pulizia dei listener e degli elementi aggiunti quando il componente viene smontato
     return () => {
-      map.removeLayer(marker);
-      map.removeLayer(satelliteLayer);
+      map.eachLayer((layer) => {
+        if (layer !== satelliteLayer) map.removeLayer(layer);
+      });
     };
-  }, []); // Dipendenze vuote per assicurarsi che il codice venga eseguito solo una volta al montaggio
+  }, [map, props.documents]); 
 
   return null;
 }
@@ -103,12 +95,101 @@ function SetMapView() {
 
 function HomePage({documents, user, refreshDocuments, stakeholders} : HomepageProps) {
 
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<any | null>(null);
   const [showDetails, setShowDetails] = useState<boolean>(false);
   const [showAddDocumentModal, setShowAddDocumentModal] = useState<boolean>(false);
   const [showEditDocumentModal, setShowEditDocumentModal] = useState<boolean>(false);
   const [showAddLinks, setShowAddLinks] = useState<boolean>(false);
   const [newDocument, setNewDocument] = useState<Document | null>(null);
+
+  // Dati di test per i documenti con coordinate all'interno di Kiruna
+  const testDocuments = [
+    {
+      id: 1,
+      title: "Environmental Impact Assessment",
+      stakeHolders: [{ name: "Kiruna Municipality" }, { name: "LKAB Mining" }],
+      scale: "Citywide",
+      issuanceDate: "2023-04-15",
+      type: "Informative document",
+      language: "English",
+      pages: "25",
+      description: "An assessment of the environmental impact of local mining activities.",
+      coordinates: { lat: 67.8558, lng: 20.2253 },
+    },
+    {
+      id: 2,
+      title: "Urban Development Plan",
+      stakeHolders: [{ name: "City Planning Department" }, { name: "Local Residents Association" }],
+      scale: "Citywide",
+      issuanceDate: "2022-12-05",
+      type: "Design document",
+      language: "Swedish",
+      pages: "30",
+      description: "Plan for urban development in Kiruna considering population relocation.",
+      coordinates: { lat: 67.8580, lng: 20.2400 },
+    },
+    {
+      id: 3,
+      title: "Historical Preservation Report",
+      stakeHolders: [{ name: "Cultural Heritage Agency" }],
+      scale: "Local",
+      issuanceDate: "2021-09-10",
+      type: "Technical document",
+      language: "Swedish",
+      pages: "15",
+      description: "Report on preserving historical buildings in Kiruna.",
+      coordinates: { lat: 67.8520, lng: 20.2150 },
+    },
+    {
+      id: 4,
+      title: "Infrastructure Agreement",
+      stakeHolders: [{ name: "Kiruna Municipality" }, { name: "Swedish Transport Administration" }],
+      scale: "Citywide",
+      issuanceDate: "2020-07-01",
+      type: "Agreement",
+      language: "English",
+      pages: "12",
+      description: "Agreement on the development of new infrastructure in Kiruna.",
+      coordinates: { lat: 67.8600, lng: 20.2350 },
+    },
+    {
+      id: 5,
+      title: "Mining Effects on Local Wildlife",
+      stakeHolders: [{ name: "Environmental Protection Agency" }],
+      scale: "Regional",
+      issuanceDate: "2023-02-20",
+      type: "Prescriptive document",
+      language: "English",
+      pages: "20",
+      description: "Document outlining regulations for protecting wildlife near mining areas.",
+      coordinates: { lat: 67.8590, lng: 20.2200 },
+    },
+    {
+      id: 6,
+      title: "Public Consultation on Relocation",
+      stakeHolders: [{ name: "Local Residents Association" }, { name: "City Council" }],
+      scale: "Community",
+      issuanceDate: "2023-01-18",
+      type: "Consultation",
+      language: "Swedish",
+      pages: "10",
+      description: "Summary of the public consultation regarding relocation plans.",
+      coordinates: { lat: 67.8540, lng: 20.2100 },
+    },
+    {
+      id: 7,
+      title: "Construction Code Update",
+      stakeHolders: [{ name: "Kiruna Municipality" }, { name: "Local Construction Firms" }],
+      scale: "Citywide",
+      issuanceDate: "2022-06-30",
+      type: "Material effect",
+      language: "Swedish",
+      pages: "18",
+      description: "New guidelines for construction standards in the area.",
+      coordinates: { lat: 67.8605, lng: 20.2258 },
+    },
+  ];
+
 
   const handleEdit = () => {
     setShowEditDocumentModal(true);
@@ -119,11 +200,10 @@ function HomePage({documents, user, refreshDocuments, stakeholders} : HomepagePr
       setSelectedDocument(null);
   };
 
-  const handleDocumentClick = async (doc: Document) => {
-      const document = await API.getDocumentById(doc.id);
-      setSelectedDocument(document);
+  const handleDocumentClick = async (doc: any) => {
+      //const document = await API.getDocumentById(doc.id);
+      setSelectedDocument(doc);
       setShowDetails(true);
-
   }
 
   function refreshSelectedDocument(doc: Document) {
@@ -161,8 +241,8 @@ function HomePage({documents, user, refreshDocuments, stakeholders} : HomepagePr
     <MapContainer
       style={{ height: "100vh", width: "100%" }}
     >
-      {/* Impostiamo il centro e il livello di zoom tramite SetMapView */}
-      <SetMapView />
+      {/* Impostiamo il centro, il livello di zoom e i vari documenti tramite SetMapView */}
+      <SetMapView documents={testDocuments} onMarkerClick={handleDocumentClick}/>
 
     </MapContainer>
 
@@ -187,7 +267,7 @@ function HomePage({documents, user, refreshDocuments, stakeholders} : HomepagePr
         alignItems: 'stretch', // Stretch items to match tallest card in each row
         maxWidth: '80%', // Optional: limits width to prevent cards from stretching too wide
       }}>
-        {documents.map((doc, index) => (
+        {testDocuments.map((doc, index) => (
           <div key={index} 
             style={{
             display: 'flex',

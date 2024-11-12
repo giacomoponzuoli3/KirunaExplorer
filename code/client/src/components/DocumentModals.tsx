@@ -564,6 +564,14 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, show, onHide
                                   <p className="text-sm text-gray-600"><strong>Pages:</strong> 
                                       {selectedDocument.pages ? selectedDocument.pages : '-'}
                                   </p>
+                                  {/*
+                                    <p className="text-sm text-gray-600"><strong>Coordinates:</strong> 
+                                        {selectedDocument.coordinates ? selectedDocument.coordinates : '-'}
+                                    </p>
+                                    */
+                                  }
+                                  
+                                  
                               </Col>
                               <Col xs={12} md={7}>
                                   <p><strong>Description:</strong></p>
