@@ -119,6 +119,11 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
 
     const handleSubmit = async () => {
         //API call to georeference the document
+        if(polygon.length === 0 && markerPosition !== null){ 
+          API.setDocumentCoordinates(document.id, markerPosition);
+        } else {
+          API.setDocumentCoordinates(document.id, polygon);
+        }
         console.log(polygon);
         console.log(markerPosition);
         handleClose();
