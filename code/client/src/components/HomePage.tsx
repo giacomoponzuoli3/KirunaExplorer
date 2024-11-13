@@ -226,67 +226,6 @@ function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakehold
     {/* Show the Legend of document types */}
     <DocumentLegend />
 
-    {/* div to show the documents (this will change once the map is implemented) */}
-    <div className="mt-3" 
-      style={{ 
-      display: 'flex',
-      justifyContent: 'center', // Center horizontally
-      alignItems: 'center', // Center vertically
-      paddingTop: '100px',
-      boxSizing: 'border-box'
-    }}>
-      <div className="mt-5" 
-        style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: '16px',
-        justifyContent: 'center', // Center items horizontally within the row
-        alignItems: 'stretch', // Stretch items to match tallest card in each row
-        maxWidth: '80%', // Optional: limits width to prevent cards from stretching too wide
-      }}>
-        {testDocuments.map((doc, index) => (
-          <div key={index} 
-            style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            padding: '8px',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            textAlign: 'center',
-            width: '150px',
-            minHeight: '100%', // Make each card stretch to fill the row
-            boxSizing: 'border-box',
-          }}
-          onClick={() => handleDocumentClick(doc)}
-          >
-            <span style={{
-              marginBottom: '8px',
-              fontSize: '24px',
-            }}>
-              {getDocumentIcon(doc.type)}
-            </span>
-            <span 
-              style={{
-              fontWeight: 'bold',
-              whiteSpace: 'normal',
-              wordWrap: 'break-word',
-              overflowWrap: 'break-word',
-              width: '100%',
-              textOverflow: 'ellipsis',
-              overflow: 'hidden',
-            }}>
-              {doc.title}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-
-
-
-
-
   {/* Modal to show the document info */}
     {selectedDocument && ( 
       <ShowDocumentInfoModal 
