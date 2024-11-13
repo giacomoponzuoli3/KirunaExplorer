@@ -24,6 +24,7 @@ interface HomepageProps {
     documents: Document[];
     user: User;
     refreshDocuments: () => void;
+    getDocumentIcon: (type: string) => JSX.Element | null;
     stakeholders: Stakeholder[];
 }
 
@@ -160,7 +161,7 @@ function SetMapView(props: any) {
 }
 
 
-function HomePage({documents, user, refreshDocuments, stakeholders} : HomepageProps) {
+function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakeholders} : HomepageProps) {
 
   const [selectedDocument, setSelectedDocument] = useState<any | null>(null);
   const [newDocument, setNewDocument] = useState<Document | null>(null);
@@ -170,7 +171,6 @@ function HomePage({documents, user, refreshDocuments, stakeholders} : HomepagePr
   const [showAddDocumentModal, setShowAddDocumentModal] = useState<boolean>(false);
   const [showEditDocumentModal, setShowEditDocumentModal] = useState<boolean>(false);
   const [showAddLinks, setShowAddLinks] = useState<boolean>(false);
-  
 
   // Dati di test per i documenti con coordinate all'interno di Kiruna
   const testDocuments = [
@@ -278,29 +278,6 @@ function HomePage({documents, user, refreshDocuments, stakeholders} : HomepagePr
 
   function refreshSelectedDocument(doc: Document) {
     setSelectedDocument(doc)
-  }
-
-  function getDocumentIcon(type: string) {
-      switch (type) {
-          case 'Informative document':
-            return <img src="/kiruna/img/informativeDocument.png" alt="Informative Document" />;
-          case 'Prescriptive document':
-            return <img src="/kiruna/img/prescriptiveDocument.png" alt="Prescriptive Document" />;
-          case 'Material effect':
-            return <img src="/kiruna/img/construction.png" alt="Material Effect" />;
-          case 'Design document':
-            return <img src="/kiruna/img/designDocument.png" alt="Design Document" />;
-          case 'Technical document':
-            return <img src="/kiruna/img/technicalDocument.png" alt="Technical Document" />;
-          case 'Agreement':
-            return <img src="/kiruna/img/agreement.png" alt="Technical Document" />;
-          case 'Conflict':
-            return <img src="/kiruna/img/conflict.png" alt="Technical Document" />;
-          case 'Consultation':
-            return <img src="/kiruna/img/consultation.png" alt="Technical Document" />;
-          default:
-            return null; // Return null if no matching type
-        }
   }
 
   return (
@@ -446,22 +423,5 @@ function HomePage({documents, user, refreshDocuments, stakeholders} : HomepagePr
   );      
 }
 
-function ButtonHomePage(){
-  const location = useLocation();
-  const isLoginPath = location.pathname === '/';
-  return (
-    <>
-      { !isLoginPath ? (
-        <Link 
-          to={`/`}
-          className="inline-flex  mr-4 items-center gap-2 bg-gray-200 hover:bg-gray-300 text-black rounded-md px-4 py-2 text-sm font-medium no-underline"
-        >
-          <i className="bi bi-house-door-fill"></i> 
-          <span className="hidden md:inline">Back Home</span>
-        </Link>
-      ) : null }
-    </>
-  );
-}
 
-export { HomePage, ButtonHomePage };
+export { HomePage };

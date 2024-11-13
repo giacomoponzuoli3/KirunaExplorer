@@ -54,7 +54,7 @@ interface ShowDocumentInfoModalProps {
   selectedDocument: Document;
   show: boolean;
   onHide: () => void;
-  getDocumentIcon: (type: string) => JSX.Element | null;
+  getDocumentIcon: (type: string, size: number) => JSX.Element | null;
   user: User;
   handleEdit: () => void;
   refreshDocuments: () => void;
@@ -527,7 +527,8 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, show, onHide
                       <div className="hidden md:block">
                           <Row>
                               <Col xs={3} md={2}>
-                                  {getDocumentIcon(selectedDocument.type)}
+                                  {getDocumentIcon(selectedDocument.type, 16)}
+  
                                   {user.role === "Urban Planner" && (
                                       <div className="flex space-x-2 mt-4">
                                           <button
@@ -579,59 +580,7 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, show, onHide
                               </Col>
                           </Row>
                       </div>
-                      
-                      {/* Card view visible only on small screens */}
-                      <div className="block md:hidden">
-                          <div className="bg-white shadow-md rounded-lg p-4 mb-4">
-                              <div className="flex mb-4">
-                                  <div className="mr-4 mt-2">{getDocumentIcon(selectedDocument.type)}</div>
-                                  <div style={{
-                                      whiteSpace: 'normal',
-                                      wordWrap: 'break-word',
-                                      overflowWrap: 'break-word',
-                                      textOverflow: 'ellipsis',
-                                      overflow: 'hidden',
-                                  }}>
-                                      <p className="text-sm text-gray-600"><strong>Stakeholders: </strong> 
-                                          {selectedDocument.stakeHolders.map(sh => sh.name).join(' / ')}
-                                      </p>
-                                      <p className="text-sm text-gray-600"><strong>Scale: </strong> 
-                                          {selectedDocument.scale}
-                                      </p>
-                                      <p className="text-sm text-gray-600"><strong>Issuance Date: </strong> 
-                                          {selectedDocument.issuanceDate}
-                                      </p>
-                                      <p className="text-sm text-gray-600"><strong>Type: </strong> 
-                                          {selectedDocument.type}
-                                      </p>
-                                      <p className="text-sm text-gray-600"><strong>Language: </strong> 
-                                          {selectedDocument.language ? selectedDocument.language : '-'}
-                                      </p>
-                                      <p className="text-sm text-gray-600"><strong>Pages:</strong> 
-                                          {selectedDocument.pages ? selectedDocument.pages : '-'}
-                                      </p>
-                                  </div>
-                              </div>
-                              <div className="mt-2">
-                                  <p className="text-sm text-gray-500"><strong>Description:</strong></p>
-                                  <TruncatedText text={selectedDocument.description ?? 'No description available'} maxLength={100} />
-                              </div>
-                              <div className="mt-4 flex justify-end">
-                                  <button 
-                                      className="p-2 rounded-full border-2 bg-red-400 text-white hover:bg-red-700 transition-colors duration-200"
-                                      onClick={handleDeleteClick}
-                                  >
-                                      <TrashIcon className="h-5 w-5" />
-                                  </button>
-                                  <button
-                                      className="p-2 rounded-full border-2 bg-blue-400 text-white hover:bg-blue-700 transition-colors duration-200"
-                                      onClick={handleEditClick}
-                                  >
-                                      <PencilIcon className="h-5 w-5" />
-                                  </button>
-                              </div>
-                          </div>
-                      </div>
+
                   </Container>
               </Modal.Body>
               <Modal.Footer style={{ backgroundColor: 'rgb(148, 137, 121,0.2)' }}>

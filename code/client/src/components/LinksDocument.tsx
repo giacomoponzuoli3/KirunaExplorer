@@ -42,29 +42,6 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({ text, maxWords }) => {
 };
 
 
-function getDocumentIcon(type: string) {
-  switch (type) {
-      case 'Informative document':
-        return <img src="/kiruna/img/informativeDocument.png" alt="Informative Document" />;
-      case 'Prescriptive document':
-        return <img src="/kiruna/img/prescriptiveDocument.png" alt="Prescriptive Document" />;
-      case 'Material effect':
-        return <img src="/kiruna/img/construction.png" alt="Material Effect" />;
-      case 'Design document':
-        return <img src="/kiruna/img/designDocument.png" alt="Design Document" />;
-      case 'Technical document':
-        return <img src="/kiruna/img/technicalDocument.png" alt="Technical Document" />;
-      case 'Agreement':
-        return <img src="/kiruna/img/agreement.png" alt="Technical Document" />;
-      case 'Conflict':
-        return <img src="/kiruna/img/conflict.png" alt="Technical Document" />;
-      case 'Consultation':
-        return <img src="/kiruna/img/consultation.png" alt="Technical Document" />;
-      default:
-        return null; // Return null if no matching type
-    }
-}
-
 function LinksDocument(props: any) {
     const navigate = useNavigate();
 
@@ -251,7 +228,6 @@ function LinksDocument(props: any) {
                 </div>
               ) : (
                 <>
-                  {/* Tabella visibile solo su schermi grandi */}
                   <div className="hidden lg:block overflow-x-auto">
                     <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
                       <thead>
@@ -269,7 +245,7 @@ function LinksDocument(props: any) {
                       <tbody>
                         {paginatedLinks.map((doc, index) => (
                           <tr key={index} className="border-b hover:bg-gray-50 transition duration-200 ease-in-out">
-                            <td className="p-4">{getDocumentIcon(doc.type)}</td>
+                            <td className="p-4">{props.getDocumentIcon(doc.type, 8)}</td>
                             <td className="p-4">{doc.title}</td>
                             <td className="p-4">{doc.stakeHolders.map(sh => sh.name).join(' / ')}</td>
                             <td className="p-4">
@@ -292,40 +268,6 @@ function LinksDocument(props: any) {
                     </table>
                   </div>
           
-                  {/* Card view visibile solo su schermi piccoli */}
-                  <div className="block lg:hidden">
-                    {paginatedLinks.map((doc, index) => (
-                      <div key={index} className="bg-white shadow-md rounded-lg p-4 mb-4">
-                        <div className="flex items-center mb-4">
-                          <div className="mr-4">{getDocumentIcon(doc.type)}</div>
-                          <div>
-                            <h3 className="text-lg font-semibold">{doc.title}</h3>
-                            <p className="text-sm text-gray-600"><strong>Type of link:</strong> {doc.relatedLink.name}</p>
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500"><strong>Stakeholders:</strong> {doc.stakeHolders.map(sh => sh.name).join(' / ')}</p>
-                        </div>
-                        <div className="mt-2">
-                            <p className="text-sm text-gray-500"><strong>Description:</strong></p>
-                            <TruncatedText text={doc.description ?? 'No description available'} maxWords={20} />
-                        </div>
-                        {props.isLogged && props.user.role == "Urban Planner" && (<>
-                          <div className="mt-4 flex justify-end">
-                            <button className="text-red-500 hover:text-red-700" onClick={() => confirmDelete(doc.id, doc.relatedLink.id)}>
-                              <TrashIcon className="h-5 w-5" />
-                            </button>
-                            <button className="text-blue-500 hover:text-blue-700 ml-2" onClick={() => handleUpdate(doc)}>
-                              <PencilIcon className="h-5 w-5" />
-                            </button>
-                          </div>
-                          
-                          
-                          </>
-                        )}
-                      </div>
-                    ))}
-                  </div>
                   {/* Pagination Controls */}
                     {totalPages > 1 && (
                       <div className="flex justify-center space-x-4 mt-4">
@@ -393,4 +335,4 @@ function LinksDocument(props: any) {
     
 }
 
-export { LinksDocument };
+export { LinksDocument, TruncatedText };
