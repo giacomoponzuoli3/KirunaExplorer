@@ -38,6 +38,23 @@ class CoordinatesRoutes {
                 }
             }
         );
+
+        this.router.post(
+            "/",
+            this.authenticator.isLoggedIn, //error 401
+            this.authenticator.isPlanner, //error 401
+            body("idDoc").isNumeric(),
+            this.errorHandler.validateRequest,
+            (req: any, res: any, next: any) => {
+                try {
+                    this.controller.setDocumentCoordinates(req.body.idDoc, req.body.coordinates)
+                        .then(() => res.status(200).json({ message: "Coordinates added successfully" }))
+                        .catch((err: Error) => next(err))
+                } catch (err) {
+                    next(err)
+                }
+            }
+        )
     }
 }
 
