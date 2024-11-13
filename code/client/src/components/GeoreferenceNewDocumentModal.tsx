@@ -1,4 +1,4 @@
-import {Button, Container, Modal} from "react-bootstrap"
+import {Button, Container, Form, Modal} from "react-bootstrap"
 import { useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import API from '../API/API';
@@ -88,7 +88,10 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
     const [isEnterCoordinatesMode, setIsEnterCoordinatesMode] = useState(false);
     const [polygon, setPolygon] = useState<LatLng[]>([]);
     const [wholeMapPolygon, setWholeMapPolygon] = useState<L.Polygon | null>(null); // Track the whole map polygon
+    const [latitude, setLatitude] = useState('');
+    const [longitude, setLongitude] = useState('');
     const [showAlert, setShowAlert] = useState(false); // alert state
+    const [alertMessage, setAlertMessage] = useState('');
     const drawControlRef = useRef<any>(null);
     const mapRef = useRef<L.Map>(null);
 
@@ -121,26 +124,32 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
         handleClose();
     };
 
+    const clearOtherLayers = () => {
+      mapRef.current?.eachLayer((layer) => { 
+        if ( layer instanceof L.Polygon ||                 //can't only delete layer of instance markers because it intercepts
+            (layer instanceof L.Marker && layer.options.isStandalone) //with some drawing tools and polygon drawing doesn't work then
+        ) {                                                         //that's why we need to add standalone to destinguish them
+            mapRef.current?.removeLayer(layer);
+        }
+      });
+    };
+
     const handleDrawStart = (e: any) => {
       const { layerType } = e;
       
       if ( layerType === 'marker') {
-          mapRef.current?.eachLayer((layer) => {
-              if (layer instanceof L.Marker || layer instanceof L.Polygon) {
-                  mapRef.current?.removeLayer(layer);
-              }
-          });
+          clearOtherLayers();
+          setLatitude('');
+          setLongitude('');
+          setIsEnterCoordinatesMode(false);
           setMarkerPosition(null); // Reset marker position
           setPolygon([]);          // Reset polygon
           setWholeMapPolygon(null);
       }else if(layerType === 'polygon'){
-        mapRef.current?.eachLayer((layer) => { 
-          if ( layer instanceof L.Polygon ||                 //can't only delete layer of instance markers because it intercepts
-            (layer instanceof L.Marker && layer.options.isStandalone) //with some drawing tools and polygon drawing doesn't work then
-          ) {                                                         //that's why we need to add standalone to destinguish them
-              mapRef.current?.removeLayer(layer);
-          }
-        });
+        clearOtherLayers();
+        setLatitude('');
+        setLongitude('');
+        setIsEnterCoordinatesMode(false);
         setMarkerPosition(null); // Reset marker position
         setPolygon([]);          // Reset polygon
         setWholeMapPolygon(null);
@@ -167,12 +176,11 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
     // Function to handle selecting the whole map
     const handleSelectWholeMap = () => {
       if (!mapRef.current) return; // Ensure mapRef.current is not null
-
+      
       // If the whole map polygon is already selected, remove it
       if (wholeMapPolygon) {
         mapRef.current.removeLayer(wholeMapPolygon);
-        setMarkerPosition(null);
-        setPolygon([]);
+        //setPolygon([]);
         setWholeMapPolygon(null); // Update state to reflect no selection
       } else {
         const bounds = mapRef.current.getBounds();
@@ -192,13 +200,8 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
             ]);
 
             // Clear any existing polygons or markers, if needed
-            mapRef.current.eachLayer((layer) => {
-                if (layer instanceof L.Polygon || layer instanceof L.Marker) {
-                    mapRef.current?.removeLayer(layer);
-                }
-            });
+            clearOtherLayers();
 
-            setMarkerPosition(null); // Reset marker position
             // Save the coordinates of the whole map polygon
             setPolygon(newPolygon.getLatLngs()[0] as L.LatLng[]); // First array in LatLngs represents the outer boundary
 
@@ -206,6 +209,44 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
             newPolygon.addTo(mapRef.current);
             setWholeMapPolygon(newPolygon); // Update state to store the polygon
         }
+      }
+    };
+
+    // Handle form submission or Enter key press
+    const handleCoordinatesSubmit = (e: React.FormEvent) => {
+      e.preventDefault(); // Prevent form submission
+      const kirunaBounds = new LatLngBounds(
+        [67.7758, 20.1003],  // Sud-ovest
+        [67.9358, 20.3503]   // Nord-est
+      );
+      if (latitude.trim() !== '' && longitude.trim() !== '') {
+        const lat = parseFloat(latitude);
+        const lng = parseFloat(longitude);
+          
+        if (!isNaN(lat) && !isNaN(lng)) {
+          const newPosition = new L.LatLng(lat, lng);
+
+          // Check if coordinates are within the bounds of Kiruna
+          if (kirunaBounds.contains(newPosition)) {
+            setMarkerPosition(newPosition);
+            // Add the marker to the map (make sure mapRef is defined in your code)
+            if (mapRef.current) {
+                L.marker(newPosition,{isStandalone: true, icon: customIcon}).addTo(mapRef.current);
+                setIsEnterCoordinatesMode(false);
+                setLatitude('');
+                setLongitude('');
+            }
+          } else {
+            setShowAlert(true);
+            setAlertMessage("Coordinates are out of bounds for Kiruna.");
+          }
+        } else {
+          setShowAlert(true);
+          setAlertMessage("Invalid coordinates entered");
+        }
+      }else{
+        setShowAlert(true);
+        setAlertMessage("Please enter coordinates");
       }
     };
 
@@ -219,9 +260,10 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
             <Container>
               {showAlert &&
                 <Alert
-                    message="Please fill in the mandatory fields marked with the red star (*)."
+                    message= {alertMessage}
                     onClose={() => {
-                        setShowAlert(false);
+                      setShowAlert(false);
+                      setAlertMessage('')
                     }}
                 />
               }
@@ -266,6 +308,11 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
                  }}
                     variant={wholeMapPolygon ? "primary" : "secondary"}
                     onClick={() => {
+                       setLatitude('');
+                       setLongitude('');
+                       setPolygon([])
+                       setMarkerPosition(null);
+                       setIsEnterCoordinatesMode(false);
                        handleSelectWholeMap();
                     }}
                 >
@@ -288,27 +335,69 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
                   Selected area: The whole municipality of Kiruna
                  </div>
                 )}
-                {/* A button for the possibility of manually adding coordinates*/}
-                <Button
-                 style={{
-                    position: 'absolute',
-                    top: '235px',  // Adjust based on position under zoom controls
-                    right: '40px', // Adjust for placement on map
-                    zIndex: 1000,
-                    width: '30px',
-                    height: '30px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    
-                 }}
+                <div>
+                  {/* A button for the possibility of manually adding coordinates*/}
+                  <Button title="Enter coordinates"
+                    style={{
+                     position: 'absolute',
+                     top: '235px',  // Adjust based on position under zoom controls
+                     right: '40px', // Adjust for placement on map
+                     zIndex: 1000,
+                     width: '30px',
+                     height: '30px',
+                     display: 'flex',
+                     alignItems: 'center',
+                     justifyContent: 'center',   
+                    }}
                     variant={isEnterCoordinatesMode ? "primary" : "secondary"}
                     onClick={() => {
+                      setLatitude('');
+                      setLongitude('');
+                      setWholeMapPolygon(null)
+                      setPolygon([])
+                      setMarkerPosition(null);
                       setIsEnterCoordinatesMode((prev) => !prev);
+                      clearOtherLayers();
                     }}
-                >
+                  >
                     <i className="bi bi-card-text fs-8"></i>
-                </Button>
+                  </Button>
+                 {/* Coordinates input form */}
+                 {isEnterCoordinatesMode && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '235px',
+                    right: '80px', // Position next to the button
+                    zIndex: 1000,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    backgroundColor: 'white',
+                    padding: '10px',
+                    borderRadius: '5px',
+                    boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+                  }}>
+                    <Form onSubmit={handleCoordinatesSubmit}>
+                      <Form.Group className="mb-2">
+                        <Form.Control
+                          type="text"
+                          placeholder="Latitude"
+                          value={latitude}
+                          onChange={(e) => setLatitude(e.target.value)}
+                        />
+                      </Form.Group>
+                      <Form.Group className="mb-2">
+                          <Form.Control
+                            type="text"
+                            placeholder="Longitude"
+                            value={longitude}
+                            onChange={(e) => setLongitude(e.target.value)}
+                          />
+                      </Form.Group>
+                      <Button type="submit">Place Marker</Button>
+                    </Form>
+                  </div>
+                 )}
+                </div> 
              </Container>
           </Modal.Body>
           <Modal.Footer style={{ backgroundColor: 'rgb(148, 137, 121,0.4)' }}>
