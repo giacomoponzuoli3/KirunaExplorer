@@ -15,7 +15,12 @@ import { EditControl } from 'react-leaflet-draw';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
-
+// Extend the L.MarkerOptions type to include isStandalone
+declare module 'leaflet' {
+  interface MarkerOptions {
+      isStandalone?: boolean;
+  }
+}
 
 function SetMapView() {
     const map = useMap(); // Ottieni l'istanza della mappa
@@ -82,7 +87,6 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
     const [markerPosition, setMarkerPosition] = useState<LatLng | null>(null);
     const [isEnterCoordinatesMode, setIsEnterCoordinatesMode] = useState(false);
     const [polygon, setPolygon] = useState<LatLng[]>([]);
-    const [lastLayer, setLastLayer] = useState<Layer | null>(null);
     const [showAlert, setShowAlert] = useState(false); // alert state
     const drawControlRef = useRef<any>(null);
     const mapRef = useRef<L.Map>(null);
@@ -129,8 +133,10 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
           setPolygon([]);          // Reset polygon
       }else if(layerType === 'polygon'){
         console.log("tuka sun")
-        mapRef.current?.eachLayer((layer) => {
-          if ( layer instanceof L.Polygon) {
+        mapRef.current?.eachLayer((layer) => { 
+          if ( layer instanceof L.Polygon ||                 //can't only delete layer of instance markers because it intercepts
+            (layer instanceof L.Marker && layer.options.isStandalone) //with some drawing tools and polygon drawing doesn't work then
+          ) {                                                         //that's why we need to add standalone to destinguish them
               mapRef.current?.removeLayer(layer);
           }
         });
@@ -141,11 +147,10 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
 
   const handleCreated = (e: any) => {
       const { layerType, layer } = e;
-      setLastLayer(layer); 
 
       if (layerType === 'marker') {
-          const { lat, lng } = layer.getLatLng();
-          setMarkerPosition(new LatLng(lat, lng));
+          layer.options.isStandalone = true;
+          setMarkerPosition(layer.getLatLng());
       } 
       else if (layerType === 'polygon') {
           const latLngs = layer.getLatLngs()[0].map((latLng: L.LatLng) => ({
@@ -189,7 +194,9 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
                        circle: false,
                        circlemarker: false,
                        polygon: true,
-                       marker: {icon: customIcon},
+                       marker: {
+                        icon: customIcon
+                       },
                        polyline: false,
                       }}
                     />
