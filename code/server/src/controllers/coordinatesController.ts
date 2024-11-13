@@ -1,6 +1,11 @@
 import { DocCoordinates } from "../models/document_coordinate";
 import { CoordinatesDAO } from "../dao/coordinatesDAO";
 
+interface LatLng {
+    lat: number;
+    lng: number;
+}
+
 class CoordinatesController {
     private dao: CoordinatesDAO;
 
@@ -15,6 +20,17 @@ class CoordinatesController {
     getAllDocumentsCoordinates(): Promise<DocCoordinates[]> {
         return this.dao.getAllDocumentsCoordinates();
     }
+
+    /**
+     * Sets the coordinates of a document with the given id.
+     * @param id The id of the document to set the coordinates of.
+     * @param coord The coordinates to set, either a single LatLng object or an array of LatLng objects.
+     * @returns A Promise that resolves when the coordinates have been set.
+     */
+    setDocumentCoordinates(id: number, coord: LatLng|LatLng[]): Promise<void> {
+        return this.dao.setDocumentCoordinates(id, coord);
+    }
+
 }
 
 export { CoordinatesController };
