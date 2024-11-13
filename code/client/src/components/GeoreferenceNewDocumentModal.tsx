@@ -87,6 +87,7 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
     const [markerPosition, setMarkerPosition] = useState<LatLng | null>(null);
     const [isEnterCoordinatesMode, setIsEnterCoordinatesMode] = useState(false);
     const [polygon, setPolygon] = useState<LatLng[]>([]);
+    const [wholeMapPolygon, setWholeMapPolygon] = useState<L.Polygon | null>(null); // Track the whole map polygon
     const [showAlert, setShowAlert] = useState(false); // alert state
     const drawControlRef = useRef<any>(null);
     const mapRef = useRef<L.Map>(null);
@@ -103,6 +104,7 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
     const resetForm = () => {
         setMarkerPosition(null);
         setPolygon([]);
+        setWholeMapPolygon(null);
         setShowAlert(false);
     };
 
@@ -121,7 +123,6 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
 
     const handleDrawStart = (e: any) => {
       const { layerType } = e;
-      //console.log(polygon);
       
       if ( layerType === 'marker') {
           mapRef.current?.eachLayer((layer) => {
@@ -131,8 +132,8 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
           });
           setMarkerPosition(null); // Reset marker position
           setPolygon([]);          // Reset polygon
+          setWholeMapPolygon(null);
       }else if(layerType === 'polygon'){
-        console.log("tuka sun")
         mapRef.current?.eachLayer((layer) => { 
           if ( layer instanceof L.Polygon ||                 //can't only delete layer of instance markers because it intercepts
             (layer instanceof L.Marker && layer.options.isStandalone) //with some drawing tools and polygon drawing doesn't work then
@@ -142,10 +143,11 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
         });
         setMarkerPosition(null); // Reset marker position
         setPolygon([]);          // Reset polygon
+        setWholeMapPolygon(null);
       }
     };
 
-  const handleCreated = (e: any) => {
+    const handleCreated = (e: any) => {
       const { layerType, layer } = e;
 
       if (layerType === 'marker') {
@@ -160,7 +162,52 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
           setPolygon(latLngs);
           console.log(latLngs);
         }
-  };
+    };
+
+    // Function to handle selecting the whole map
+    const handleSelectWholeMap = () => {
+      if (!mapRef.current) return; // Ensure mapRef.current is not null
+
+      // If the whole map polygon is already selected, remove it
+      if (wholeMapPolygon) {
+        mapRef.current.removeLayer(wholeMapPolygon);
+        setMarkerPosition(null);
+        setPolygon([]);
+        setWholeMapPolygon(null); // Update state to reflect no selection
+      } else {
+        const bounds = mapRef.current.getBounds();
+        if (bounds) {
+            // Get the corners of the current map view
+            const northWest = bounds.getNorthWest();
+            const northEast = bounds.getNorthEast();
+            const southEast = bounds.getSouthEast();
+            const southWest = bounds.getSouthWest();
+
+            // Define a polygon that covers the map bounds
+            const newPolygon = L.polygon([
+                northWest,
+                northEast,
+                southEast,
+                southWest,
+            ]);
+
+            // Clear any existing polygons or markers, if needed
+            mapRef.current.eachLayer((layer) => {
+                if (layer instanceof L.Polygon || layer instanceof L.Marker) {
+                    mapRef.current?.removeLayer(layer);
+                }
+            });
+
+            setMarkerPosition(null); // Reset marker position
+            // Save the coordinates of the whole map polygon
+            setPolygon(newPolygon.getLatLngs()[0] as L.LatLng[]); // First array in LatLngs represents the outer boundary
+
+            // Add the new polygon to the map
+            newPolygon.addTo(mapRef.current);
+            setWholeMapPolygon(newPolygon); // Update state to store the polygon
+        }
+      }
+    };
 
    
     return (
@@ -203,12 +250,50 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
                   </FeatureGroup>
                 </MapContainer>
                 
+                {/* A button for the possibility of selecting the whole area*/}
+                <Button title="Select the whole area"
+                 style={{
+                    position: 'absolute',
+                    top: '200px',  // Adjust based on position under zoom controls
+                    right: '40px', // Adjust for placement on map
+                    zIndex: 1000,
+                    width: '30px',
+                    height: '30px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    
+                 }}
+                    variant={wholeMapPolygon ? "primary" : "secondary"}
+                    onClick={() => {
+                       handleSelectWholeMap();
+                    }}
+                >
+                    <i className="bi bi-arrows-fullscreen fs-8"></i>
+                </Button>
+
+                {wholeMapPolygon && (
+                 <div style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  zIndex: 1000,
+                  transform: "translate(-50%, -50%)",
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                  color: "white",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  pointerEvents: "none" // Prevent interaction with the label
+                 }}>
+                  Selected area: The whole municipality of Kiruna
+                 </div>
+                )}
                 {/* A button for the possibility of manually adding coordinates*/}
                 <Button
                  style={{
                     position: 'absolute',
-                    top: '260px',  // Adjust based on position under zoom controls
-                    left: '40px', // Adjust for placement on map
+                    top: '235px',  // Adjust based on position under zoom controls
+                    right: '40px', // Adjust for placement on map
                     zIndex: 1000,
                     width: '30px',
                     height: '30px',
