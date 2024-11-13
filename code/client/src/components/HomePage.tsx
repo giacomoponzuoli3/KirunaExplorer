@@ -173,94 +173,7 @@ function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakehold
   const [showAddDocumentModal, setShowAddDocumentModal] = useState<boolean>(false);
   const [showEditDocumentModal, setShowEditDocumentModal] = useState<boolean>(false);
   const [showAddLinks, setShowAddLinks] = useState<boolean>(false);
-
-  // Dati di test per i documenti con coordinate all'interno di Kiruna
-  const testDocuments = [
-    {
-      id: 1,
-      title: "Environmental Impact Assessment",
-      stakeHolders: [{ name: "Kiruna Municipality" }, { name: "LKAB Mining" }],
-      scale: "Citywide",
-      issuanceDate: "2023-04-15",
-      type: "Informative document",
-      language: "English",
-      pages: "25",
-      description: "An assessment of the environmental impact of local mining activities.",
-      coordinates: { lat: 67.8558, lng: 20.2253 },
-    },
-    {
-      id: 2,
-      title: "Urban Development Plan",
-      stakeHolders: [{ name: "City Planning Department" }, { name: "Local Residents Association" }],
-      scale: "Citywide",
-      issuanceDate: "2022-12-05",
-      type: "Design document",
-      language: "Swedish",
-      pages: "30",
-      description: "Plan for urban development in Kiruna considering population relocation.",
-      coordinates: { lat: 67.8580, lng: 20.2400 },
-    },
-    {
-      id: 3,
-      title: "Historical Preservation Report",
-      stakeHolders: [{ name: "Cultural Heritage Agency" }],
-      scale: "Local",
-      issuanceDate: "2021-09-10",
-      type: "Technical document",
-      language: "Swedish",
-      pages: "15",
-      description: "Report on preserving historical buildings in Kiruna.",
-      coordinates: { lat: 67.8520, lng: 20.2150 },
-    },
-    {
-      id: 4,
-      title: "Infrastructure Agreement",
-      stakeHolders: [{ name: "Kiruna Municipality" }, { name: "Swedish Transport Administration" }],
-      scale: "Citywide",
-      issuanceDate: "2020-07-01",
-      type: "Agreement",
-      language: "English",
-      pages: "12",
-      description: "Agreement on the development of new infrastructure in Kiruna.",
-      coordinates: { lat: 67.8600, lng: 20.2350 },
-    },
-    {
-      id: 5,
-      title: "Mining Effects on Local Wildlife",
-      stakeHolders: [{ name: "Environmental Protection Agency" }],
-      scale: "Regional",
-      issuanceDate: "2023-02-20",
-      type: "Prescriptive document",
-      language: "English",
-      pages: "20",
-      description: "Document outlining regulations for protecting wildlife near mining areas.",
-      coordinates: { lat: 67.8590, lng: 20.2200 },
-    },
-    {
-      id: 6,
-      title: "Public Consultation on Relocation",
-      stakeHolders: [{ name: "Local Residents Association" }, { name: "City Council" }],
-      scale: "Community",
-      issuanceDate: "2023-01-18",
-      type: "Consultation",
-      language: "Swedish",
-      pages: "10",
-      description: "Summary of the public consultation regarding relocation plans.",
-      coordinates: { lat: 67.8540, lng: 20.2100 },
-    },
-    {
-      id: 7,
-      title: "Construction Code Update",
-      stakeHolders: [{ name: "Kiruna Municipality" }, { name: "Local Construction Firms" }],
-      scale: "Citywide",
-      issuanceDate: "2022-06-30",
-      type: "Material effect",
-      language: "Swedish",
-      pages: "18",
-      description: "New guidelines for construction standards in the area.",
-      coordinates: { lat: 67.8605, lng: 20.2258 },
-    },
-  ];
+  const [showAlert, setShowAlert] = useState<boolean>(false);
 
   const [showGeoreferenceDocument, setShowGeoreferenceDocument] = useState<boolean>(false);
 
@@ -286,8 +199,13 @@ function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakehold
 
   useEffect (() => {
     const getDocCord = async () => {
-      const documents =await API.getAllDocumentsCoordinates();
-      setDocumentsCoordinates(documents);
+      try {
+        const documents =await API.getAllDocumentsCoordinates();
+        setDocumentsCoordinates(documents);
+      }
+      catch (error) {
+        setShowAlert(true);
+      }
     }
     getDocCord().then();
   }, []);
