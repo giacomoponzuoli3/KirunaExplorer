@@ -17,6 +17,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap,  Marker as LeafletMarke
 import { LatLngExpression, LatLngTuple, LatLngBounds, Icon } from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { GeoreferenceNewDocumentModal } from "./GeoreferenceNewDocumentModal";
 
 interface HomepageProps {
     documents: Document[];
@@ -35,7 +36,7 @@ function SetMapView() {
   // Funzione per aggiornare dinamicamente il livello di zoom
   const handleZoomChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setZoomLevel(Number(event.target.value));
-};
+  };
 
   // Coordinate di Kiruna, Svezia
   const position: LatLngTuple = [67.8558, 20.2253];
@@ -109,6 +110,7 @@ function HomePage({documents, user, refreshDocuments, stakeholders} : HomepagePr
   const [showEditDocumentModal, setShowEditDocumentModal] = useState<boolean>(false);
   const [showAddLinks, setShowAddLinks] = useState<boolean>(false);
   const [newDocument, setNewDocument] = useState<Document | null>(null);
+  const [showGeoreferenceDocument, setShowGeoreferenceDocument] = useState<boolean>(false);
 
   const handleEdit = () => {
     setShowEditDocumentModal(true);
@@ -270,7 +272,7 @@ function HomePage({documents, user, refreshDocuments, stakeholders} : HomepagePr
       onHide={() => setShowAddDocumentModal(false)} 
       refreshDocuments={refreshDocuments} 
       stakeholders={stakeholders} 
-      showAddNewDocumentLinksModal = {(doc: Document) => {setNewDocument(doc); setShowAddLinks(true); }}
+      showGeoreferenceNewDocumentModal = {(doc: Document) => {setNewDocument(doc); setShowGeoreferenceDocument(true); }}
     />
 
 
@@ -280,6 +282,13 @@ function HomePage({documents, user, refreshDocuments, stakeholders} : HomepagePr
         onHide={() => setShowEditDocumentModal(false)} refreshSelectedDocument={refreshSelectedDocument}
         stakeholders={stakeholders}
       />
+    )}
+
+    {newDocument && (
+      <GeoreferenceNewDocumentModal show={showGeoreferenceDocument} 
+      onHide={() => setShowGeoreferenceDocument(false)} document={newDocument}
+      showAddNewDocumentLinks = {(doc: Document) => {setNewDocument(doc); setShowAddLinks(true); }}
+    />
     )}
 
     {newDocument && (
