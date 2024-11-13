@@ -256,6 +256,7 @@ function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakehold
             position: 'fixed',
             bottom: '24px',
             right: '24px',
+            zIndex: 1000,
             borderRadius: '50%',
             width: '60px',
             height: '60px',
@@ -265,7 +266,6 @@ function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakehold
             fontSize: '24px',
             fontWeight: 'bold',
             border: "#1E3A8A" /* Bordo blu scuro */
-            
         }}
         onClick={() => setShowAddDocumentModal(true)}
       >
