@@ -34,7 +34,7 @@ interface AddDocumentModalProps {
     onHide: () => void;
     refreshDocuments: () => void;
     stakeholders: Stakeholder[];
-    showAddNewDocumentLinksModal: (doc: Document) => void;
+    showGeoreferenceNewDocumentModal: (doc: Document) => void;
 }
 
 interface EditDocumentModalProps {
@@ -92,7 +92,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({ text, maxLength }) => {
 
 
 
-function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAddNewDocumentLinksModal}: AddDocumentModalProps) {
+function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeoreferenceNewDocumentModal}: AddDocumentModalProps) {
     const [title, setTitle] = useState('');
     const [selectedStakeholders, setSelectedStakeholders] = useState<Stakeholder[]>([]);
     const [scale, setScale] = useState('');
@@ -142,7 +142,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showAdd
         refreshDocuments();
         handleClose();
         refreshDocuments();
-        showAddNewDocumentLinksModal(doc);
+        showGeoreferenceNewDocumentModal(doc);
     };
 
     // Ottieni tutte le lingue disponibili da ISO 639-1

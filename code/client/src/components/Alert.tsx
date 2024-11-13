@@ -8,7 +8,7 @@ interface AlertProps {
 
 const Alert: React.FC<AlertProps> = ({ message, onClose }) => {
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-800 bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-800 bg-opacity-50" style={{zIndex: 2000,}}>
             <div className="bg-red-700 text-white p-6 rounded shadow-lg">
                 <div className="flex items-center">
                     <img src={AlertIcon} alt="Alert Icon" className="text-white h-6 w-6 mr-2" />

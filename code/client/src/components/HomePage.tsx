@@ -16,9 +16,9 @@ import { MapContainer, useMap } from 'react-leaflet';
 import { LatLngTuple, LatLngBounds } from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { GeoreferenceNewDocumentModal } from "./GeoreferenceNewDocumentModal";
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet-draw';
-
 
 interface HomepageProps {
     documents: Document[];
@@ -260,6 +260,7 @@ function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakehold
     },
   ];
 
+  const [showGeoreferenceDocument, setShowGeoreferenceDocument] = useState<boolean>(false);
 
   const handleEdit = () => {
     setShowEditDocumentModal(true);
@@ -397,7 +398,7 @@ function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakehold
       onHide={() => setShowAddDocumentModal(false)} 
       refreshDocuments={refreshDocuments} 
       stakeholders={stakeholders} 
-      showAddNewDocumentLinksModal = {(doc: Document) => {setNewDocument(doc); setShowAddLinks(true); }}
+      showGeoreferenceNewDocumentModal = {(doc: Document) => {setNewDocument(doc); setShowGeoreferenceDocument(true); }}
     />
 
 
@@ -407,6 +408,13 @@ function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakehold
         onHide={() => setShowEditDocumentModal(false)} refreshSelectedDocument={refreshSelectedDocument}
         stakeholders={stakeholders}
       />
+    )}
+
+    {newDocument && (
+      <GeoreferenceNewDocumentModal show={showGeoreferenceDocument} 
+      onHide={() => setShowGeoreferenceDocument(false)} document={newDocument}
+      showAddNewDocumentLinks = {(doc: Document) => {setNewDocument(doc); setShowAddLinks(true); }}
+    />
     )}
 
     {newDocument && (
