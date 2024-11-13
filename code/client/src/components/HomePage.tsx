@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import { AddDocumentModal, ShowDocumentInfoModal, EditDocumentModal, AddNewDocumentLinksModal } from "./DocumentModals";
 import { Stakeholder } from "../models/stakeholder";
 import {DocumentLegend} from "./DocumentLegend"
+import Alert from "./Alert"
 
 import { MapContainer, useMap } from 'react-leaflet';
 import { LatLngTuple, LatLngBounds } from 'leaflet'; // Import del tipo corretto
@@ -20,6 +21,11 @@ import { GeoreferenceNewDocumentModal } from "./GeoreferenceNewDocumentModal";
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet-draw';
 import { DocCoordinates } from "../models/document_coordinate";
+import ReactDOMServer from 'react-dom/server';
+
+
+//coordinates of Kiruna Town Hall
+const kiruna_town_hall: LatLngTuple = [67.8558, 20.2253];
 
 interface HomepageProps {
     documents: Document[];
@@ -37,7 +43,6 @@ function SetMapView(props: any) {
 
   // Coordinate di Kiruna, Svezia
   const position: LatLngTuple = [67.8558, 20.2253];
-
 
   const kirunaBounds = new LatLngBounds(
     [67.7758, 20.1003],  // Sud-ovest
@@ -139,11 +144,12 @@ function SetMapView(props: any) {
 
     // Creazione e aggiunta dei marker personalizzati
     props.documents.forEach((doc: any) => {
+      const iconHtml = ReactDOMServer.renderToString(props.getDocumentIcon(doc.type, 5) || <></>);
       const marker = L.marker([doc.coordinates[0].latitude, doc.coordinates[0].longitude], {
         icon: L.divIcon({
           html: `
             <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95">
-              <img src="/kiruna/img/informativeDocument.png" alt="Marker Icon" class="w-5 h-5">
+              ${iconHtml}
             </div>
           `,
           iconSize: [20, 20],
@@ -212,14 +218,21 @@ function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakehold
 
   return (
   <>
-
+    {showAlert &&
+      <Alert
+          message="Sorry, something went wrong..."
+          onClose={() => {
+              setShowAlert(false);
+          }}
+      />
+    }
     
     {/* Container to show the map */}
     <MapContainer
-      style={{ height: "100vh", width: "100%" }}
+      style={{ height: "calc(100vh - 65px)", width: "100%" }}
     >
       {/* Impostiamo il centro, il livello di zoom e i vari documenti tramite SetMapView */}
-      <SetMapView documents={documentsCoordinates} onMarkerClick={handleDocumentClick}/>
+      <SetMapView documents={documentsCoordinates} getDocumentIcon={getDocumentIcon} onMarkerClick={handleDocumentClick}/>
 
     </MapContainer>
 

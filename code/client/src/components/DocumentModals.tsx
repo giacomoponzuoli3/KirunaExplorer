@@ -14,6 +14,7 @@ import Alert from "./Alert";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import Select from 'react-select';
 import ISO6391 from 'iso-639-1';  // Utilizziamo ISO 639-1 per ottenere le lingue
+import { DocCoordinates } from '../models/document_coordinate';
 
 interface RequiredLabelProps {
     text: string; // Explicitly define the type of 'text' as string
@@ -51,7 +52,7 @@ interface TruncatedTextProps {
 }
 
 interface ShowDocumentInfoModalProps {
-  selectedDocument: Document;
+  selectedDocument: Document | DocCoordinates;
   show: boolean;
   onHide: () => void;
   getDocumentIcon: (type: string, size: number) => JSX.Element | null;
