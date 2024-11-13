@@ -187,6 +187,7 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
                      draw={{
                        rectangle: false,
                        circle: false,
+                       circlemarker: false,
                        polygon: true,
                        marker: {icon: customIcon},
                        polyline: false,
