@@ -121,7 +121,7 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
         //API call to georeference the document
         if(polygon.length === 0 && markerPosition !== null){ 
           API.setDocumentCoordinates(document.id, markerPosition);
-        } else {
+        } else if (polygon.length !== 0 && markerPosition === null){
           API.setDocumentCoordinates(document.id, polygon);
         }
         console.log(polygon);
