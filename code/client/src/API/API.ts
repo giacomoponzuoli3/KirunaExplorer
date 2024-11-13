@@ -306,9 +306,26 @@ async function getAllStakeholders() {
     }
 }
 
+/** ------------------- Coordinates APIs ------------------------ */
+
+async function getAllDocumentsCoordinates() {
+    const response = await fetch(baseURL + "coordinates", { credentials: "include" })
+    if (response.ok) {
+        return await response.json()
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+
 const API = {
     login, logOut, getUserInfo, register,
     addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType,
-    addLink, deleteLink, editLink, getAllLinks, getAllStakeholders
+    addLink, deleteLink, editLink, getAllLinks, getAllStakeholders,
+    getAllDocumentsCoordinates
 }
 export default API

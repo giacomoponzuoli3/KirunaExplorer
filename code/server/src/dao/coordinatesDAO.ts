@@ -85,3 +85,5 @@ class CoordinatesDAO {
     
 
 }
+
+export {CoordinatesDAO};

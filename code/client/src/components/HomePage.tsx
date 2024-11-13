@@ -19,6 +19,7 @@ import L from 'leaflet';
 import { GeoreferenceNewDocumentModal } from "./GeoreferenceNewDocumentModal";
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet-draw';
+import { DocCoordinates } from "../models/document_coordinate";
 
 interface HomepageProps {
     documents: Document[];
@@ -138,7 +139,7 @@ function SetMapView(props: any) {
 
     // Creazione e aggiunta dei marker personalizzati
     props.documents.forEach((doc: any) => {
-      const marker = L.marker([doc.coordinates.lat, doc.coordinates.lng], {
+      const marker = L.marker([doc.coordinates[0].latitude, doc.coordinates[0].longitude], {
         icon: L.divIcon({
           html: `
             <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95">
@@ -165,6 +166,7 @@ function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakehold
 
   const [selectedDocument, setSelectedDocument] = useState<any | null>(null);
   const [newDocument, setNewDocument] = useState<Document | null>(null);
+  const [documentsCoordinates, setDocumentsCoordinates] = useState<DocCoordinates[]|null>([]);
 
   //modals
   const [showDetails, setShowDetails] = useState<boolean>(false);
@@ -272,14 +274,23 @@ function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakehold
   };
 
   const handleDocumentClick = async (doc: any) => {
-      //const document = await API.getDocumentById(doc.id);
-      setSelectedDocument(doc);
+      const document = await API.getDocumentById(doc.id);
+      setSelectedDocument(document);
       setShowDetails(true);
   }
 
   function refreshSelectedDocument(doc: Document) {
     setSelectedDocument(doc)
   }
+
+
+  useEffect (() => {
+    const getDocCord = async () => {
+      const documents =await API.getAllDocumentsCoordinates();
+      setDocumentsCoordinates(documents);
+    }
+    getDocCord().then();
+  }, []);
 
   return (
   <>
@@ -290,7 +301,7 @@ function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakehold
       style={{ height: "100vh", width: "100%" }}
     >
       {/* Impostiamo il centro, il livello di zoom e i vari documenti tramite SetMapView */}
-      <SetMapView documents={testDocuments} onMarkerClick={handleDocumentClick}/>
+      <SetMapView documents={documentsCoordinates} onMarkerClick={handleDocumentClick}/>
 
     </MapContainer>
 

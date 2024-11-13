@@ -5,6 +5,7 @@ import Authenticator from "./routers/auth"
 import { DocumentRoutes } from "./routers/documentRoutes"
 import LinkRoutes from "./routers/linkRoutes"
 import { StakeholderRoutes } from "./routers/stakeholderRoutes"
+import { CoordinatesRoutes } from "./routers/coordinatesRoutes"
 
 
 const morgan = require("morgan")
@@ -35,11 +36,13 @@ function initRoutes(app: express.Application) {
     const docRoutes = new DocumentRoutes(authenticator);
     const linkRoutes = new LinkRoutes(authenticator);
     const stakeholderRoutes = new StakeholderRoutes();
+    const coordinatesRoutes = new CoordinatesRoutes(authenticator);
 
     app.use(`${prefix}/sessions`, authRoutes.getRouter())
     app.use(`${prefix}/doc`, docRoutes.getRouter())
     app.use(`${prefix}/link`, linkRoutes.getRouter())
     app.use(`${prefix}/stakeholders`, stakeholderRoutes.getRouter())
+    app.use(`${prefix}/coordinates`, coordinatesRoutes.getRouter())
 
     ErrorHandler.registerErrorHandler(app)
 }
