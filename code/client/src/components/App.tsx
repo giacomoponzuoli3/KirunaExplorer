@@ -8,6 +8,32 @@ import { NotFoundLayout } from './NotFoundLayout';
 import { Document } from '../models/document';
 import { LinksDocument } from './LinksDocument';
 import { Stakeholder } from '../models/stakeholder';
+import { DocumentsTable } from './DocumentsTable';
+
+function getDocumentIcon(type: string, size: number = 16): JSX.Element | null {
+  const sizeClass = `w-${size} h-${size}`;
+  switch (type) {
+      case 'Informative document':
+        return <img src="/kiruna/img/informativeDocument.png" alt="Informative Document" className={sizeClass}/>;
+      case 'Prescriptive document':
+        return <img src="/kiruna/img/prescriptiveDocument.png" alt="Prescriptive Document" className={sizeClass}/>;
+      case 'Material effect':
+        return <img src="/kiruna/img/construction.png" alt="Material Effect" className={sizeClass}/>;
+      case 'Design document':
+        return <img src="/kiruna/img/designDocument.png" alt="Design Document" className={sizeClass}/>;
+      case 'Technical document':
+        return <img src="/kiruna/img/technicalDocument.png" alt="Technical Document" className={sizeClass}/>;
+      case 'Agreement':
+        return <img src="/kiruna/img/agreement.png" alt="Technical Document" className={sizeClass}/>;
+      case 'Conflict':
+        return <img src="/kiruna/img/conflict.png" alt="Technical Document" className={sizeClass}/>;
+      case 'Consultation':
+        return <img src="/kiruna/img/consultation.png" alt="Technical Document" className={sizeClass}/>;
+      default:
+        return null; // Return null if no matching type
+    }
+}
+
 
 function App() {
   const [user, setUser] = useState<any>('');
@@ -90,11 +116,12 @@ function App() {
             <Outlet/>
           </>
         }>
-          <Route index element={<HomePage documents={documents} user={user} refreshDocuments={getAllDocuments} stakeholders={stakeholders}/>}/>
+          <Route index element={<HomePage documents={documents} user={user} refreshDocuments={getAllDocuments} stakeholders={stakeholders} getDocumentIcon={getDocumentIcon}/>}/>
           <Route path="/login" element={<Login message={message} isLogged={isLogged} login={handleLogin} handleBack={handleBack}/>} />
           <Route path="*" element={<NotFoundLayout/>} />
           {/* Aggiungi altre route come la dashboard */}
-          <Route path="documents/:idDocument/links" element={<LinksDocument user={user} isLogged={isLogged} />} />
+          <Route path="documents/:idDocument/links" element={<LinksDocument user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} />} />
+          <Route path="/documents" element={<DocumentsTable user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} />} />
         </Route>
       </Routes>
     </>
