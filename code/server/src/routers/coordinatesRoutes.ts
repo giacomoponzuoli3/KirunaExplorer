@@ -41,8 +41,8 @@ class CoordinatesRoutes {
 
         this.router.post(
             "/",
-            this.authenticator.isLoggedIn, //error 401
-            this.authenticator.isPlanner, //error 401
+            this.authenticator.isLoggedIn,
+            this.authenticator.isPlanner, 
             body("idDoc").isNumeric(),
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
