@@ -3,6 +3,8 @@ import { Disclosure } from '@headlessui/react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { LogoutButton, LoginButton } from './Login';
 import logo from '../img/logoKiruna.png';
+import { ButtonHomePage } from './HomePage';
+import { Button } from 'react-bootstrap';
 
 
 export default function Navbar(props: any) {
@@ -42,7 +44,8 @@ export default function Navbar(props: any) {
             </div>
 
             {/* Navigation links (Documents and Diagram) */}
-            <div className="flex space-x-8 ml-10 items-center"> {/* Increased margin-left for more space */}
+            {/*
+            <div className="flex space-x-8 ml-10 items-center"> 
               <Link
                 to="/"
                 onClick={() => setActiveTab("home")}
@@ -71,16 +74,21 @@ export default function Navbar(props: any) {
                 Diagram
               </Link>
             </div>
+          
+            
+            */}
+            
           </div>
 
           {/* Right-aligned login/logout buttons */}
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+            <ButtonHomePage />
             {!props.isLogged ? (
               <>
                 <LoginButton />
               </>
             ) : (
-              <>
+              <>   
                 <LogoutButton className="ml-4" logout={props.logout} />
               </>
             )}

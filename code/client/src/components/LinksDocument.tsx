@@ -204,7 +204,7 @@ function LinksDocument(props: any) {
         );
     }else{
         return (
-            <div className="p-4">
+            <div className="p-4" style={{ height: "calc(100vh - 65px)", overflowY: "auto" }}>
               <h2 className="text-xl font-normal text-gray-600 mb-1 text-center">
                 Connections of
               </h2>
@@ -228,39 +228,45 @@ function LinksDocument(props: any) {
                 </div>
               ) : (
                 <>
-                  <div className="hidden lg:block overflow-x-auto">
+                  <div className="overflow-x-auto">
                     <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
                       <thead>
                         <tr className="bg-gray-100 border-b">
-                          <th className="p-4 text-left text-gray-600 font-semibold">Icon</th>
-                          <th className="p-4 text-left text-gray-600 font-semibold">Title</th>
-                          <th className="p-4 text-left text-gray-600 font-semibold">Stakeholder(s)</th>
-                          <th className="p-4 text-left text-gray-600 font-semibold">Description</th>
-                          <th className="p-4 text-left text-gray-600 font-semibold">Type of Link</th>
+                          <th className="pl-4 pr-4 pt-3 pb-3 text-left text-gray-600 font-semibold">Icon</th>
+                          <th className="pl-4 pr-4 pt-3 pb-3 text-left text-gray-600 font-semibold">Title</th>
+                          <th className="pl-4 pr-4 pt-3 pb-3 text-left text-gray-600 font-semibold">Stakeholder(s)</th>
+                          <th className="pl-4 pr-4 pt-3 pb-3 text-left text-gray-600 font-semibold">Description</th>
+                          <th className="pl-4 pr-4 pt-3 pb-3 text-left text-gray-600 font-semibold">Type of Link</th>
                           {props.isLogged && props.user.role == "Urban Planner" && (
-                            <th className="p-4 text-center text-gray-600 font-semibold">Actions</th>
+                            <th className="pl-4 pr-4 pt-3 pb-3 text-center text-gray-600 font-semibold">Actions</th>
                           )}
                         </tr>
                       </thead>
                       <tbody>
                         {paginatedLinks.map((doc, index) => (
                           <tr key={index} className="border-b hover:bg-gray-50 transition duration-200 ease-in-out">
-                            <td className="p-4">{props.getDocumentIcon(doc.type, 8)}</td>
-                            <td className="p-4">{doc.title}</td>
-                            <td className="p-4">{doc.stakeHolders.map(sh => sh.name).join(' / ')}</td>
-                            <td className="p-4">
+                            <td className="pl-4 pr-4 pt-3 pb-3">{props.getDocumentIcon(doc.type, 8)}</td>
+                            <td className="pl-4 pr-4 pt-3 pb-3">{doc.title}</td>
+                            <td className="pl-4 pr-4 pt-3 pb-3">{doc.stakeHolders.map(sh => sh.name).join(' / ')}</td>
+                            <td className="pl-4 pr-4 pt-3 pb-3">
                                 <TruncatedText text={doc.description ?? 'No description available'} maxWords={20}  />
                             </td>
-                            <td className="p-4">{doc.relatedLink.name}</td>
+                            <td className="pl-4 pr-4 pt-3 pb-3">{doc.relatedLink.name}</td>
                             {props.isLogged && props.user.role == "Urban Planner" && (
-                              <td className="p-4 flex justify-center space-x-4">
-                                <button className="text-red-500 hover:text-red-700" onClick={() => confirmDelete(doc.id, doc.relatedLink.id)}>
-                                  <TrashIcon className="h-5 w-5" />
-                                </button>
-                                <button className="text-blue-500 hover:text-blue-700 ml-2" onClick={() => handleUpdate(doc)}>
-                                  <PencilIcon className="h-5 w-5" />
-                                </button> 
-                              </td>
+                              <td className="pl-4 pr-4 pt-3 pb-3 items-center justify-center space-x-4">
+                              <button
+                                className="text-red-500 hover:text-red-700"
+                                onClick={() => confirmDelete(doc.id, doc.relatedLink.id)}
+                              >
+                                <TrashIcon className="h-5 w-5" />
+                              </button>
+                              <button
+                                className="text-blue-500 hover:text-blue-700 ml-2"
+                                onClick={() => handleUpdate(doc)}
+                              >
+                                <PencilIcon className="h-5 w-5" />
+                              </button>
+                            </td>
                             )}
                           </tr>
                         ))}

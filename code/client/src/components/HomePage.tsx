@@ -14,7 +14,7 @@ import {DocumentLegend} from "./DocumentLegend"
 import Alert from "./Alert"
 
 import { MapContainer, useMap } from 'react-leaflet';
-import { LatLngTuple, LatLngBounds } from 'leaflet'; // Import del tipo corretto
+import { LatLngTuple, LatLngBounds, ControlOptions } from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { GeoreferenceNewDocumentModal } from "./GeoreferenceNewDocumentModal";
@@ -36,32 +36,31 @@ interface HomepageProps {
 }
 
 // Componente per la costruzione dell mappa
-function SetMapView(props: any) {
+function SetMapViewHome(props: any) {
 
   // Ottieni l'istanza della mappa
   const map = useMap(); 
 
-  // Coordinate di Kiruna, Svezia
+  // coordinates of Kiruna town hall means the centre of the city
   const position: LatLngTuple = [67.8558, 20.2253];
 
   const kirunaBounds = new LatLngBounds(
-    [67.7758, 20.1003],  // Sud-ovest
-    [67.9358, 20.3503]   // Nord-est
+    [67.3556, 17.8994],  // Sud-ovest
+    [69.0592, 23.2858]   // Nord-est
   );
 
   // Definisci l'icona personalizzata per i marker disegnati
-  const customIcon = L.icon({
-    iconUrl: '/kiruna/img/informativeDocument.png', // Percorso dell'icona personalizzata
-    iconSize: [20, 20], // Dimensioni dell'icona
-    iconAnchor: [10, 10], // Punto dell'icona che si allinea alla posizione del marker
-    popupAnchor: [0, -10], // Punto per l'apertura del popup rispetto al marker
+  const defaultIcon = L.icon({
+    iconUrl: '/kiruna/img/pinMap.png', // URL dell'icona predefinita
+    iconSize: [40, 40], // Dimensioni dell'icona
+    iconAnchor: [15, 30], // Punto di ancoraggio (allinea la parte inferiore dell'icona alla posizione del marker)
+    popupAnchor: [1, -34], // Punto per l'apertura del popup rispetto al marker
   });
-    
 
   // Configurazione strumenti di disegno
   const drawControl = new L.Control.Draw({
     draw: {
-      marker: {icon: customIcon}, // Abilita l'opzione di aggiungere punti
+      marker: {icon: defaultIcon}, // Abilita l'opzione di aggiungere punti
       polygon: {
         shapeOptions: {
           color: '#3388ff', // Colore del bordo
@@ -102,6 +101,38 @@ function SetMapView(props: any) {
     { attribution: '&copy; <a href="https://www.opentopomap.org">OpenTopoMap</a>' }
   );
 
+  // Funzione per disegnare un poligono di default
+  const drawDefaultPolygon = () => {
+    const defaultPolygon = L.polygon(
+      [
+        [67.855, 20.225],
+        [67.856, 20.226],
+        [67.857, 20.225],
+        [67.856, 20.224],
+      ],
+      {
+        color: '#3388ff',
+        weight: 2,
+        fillOpacity: 0.3,
+      }
+    );
+
+    defaultPolygon.addTo(map);
+  };
+
+  //create a new control for 
+  const customControl = new L.Control({ position: 'topright' } as ControlOptions);
+
+  // Metodo onAdd per aggiungere il pulsante al controllo
+  customControl.onAdd = () => {
+    const container = L.DomUtil.create('button', 'leaflet-bar');
+    container.innerHTML = 'Draw Polygon';
+    container.style.backgroundColor = 'white';
+    container.style.width = '100px';
+    container.style.height = '30px';
+    container.onclick = drawDefaultPolygon;
+    return container;
+  };
 
   useEffect(() => {
 
@@ -111,7 +142,7 @@ function SetMapView(props: any) {
     }
 
     // Imposta i limiti di zoom
-    map.setMaxZoom(16);
+    map.setMaxZoom(18);
     map.setMinZoom(12);
 
     // Limita l'area visibile della mappa alla bounding box di Kiruna
@@ -123,6 +154,8 @@ function SetMapView(props: any) {
     // Aggiungi il layer satellitare alla mappa
     satelliteLayer.addTo(map);
 
+    // Aggiungi il controllo alla mappa
+    customControl.addTo(map);
 
     // Pulizia dei listener e degli elementi aggiunti quando il componente viene smontato
     return () => {
@@ -132,6 +165,8 @@ function SetMapView(props: any) {
           map.removeControl(layer); // Rimuove il controllo di disegno
         }
       });
+
+      map.removeControl(customControl);
 
       map.eachLayer((layer) => {
         if (layer !== satelliteLayer) map.removeLayer(layer);
@@ -232,14 +267,14 @@ function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakehold
       style={{ height: "calc(100vh - 65px)", width: "100%" }}
     >
       {/* Impostiamo il centro, il livello di zoom e i vari documenti tramite SetMapView */}
-      <SetMapView documents={documentsCoordinates} getDocumentIcon={getDocumentIcon} onMarkerClick={handleDocumentClick}/>
+      <SetMapViewHome documents={documentsCoordinates} getDocumentIcon={getDocumentIcon} onMarkerClick={handleDocumentClick}/>
 
     </MapContainer>
 
     {/* Show the Legend of document types */}
-    <DocumentLegend />
+    {/*<DocumentLegend />*/}
 
-  {/* Modal to show the document info */}
+    {/* Modal to show the document info */}
     {selectedDocument && ( 
       <ShowDocumentInfoModal 
         selectedDocument={selectedDocument} show={showDetails} 
@@ -248,29 +283,14 @@ function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakehold
       />
     )}
                         
-  {/* Add Document Button */}
+    {/* Add Document Button */}
     {user.role==="Urban Planner" ? (
-      <Button className="bg-blue-950 z-[1000] hover:border-blue-500 hover:bg-blue-500" 
-        style={{
-            backgroundColor: '#1E3A8A', // Hex per la tonalità blu scura
-            position: 'fixed',
-            bottom: '24px',
-            right: '24px',
-            borderRadius: '50%',
-            width: '60px',
-            height: '60px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '24px',
-            fontWeight: 'bold',
-            border: "#1E3A8A" /* Bordo blu scuro */
-            
-        }}
+      <button
+        className="bg-blue-950 z-[1000] hover:border-blue-700 hover:bg-blue-700 fixed bottom-6 right-6 rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold border-2 border-blue-950"
         onClick={() => setShowAddDocumentModal(true)}
       >
         <img src="kiruna/img/addDocument.png" alt="addDocument icon" />
-      </Button>
+      </button>
       ) : null
     }
 
@@ -312,5 +332,23 @@ function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakehold
   );      
 }
 
+function ButtonHomePage(){
+  const location = useLocation();
+  const isLoginPath = location.pathname === '/';
+  return (
+    <>
+      { !isLoginPath ? (
+        <Link 
+          to={`/`}
+          className="inline-flex mr-4 items-center gap-2 bg-gray-200 hover:bg-gray-300 text-black rounded-md px-4 py-2 text-sm font-medium no-underline"
+        >
+          <i className="bi bi-house-door-fill"></i> 
+          <span className="hidden md:inline">Back Home</span>
+        </Link>
+      ) : null }
+    </>
+  );
+}
 
-export { HomePage };
+
+export { HomePage, ButtonHomePage };

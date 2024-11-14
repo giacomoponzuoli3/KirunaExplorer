@@ -8,13 +8,15 @@ import API from '../API/API';
 import { Stakeholder } from '../models/stakeholder';
 import { DocLink } from '../models/document_link';
 import '../modal.css'
-import { TrashIcon, PencilIcon,ChevronLeftIcon,ChevronRightIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, PencilIcon,ChevronLeftIcon,ChevronRightIcon, MapIcon } from "@heroicons/react/24/outline";
 import Link from '../models/link'; 
 import Alert from "./Alert";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import Select from 'react-select';
 import ISO6391 from 'iso-639-1';  // Utilizziamo ISO 639-1 per ottenere le lingue
 import { DocCoordinates } from '../models/document_coordinate';
+import Coordinate from '../models/coordinate';
+import {ModalEditGeoreference} from "./ModalEditGeoreference"
 
 interface RequiredLabelProps {
     text: string; // Explicitly define the type of 'text' as string
@@ -52,7 +54,7 @@ interface TruncatedTextProps {
 }
 
 interface ShowDocumentInfoModalProps {
-  selectedDocument: Document | DocCoordinates;
+  selectedDocument: Document;
   show: boolean;
   onHide: () => void;
   getDocumentIcon: (type: string, size: number) => JSX.Element | null;
@@ -488,23 +490,54 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
 
 function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, show, onHide, user, handleEdit, refreshDocuments }: ShowDocumentInfoModalProps) {
   const navigate = useNavigate();  
+  
+
+  const [documentsCoordinates, setDocumentsCoordinates] = useState<Coordinate[] | null>([]); //da mettere null
+  const [showModalEditGeoreference, setShowModalEditGeoreference] = useState<boolean>(false);
 
   const handleEditClick = () => {
       handleEdit();
-      // onHide()
+      //onHide()
+  };
+
+  const handleEditGeoreference = () => {
+    
+    if(documentsCoordinates != null){
+      console.log(documentsCoordinates)
+      setShowModalEditGeoreference(true);
+    }
+
   };
 
   const handleDeleteClick = async () => {
+    try{
       await API.deleteDocument(selectedDocument.id).then();
       refreshDocuments();
+    }catch(err){
+
+    }finally{
       onHide();
-      refreshDocuments();
+    }
+      
   };
+  
+  const getCoordinatesById = async () => {
+    try{
+      //const coordinates = await API.getCoordinatesById(selectedDocument.id);
+      //setDocumentsCoordinates([]);
+    } catch{
+      
+    }   
+  }
+
+  useEffect(() => {
+    getCoordinatesById().then();
+  }, [])
 
   return (
       <>
           <Modal 
-              show={show} 
+              show={show && !showModalEditGeoreference} 
               onHide={onHide} 
               dialogClassName="custom-modal-width" 
               aria-labelledby="example-custom-modal-styling-title"
@@ -533,16 +566,22 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, show, onHide
                                   {user.role === "Urban Planner" && (
                                       <div className="flex space-x-2 mt-4">
                                           <button
-                                              className="p-2 rounded-full border-2 bg-red-400 text-white hover:bg-red-700 transition-colors duration-200"
-                                              onClick={handleDeleteClick}
+                                            className="p-2 rounded-full border-2 bg-red-400 text-white hover:bg-red-700 transition-colors duration-200"
+                                            onClick={handleDeleteClick}
                                           >
                                               <TrashIcon className="h-5 w-5" />
                                           </button>
                                           <button
-                                              className="p-2 rounded-full border-2 bg-blue-400 text-white hover:bg-blue-700 transition-colors duration-200"
-                                              onClick={handleEditClick}
+                                            className="p-2 rounded-full border-2 bg-blue-400 text-white hover:bg-blue-700 transition-colors duration-200"
+                                            onClick={handleEditClick}
                                           >
                                               <PencilIcon className="h-5 w-5" />
+                                          </button>
+                                          <button
+                                            className="p-2 rounded-full border-2 bg-yellow-500 text-white hover:bg-yellow-600 transition-colors duration-200"
+                                            onClick={handleEditGeoreference}
+                                          >
+                                            <MapIcon className="h-5 w-5 text-white" />
                                           </button>
                                       </div>
                                   )}
@@ -566,14 +605,7 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, show, onHide
                                   <p className="text-sm text-gray-600"><strong>Pages:</strong> 
                                       {selectedDocument.pages ? selectedDocument.pages : '-'}
                                   </p>
-                                  {/*
-                                    <p className="text-sm text-gray-600"><strong>Coordinates:</strong> 
-                                        {selectedDocument.coordinates ? selectedDocument.coordinates : '-'}
-                                    </p>
-                                    */
-                                  }
-                                  
-                                  
+                                                                    
                               </Col>
                               <Col xs={12} md={7}>
                                   <p><strong>Description:</strong></p>
@@ -593,6 +625,19 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, show, onHide
                   </button>
               </Modal.Footer>
           </Modal>
+          
+          {showModalEditGeoreference && documentsCoordinates &&
+            <ModalEditGeoreference
+              document={selectedDocument}
+              documentCoordinates={documentsCoordinates}
+              
+              refreshDocuments={refreshDocuments}
+
+              onClose={() => setShowModalEditGeoreference(false)}
+              
+            />
+          }
+
       </>
   );
 }
