@@ -308,7 +308,7 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
 
    
     return (
-      <Modal size="lg" show={show} onHide={handleClose} aria-labelledby="example-modal-sizes-title-lg">
+      <Modal dialogClassName="custom-modal-width" show={show} onHide={handleClose} aria-labelledby="example-modal-sizes-title-lg">
           <Modal.Header closeButton style={{ backgroundColor: 'rgb(148, 137, 121,0.4)' }}>
             <Modal.Title id="example-modal-sizes-title-lg">Would u like to georeference the new document?</Modal.Title>
           </Modal.Header>
