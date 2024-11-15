@@ -1,3 +1,7 @@
-# .dockerignore
-code/client/node_modules
-code/server/node_modules
+server/node_modules
+client/node_modules
+npm-debug.log
+.dockerignore
+Dockerfile*
+.git
+.gitignore
