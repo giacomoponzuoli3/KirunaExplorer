@@ -55,12 +55,14 @@ interface TruncatedTextProps {
 
 interface ShowDocumentInfoModalProps {
   selectedDocument: Document;
+  selectedDocumentCoordinates: DocCoordinates;
   show: boolean;
   onHide: () => void;
   getDocumentIcon: (type: string, size: number) => JSX.Element | null;
   user: User;
   handleEdit: () => void;
   refreshDocuments: () => void;
+  refreshDocumentsCoordinates: () => void;
 }
 
 interface AddNewDocumentLinksModalProps {
@@ -488,7 +490,7 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
     );
 }
 
-function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, show, onHide, user, handleEdit, refreshDocuments }: ShowDocumentInfoModalProps) {
+function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, selectedDocumentCoordinates, show, onHide, user, handleEdit, refreshDocuments, refreshDocumentsCoordinates  }: ShowDocumentInfoModalProps) {
   const navigate = useNavigate();  
   
 
@@ -502,8 +504,7 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, show, onHide
 
   const handleEditGeoreference = () => {
     
-    if(documentsCoordinates != null){
-      console.log(documentsCoordinates)
+    if(selectedDocumentCoordinates.coordinates.length !== 0){
       setShowModalEditGeoreference(true);
     }
 
@@ -513,6 +514,7 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, show, onHide
     try{
       await API.deleteDocument(selectedDocument.id).then();
       refreshDocuments();
+      refreshDocumentsCoordinates();
     }catch(err){
 
     }finally{
@@ -520,19 +522,7 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, show, onHide
     }
       
   };
-  
-  const getCoordinatesById = async () => {
-    try{
-      //const coordinates = await API.getCoordinatesById(selectedDocument.id);
-      //setDocumentsCoordinates([]);
-    } catch{
-      
-    }   
-  }
 
-  useEffect(() => {
-    getCoordinatesById().then();
-  }, [])
 
   return (
       <>
@@ -626,12 +616,12 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, show, onHide
               </Modal.Footer>
           </Modal>
           
-          {showModalEditGeoreference && documentsCoordinates &&
+          {showModalEditGeoreference && selectedDocumentCoordinates.coordinates.length !== 0 &&
             <ModalEditGeoreference
-              document={selectedDocument}
-              documentCoordinates={documentsCoordinates}
+              documentCoordinates={selectedDocumentCoordinates}
               
               refreshDocuments={refreshDocuments}
+              refreshDocumentsCoordinates={refreshDocumentsCoordinates}
 
               onClose={() => setShowModalEditGeoreference(false)}
               

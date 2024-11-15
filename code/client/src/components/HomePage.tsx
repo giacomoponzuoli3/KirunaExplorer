@@ -29,8 +29,10 @@ const kiruna_town_hall: LatLngTuple = [67.8558, 20.2253];
 
 interface HomepageProps {
     documents: Document[];
+    documentsCoordinates: DocCoordinates[];
     user: User;
     refreshDocuments: () => void;
+    refreshDocumentsCoordinates: () => void;
     getDocumentIcon: (type: string) => JSX.Element | null;
     stakeholders: Stakeholder[];
 }
@@ -150,12 +152,15 @@ function SetMapViewHome(props: any) {
   }, [map]); 
 
   useEffect(() => {
+    // Rimuovere i marker vecchi prima di aggiungere i nuovi
+    map.eachLayer((layer) => {
+      if (layer instanceof L.Marker) {
+        map.removeLayer(layer);
+      }
+    });
 
-
-    console.log(props.documents);
     // Creazione e aggiunta dei marker personalizzati
-
-    props.documents.filter((d: DocCoordinates) => d.coordinates.length != 0).forEach((doc: any) => {
+    props.documentsCoordinates.filter((d: DocCoordinates) => d.coordinates.length != 0).forEach((doc: any) => {
       const iconHtml = ReactDOMServer.renderToString(props.getDocumentIcon(doc.type, 5) || <></>);
       const marker = L.marker([doc.coordinates[0].latitude, doc.coordinates[0].longitude], {
         icon: L.divIcon({
@@ -175,17 +180,18 @@ function SetMapViewHome(props: any) {
       });
     });
 
-  }, [props.documents])
+  }, [props.documentsCoordinates])
 
   return null;
 }
 
 
-function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakeholders} : HomepageProps) {
+function HomePage({documentsCoordinates, documents, user, refreshDocuments, refreshDocumentsCoordinates, getDocumentIcon, stakeholders} : HomepageProps) {
 
-  const [selectedDocument, setSelectedDocument] = useState<any | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+  const [selectedDocumentCoordinates, setSelectedDocumentCoordinates] = useState<DocCoordinates | null>(null);
+
   const [newDocument, setNewDocument] = useState<Document | null>(null);
-  const [documentsCoordinates, setDocumentsCoordinates] = useState<DocCoordinates[]|null>([]);
 
   //modals
   const [showDetails, setShowDetails] = useState<boolean>(false);
@@ -203,31 +209,19 @@ function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakehold
   const handleCloseDetailsModal = () => {
       setShowDetails(false);
       setSelectedDocument(null);
+      setSelectedDocumentCoordinates(null);
   };
 
-  const handleDocumentClick = async (doc: any) => {
+  const handleDocumentClick = async (doc: DocCoordinates) => {
       const document = await API.getDocumentById(doc.id);
       setSelectedDocument(document);
+      setSelectedDocumentCoordinates(doc);
       setShowDetails(true);
   }
 
   function refreshSelectedDocument(doc: Document) {
     setSelectedDocument(doc)
   }
-
-
-  useEffect (() => {
-    const getDocCord = async () => {
-      try {
-        const documents = await API.getAllDocumentsCoordinates(); //all documents also which that aren't coordinates
-        setDocumentsCoordinates(documents);
-      }
-      catch (error) {
-        setShowAlert(true);
-      }
-    }
-    getDocCord().then();
-  }, []);
 
   return (
   <>
@@ -245,7 +239,7 @@ function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakehold
       style={{ height: "calc(100vh - 65px)", width: "100%" }}
     >
       {/* Impostiamo il centro, il livello di zoom e i vari documenti tramite SetMapView */}
-      <SetMapViewHome documents={documentsCoordinates} getDocumentIcon={getDocumentIcon} onMarkerClick={handleDocumentClick}/>
+      <SetMapViewHome documentsCoordinates={documentsCoordinates} getDocumentIcon={getDocumentIcon} onMarkerClick={handleDocumentClick}/>
 
     </MapContainer>
 
@@ -253,11 +247,13 @@ function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakehold
     {/*<DocumentLegend />*/}
 
     {/* Modal to show the document info */}
-    {selectedDocument && ( 
+    {selectedDocumentCoordinates && selectedDocument && ( 
       <ShowDocumentInfoModal 
-        selectedDocument={selectedDocument} show={showDetails} 
+        show={showDetails} 
+        selectedDocument={selectedDocument} 
+        selectedDocumentCoordinates={selectedDocumentCoordinates}
         onHide={handleCloseDetailsModal} getDocumentIcon={getDocumentIcon} 
-        user={user} handleEdit={handleEdit} refreshDocuments={refreshDocuments}
+        user={user} handleEdit={handleEdit} refreshDocuments={refreshDocuments} refreshDocumentsCoordinates={refreshDocumentsCoordinates}
       />
     )}
                         

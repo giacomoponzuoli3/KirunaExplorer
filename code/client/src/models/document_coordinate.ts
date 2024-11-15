@@ -13,9 +13,9 @@ class DocCoordinates {
     scale: string
     issuanceDate: string
     type: string
-    language: string | null
+    language: string 
     pages: string | null
-    description: string | null
+    description: string 
     coordinates: Coordinate[]
 
     /**
@@ -38,9 +38,9 @@ class DocCoordinates {
         scale: string,
         issuanceDate: string,
         type: string,
-        language: string | null = null,
+        language: string,
         pages: string | null = null,
-        description: string | null = null,
+        description: string,
         coordinates: Coordinate[]
     ) {
         this.id = id
