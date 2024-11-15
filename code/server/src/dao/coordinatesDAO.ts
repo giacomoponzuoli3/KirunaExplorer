@@ -88,7 +88,6 @@ class CoordinatesDAO {
      * @param coordinates is the vector of coordinate
      */
     
-
     setDocumentCoordinates(id: number, coord: LatLng|LatLng[]): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try {

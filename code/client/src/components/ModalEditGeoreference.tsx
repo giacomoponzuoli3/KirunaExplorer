@@ -141,16 +141,16 @@ function SetMapViewEdit(props: any) {
         // Impostare la vista iniziale solo al primo rendering
     if (map.getZoom() === undefined) {
         map.setView(position, 12);
-      }
+    }
   
       // Imposta i limiti di zoom
       map.setMaxZoom(18);
       map.setMinZoom(3);
   
         // Limita la mappa alla zona di Kiruna
-        map.setMaxBounds(kirunaBounds);
+      map.setMaxBounds(kirunaBounds);
   
-        // Aggiungi i controlli per il disegno
+      // Aggiungi i controlli per il disegno
         const drawControl = new L.Control.Draw({
           draw: {
             marker: { icon: defaultIcon }, // Abilita i marker con l'icona personalizzata
