@@ -55,6 +55,23 @@ class CoordinatesRoutes {
                 }
             }
         )
+
+        this.router.post(
+            "/update",
+            this.authenticator.isLoggedIn,
+            this.authenticator.isPlanner, 
+            body("idDoc").isNumeric(),
+            this.errorHandler.validateRequest,
+            (req: any, res: any, next: any) => {
+                try {
+                    this.controller.updateDocumentCoordinates(req.body.idDoc, req.body.coordinates)
+                        .then(() => res.status(200).json({ message: "Coordinates updated successfully" }))
+                        .catch((err: Error) => next(err))
+                } catch (err) {
+                    next(err)
+                }
+            }
+        )
     }
 }
 

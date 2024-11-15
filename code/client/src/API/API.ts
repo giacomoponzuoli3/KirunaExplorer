@@ -341,10 +341,24 @@ async function setDocumentCoordinates(idDoc: number, coordinates: LatLng|LatLng[
     }
 }
 
+async function updateDocumentCoordinates(idDoc: number, coordinates: LatLng|LatLng[]) {
+    const response = await fetch(baseURL + "update/" + "coordinates", { method: 'POST', credentials: "include", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idDoc: idDoc, coordinates: coordinates },) })
+    if (response.ok) {
+        return 
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Something went wrong")
+    }
+}
+
 const API = {
     login, logOut, getUserInfo, register,
     addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType,
     addLink, deleteLink, editLink, getAllLinks, getAllStakeholders,
-    getAllDocumentsCoordinates, setDocumentCoordinates
+    getAllDocumentsCoordinates, setDocumentCoordinates, updateDocumentCoordinates
 }
 export default API
