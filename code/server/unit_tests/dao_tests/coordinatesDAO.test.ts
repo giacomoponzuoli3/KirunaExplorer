@@ -2,7 +2,10 @@ import { describe, afterEach, test, expect, jest } from "@jest/globals"
 import { CoordinatesDAO } from "../../src/dao/coordinatesDAO"
 import db from "../../src/db/db"
 import Coordinate from '../../src/models/coordinate';
+<<<<<<< HEAD
 import { LatLng } from '../../src/interfaces';
+=======
+>>>>>>> d952ae17adcb6829886f4adac83ee0cea1adc9b2
 import { DocCoordinates } from '../../src/models/document_coordinate'
 import { Stakeholder } from "../../src/models/stakeholder"
 import { Database } from "sqlite3";
@@ -147,7 +150,11 @@ describe('coordinatesDAO', () => {
             await expect(dao.getAllDocumentsCoordinates()).resolves.toEqual([testDocCoordinate]);
 
             expect(db.all).toHaveBeenCalledWith(
+<<<<<<< HEAD
                 `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude,dc.longitude, dc.point_order FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id ORDER BY dc.point_order`,
+=======
+                `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude, dc.longitude, dc.point_order FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id ORDER BY dc.point_order`,
+>>>>>>> d952ae17adcb6829886f4adac83ee0cea1adc9b2
                 [], expect.any(Function)
             );
         });
@@ -162,7 +169,11 @@ describe('coordinatesDAO', () => {
             await expect(dao.getAllDocumentsCoordinates()).resolves.toEqual([]);
 
             expect(db.all).toHaveBeenCalledWith(
+<<<<<<< HEAD
                 `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude,dc.longitude, dc.point_order FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id ORDER BY dc.point_order`,
+=======
+                `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude, dc.longitude, dc.point_order FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id ORDER BY dc.point_order`,
+>>>>>>> d952ae17adcb6829886f4adac83ee0cea1adc9b2
                 [], expect.any(Function)
             );
         });
@@ -177,7 +188,11 @@ describe('coordinatesDAO', () => {
             await expect(dao.getAllDocumentsCoordinates()).rejects.toThrow(`Database error`);
 
             expect(db.all).toHaveBeenCalledWith(
+<<<<<<< HEAD
               `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude,dc.longitude, dc.point_order FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id ORDER BY dc.point_order`,
+=======
+               `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude, dc.longitude, dc.point_order FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id ORDER BY dc.point_order`,
+>>>>>>> d952ae17adcb6829886f4adac83ee0cea1adc9b2
                 [], expect.any(Function)
             );
 
@@ -198,6 +213,7 @@ describe('coordinatesDAO', () => {
 
     describe('setDocumentCoordinates', () => {
 
+<<<<<<< HEAD
         test('It should successfully set a coordinate for a document', async () => {
             const coordinate: LatLng = { lat: 40.7128, lng: -74.0060 };
 
@@ -334,4 +350,24 @@ describe('coordinatesDAO', () => {
 
     });
 
+=======
+        test('It should successfully insert the coordinates of a document', async () => {
+            const singleCoord = { lat: 40.7128, lng: -74.0060 };
+
+            jest.spyOn(db, 'run')
+            .mockImplementationOnce((sql, params, callback) => {
+                callback.bind({ lastID: 1 })(null);
+                return {} as Database;
+            })
+        
+            await expect(dao.setDocumentCoordinates(1, singleCoord)).resolves.toBeUndefined();
+        
+            expect(db.run).toHaveBeenCalledWith(
+              `INSERT INTO document_coordinates (document_id, latitude, longitude, point_order) VALUES (?, ?, ?, ?)`,
+              [1, singleCoord.lat, singleCoord.lng, 1],
+              expect.any(Function)
+            );
+        });
+    });
+>>>>>>> d952ae17adcb6829886f4adac83ee0cea1adc9b2
 });
