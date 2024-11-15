@@ -85,29 +85,37 @@ class CoordinatesDAO {
      */
     
 
+    /**
+     * Update the coordinates of a document
+     * @param id is the id of document
+     * @param coordinates is the vector of coordinate
+     * @returns a Promise that resolves when the coordinates have been updated
+     */
     setDocumentCoordinates(id: number, coord: LatLng|LatLng[]): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try {
                 const coordinatesArray = Array.isArray(coord) ? coord : [coord];
-                
-            for (let i = 0; i < coordinatesArray.length; i++) {
-                const point = coordinatesArray[i];
-                const pointOrder = i + 1;
 
-                const sql = `INSERT INTO document_coordinates (document_id, latitude, longitude, point_order) VALUES (?, ?, ?, ?)`;
+                for (let i = 0; i < coordinatesArray.length; i++) {
+                    const point = coordinatesArray[i];
+                    const pointOrder = i + 1;
 
-                db.run(sql, [id, point.lat, point.lng, pointOrder], (err: Error | null) => {
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-                });
-            }
+                    const sql = `INSERT INTO document_coordinates (document_id, latitude, longitude, point_order) VALUES (?, ?, ?, ?)`;
+
+                    db.run(sql, [id, point.lat, point.lng, pointOrder], (err: Error | null) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+                    });
+                }
             } catch (error) {
                 reject(error);
             }
+            resolve();
         });
     }
+
 }
 
 export {CoordinatesDAO};
