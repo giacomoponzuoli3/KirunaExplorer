@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for server/src/dao/stakeholderDAO.ts</title>
+    <title>Code coverage report for server/src/controllers/coordinatesController.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../../prettify.css" />
     <link rel="stylesheet" href="../../../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../../index.html">All files</a> / <a href="index.html">server/src/dao</a> stakeholderDAO.ts</h1>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">server/src/controllers</a> coordinatesController.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">17.64% </span>
+                <span class="strong">60% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>3/17</span>
+                <span class='fraction'>3/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">33.33% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>1/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">18.75% </span>
+                <span class="strong">60% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>3/16</span>
+                <span class='fraction'>3/5</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -94,39 +94,20 @@
 <a name='L29'></a><a href='#L29'>29</a>
 <a name='L30'></a><a href='#L30'>30</a>
 <a name='L31'></a><a href='#L31'>31</a>
-<a name='L32'></a><a href='#L32'>32</a>
-<a name='L33'></a><a href='#L33'>33</a>
-<a name='L34'></a><a href='#L34'>34</a>
-<a name='L35'></a><a href='#L35'>35</a>
-<a name='L36'></a><a href='#L36'>36</a>
-<a name='L37'></a><a href='#L37'>37</a>
-<a name='L38'></a><a href='#L38'>38</a>
-<a name='L39'></a><a href='#L39'>39</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L32'></a><a href='#L32'>32</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -139,45 +120,43 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">import db from "../db/db"
-import { Stakeholder } from "../models/stakeholder"
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">import { DocCoordinates } from "../models/document_coordinate";
+import { CoordinatesDAO } from "../dao/coordinatesDAO";
+import { LatLng } from "../interfaces";
 &nbsp;
-class StakeholderDAO {
-    
-<span class="fstat-no" title="function not covered" >    getAllStakeholders(</span>): Promise&lt;Stakeholder[]&gt; {
-<span class="cstat-no" title="statement not covered" >        return new Promise&lt;Stakeholder[]&gt;(<span class="fstat-no" title="function not covered" >(r</span>esolve, reject) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >            try {</span>
-                const sql = <span class="cstat-no" title="statement not covered" >"SELECT * FROM stakeholders";</span>
-<span class="cstat-no" title="statement not covered" >                db.all(sql, [], <span class="fstat-no" title="function not covered" >(e</span>rr: Error | null, rows: any[]) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >                    <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {</span>
-<span class="cstat-no" title="statement not covered" >                        reject(err);</span>
-<span class="cstat-no" title="statement not covered" >                        return;</span>
-                    }
-<span class="cstat-no" title="statement not covered" >                    <span class="missing-if-branch" title="if path not taken" >I</span>if (!rows || rows.length === 0) {</span>
-<span class="cstat-no" title="statement not covered" >                        reject(new Error("No stakeholders found."));</span>
-<span class="cstat-no" title="statement not covered" >                        return;</span>
-                    }
-                    
-                    // Map rows to Stakeholder instances
-                    const stakeholders: Stakeholder[] = <span class="cstat-no" title="statement not covered" >rows.map(<span class="fstat-no" title="function not covered" >row </span>=&gt; <span class="cstat-no" title="statement not covered" >new Stakeholder(</span></span>
-                        row.id,
-                        row.name,
-                        row.category
-                    ));
-<span class="cstat-no" title="statement not covered" >                    resolve(stakeholders);</span>
-                });
-            } catch (error) {
-<span class="cstat-no" title="statement not covered" >                reject(error);</span>
-            }
-        });
+class CoordinatesController {
+    private dao: CoordinatesDAO;
+&nbsp;
+    constructor() {
+        this.dao = new CoordinatesDAO();
     }
-    
+&nbsp;
+    /**
+     * Retrieves all documents with their coordinates.
+     * @returns A Promise that resolves to an array of DocCoordinates objects.
+     */
+<span class="fstat-no" title="function not covered" >    getAllDocumentsCoordinates(</span>): Promise&lt;DocCoordinates[]&gt; {
+<span class="cstat-no" title="statement not covered" >        return this.dao.getAllDocumentsCoordinates();</span>
+    }
+&nbsp;
+    /**
+     * Sets the coordinates of a document with the given id.
+     * @param id The id of the document to set the coordinates of.
+     * @param coord The coordinates to set, either a single LatLng object or an array of LatLng objects.
+     * @returns A Promise that resolves when the coordinates have been set.
+     */
+<span class="fstat-no" title="function not covered" >    setDocumentCoordinates(</span>id: number, coord: LatLng|LatLng[]): Promise&lt;void&gt; {
+<span class="cstat-no" title="statement not covered" >        return this.dao.setDocumentCoordinates(id, coord);</span>
+    }
 &nbsp;
 }
 &nbsp;
-&nbsp;
-&nbsp;
-export {StakeholderDAO}</pre></td></tr></table></pre>
+export { CoordinatesController };</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
