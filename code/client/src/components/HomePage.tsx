@@ -45,38 +45,9 @@ function SetMapViewHome(props: any) {
   const position: LatLngTuple = [67.8558, 20.2253];
 
   const kirunaBounds = new LatLngBounds(
-    [67.3556, 17.8994],  // Sud-ovest
-    [69.0592, 23.2858]   // Nord-est
+    [67.790390, 20.416509],  // Sud-ovest
+    [67.889194, 20.050656]   // Nord-est
   );
-
-  // Definisci l'icona personalizzata per i marker disegnati
-  const defaultIcon = L.icon({
-    iconUrl: '/kiruna/img/pinMap.png', // URL dell'icona predefinita
-    iconSize: [40, 40], // Dimensioni dell'icona
-    iconAnchor: [15, 30], // Punto di ancoraggio (allinea la parte inferiore dell'icona alla posizione del marker)
-    popupAnchor: [1, -34], // Punto per l'apertura del popup rispetto al marker
-  });
-
-  // Configurazione strumenti di disegno
-  const drawControl = new L.Control.Draw({
-    draw: {
-      marker: {icon: defaultIcon}, // Abilita l'opzione di aggiungere punti
-      polygon: {
-        shapeOptions: {
-          color: '#3388ff', // Colore del bordo
-          weight: 2,        // Spessore del bordo
-          opacity: 0.8,     // Opacità del bordo
-          fillColor: '#3388ff', // Colore di riempimento
-          fillOpacity: 0.3, // Opacità del riempimento
-          dashArray: '5,5', // Linea tratteggiata (opzionale)
-        },
-      }, // Abilita l'opzione di aggiungere poligoni
-      polyline: false, // Disabilita linee per questo esempio
-      rectangle: false, // Disabilita rettangoli
-      circle: false, // Disabilita cerchi
-      circlemarker: false, // Disabilita marker circolari
-    },
-  });
 
   // Gestire gli eventi di creazione delle geometrie
   map.on(L.Draw.Event.CREATED, (event: any) => {
@@ -120,19 +91,6 @@ function SetMapViewHome(props: any) {
     defaultPolygon.addTo(map);
   };
 
-  //create a new control for 
-  const customControl = new L.Control({ position: 'topright' } as ControlOptions);
-
-  // Metodo onAdd per aggiungere il pulsante al controllo
-  customControl.onAdd = () => {
-    const container = L.DomUtil.create('button', 'leaflet-bar');
-    container.innerHTML = 'Draw Polygon';
-    container.style.backgroundColor = 'white';
-    container.style.width = '100px';
-    container.style.height = '30px';
-    container.onclick = drawDefaultPolygon;
-    return container;
-  };
 
   useEffect(() => {
 
@@ -147,15 +105,10 @@ function SetMapViewHome(props: any) {
 
     // Limita l'area visibile della mappa alla bounding box di Kiruna
     map.setMaxBounds(kirunaBounds);
-
-    //inserisco le opzioni di disegno
-    map.addControl(drawControl);
+    map.options.maxBoundsViscosity = 1.0; // Imposta viscosità per bloccare l'utente al bounding box
 
     // Aggiungi il layer satellitare alla mappa
     satelliteLayer.addTo(map);
-
-    // Aggiungi il controllo alla mappa
-    customControl.addTo(map);
 
     // Pulizia dei listener e degli elementi aggiunti quando il componente viene smontato
     return () => {
@@ -165,8 +118,6 @@ function SetMapViewHome(props: any) {
           map.removeControl(layer); // Rimuove il controllo di disegno
         }
       });
-
-      map.removeControl(customControl);
 
       map.eachLayer((layer) => {
         if (layer !== satelliteLayer) map.removeLayer(layer);
