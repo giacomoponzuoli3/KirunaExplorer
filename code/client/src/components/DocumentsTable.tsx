@@ -156,13 +156,14 @@ function DocumentsTable(props: any){
                 </table>
               </div>
       
-              {selectedDocument && ( 
+              {/*selectedDocument && ( 
                 <ShowDocumentInfoModal 
                   selectedDocument={selectedDocument} show={showDetails} 
                   onHide={handleCloseDetailsModal} getDocumentIcon={props.getDocumentIcon} 
                   user={props.user} handleEdit={props.handleEdit} refreshDocuments={props.refreshDocuments}
                 />
-              )}
+
+              )*/}
 
               {/* Pagination Controls */}
               {totalPages > 1 && (

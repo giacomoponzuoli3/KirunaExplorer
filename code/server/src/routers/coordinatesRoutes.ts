@@ -64,10 +64,12 @@ class CoordinatesRoutes {
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
                 try {
+                    console.log("entrato " + req.body.coordinates);
                     this.controller.updateDocumentCoordinates(req.body.idDoc, req.body.coordinates)
                         .then(() => res.status(200).json({ message: "Coordinates updated successfully" }))
                         .catch((err: Error) => next(err))
                 } catch (err) {
+                    console.log(err);
                     next(err)
                 }
             }

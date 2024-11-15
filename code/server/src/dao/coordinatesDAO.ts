@@ -83,7 +83,6 @@ class CoordinatesDAO {
     
                     // Convert map values to array
                     const documents = Array.from(documentsMap.values());
-                    console.log(documents);
                     resolve(documents);
                 });
             } catch (error) {
@@ -102,7 +101,7 @@ class CoordinatesDAO {
         return new Promise<void>((resolve, reject) => {
             try {
                 const coordinatesArray = Array.isArray(coord) ? coord : [coord];
-                
+
             for (let i = 0; i < coordinatesArray.length; i++) {
                 const point = coordinatesArray[i];
                 const pointOrder = i + 1;

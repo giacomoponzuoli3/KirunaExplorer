@@ -9,6 +9,7 @@ import { Document } from '../models/document';
 import { LinksDocument } from './LinksDocument';
 import { Stakeholder } from '../models/stakeholder';
 import { DocumentsTable } from './DocumentsTable';
+import { DocCoordinates } from '../models/document_coordinate';
 
 function getDocumentIcon(type: string, size: number = 16): JSX.Element | null {
   const sizeClass = `w-${size} h-${size}`;
@@ -37,9 +38,13 @@ function getDocumentIcon(type: string, size: number = 16): JSX.Element | null {
 
 function App() {
   const [user, setUser] = useState<any>('');
+
   const [isLogged, setIsLogged] = useState<any>(false);
   const [message, setMessage] = useState<any>('');
+
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [documentsCoordinates, setDocumentsCoordinates] = useState<DocCoordinates[]>([]);
+
   const [stakeholders, setStakeholders] = useState<Stakeholder[]>([]);
 
   //API call to get all the documents so we can display them
@@ -47,7 +52,15 @@ function App() {
     try {
         const docs = await API.getAllDocuments();
         setDocuments(docs);
-        //console.log(docs)
+    } catch (err: any) {
+        console.log(err);
+    }
+  };
+
+  const getAllDocumentsCoordinates = async () => {
+    try {
+        const docs = await API.getAllDocumentsCoordinates();
+        setDocumentsCoordinates(docs);
     } catch (err: any) {
         console.log(err);
     }
@@ -64,6 +77,7 @@ function App() {
 
   useEffect(() => {
       getAllDocuments().then();
+      getAllDocumentsCoordinates().then()
       getAllStakeholders().then();
   }, []);
 
@@ -116,7 +130,7 @@ function App() {
             <Outlet/>
           </>
         }>
-          <Route index element={<HomePage documents={documents} user={user} refreshDocuments={getAllDocuments} stakeholders={stakeholders} getDocumentIcon={getDocumentIcon}/>}/>
+          <Route index element={<HomePage documentsCoordinates={documentsCoordinates} documents={documents} user={user} refreshDocuments={getAllDocuments} refreshDocumentsCoordinates={getAllDocumentsCoordinates} stakeholders={stakeholders} getDocumentIcon={getDocumentIcon}/>}/>
           <Route path="/login" element={<Login message={message} isLogged={isLogged} login={handleLogin} handleBack={handleBack}/>} />
           <Route path="*" element={<NotFoundLayout/>} />
           {/* Aggiungi altre route come la dashboard */}
