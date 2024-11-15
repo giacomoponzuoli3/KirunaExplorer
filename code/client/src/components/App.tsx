@@ -108,7 +108,7 @@ function App() {
   };
 
   return (
-    <BrowserRouter basename="/kiruna">
+    <>
       <Routes>
       <Route element={
           <>
@@ -124,8 +124,7 @@ function App() {
           <Route path="/documents" element={<DocumentsTable user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} />} />
         </Route>
       </Routes>
-    </BrowserRouter>
-    
+    </>
   );
 }
 
