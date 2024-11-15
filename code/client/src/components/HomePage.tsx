@@ -1,14 +1,12 @@
 import {Button} from "react-bootstrap"
 import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import API from '../API/API';
-import { Link } from 'react-router-dom';
 import { Document } from "../models/document";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { User } from "../models/user";
 import { useEffect } from "react";
-import { AddDocumentModal, ShowDocumentInfoModal, EditDocumentModal, AddNewDocumentLinksModal } from "./DocumentModals";
+import { AddDocumentModal } from "./AddDocumentModal";
 import { Stakeholder } from "../models/stakeholder";
 import {DocumentLegend} from "./DocumentLegend"
 import Alert from "./Alert"
@@ -22,6 +20,9 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet-draw';
 import { DocCoordinates } from "../models/document_coordinate";
 import ReactDOMServer from 'react-dom/server';
+import { ShowDocumentInfoModal } from "./ShowDocumentInfoModal";
+import { EditDocumentModal } from "./EditDocumentModal";
+import { AddNewDocumentLinksModal } from "./AddNewDocumentLinksModal";
 
 
 //coordinates of Kiruna Town Hall

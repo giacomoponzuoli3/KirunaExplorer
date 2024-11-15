@@ -15,7 +15,7 @@ class DocLink {
     type: string
     language: string | null
     pages: string | null
-    description: string | null
+    description: string
     relatedLink: Link
 
     /**
@@ -40,7 +40,7 @@ class DocLink {
         type: string,
         language: string | null = null,
         pages: string | null = null,
-        description: string | null = null,
+        description: string,
         relatedLink: Link
     ) {
         this.id = id
