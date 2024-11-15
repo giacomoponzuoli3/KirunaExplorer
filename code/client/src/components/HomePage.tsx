@@ -66,6 +66,12 @@ function SetMapViewHome(props: any) {
     layer.addTo(map);
   });
 
+  //classic layer
+  const classicLayer =   L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
+    { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }
+  );
+
   // Configurazione layer satellitare alla mappa
   const satelliteLayer = L.tileLayer(
     'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', 
@@ -110,6 +116,21 @@ function SetMapViewHome(props: any) {
     // Aggiungi il layer satellitare alla mappa
     satelliteLayer.addTo(map);
 
+    //Add the classic layer
+    classicLayer.addTo(map);
+
+    // Add the control of the layers
+    L.control.layers(
+      {
+        'Classic': classicLayer,
+        'Satellite': satelliteLayer
+      },
+      {},
+      {
+        position: 'topleft'  // Posizione del controllo dei layer
+      }
+    ).addTo(map);
+
     // Pulizia dei listener e degli elementi aggiunti quando il componente viene smontato
     return () => {
       // Rimuovi il controllo di disegno quando il componente viene smontato
@@ -120,7 +141,9 @@ function SetMapViewHome(props: any) {
       });
 
       map.eachLayer((layer) => {
-        if (layer !== satelliteLayer) map.removeLayer(layer);
+        if (layer !== satelliteLayer && layer !== classicLayer) {
+          map.removeLayer(layer);
+        }
       });
     };
 
@@ -128,8 +151,11 @@ function SetMapViewHome(props: any) {
 
   useEffect(() => {
 
+
+    console.log(props.documents);
     // Creazione e aggiunta dei marker personalizzati
-    props.documents.forEach((doc: any) => {
+
+    props.documents.filter((d: DocCoordinates) => d.coordinates.length != 0).forEach((doc: any) => {
       const iconHtml = ReactDOMServer.renderToString(props.getDocumentIcon(doc.type, 5) || <></>);
       const marker = L.marker([doc.coordinates[0].latitude, doc.coordinates[0].longitude], {
         icon: L.divIcon({
@@ -148,6 +174,7 @@ function SetMapViewHome(props: any) {
         props.onMarkerClick(doc);
       });
     });
+
   }, [props.documents])
 
   return null;
@@ -192,7 +219,7 @@ function HomePage({documents, user, refreshDocuments, getDocumentIcon, stakehold
   useEffect (() => {
     const getDocCord = async () => {
       try {
-        const documents =await API.getAllDocumentsCoordinates();
+        const documents = await API.getAllDocumentsCoordinates(); //all documents also which that aren't coordinates
         setDocumentsCoordinates(documents);
       }
       catch (error) {

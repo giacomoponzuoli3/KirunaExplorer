@@ -31,6 +31,16 @@ class CoordinatesController {
         return this.dao.setDocumentCoordinates(id, coord);
     }
 
+    /**
+     * Modify the coordinates of a document
+     * @param id the id of the document to update the coordinates
+     * @param coord the array of the new coordinates 
+     * @return A Promise that resolves when the coordinates have been updated
+     */
+    updateDocumentCoordinates(id_document: number, coord: LatLng|LatLng[]): Promise<void> {
+        return this.dao.updateDocumentCoordinates(id_document, coord);
+    }
+
 }
 
 export { CoordinatesController };
