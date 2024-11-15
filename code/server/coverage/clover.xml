@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1731245219076" clover="3.2.0">
-  <project timestamp="1731245219076" name="All files">
-    <metrics statements="603" coveredstatements="452" conditionals="123" coveredconditionals="76" methods="204" coveredmethods="138" elements="930" coveredelements="666" complexity="0" loc="603" ncloc="603" packages="7" files="22" classes="22"/>
+<coverage generated="1731658586529" clover="3.2.0">
+  <project timestamp="1731658586529" name="All files">
+    <metrics statements="705" coveredstatements="484" conditionals="142" coveredconditionals="78" methods="228" coveredmethods="143" elements="1075" coveredelements="705" complexity="0" loc="705" ncloc="705" packages="7" files="27" classes="27"/>
     <package name="server">
       <metrics statements="14" coveredstatements="12" conditionals="1" coveredconditionals="0" methods="1" coveredmethods="0"/>
-      <file name="index.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\index.ts">
+      <file name="index.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/index.ts">
         <metrics statements="14" coveredstatements="12" conditionals="1" coveredconditionals="0" methods="1" coveredmethods="0"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
@@ -23,8 +23,8 @@
       </file>
     </package>
     <package name="server.src">
-      <metrics statements="39" coveredstatements="36" conditionals="7" coveredconditionals="7" methods="8" coveredmethods="5"/>
-      <file name="helper.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\helper.ts">
+      <metrics statements="42" coveredstatements="39" conditionals="7" coveredconditionals="7" methods="8" coveredmethods="5"/>
+      <file name="helper.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/helper.ts">
         <metrics statements="11" coveredstatements="11" conditionals="7" coveredconditionals="7" methods="4" coveredmethods="4"/>
         <line num="1" count="1" type="stmt"/>
         <line num="17" count="64" type="stmt"/>
@@ -38,8 +38,8 @@
         <line num="34" count="10" type="cond" truecount="2" falsecount="0"/>
         <line num="42" count="1" type="stmt"/>
       </file>
-      <file name="routes.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\routes.ts">
-        <metrics statements="23" coveredstatements="23" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+      <file name="routes.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/routes.ts">
+        <metrics statements="26" coveredstatements="26" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
@@ -47,24 +47,27 @@
         <line num="5" count="1" type="stmt"/>
         <line num="6" count="1" type="stmt"/>
         <line num="7" count="1" type="stmt"/>
-        <line num="10" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
         <line num="11" count="1" type="stmt"/>
-        <line num="23" count="1" type="stmt"/>
+        <line num="12" count="1" type="stmt"/>
         <line num="24" count="1" type="stmt"/>
         <line num="25" count="1" type="stmt"/>
-        <line num="33" count="1" type="stmt"/>
+        <line num="26" count="1" type="stmt"/>
         <line num="34" count="1" type="stmt"/>
         <line num="35" count="1" type="stmt"/>
         <line num="36" count="1" type="stmt"/>
         <line num="37" count="1" type="stmt"/>
+        <line num="38" count="1" type="stmt"/>
         <line num="39" count="1" type="stmt"/>
-        <line num="40" count="1" type="stmt"/>
         <line num="41" count="1" type="stmt"/>
         <line num="42" count="1" type="stmt"/>
+        <line num="43" count="1" type="stmt"/>
         <line num="44" count="1" type="stmt"/>
+        <line num="45" count="1" type="stmt"/>
         <line num="47" count="1" type="stmt"/>
+        <line num="50" count="1" type="stmt"/>
       </file>
-      <file name="utilities.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\utilities.ts">
+      <file name="utilities.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/utilities.ts">
         <metrics statements="5" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="0"/>
         <line num="1" count="1" type="stmt"/>
         <line num="12" count="0" type="stmt"/>
@@ -74,8 +77,16 @@
       </file>
     </package>
     <package name="server.src.controllers">
-      <metrics statements="25" coveredstatements="23" conditionals="4" coveredconditionals="4" methods="19" coveredmethods="17"/>
-      <file name="documentController.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\controllers\documentController.ts">
+      <metrics statements="30" coveredstatements="26" conditionals="4" coveredconditionals="4" methods="22" coveredmethods="18"/>
+      <file name="coordinatesController.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/controllers/coordinatesController.ts">
+        <metrics statements="5" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="1"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="17" count="0" type="stmt"/>
+        <line num="27" count="0" type="stmt"/>
+        <line num="32" count="1" type="stmt"/>
+      </file>
+      <file name="documentController.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/controllers/documentController.ts">
         <metrics statements="14" coveredstatements="14" conditionals="4" coveredconditionals="4" methods="12" coveredmethods="12"/>
         <line num="2" count="2" type="stmt"/>
         <line num="10" count="1" type="stmt"/>
@@ -92,7 +103,7 @@
         <line num="122" count="4" type="stmt"/>
         <line num="127" count="2" type="stmt"/>
       </file>
-      <file name="linkController.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\controllers\linkController.ts">
+      <file name="linkController.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/controllers/linkController.ts">
         <metrics statements="7" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="5" coveredmethods="4"/>
         <line num="1" count="2" type="stmt"/>
         <line num="8" count="7" type="stmt"/>
@@ -102,7 +113,7 @@
         <line num="50" count="2" type="stmt"/>
         <line num="54" count="2" type="stmt"/>
       </file>
-      <file name="stakeholderController.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\controllers\stakeholderController.ts">
+      <file name="stakeholderController.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/controllers/stakeholderController.ts">
         <metrics statements="4" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="1"/>
         <line num="1" count="1" type="stmt"/>
         <line num="8" count="1" type="stmt"/>
@@ -111,8 +122,52 @@
       </file>
     </package>
     <package name="server.src.dao">
-      <metrics statements="277" coveredstatements="219" conditionals="80" coveredconditionals="57" methods="81" coveredmethods="66"/>
-      <file name="documentDAO.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\dao\documentDAO.ts">
+      <metrics statements="318" coveredstatements="224" conditionals="89" coveredconditionals="57" methods="88" coveredmethods="66"/>
+      <file name="coordinatesDAO.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/dao/coordinatesDAO.ts">
+        <metrics statements="41" coveredstatements="5" conditionals="9" coveredconditionals="0" methods="7" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="13" count="0" type="stmt"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="15" count="0" type="stmt"/>
+        <line num="28" count="0" type="stmt"/>
+        <line num="29" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="30" count="0" type="stmt"/>
+        <line num="31" count="0" type="stmt"/>
+        <line num="33" count="0" type="cond" truecount="0" falsecount="3"/>
+        <line num="34" count="0" type="stmt"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="38" count="0" type="stmt"/>
+        <line num="39" count="0" type="stmt"/>
+        <line num="40" count="0" type="stmt"/>
+        <line num="41" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="42" count="0" type="stmt"/>
+        <line num="57" count="0" type="stmt"/>
+        <line num="59" count="0" type="stmt"/>
+        <line num="60" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="61" count="0" type="stmt"/>
+        <line num="64" count="0" type="stmt"/>
+        <line num="66" count="0" type="stmt"/>
+        <line num="72" count="0" type="stmt"/>
+        <line num="73" count="0" type="stmt"/>
+        <line num="76" count="0" type="stmt"/>
+        <line num="89" count="0" type="stmt"/>
+        <line num="90" count="0" type="stmt"/>
+        <line num="91" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="93" count="0" type="stmt"/>
+        <line num="94" count="0" type="stmt"/>
+        <line num="95" count="0" type="stmt"/>
+        <line num="97" count="0" type="stmt"/>
+        <line num="99" count="0" type="stmt"/>
+        <line num="100" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="101" count="0" type="stmt"/>
+        <line num="102" count="0" type="stmt"/>
+        <line num="107" count="0" type="stmt"/>
+        <line num="113" count="1" type="stmt"/>
+      </file>
+      <file name="documentDAO.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/dao/documentDAO.ts">
         <metrics statements="168" coveredstatements="168" conditionals="46" coveredconditionals="43" methods="52" coveredmethods="52"/>
         <line num="1" count="3" type="stmt"/>
         <line num="2" count="3" type="stmt"/>
@@ -283,7 +338,7 @@
         <line num="444" count="1" type="stmt"/>
         <line num="454" count="3" type="stmt"/>
       </file>
-      <file name="linkDAO.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\dao\linkDAO.ts">
+      <file name="linkDAO.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/dao/linkDAO.ts">
         <metrics statements="54" coveredstatements="44" conditionals="19" coveredconditionals="14" methods="16" coveredmethods="14"/>
         <line num="1" count="2" type="stmt"/>
         <line num="2" count="2" type="stmt"/>
@@ -340,7 +395,7 @@
         <line num="99" count="0" type="stmt"/>
         <line num="105" count="2" type="stmt"/>
       </file>
-      <file name="stakeholderDAO.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\dao\stakeholderDAO.ts">
+      <file name="stakeholderDAO.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/dao/stakeholderDAO.ts">
         <metrics statements="16" coveredstatements="3" conditionals="4" coveredconditionals="0" methods="4" coveredmethods="0"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
@@ -359,7 +414,7 @@
         <line num="29" count="0" type="stmt"/>
         <line num="39" count="1" type="stmt"/>
       </file>
-      <file name="userDAO.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\dao\userDAO.ts">
+      <file name="userDAO.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/dao/userDAO.ts">
         <metrics statements="39" coveredstatements="4" conditionals="11" coveredconditionals="0" methods="9" coveredmethods="0"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
@@ -404,7 +459,7 @@
     </package>
     <package name="server.src.db">
       <metrics statements="7" coveredstatements="7" conditionals="5" coveredconditionals="2" methods="1" coveredmethods="1"/>
-      <file name="db.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\db\db.ts">
+      <file name="db.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/db/db.ts">
         <metrics statements="7" coveredstatements="7" conditionals="5" coveredconditionals="2" methods="1" coveredmethods="1"/>
         <line num="9" count="5" type="stmt"/>
         <line num="16" count="5" type="cond" truecount="1" falsecount="1"/>
@@ -416,8 +471,16 @@
       </file>
     </package>
     <package name="server.src.models">
-      <metrics statements="49" coveredstatements="49" conditionals="11" coveredconditionals="6" methods="8" coveredmethods="8"/>
-      <file name="document.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\models\document.ts">
+      <metrics statements="71" coveredstatements="57" conditionals="14" coveredconditionals="8" methods="11" coveredmethods="9"/>
+      <file name="coordinate.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/models/coordinate.ts">
+        <metrics statements="5" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="10" count="0" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="12" count="0" type="stmt"/>
+        <line num="15" count="1" type="stmt"/>
+      </file>
+      <file name="document.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/models/document.ts">
         <metrics statements="16" coveredstatements="16" conditionals="4" coveredconditionals="2" methods="2" coveredmethods="2"/>
         <line num="42" count="18" type="stmt"/>
         <line num="43" count="18" type="stmt"/>
@@ -436,8 +499,28 @@
         <line num="62" count="5" type="stmt"/>
         <line num="66" count="5" type="stmt"/>
       </file>
-      <file name="document_link.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\models\document_link.ts">
-        <metrics statements="17" coveredstatements="17" conditionals="5" coveredconditionals="2" methods="2" coveredmethods="2"/>
+      <file name="document_coordinate.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/models/document_coordinate.ts">
+        <metrics statements="17" coveredstatements="7" conditionals="4" coveredconditionals="2" methods="2" coveredmethods="1"/>
+        <line num="47" count="0" type="stmt"/>
+        <line num="48" count="0" type="stmt"/>
+        <line num="49" count="0" type="stmt"/>
+        <line num="50" count="0" type="stmt"/>
+        <line num="51" count="0" type="stmt"/>
+        <line num="52" count="0" type="stmt"/>
+        <line num="53" count="0" type="stmt"/>
+        <line num="54" count="0" type="stmt"/>
+        <line num="55" count="0" type="stmt"/>
+        <line num="56" count="0" type="stmt"/>
+        <line num="63" count="1" type="cond" truecount="2" falsecount="0"/>
+        <line num="64" count="1" type="stmt"/>
+        <line num="65" count="1" type="stmt"/>
+        <line num="66" count="1" type="stmt"/>
+        <line num="67" count="1" type="stmt"/>
+        <line num="68" count="1" type="stmt"/>
+        <line num="71" count="1" type="stmt"/>
+      </file>
+      <file name="document_link.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/models/document_link.ts">
+        <metrics statements="17" coveredstatements="17" conditionals="4" coveredconditionals="2" methods="2" coveredmethods="2"/>
         <line num="46" count="14" type="stmt"/>
         <line num="47" count="14" type="stmt"/>
         <line num="48" count="14" type="stmt"/>
@@ -456,20 +539,20 @@
         <line num="67" count="5" type="stmt"/>
         <line num="70" count="5" type="stmt"/>
       </file>
-      <file name="link.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\models\link.ts">
+      <file name="link.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/models/link.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
         <line num="6" count="20" type="stmt"/>
         <line num="7" count="20" type="stmt"/>
         <line num="10" count="7" type="stmt"/>
       </file>
-      <file name="stakeholder.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\models\stakeholder.ts">
+      <file name="stakeholder.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/models/stakeholder.ts">
         <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
         <line num="21" count="17" type="stmt"/>
         <line num="22" count="17" type="stmt"/>
         <line num="23" count="17" type="stmt"/>
         <line num="29" count="5" type="stmt"/>
       </file>
-      <file name="user.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\models\user.ts">
+      <file name="user.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/models/user.ts">
         <metrics statements="9" coveredstatements="9" conditionals="2" coveredconditionals="2" methods="2" coveredmethods="2"/>
         <line num="18" count="1" type="stmt"/>
         <line num="19" count="1" type="stmt"/>
@@ -483,8 +566,8 @@
       </file>
     </package>
     <package name="server.src.routers">
-      <metrics statements="192" coveredstatements="106" conditionals="15" coveredconditionals="0" methods="86" coveredmethods="41"/>
-      <file name="AuthRoutes.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\routers\AuthRoutes.ts">
+      <metrics statements="223" coveredstatements="119" conditionals="22" coveredconditionals="0" methods="97" coveredmethods="44"/>
+      <file name="AuthRoutes.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/routers/AuthRoutes.ts">
         <metrics statements="29" coveredstatements="13" conditionals="0" coveredconditionals="0" methods="13" coveredmethods="3"/>
         <line num="1" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
@@ -516,7 +599,7 @@
         <line num="123" count="0" type="stmt"/>
         <line num="130" count="1" type="stmt"/>
       </file>
-      <file name="auth.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\routers\auth.ts">
+      <file name="auth.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/routers/auth.ts">
         <metrics statements="42" coveredstatements="6" conditionals="15" coveredconditionals="0" methods="20" coveredmethods="0"/>
         <line num="3" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
@@ -561,7 +644,41 @@
         <line num="172" count="0" type="stmt"/>
         <line num="177" count="1" type="stmt"/>
       </file>
-      <file name="documentRoutes.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\routers\documentRoutes.ts">
+      <file name="coordinatesRoutes.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/routers/coordinatesRoutes.ts">
+        <metrics statements="31" coveredstatements="13" conditionals="7" coveredconditionals="0" methods="11" coveredmethods="3"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="15" count="1" type="stmt"/>
+        <line num="16" count="1" type="stmt"/>
+        <line num="17" count="1" type="stmt"/>
+        <line num="18" count="1" type="stmt"/>
+        <line num="19" count="1" type="stmt"/>
+        <line num="23" count="1" type="stmt"/>
+        <line num="28" count="1" type="stmt"/>
+        <line num="31" count="0" type="stmt"/>
+        <line num="32" count="0" type="stmt"/>
+        <line num="33" count="0" type="stmt"/>
+        <line num="34" count="0" type="stmt"/>
+        <line num="36" count="0" type="stmt"/>
+        <line num="41" count="1" type="stmt"/>
+        <line num="47" count="0" type="stmt"/>
+        <line num="48" count="0" type="cond" truecount="0" falsecount="3"/>
+        <line num="50" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="51" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="52" count="0" type="stmt"/>
+        <line num="55" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="56" count="0" type="stmt"/>
+        <line num="59" count="0" type="stmt"/>
+        <line num="63" count="0" type="stmt"/>
+        <line num="64" count="0" type="stmt"/>
+        <line num="65" count="0" type="stmt"/>
+        <line num="66" count="0" type="stmt"/>
+        <line num="68" count="0" type="stmt"/>
+        <line num="75" count="1" type="stmt"/>
+      </file>
+      <file name="documentRoutes.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/routers/documentRoutes.ts">
         <metrics statements="71" coveredstatements="62" conditionals="0" coveredconditionals="0" methods="32" coveredmethods="32"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
@@ -635,7 +752,7 @@
         <line num="213" count="1" type="stmt"/>
         <line num="221" count="1" type="stmt"/>
       </file>
-      <file name="linkRoutes.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\routers\linkRoutes.ts">
+      <file name="linkRoutes.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/routers/linkRoutes.ts">
         <metrics statements="35" coveredstatements="15" conditionals="0" coveredconditionals="0" methods="15" coveredmethods="3"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
@@ -673,7 +790,7 @@
         <line num="93" count="0" type="stmt"/>
         <line num="100" count="1" type="stmt"/>
       </file>
-      <file name="stakeholderRoutes.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\routers\stakeholderRoutes.ts">
+      <file name="stakeholderRoutes.ts" path="/Users/giacomoponzuoli/Desktop/KirunaExplorer/code/server/src/routers/stakeholderRoutes.ts">
         <metrics statements="15" coveredstatements="10" conditionals="0" coveredconditionals="0" methods="6" coveredmethods="3"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
