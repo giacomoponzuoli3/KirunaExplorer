@@ -96,10 +96,7 @@ class DocumentController {
      */
 
     getDocumentDescriptionById(id: number): Promise<string> {
-        return this.dao.getDocumentDescriptionById(id).then((description: string | null) => {
-            //if the document does not have a description it returns a message to notify it
-            return description ?? "No description available";
-        });
+        return this.dao.getDocumentDescriptionById(id)
     }
 
     /**

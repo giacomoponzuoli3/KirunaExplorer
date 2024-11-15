@@ -143,7 +143,7 @@ class Authenticator {
      */
     isResident(req: any, res: any, next: any) {
         if (req.isAuthenticated() && Utility.isResident(req.user)) return next()
-        return res.status(401).json({ error: "User is not a resident", status: 401 })
+        return res.status(403).json({ error: "User is not a resident", status: 403 })
     }
 
     /**
@@ -156,7 +156,7 @@ class Authenticator {
      */
     isPlanner(req: any, res: any, next: any) {
         if (req.isAuthenticated() && Utility.isPlanner(req.user)) return next()
-        return res.status(401).json({ error: "User is not an urban planner", status: 401 })
+        return res.status(403).json({ error: "User is not an urban planner", status: 403 })
     }
 
     /**
@@ -169,7 +169,7 @@ class Authenticator {
      */
     isDeveloper(req: any, res: any, next: any) {
         if (req.isAuthenticated() && Utility.isDeveloper(req.user)) return next()
-        return res.status(401).json({ error: "User is not an urban developer", status: 401 })
+        return res.status(403).json({ error: "User is not an urban developer", status: 403 })
     }
 
 }
