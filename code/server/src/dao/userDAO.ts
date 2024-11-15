@@ -1,6 +1,7 @@
 import db from "../db/db"
 import { User } from "../models/user"
 import crypto from "crypto"
+import {UserAlreadyExistsError, UserNotFoundError} from "../errors/user";
 
 
 class UserDAO {
@@ -22,11 +23,10 @@ class UserDAO {
                 const sql = "INSERT INTO users(username, name, surname, role, password, salt) VALUES(?, ?, ?, ?, ?, ?)"
                 db.run(sql, [username, name, surname, role, hashedPassword, salt], (err: Error | null) => {
                     if (err) {
-                        if (err.message.includes("UNIQUE constraint failed: users.username")){ 
-                            return reject(new Error("User already exists."));  
-                        }
-                        reject(err)
+                        if (err.message.includes("UNIQUE constraint failed: users.username")) return reject(new UserAlreadyExistsError);
+                        return reject(err)
                     }
+
                     resolve(true)
                 })
             } catch (error) {
@@ -51,18 +51,17 @@ class UserDAO {
                  */
                 const sql = "SELECT username, password, salt FROM users WHERE username = ?"
                 db.get(sql, [username], (err: Error | null, row: any) => {
-                    if (err) reject(err)
+                    if (err) return reject(err)
                     //If there is no user with the given username, or the user salt is not saved in the database, the user is not authenticated.
-                    if (!row || row.username !== username || !row.salt) {
-                        resolve(false)
-                    } else {
-                        //Hashes the plain password using the salt and then compares it with the hashed password stored in the database
-                        const hashedPassword = crypto.scryptSync(plainPassword, row.salt, 16)
-                        const passwordHex = Buffer.from(row.password, "hex")
-                        if (!crypto.timingSafeEqual(passwordHex, hashedPassword)) resolve(false)
-                        resolve(true)
-                    }
+                    if (!row || row.username !== username || !row.salt) return resolve(false)
 
+                    //Hashes the plain password using the salt and then compares it with the hashed password stored in the database
+                    const hashedPassword = crypto.scryptSync(plainPassword, row.salt, 16)
+                    const passwordHex = Buffer.from(row.password, "hex")
+
+                    if (!crypto.timingSafeEqual(passwordHex, hashedPassword)) return resolve(false)
+
+                    resolve(true)
                 })
             } catch (error) {
                 reject(error)
@@ -80,14 +79,9 @@ class UserDAO {
         return new Promise<User>((resolve, reject) => {
                 const sql = "SELECT * FROM users WHERE username = ?"
                 db.get(sql, [username], (err: Error | null, row: any) => {
-                    if (err) {
-                        reject(err)
-                        return
-                    }
-                    if (!row) {
-                        reject(new Error("User not found."))
-                        return
-                    } 
+                    if (err) return reject(err)
+                    if (!row) return reject(new UserNotFoundError)
+                    
                     const user: User = new User(row.username, row.name, row.surname, row.role)
                     resolve(user)
                 })

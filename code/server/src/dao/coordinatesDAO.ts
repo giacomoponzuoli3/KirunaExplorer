@@ -10,9 +10,10 @@ class CoordinatesDAO {
      * @returns A Promise that resolves to the array of documents with their coordinates
      */
     getAllDocumentsCoordinates(): Promise<DocCoordinates[]> {
-        return new Promise<DocCoordinates[]>((resolve, reject) => {
+        return new Promise<DocCoordinates[]>(async (resolve, reject) => {
             try {
-                const sql = `SELECT d.*, 
+                let rows: any[] = await new Promise<any[]>((resolve, reject) => {
+                    const sql = `SELECT d.*, 
                             s.id AS stakeholder_id, 
                             s.name AS stakeholder_name, 
                             s.category AS stakeholder_category, 
@@ -24,65 +25,53 @@ class CoordinatesDAO {
                                 JOIN document_coordinates dc ON dc.document_id = d.id
                                 JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id
                                 ORDER BY dc.point_order`;
-    
-                db.all(sql, [], (err: Error | null, rows: any[]) => {
-                    if (err) {
-                        reject(err);
-                        return;
+
+                    db.all(sql, [], (err: Error | null, rows: any[]) => {
+                        if (err) return reject(err);
+                        if (!rows || rows.length == 0) return resolve([]);
+
+                        resolve(rows);
+                    });
+                })
+
+                const documentsMap = new Map<number, DocCoordinates>();
+                rows.forEach((row: any) => {
+                    const documentId = row.id;
+                    if (!documentsMap.has(documentId)) {
+                        documentsMap.set(documentId, new DocCoordinates(
+                            row.id,
+                            row.title,
+                            [],  // Placeholder for stakeholders, populated below
+                            row.scale,
+                            row.issuance_date,
+                            row.type,
+                            row.language,
+                            row.pages,
+                            row.description,
+                            []   // Placeholder for coordinates, populated below
+                        ));
                     }
-                    if (!rows || rows.length === 0) {
-                        resolve([]);
-                        return;
-                    }
-                    
-                    const documentsMap = new Map<number, DocCoordinates>();
-                    rows.forEach((row: any) => {
-                        const documentId = row.id;
-                        if (!documentsMap.has(documentId)) {
-                            documentsMap.set(documentId, new DocCoordinates(
-                                row.id,
-                                row.title,
-                                [],  // Placeholder for stakeholders, populated below
-                                row.scale,
-                                row.issuance_date,
-                                row.type,
-                                row.language,
-                                row.pages,
-                                row.description,
-                                []
-                            ));
-                        }
-    
+
+                    const doc = documentsMap.get(documentId);
+                    if (doc) {
                         // Add stakeholder (always available) to the document's stakeholders array
                         const stakeholder = new Stakeholder(row.stakeholder_id, row.stakeholder_name, row.stakeholder_category);
+                        doc.stakeHolders.push(stakeholder);
 
-                        const doc = documentsMap.get(documentId);
-                        if (doc) {
-                            doc.stakeHolders.push(stakeholder);
-                            
-                            // Add coordinate to the document's coordinates array
-                            const coordinate = new Coordinate(row.coordinate_id, row.point_order, row.latitude, row.longitude);
-
-                            doc.coordinates.push(coordinate);
-                        }
-
-                    });
-    
-                    // Convert map values to array
-                    const documents = Array.from(documentsMap.values());
-                    resolve(documents);
+                        // Add coordinate to the document's coordinates array
+                        const coordinate = new Coordinate(row.coordinate_id, row.point_order, row.latitude, row.longitude);
+                        doc.coordinates.push(coordinate);
+                    }
                 });
+
+                // Convert map values to array
+                const documents = Array.from(documentsMap.values());
+                resolve(documents);
             } catch (error) {
                 reject(error);
             }
         });
     }
-
-    /**
-     * Update the coordinates of a document
-     * @param id is the id of document
-     * @param coordinates is the vector of coordinate
-     */
     
 
     /**
@@ -91,31 +80,31 @@ class CoordinatesDAO {
      * @param coordinates is the vector of coordinate
      * @returns a Promise that resolves when the coordinates have been updated
      */
-    setDocumentCoordinates(id: number, coord: LatLng|LatLng[]): Promise<void> {
+    setDocumentCoordinates(id: number, coords: LatLng|LatLng[]): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try {
-                const coordinatesArray = Array.isArray(coord) ? coord : [coord];
+                const coordinatesArray = Array.isArray(coords) ? coords : [coords];
 
-                for (let i = 0; i < coordinatesArray.length; i++) {
-                    const point = coordinatesArray[i];
-                    const pointOrder = i + 1;
+                const sql = `INSERT INTO document_coordinates (document_id, latitude, longitude, point_order) VALUES (?, ?, ?, ?)`;
+                const coordinatesInserts = coordinatesArray.map((point, index) => new Promise<void>(
+                    (resolveInsert, rejectInsert) => {
+                        const pointOrder = index + 1;
 
-                    const sql = `INSERT INTO document_coordinates (document_id, latitude, longitude, point_order) VALUES (?, ?, ?, ?)`;
+                        db.run(sql, [id, point.lat, point.lng, pointOrder], (err: Error | null) => {
+                            if (err) rejectInsert(err);
+                            else resolveInsert();
+                        })
+                    })
+                )
 
-                    db.run(sql, [id, point.lat, point.lng, pointOrder], (err: Error | null) => {
-                        if (err) {
-                            reject(err);
-                            return;
-                        }
-                    });
-                }
+                Promise.all(coordinatesInserts)
+                    .then(() => resolve())
+                    .catch(error => reject(error));
             } catch (error) {
                 reject(error);
             }
-            resolve();
         });
     }
-
 }
 
 export {CoordinatesDAO};
