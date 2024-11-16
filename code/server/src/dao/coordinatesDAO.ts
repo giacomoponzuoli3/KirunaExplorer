@@ -100,12 +100,13 @@ class CoordinatesDAO {
     setDocumentCoordinates(id: number, coord: LatLng|LatLng[]): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try {
+                console.log("coord: " + coord);
                 const coordinatesArray = Array.isArray(coord) ? coord : [coord];
-
+                console.log("coordinatesArray: " + coordinatesArray.length);
             for (let i = 0; i < coordinatesArray.length; i++) {
                 const point = coordinatesArray[i];
                 const pointOrder = i + 1;
-
+                console.log("point[" + i+1 + "]: " + JSON.stringify(point));
                 const sql = `INSERT INTO document_coordinates (document_id, latitude, longitude, point_order) VALUES (?, ?, ?, ?)`;
 
                 db.run(sql, [id, point.lat, point.lng, pointOrder], (err: Error | null) => {
@@ -114,8 +115,11 @@ class CoordinatesDAO {
                         return;
                     }
                 });
-                return resolve();
+                
             }
+
+            return resolve();
+            
             } catch (error) {
                 reject(error);
             }

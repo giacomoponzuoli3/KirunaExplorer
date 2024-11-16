@@ -23,6 +23,20 @@ import 'leaflet-draw';
 import { DocCoordinates } from "../models/document_coordinate";
 import ReactDOMServer from 'react-dom/server';
 
+// Funzione per ottenere una "firma" unica per un poligono
+function getPolygonKey(latLngs: LatLngTuple[]): string {
+  // Ordina le coordinate del poligono per latitudine e longitudine
+  const sortedCoords = latLngs
+    .map(coord => `${coord[0]},${coord[1]}`)  // Converti le coordinate in stringhe
+    .sort();  // Ordina le coordinate in ordine crescente
+  return sortedCoords.join(";");
+}
+
+// Funzione per confrontare se due poligoni sono uguali
+function comparePolygons(poly1: LatLngTuple[], poly2: LatLngTuple[]): boolean {
+  // Ottieni la firma di entrambi i poligoni
+  return getPolygonKey(poly1) === getPolygonKey(poly2);
+}
 
 //coordinates of Kiruna Town Hall
 const kiruna_town_hall: LatLngTuple = [67.8558, 20.2253];
@@ -37,9 +51,9 @@ interface HomepageProps {
     stakeholders: Stakeholder[];
 }
 
-// Componente per la costruzione dell mappa
+// Componente per la costruzione della mappa
+// Componente per la costruzione della mappa
 function SetMapViewHome(props: any) {
-
   // Ottieni l'istanza della mappa
   const map = useMap(); 
 
@@ -61,7 +75,6 @@ function SetMapViewHome(props: any) {
       
       // Ottieni le coordinate del poligono
       const coordinates = layer.getLatLngs(); // Questo restituirà un array di coordinate
-
     }
 
     // Aggiungi il layer creato alla mappa
@@ -69,7 +82,7 @@ function SetMapViewHome(props: any) {
   });
 
   //classic layer
-  const classicLayer =   L.tileLayer(
+  const classicLayer = L.tileLayer(
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
     { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }
   );
@@ -80,28 +93,7 @@ function SetMapViewHome(props: any) {
     { attribution: '&copy; <a href="https://www.opentopomap.org">OpenTopoMap</a>' }
   );
 
-  // Funzione per disegnare un poligono di default
-  const drawDefaultPolygon = () => {
-    const defaultPolygon = L.polygon(
-      [
-        [67.855, 20.225],
-        [67.856, 20.226],
-        [67.857, 20.225],
-        [67.856, 20.224],
-      ],
-      {
-        color: '#3388ff',
-        weight: 2,
-        fillOpacity: 0.3,
-      }
-    );
-
-    defaultPolygon.addTo(map);
-  };
-
-
   useEffect(() => {
-
     // Impostare la vista iniziale solo al primo rendering
     if (map.getZoom() === undefined) {
       map.setView(position, 12);
@@ -118,7 +110,7 @@ function SetMapViewHome(props: any) {
     // Aggiungi il layer satellitare alla mappa
     satelliteLayer.addTo(map);
 
-    //Add the classic layer
+    // Add the classic layer
     classicLayer.addTo(map);
 
     // Add the control of the layers
@@ -148,21 +140,43 @@ function SetMapViewHome(props: any) {
         }
       });
     };
-
-  }, [map]); 
+  }, [map]);
 
   useEffect(() => {
     // Rimuovere i marker vecchi prima di aggiungere i nuovi
     map.eachLayer((layer) => {
-      if (layer instanceof L.Marker) {
+      if (layer instanceof L.Marker || layer instanceof L.Polygon) {
         map.removeLayer(layer);
       }
     });
 
+    // Mappa per associare documenti a poligoni o punti
+    const documentLayers = new Map();
+
+    // Mappa per tenere traccia delle coordinate già utilizzate (in formato stringa) con il numero di duplicati
+    const usedCoordinates = new Map<string, number>();
+
     // Creazione e aggiunta dei marker personalizzati
-    props.documentsCoordinates.filter((d: DocCoordinates) => d.coordinates.length != 0).forEach((doc: any) => {
+    props.documentsCoordinates.filter((d: DocCoordinates) => d.coordinates.length !== 0).forEach((doc: any) => {
+      let latitude = doc.coordinates[0].latitude;
+      let longitude = doc.coordinates[0].longitude;
+
+      // Genera una chiave per le coordinate
+      const key = `${latitude},${longitude}`;
+
+      // Se la coordinata è già stata utilizzata, incrementa il contatore e sposta il marker
+      let offset = usedCoordinates.get(key) ?? 0; // Usa 0 se offset è undefined
+      if (offset > 0) {
+        usedCoordinates.set(key, offset + 1);
+        // Sposta leggermente il marker (a sinistra o destra) a seconda del contatore
+        longitude += 0.0004 * (offset % 2 === 0 ? 1 : -1);  // Alterna il segno per evitare che si accumulino nello stesso punto
+      } else {
+        // Se è la prima volta che vediamo questa coordinata, aggiungiamo un nuovo contatore
+        usedCoordinates.set(key, 1);
+      }
+
       const iconHtml = ReactDOMServer.renderToString(props.getDocumentIcon(doc.type, 5) || <></>);
-      const marker = L.marker([doc.coordinates[0].latitude, doc.coordinates[0].longitude], {
+      const marker = L.marker([latitude, longitude], {
         icon: L.divIcon({
           html: `
             <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95">
@@ -174,16 +188,54 @@ function SetMapViewHome(props: any) {
         }),
       }).addTo(map);
 
+      // Se il documento ha più di una coordinata (poligono), crea il poligono
+      if (doc.coordinates.length > 1) {
+        const latLngs = doc.coordinates.map((coord: any) => [coord.latitude, coord.longitude]);
+
+        // Definire il poligono, ma non aggiungerlo alla mappa immediatamente
+        const relatedLayer: L.Polygon = L.polygon(latLngs, {
+          color: '#B22222',  // Bordo rosso più scuro (Rosso fuoco)
+          weight: 1,         // Bordo molto sottile
+          opacity: 0.8,      // Opacità del bordo (visibile ma non troppo forte)
+          fillColor: '#FFD700',  // Colore di riempimento giallo oro
+          fillOpacity: 0.1,  // Opacità del riempimento (più opaco per non oscurare la mappa sottostante)
+          smoothFactor: 2,   // Rende il poligono con bordi più arrotondati
+        });
+
+        documentLayers.set(doc, relatedLayer);
+
+        // Evento per mostrare il poligono quando si passa sopra il marker
+        marker.on('mouseover', () => {
+          if (!map.hasLayer(relatedLayer)) {
+            relatedLayer.addTo(map);  // Aggiungi il poligono alla mappa quando il mouse passa sopra il marker
+
+            // Cambia il colore del bordo e riempimento quando il mouse passa sopra
+            relatedLayer.setStyle({
+              color: '#8B0000', // Cambia il colore del bordo a un rosso scuro più intenso
+              weight: 2,        // Aumenta leggermente lo spessore del bordo
+              fillOpacity: 0.2, // Aumenta l'opacità del riempimento
+            });
+          }
+        });
+
+        // Evento per nascondere il poligono quando il mouse esce dal marker
+        marker.on('mouseout', () => {
+          if (map.hasLayer(relatedLayer)) {
+            map.removeLayer(relatedLayer);  // Rimuovi il poligono dalla mappa quando il mouse esce dal marker
+          }
+        });
+      }
+        
       // Listener per aprire il componente ShowDocumentInfoModal al clic del marker
       marker.on('click', () => {
         props.onMarkerClick(doc);
       });
     });
-
-  }, [props.documentsCoordinates])
+  }, [props.documentsCoordinates]);
 
   return null;
 }
+
 
 
 function HomePage({documentsCoordinates, documents, user, refreshDocuments, refreshDocumentsCoordinates, getDocumentIcon, stakeholders} : HomepageProps) {
