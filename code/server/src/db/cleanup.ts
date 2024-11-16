@@ -2,13 +2,32 @@
 
 import db from "../db/db";
 
-/**
- * Deletes all data from the database within a transaction.
- * Ensures that all tables are cleaned in the correct order.
- * This function must be called before each integration test.
- */
-
-
 export async function cleanup() {
-    return;
+    // Helper function to drop tables
+    function dropTable(tableName: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            db.run(`DROP TABLE IF EXISTS "${tableName}"`, (err) => {
+                if (err) {
+                    return reject(new Error(`Failed to drop table ${tableName}: ${err.message}`));
+                }
+                resolve();
+            });
+        });
+    }
+
+    try {
+        // Drop tables in reverse order of creation (to handle foreign key dependencies)
+        await dropTable("document_coordinates");
+        await dropTable("documents_links");
+        await dropTable("stakeholders_documents");
+        await dropTable("users");
+        await dropTable("stakeholders");
+        await dropTable("links");
+        await dropTable("documents");
+
+        console.log("All tables dropped successfully.");
+    } catch (err) {
+        console.error(err.message);
+        throw err; // Propagate the error to handle it at a higher level
+    }
 }
