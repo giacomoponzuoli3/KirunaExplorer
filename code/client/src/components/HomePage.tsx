@@ -92,7 +92,6 @@ function SetMapViewHome(props: any) {
   // Configurazione layer satellitare alla mappa
   const satelliteLayer = L.tileLayer(
     'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', 
-    { attribution: '&copy; <a href="https://www.opentopomap.org">OpenTopoMap</a>' }
   );
 
   useEffect(() => {
