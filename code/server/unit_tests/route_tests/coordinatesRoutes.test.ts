@@ -1,14 +1,9 @@
 import { describe, beforeAll, beforeEach, test, expect, jest } from "@jest/globals"
-import DocumentController from "../../src/controllers/documentController"
-import { CoordinatesDAO } from "../../src/dao/coordinatesDAO"
 import { CoordinatesController } from "../../src/controllers/coordinatesController"
 import Coordinate from '../../src/models/coordinate';
 import { LatLng } from '../../src/interfaces';
 import { DocCoordinates } from '../../src/models/document_coordinate'
-import { Document } from "../../src/models/document"
 import { Stakeholder } from "../../src/models/stakeholder"
-import { DocLink } from "../../src/models/document_link"
-import Link from "../../src/models/link"
 import { app } from "../../index";
 import request from 'supertest';
 import Authenticator from "../../src/routers/auth"
