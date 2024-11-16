@@ -14,24 +14,6 @@ interface TruncatedTextProps {
     text: string;
     maxLength: number;
 }
-
-const TruncatedText: React.FC<TruncatedTextProps> = ({ text, maxLength }) => {
-    const [isExpanded, setIsExpanded] = useState(false);
-  
-    return (
-      <div className="relative">
-        <span className={isExpanded ? '' : 'line-clamp-3'}>
-          {text}
-        </span>
-        <button
-          className="text-blue-600 mt-1"
-          onClick={() => setIsExpanded(!isExpanded)}
-        >
-          {isExpanded ? 'Show less' : 'Show more'}
-        </button>
-      </div>
-    );
-  };
   
 interface ShowDocumentInfoModalProps {
     selectedDocument: Document;
