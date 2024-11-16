@@ -11,7 +11,7 @@ import { AddDocumentModal } from "./AddDocumentModal";
 import { Stakeholder } from "../models/stakeholder";
 import {DocumentLegend} from "./DocumentLegend"
 import Alert from "./Alert"
-
+import { DocumentPlusIcon } from "@heroicons/react/24/outline";
 import { MapContainer, useMap } from 'react-leaflet';
 import { LatLngTuple, LatLngBounds, ControlOptions } from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
@@ -307,17 +307,18 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
         selectedDocument={selectedDocument} 
         selectedDocumentCoordinates={selectedDocumentCoordinates}
         onHide={handleCloseDetailsModal} getDocumentIcon={getDocumentIcon} 
-        user={user} handleEdit={handleEdit} refreshDocuments={refreshDocuments} refreshDocumentsCoordinates={refreshDocumentsCoordinates}
+        user={user} handleEdit={handleEdit} refreshDocuments={refreshDocuments} 
+        refreshDocumentsCoordinates={refreshDocumentsCoordinates}
       />
     )}
                         
     {/* Add Document Button */}
     {user.role==="Urban Planner" ? (
       <button
-        className="bg-blue-950 z-[1000] hover:border-blue-700 hover:bg-blue-700 fixed bottom-6 right-6 rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold border-2 border-blue-950"
+        className="bg-blue-950 z-[1000] hover:border-blue-700 hover:bg-blue-700 fixed bottom-6 right-6 rounded-full w-14 h-14 flex items-center justify-center text-2xl font-bold border-2 border-blue-950"
         onClick={() => setShowAddDocumentModal(true)}
       >
-        <img src="kiruna/img/addDocument.png" alt="addDocument icon" />
+        <DocumentPlusIcon className="h-7 w-7 text-white" />
       </button>
       ) : null
     }
@@ -342,7 +343,8 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
     {newDocument && (
       <GeoreferenceNewDocumentModal show={showGeoreferenceDocument} 
       onHide={() => setShowGeoreferenceDocument(false)} document={newDocument}
-      showAddNewDocumentLinks = {(doc: Document) => {setNewDocument(doc); setShowAddLinks(true); }}
+      showAddNewDocumentLinks = {(doc: Document) => {setNewDocument(doc); setShowAddLinks(true);}}
+      refreshDocumentsCoordinates={refreshDocumentsCoordinates}
     />
     )}
 
