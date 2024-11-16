@@ -28,6 +28,15 @@ interface SetMapViewInterface{
   setPolygon: (polygon: LatLng[]) => void;
 }
 
+const customIcon = new L.Icon({
+  iconUrl: '/img/marker.png',
+  iconSize: [25, 41],  // Dimensioni dell'icona
+  iconAnchor: [12, 41], // Punto di ancoraggio dell'icona
+  popupAnchor: [1, -34], // Punto da cui si apre il popup
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  shadowSize: [41, 41]  // Dimensioni dell'ombra
+});
+
 function SetMapView({resetForm, setMarkerPosition, setPolygon}: SetMapViewInterface) {
     const map = useMap(); // Ottieni l'istanza della mappa
     
@@ -46,14 +55,6 @@ function SetMapView({resetForm, setMarkerPosition, setPolygon}: SetMapViewInterf
       [67.9358, 20.3503]   // Nord-est
     );
 
-    const customIcon = new L.Icon({
-      iconUrl: '/kiruna/img/marker.png',
-      iconSize: [25, 41],  // Dimensioni dell'icona
-      iconAnchor: [12, 41], // Punto di ancoraggio dell'icona
-      popupAnchor: [1, -34], // Punto da cui si apre il popup
-      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-      shadowSize: [41, 41]  // Dimensioni dell'ombra
-    });
 
     // Create the EditControl manually
     const newDrawControl = new L.Control.Draw({
@@ -166,9 +167,10 @@ interface GeoreferenceNewDocumentModalProps {
     onHide: () => void;
     document: Document;
     showAddNewDocumentLinks: (doc: Document) => void;
+    refreshDocumentsCoordinates: () => void;
 }
 
-function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocumentLinks }: GeoreferenceNewDocumentModalProps) {
+function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocumentLinks, refreshDocumentsCoordinates }: GeoreferenceNewDocumentModalProps) {
     
     const [markerPosition, setMarkerPosition] = useState<LatLng | null>(null);
     const [isEnterCoordinatesMode, setIsEnterCoordinatesMode] = useState(false);
@@ -178,17 +180,8 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
     const [longitude, setLongitude] = useState('');
     const [showAlert, setShowAlert] = useState(false); // alert state
     const [alertMessage, setAlertMessage] = useState('');
-    const drawControlRef = useRef<any>(null);
     const mapRef = useRef<L.Map>(null);
 
-    const customIcon = new L.Icon({
-        iconUrl: '/kiruna/img/marker.png',
-        iconSize: [25, 41],  // Dimensioni dell'icona
-        iconAnchor: [12, 41], // Punto di ancoraggio dell'icona
-        popupAnchor: [1, -34], // Punto da cui si apre il popup
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-        shadowSize: [41, 41]  // Dimensioni dell'ombra
-      });
 
     const resetForm = () => {
         setLatitude('');
@@ -216,7 +209,9 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
         }
         console.log(polygon);
         console.log(markerPosition);
+        refreshDocumentsCoordinates();
         handleClose();
+        refreshDocumentsCoordinates();
     };
 
     const clearOtherLayers = () => {

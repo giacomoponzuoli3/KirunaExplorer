@@ -38,7 +38,7 @@ class DocumentRoutes {
             body("type").isString(),
             body("language").optional({ nullable: true }).isString(),
             body("pages").optional({ nullable: true }).isString(),
-            body("description").optional({ nullable: true }).isString(),
+            body("description").isString(),
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
                 try {
@@ -53,7 +53,7 @@ class DocumentRoutes {
                         req.body["description"]
                     )
                         .then((document: Document) => res.status(200).json(document))
-                        .catch((err: Error) => next(err))
+                        .catch((err: Error) => {next(err); console.log(err);})
                 } catch (err) {
                     next(err);
                 }
@@ -121,7 +121,7 @@ class DocumentRoutes {
             body("type").isString(),
             body("language").optional({ nullable: true }).isString(),
             body("pages").optional({ nullable: true }).isString(),
-            body("description").optional({ nullable: true }).isString(),
+            body("description").isString(),
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
                 try {
