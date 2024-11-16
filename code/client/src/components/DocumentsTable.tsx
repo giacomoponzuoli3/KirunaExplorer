@@ -5,7 +5,8 @@ import { TruncatedText } from "./LinksDocument";
 import { Document } from "../models/document";
 import { useNavigate } from "react-router-dom";
 import Alert from "./Alert";
-import {ShowDocumentInfoModal} from "./DocumentModals"
+import { ShowDocumentInfoModal } from "./ShowDocumentInfoModal";
+
 
 function DocumentsTable(props: any){
     const navigate = useNavigate();

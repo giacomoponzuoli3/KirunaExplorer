@@ -82,7 +82,10 @@ class DocumentRoutes {
                 try {
                     this.controller.getDocumentById(req.params["id"])
                         .then((document: Document) => res.status(200).json(document))
-                        .catch((err: Error) => next(err))
+                        .catch((err: Error) => {
+                            //console.log(err)
+                            next(err)
+                        })
                 } catch (err) {
                     next(err);
                 }

@@ -1,10 +1,6 @@
 import { DocCoordinates } from "../models/document_coordinate";
 import { CoordinatesDAO } from "../dao/coordinatesDAO";
-
-interface LatLng {
-    lat: number;
-    lng: number;
-}
+import { LatLng } from "../interfaces";
 
 class CoordinatesController {
     private dao: CoordinatesDAO;
