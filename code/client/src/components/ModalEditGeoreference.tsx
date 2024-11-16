@@ -221,7 +221,7 @@ function SetMapViewEdit(props: any) {
 
   // Icona personalizzata per il marker
   const defaultIcon = L.icon({
-    iconUrl: '/kiruna/img/pinMap.png', // URL dell'icona predefinita
+    iconUrl: '/img/pinMap.png', // URL dell'icona predefinita
     iconSize: [40, 40], // Dimensioni dell'icona
     iconAnchor: [15, 30], // Punto di ancoraggio
     popupAnchor: [1, -34], // Punto popup
