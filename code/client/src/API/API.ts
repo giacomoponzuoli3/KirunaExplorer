@@ -1,11 +1,6 @@
 import { Stakeholder } from "../models/stakeholder";
-
+import LatLng from "../interfaces";
 const baseURL = "http://localhost:3001/kiruna/"
-
-interface LatLng {
-    lat: number;
-    lng: number;
-}
 
 /** ------------------- Access APIs ------------------------ */
 

@@ -5,7 +5,6 @@ import ErrorHandler from "../helper"
 import Authenticator from "./auth"
 import {DocCoordinates} from "../models/document_coordinate";
 
-
 class CoordinatesRoutes {
     private controller: CoordinatesController
     private readonly router: Router
@@ -42,16 +41,31 @@ class CoordinatesRoutes {
         this.router.post(
             "/",
             this.authenticator.isLoggedIn,
-            this.authenticator.isPlanner, 
+            this.authenticator.isPlanner,
             body("idDoc").isNumeric(),
+            body("coordinates").custom((value) => {
+                const isLatLng = (obj: any): boolean => 
+                    obj && typeof obj.lat === 'number' && typeof obj.lng === 'number';
+        
+                if (!Array.isArray(value)) {
+                    if (!isLatLng(value)) {
+                        throw new Error("Coordinates must be a LatLng object or an array of LatLng");
+                    }
+                } else {
+                    if (!value.every(isLatLng)) {
+                        throw new Error("Each elements of coordinates must be an LatLng object");
+                    }
+                }
+                return true;
+            }),
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
                 try {
                     this.controller.setDocumentCoordinates(req.body.idDoc, req.body.coordinates)
                         .then(() => res.status(200).json({ message: "Coordinates added successfully" }))
-                        .catch((err: Error) => next(err))
+                        .catch((err: Error) => next(err));
                 } catch (err) {
-                    next(err)
+                    next(err);
                 }
             }
         )

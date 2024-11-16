@@ -22,7 +22,13 @@ declare module 'leaflet' {
   }
 }
 
-function SetMapView() {
+interface SetMapViewInterface{
+  resetForm: () => void;
+  setMarkerPosition: (position: LatLng) => void;
+  setPolygon: (polygon: LatLng[]) => void;
+}
+
+function SetMapView({resetForm, setMarkerPosition, setPolygon}: SetMapViewInterface) {
     const map = useMap(); // Ottieni l'istanza della mappa
     
     const [zoomLevel, setZoomLevel] = useState(10); // Stato per il livello di zoom
@@ -39,11 +45,85 @@ function SetMapView() {
       [67.7758, 20.1003],  // Sud-ovest
       [67.9358, 20.3503]   // Nord-est
     );
+
+    const customIcon = new L.Icon({
+      iconUrl: '/kiruna/img/marker.png',
+      iconSize: [25, 41],  // Dimensioni dell'icona
+      iconAnchor: [12, 41], // Punto di ancoraggio dell'icona
+      popupAnchor: [1, -34], // Punto da cui si apre il popup
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+      shadowSize: [41, 41]  // Dimensioni dell'ombra
+    });
+
+    // Create the EditControl manually
+    const newDrawControl = new L.Control.Draw({
+      position: 'topright',
+      draw: {
+        rectangle: false,
+        circle: false,
+        circlemarker: false,
+        polygon: {
+          shapeOptions: {
+            color: '#3388ff', // Colore del bordo
+            weight: 2,        // Spessore del bordo
+            opacity: 0.8,     // Opacità del bordo
+            fillColor: '#3388ff', // Colore di riempimento
+            fillOpacity: 0.3, // Opacità del riempimento
+            dashArray: '5,5', // Linea tratteggiata (opzionale)
+          },
+        },
+        marker: {
+          icon: customIcon,
+        },
+        polyline: false,
+      },
+    });
+
+    const clearOtherLayers = () => {
+      map.eachLayer((layer) => { 
+        if ( layer instanceof L.Polygon ||                 //can't only delete layer of instance markers because it intercepts
+            (layer instanceof L.Marker && layer.options.isStandalone) //with some drawing tools and polygon drawing doesn't work then
+        ) {                                                         //that's why we need to add standalone to destinguish them
+            map.removeLayer(layer);
+        }
+      });
+    };
+
+    const handleDrawStart = (e: any) => {
+      const { layerType } = e;
+      
+      if ( layerType === 'marker') {
+          clearOtherLayers();
+          resetForm();
+      }else if(layerType === 'polygon'){
+        clearOtherLayers();
+        resetForm();
+      }
+    };
+
+    const handleCreated = (e: any) => {
+      const { layerType, layer } = e;
+
+      if (layerType === 'marker') {
+          layer.options.isStandalone = true;
+          setMarkerPosition(layer.getLatLng());
+      } 
+      else if (layerType === 'polygon') {
+          const latLngs = layer.getLatLngs()[0].map((latLng: L.LatLng) => ({
+              lat: latLng.lat,
+              lng: latLng.lng,
+          }));
+          setPolygon(latLngs);
+          console.log(latLngs);
+      }
+      layer.addTo(map);
+    };
   
   
     useEffect(() => {
-      // Imposta la vista iniziale una sola volta senza fare reset durante lo zoom
-      map.setView(position, 12);
+      if (map.getZoom() === undefined) {
+        map.setView(position, 12);
+      }
   
       // Imposta i limiti di zoom
       map.setMaxZoom(16);
@@ -59,13 +139,19 @@ function SetMapView() {
       );
       satelliteLayer.addTo(map);
 
-      // Add click event listener to the map
-      //map.on('click', onMapClick);
+      // Add the EditControl to the map
+      map.addControl(newDrawControl);
+
+      // Bind event listeners for draw events
+      map.on(L.Draw.Event.DRAWSTART, handleDrawStart); // For drawing start
+      map.on(L.Draw.Event.CREATED, handleCreated); // For created shape (marker or polygon)
   
   
       // Pulizia dei listener e degli elementi aggiunti quando il componente viene smontato
       return () => {
-       // map.off('click', onMapClick);
+        map.removeControl(newDrawControl);
+        map.off(L.Draw.Event.DRAWSTART, handleDrawStart);
+        map.off(L.Draw.Event.CREATED, handleCreated);
         map.removeLayer(satelliteLayer);
       };
     }, []); // Dipendenze vuote per assicurarsi che il codice venga eseguito solo una volta al montaggio
@@ -105,10 +191,14 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
       });
 
     const resetForm = () => {
+        setLatitude('');
+        setLongitude('');
+        setIsEnterCoordinatesMode(false);
         setMarkerPosition(null);
         setPolygon([]);
         setWholeMapPolygon(null);
         setShowAlert(false);
+        setAlertMessage('');
     };
 
     const handleClose = () => {
@@ -121,7 +211,7 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
         //API call to georeference the document
         if(polygon.length === 0 && markerPosition !== null){ 
           API.setDocumentCoordinates(document.id, markerPosition);
-        } else {
+        } else if (polygon.length !== 0 && markerPosition === null){
           API.setDocumentCoordinates(document.id, polygon);
         }
         console.log(polygon);
@@ -137,45 +227,6 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
             mapRef.current?.removeLayer(layer);
         }
       });
-    };
-
-    const handleDrawStart = (e: any) => {
-      const { layerType } = e;
-      
-      if ( layerType === 'marker') {
-          clearOtherLayers();
-          setLatitude('');
-          setLongitude('');
-          setIsEnterCoordinatesMode(false);
-          setMarkerPosition(null); // Reset marker position
-          setPolygon([]);          // Reset polygon
-          setWholeMapPolygon(null);
-      }else if(layerType === 'polygon'){
-        clearOtherLayers();
-        setLatitude('');
-        setLongitude('');
-        setIsEnterCoordinatesMode(false);
-        setMarkerPosition(null); // Reset marker position
-        setPolygon([]);          // Reset polygon
-        setWholeMapPolygon(null);
-      }
-    };
-
-    const handleCreated = (e: any) => {
-      const { layerType, layer } = e;
-
-      if (layerType === 'marker') {
-          layer.options.isStandalone = true;
-          setMarkerPosition(layer.getLatLng());
-      } 
-      else if (layerType === 'polygon') {
-          const latLngs = layer.getLatLngs()[0].map((latLng: L.LatLng) => ({
-              lat: latLng.lat,
-              lng: latLng.lng,
-          }));
-          setPolygon(latLngs);
-          console.log(latLngs);
-        }
     };
 
     // Function to handle selecting the whole map
@@ -257,7 +308,7 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
 
    
     return (
-      <Modal size="lg" show={show} onHide={handleClose} aria-labelledby="example-modal-sizes-title-lg">
+      <Modal dialogClassName="custom-modal-width" show={show} onHide={handleClose} aria-labelledby="example-modal-sizes-title-lg">
           <Modal.Header closeButton style={{ backgroundColor: 'rgb(148, 137, 121,0.4)' }}>
             <Modal.Title id="example-modal-sizes-title-lg">Would u like to georeference the new document?</Modal.Title>
           </Modal.Header>
@@ -274,27 +325,9 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
               }
               {/* Container to show the map */}
               <MapContainer  ref={mapRef} style={{ height: "100vh", width: "100%" }}>
-                 <SetMapView />
-                 
-                 {/* Leaflet Draw control for polyline */}
-                 <FeatureGroup>
-                   <EditControl
-                     ref={drawControlRef}
-                     position="topright"
-                     onDrawStart={handleDrawStart}
-                     onCreated={handleCreated}
-                     draw={{
-                       rectangle: false,
-                       circle: false,
-                       circlemarker: false,
-                       polygon: true,
-                       marker: {
-                        icon: customIcon
-                       },
-                       polyline: false,
-                      }}
-                    />
-                  </FeatureGroup>
+                 <SetMapView  resetForm={resetForm} 
+                 setMarkerPosition={(position: LatLng) => setMarkerPosition(position)}
+                 setPolygon={(polygon: LatLng[]) => setPolygon(polygon)}/>
                 </MapContainer>
                 
                 {/* A button for the possibility of selecting the whole area*/}

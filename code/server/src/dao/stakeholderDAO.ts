@@ -1,5 +1,6 @@
 import db from "../db/db"
 import { Stakeholder } from "../models/stakeholder"
+import {StakeholderNotFoundError} from "../errors/stakeholder";
 
 class StakeholderDAO {
     
@@ -8,15 +9,9 @@ class StakeholderDAO {
             try {
                 const sql = "SELECT * FROM stakeholders";
                 db.all(sql, [], (err: Error | null, rows: any[]) => {
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-                    if (!rows || rows.length === 0) {
-                        reject(new Error("No stakeholders found."));
-                        return;
-                    }
-                    
+                    if (err) return reject(err);
+                    if (!rows || rows.length === 0) return reject(new StakeholderNotFoundError);
+
                     // Map rows to Stakeholder instances
                     const stakeholders: Stakeholder[] = rows.map(row => new Stakeholder(
                         row.id,
@@ -30,7 +25,6 @@ class StakeholderDAO {
             }
         });
     }
-    
 
 }
 

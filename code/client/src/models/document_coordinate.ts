@@ -15,7 +15,7 @@ class DocCoordinates {
     type: string
     language: string 
     pages: string | null
-    description: string 
+    description: string
     coordinates: Coordinate[]
 
     /**
