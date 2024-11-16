@@ -22,12 +22,6 @@ declare module 'leaflet' {
   }
 }
 
-interface SetMapViewInterface{
-  resetForm: () => void;
-  setMarkerPosition: (position: LatLng) => void;
-  setPolygon: (polygon: LatLng[]) => void;
-}
-
 const customIcon = new L.Icon({
   iconUrl: '/img/marker.png',
   iconSize: [25, 41],  // Dimensioni dell'icona
@@ -36,6 +30,63 @@ const customIcon = new L.Icon({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
   shadowSize: [41, 41]  // Dimensioni dell'ombra
 });
+// Default coordinate of municipal city
+const coordinatesCity: L.LatLng[] = [
+  L.latLng(67.8753332, 20.1841097),
+  L.latLng(67.8749453, 20.1866846),
+  L.latLng(67.8738462, 20.1880579),
+  L.latLng(67.8731996, 20.1878862),
+  L.latLng(67.8710012, 20.193551),
+  L.latLng(67.8689318, 20.1969843),
+  L.latLng(67.8659569, 20.1988725),
+  L.latLng(67.8638871, 20.2023058),
+  L.latLng(67.8620112, 20.204709),
+  L.latLng(67.8603939, 20.205224),
+  L.latLng(67.8586471, 20.2011041),
+  L.latLng(67.8573531, 20.1971559),
+  L.latLng(67.857159, 20.1923494),
+  L.latLng(67.8563826, 20.1921778),
+  L.latLng(67.8561885, 20.1944093),
+  L.latLng(67.8541826, 20.1870279),
+  L.latLng(67.8528883, 20.182908),
+  L.latLng(67.8534707, 20.1793031),
+  L.latLng(67.8552179, 20.1798181),
+  L.latLng(67.8567061, 20.1808481),
+  L.latLng(67.8577414, 20.1823931),
+  L.latLng(67.858259, 20.183938),
+  L.latLng(67.8583236, 20.1868562),
+  L.latLng(67.857159, 20.1873712),
+  L.latLng(67.8577414, 20.1894312),
+  L.latLng(67.8588412, 20.1880579),
+  L.latLng(67.8596176, 20.185483),
+  L.latLng(67.8618171, 20.1880579),
+  L.latLng(67.8623993, 20.1875429),
+  L.latLng(67.8620759, 20.185483),
+  L.latLng(67.8633696, 20.1851396),
+  L.latLng(67.8640811, 20.1823931),
+  L.latLng(67.8634343, 20.1803331),
+  L.latLng(67.8590353, 20.17381),
+  L.latLng(67.8598117, 20.1688318),
+  L.latLng(67.8602645, 20.163167),
+  L.latLng(67.8587765, 20.150464),
+  L.latLng(67.8428555, 20.1463442),
+  L.latLng(67.8337899, 20.2012758),
+  L.latLng(67.8384526, 20.2012758),
+  L.latLng(67.8289966, 20.2541475),
+  L.latLng(67.8229065, 20.2901964),
+  L.latLng(67.8384526, 20.3166323),
+  L.latLng(67.8381936, 20.3561144),
+  L.latLng(67.851141, 20.3619509),
+  L.latLng(67.8604586, 20.3066759),
+  L.latLng(67.8781777, 20.2129488),
+  L.latLng(67.8753332, 20.1841097)
+];
+
+interface SetMapViewInterface{
+  resetForm: () => void;
+  setMarkerPosition: (position: LatLng) => void;
+  setPolygon: (polygon: LatLng[]) => void;
+}
 
 function SetMapView({resetForm, setMarkerPosition, setPolygon}: SetMapViewInterface) {
     const map = useMap(); // Ottieni l'istanza della mappa
@@ -254,7 +305,7 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
             clearOtherLayers();
 
             // Save the coordinates of the whole map polygon
-            setPolygon(newPolygon.getLatLngs()[0] as L.LatLng[]); // First array in LatLngs represents the outer boundary
+            setPolygon(coordinatesCity); // First array in LatLngs represents the outer boundary
 
             // Add the new polygon to the map
             newPolygon.addTo(mapRef.current);
