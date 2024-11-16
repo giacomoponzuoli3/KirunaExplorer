@@ -16,20 +16,7 @@ class CoordinatesDAO {
      getAllDocumentsCoordinates(): Promise<DocCoordinates[]> {
         return new Promise<DocCoordinates[]>((resolve, reject) => {
             try {
-                const sql = `SELECT 
-                            d.*, 
-                            s.id AS stakeholder_id, 
-                            s.name AS stakeholder_name, 
-                            s.category AS stakeholder_category, 
-                            dc.id AS coordinate_id, 
-                            dc.latitude, 
-                            dc.longitude, 
-                            dc.point_order 
-                            FROM documents d 
-                            LEFT JOIN document_coordinates dc ON dc.document_id = d.id 
-                            LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document 
-                            LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id 
-                            ORDER BY dc.point_order`;
+                const sql = `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude,dc.longitude, dc.point_order FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id ORDER BY dc.point_order`;
     
                 db.all(sql, [], (err: Error | null, rows: any[]) => {
                     if (err) {
@@ -97,31 +84,40 @@ class CoordinatesDAO {
      * @param coordinates is the vector of coordinate
      */
     
-    setDocumentCoordinates(id: number, coord: LatLng|LatLng[]): Promise<void> {
+    /**
+     * Sets the coordinates of a document with the given id.
+     * @param id The id of the document to set the coordinates of.
+     * @param coord The coordinates to set, either a single LatLng object or an array of LatLng objects.
+     * @returns A Promise that resolves when the coordinates have been set.
+     */
+    setDocumentCoordinates(id: number, coord: LatLng | LatLng[]): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try {
                 const coordinatesArray = Array.isArray(coord) ? coord : [coord];
-                for (let i = 0; i < coordinatesArray.length; i++) {
-                    const point = coordinatesArray[i];
-                    const pointOrder = i + 1;
-                    const sql = `INSERT INTO document_coordinates (document_id, latitude, longitude, point_order) VALUES (?, ?, ?, ?)`;
-
-                    db.run(sql, [id, point.lat, point.lng, pointOrder], (err: Error | null) => {
-                        if (err) {
-                            reject(err);
-                            return;
-                        }
+                const coordinatesInserts = coordinatesArray.map((point, index) => {
+                    return new Promise<void>((innerResolve, innerReject) => {
+                        const sql = `INSERT INTO document_coordinates (document_id, latitude, longitude, point_order) VALUES (?, ?, ?, ?)`;
+                        const pointOrder = index + 1;
+    
+                        db.run(sql, [id, point.lat, point.lng, pointOrder], (err: Error | null) => {
+                            if (err) {
+                                innerReject(err);
+                            } else {
+                                innerResolve();
+                            }
+                        });
                     });
-                    
-                }
-                
-                return resolve();
-            
+                });
+    
+                Promise.all(coordinatesInserts)
+                    .then(() => resolve())
+                    .catch((error) => reject(error));
             } catch (error) {
                 reject(error);
             }
         });
     }
+    
 
     /**
      * Delete the coordinates of a document by id
