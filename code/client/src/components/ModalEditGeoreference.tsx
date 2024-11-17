@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { MapContainer, useMap } from 'react-leaflet';
-import { LatLngTuple, LatLngBounds, ControlOptions, LatLng } from 'leaflet'; // Import del tipo corretto
+import React, { useState } from 'react';
+import { MapContainer } from 'react-leaflet';
+import { LatLng } from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet-draw';
 import API from '../API/API';
 import { DocCoordinates } from "../models/document_coordinate";
+import { SetMapViewEdit } from './Map';
 
 interface ModalEditGeoreferenceProps {
   documentCoordinates: DocCoordinates;  // Documento con latitudine e longitudine
@@ -204,117 +205,5 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   );
 };
 
-
-// Componente per la costruzione della mappa
-function SetMapViewEdit(props: any) {
-  const { setSelectedPosition, useMunicipalArea } = props;
-  const map = useMap(); // Ottieni l'istanza della mappa
-
-  // Coordinate di esempio (come punto centrale della mappa)
-  const position: LatLngTuple = [67.8558, 20.2253];
-
-  // Limiti della mappa per Kiruna
-  const kirunaBounds = new LatLngBounds(
-    [67.790390, 20.416509],  // Sud-ovest
-    [67.889194, 20.050656]   // Nord-est
-  );
-
-  // Icona personalizzata per il marker
-  const defaultIcon = L.icon({
-    iconUrl: '/img/pinMap.png', // URL dell'icona predefinita
-    iconSize: [40, 40], // Dimensioni dell'icona
-    iconAnchor: [15, 30], // Punto di ancoraggio
-    popupAnchor: [1, -34], // Punto popup
-  });
-
-  // Marker per il punto selezionato
-  let currentMarker: L.Marker | null = null;
-
-  useEffect(() => {
-    // Imposta la vista iniziale solo una volta
-    if (map.getZoom() === undefined) {
-      map.setView(position, 12);
-    }
-
-    // Imposta i limiti di zoom
-    map.setMaxZoom(18);
-    map.setMinZoom(3);
-
-    // Limita la mappa alla zona di Kiruna
-    map.setMaxBounds(kirunaBounds);
-
-    // Aggiungi i controlli per il disegno
-    const drawControl = new L.Control.Draw({
-      draw: {
-        marker: { icon: defaultIcon }, // Abilita i marker con l'icona personalizzata
-        polygon: false,
-        polyline: false,
-        rectangle: false,
-        circle: false,
-        circlemarker: false,
-      },
-    });
-    map.addControl(drawControl);
-
-    // Layer satellitare
-    const satelliteLayer = L.tileLayer(
-      'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-      { attribution: '&copy; <a href="https://www.opentopomap.org">OpenTopoMap</a>' }
-    );
-    satelliteLayer.addTo(map);
-
-    // Pulizia del componente (rimuovi i controlli e layer)
-    return () => {
-      map.removeControl(drawControl);
-      map.removeLayer(satelliteLayer);
-    };
-  }, [map]);
-
-  // Se la checkbox è selezionata, disabilita la mappa
-  useEffect(() => {
-
-    if (useMunicipalArea) {
-      map.doubleClickZoom.disable();
-      map.dragging.disable();
-      map.touchZoom.disable();
-      map.scrollWheelZoom.disable();
-    } else {
-      // Rimuovere il vecchio marker, se presente
-      map.eachLayer((layer) => {
-        if (layer instanceof L.Marker) {
-          map.removeLayer(layer);
-        }
-      });
-      map.doubleClickZoom.enable();
-      map.dragging.enable();
-      map.touchZoom.enable();
-      map.scrollWheelZoom.enable();
-      setSelectedPosition(null);
-    }
-  }, [map, useMunicipalArea]);
-
-  // Gestione dell'evento di creazione del marker
-  map?.on(L.Draw.Event.CREATED, (event: any) => {
-    const layer = event.layer;
-
-    if (event.layerType === 'marker') {
-      const newPosition = layer.getLatLng();
-      
-      // Rimuovere il vecchio marker, se presente
-      if (currentMarker) {
-        map.removeLayer(currentMarker);
-      }
-
-      // Aggiungi il nuovo marker sulla mappa
-      currentMarker = layer;
-      layer.addTo(map);
-
-      // Aggiorna la posizione selezionata
-      setSelectedPosition([{lat: newPosition.lat, lng: newPosition.lng}]);
-    }
-  });
-
-  return null;
-}
 
 export { ModalEditGeoreference };
