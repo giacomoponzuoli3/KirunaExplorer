@@ -129,6 +129,11 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
     }));
 
     const scaleOptions = [
+      { value: '1:2', label: '1:2' },
+      { value: '1:5', label: '1:5' },
+      { value: '1:10', label: '1:10' },
+      { value: '1:20', label: '1:20' },
+      { value: '1:50', label: '1:50' },
       { value: '1:100', label: '1:100' },
       { value: '1:200', label: '1:200' },
       { value: '1:500', label: '1:500' },
