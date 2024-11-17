@@ -19,14 +19,8 @@ class CoordinatesDAO {
                 const sql = `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude,dc.longitude, dc.point_order FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id ORDER BY dc.point_order`;
     
                 db.all(sql, [], (err: Error | null, rows: any[]) => {
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-                    if (!rows || rows.length === 0) {
-                        resolve([]);
-                        return;
-                    }
+                    if (err) return reject(err);
+                    if (!rows || rows.length === 0) return resolve([]);
                     
                     const documentsMap = new Map<number, DocCoordinates>();
                     rows.forEach((row: any) => {
@@ -42,7 +36,7 @@ class CoordinatesDAO {
                                 row.language,
                                 row.pages,
                                 row.description,
-                                []
+                                []   // Placeholder for coordinates, populated below
                             ));
                         }
     
@@ -65,7 +59,6 @@ class CoordinatesDAO {
                                 }
                             }
                         }
-
                     });
     
                     // Convert map values to array
@@ -87,13 +80,13 @@ class CoordinatesDAO {
     /**
      * Sets the coordinates of a document with the given id.
      * @param id The id of the document to set the coordinates of.
-     * @param coord The coordinates to set, either a single LatLng object or an array of LatLng objects.
+     * @param coords The coordinates to set, either a single LatLng object or an array of LatLng objects.
      * @returns A Promise that resolves when the coordinates have been set.
      */
-    setDocumentCoordinates(id: number, coord: LatLng | LatLng[]): Promise<void> {
+    setDocumentCoordinates(id: number, coords: LatLng | LatLng[]): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try {
-                const coordinatesArray = Array.isArray(coord) ? coord : [coord];
+                const coordinatesArray = Array.isArray(coords) ? coords : [coords];
                 const coordinatesInserts = coordinatesArray.map((point, index) => {
                     return new Promise<void>((innerResolve, innerReject) => {
                         const sql = `INSERT INTO document_coordinates (document_id, latitude, longitude, point_order) VALUES (?, ?, ?, ?)`;
@@ -121,7 +114,7 @@ class CoordinatesDAO {
 
     /**
      * Delete the coordinates of a document by id
-     * @param id the id of document
+     * @param id_document the id of document
      * @return a void Promise
      */
 
@@ -148,12 +141,12 @@ class CoordinatesDAO {
     /**
      * The first step is delete the previous coordinates of a specific document (id) and after inserts the its new coordinates
      * @param id_document the id of the document
-     * @param coord the array of coordinates (polygon or point)
+     * @param coords the array of coordinates (polygon or point)
      */
-    async updateDocumentCoordinates(id_document: number, coord: LatLng | LatLng[]): Promise<void> {
+    async updateDocumentCoordinates(id_document: number, coords: LatLng | LatLng[]): Promise<void> {
         try {
             await this.deleteDocumentCoordinatesById(id_document);
-            await this.setDocumentCoordinates(id_document, coord);
+            await this.setDocumentCoordinates(id_document, coords);
         } catch (error) {
             throw error; // Propagate error to caller
         }
