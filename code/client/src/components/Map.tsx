@@ -226,7 +226,7 @@ function SetMapViewEdit(props: any) {
   // Icona personalizzata per il marker
   const defaultIcon = new L.Icon({
     iconUrl: '/img/marker.png',
-    iconSize: [25, 41],  // Dimensioni dell'icona
+    iconSize: [41, 41],  // Dimensioni dell'icona
     iconAnchor: [12, 41], // Punto di ancoraggio dell'icona
     popupAnchor: [1, -34], // Punto da cui si apre il popup
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
