@@ -4,6 +4,7 @@ import {body, param} from "express-validator"
 import ErrorHandler from "../helper"
 import Authenticator from "./auth"
 import {DocCoordinates} from "../models/document_coordinate";
+import {CoordinatesArrayError, CoordinatesTypeError} from "../errors/coordinates";
 
 class CoordinatesRoutes {
     private controller: CoordinatesController
@@ -44,18 +45,11 @@ class CoordinatesRoutes {
             this.authenticator.isPlanner,
             body("idDoc").isNumeric(),
             body("coordinates").custom((value) => {
-                const isLatLng = (obj: any): boolean => 
-                    obj && typeof obj.lat === 'number' && typeof obj.lng === 'number';
+                const isLatLng = (obj: any): boolean => obj && typeof obj.lat === 'number' && typeof obj.lng === 'number';
         
-                if (!Array.isArray(value)) {
-                    if (!isLatLng(value)) {
-                        throw new Error("Coordinates must be a LatLng object or an array of LatLng");
-                    }
-                } else {
-                    if (!value.every(isLatLng)) {
-                        throw new Error("Each elements of coordinates must be an LatLng object");
-                    }
-                }
+                if (!Array.isArray(value) && !isLatLng(value)) throw new CoordinatesTypeError;
+                if (Array.isArray(value) && !value.every(isLatLng)) throw new CoordinatesArrayError;
+
                 return true;
             }),
             this.errorHandler.validateRequest,
@@ -78,12 +72,10 @@ class CoordinatesRoutes {
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
                 try {
-                    console.log("entrato " + req.body.coordinates);
                     this.controller.updateDocumentCoordinates(req.body.idDoc, req.body.coordinates)
                         .then(() => res.status(200).json({ message: "Coordinates updated successfully" }))
                         .catch((err: Error) => next(err))
                 } catch (err) {
-                    console.log(err);
                     next(err)
                 }
             }

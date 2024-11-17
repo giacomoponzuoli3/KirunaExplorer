@@ -20,21 +20,21 @@ class CoordinatesController {
     /**
      * Sets the coordinates of a document with the given id.
      * @param id The id of the document to set the coordinates of.
-     * @param coord The coordinates to set, either a single LatLng object or an array of LatLng objects.
+     * @param coords The coordinates to set, either a single LatLng object or an array of LatLng objects.
      * @returns A Promise that resolves when the coordinates have been set.
      */
-    setDocumentCoordinates(id: number, coord: LatLng|LatLng[]): Promise<void> {
-        return this.dao.setDocumentCoordinates(id, coord);
+    setDocumentCoordinates(id: number, coords: LatLng|LatLng[]): Promise<void> {
+        return this.dao.setDocumentCoordinates(id, coords);
     }
 
     /**
      * Modify the coordinates of a document
-     * @param id the id of the document to update the coordinates
-     * @param coord the array of the new coordinates 
+     * @param id_document the id of the document to update the coordinates
+     * @param coords the array of the new coordinates
      * @return A Promise that resolves when the coordinates have been updated
      */
-    updateDocumentCoordinates(id_document: number, coord: LatLng|LatLng[]): Promise<void> {
-        return this.dao.updateDocumentCoordinates(id_document, coord);
+    updateDocumentCoordinates(id_document: number, coords: LatLng|LatLng[]): Promise<void> {
+        return this.dao.updateDocumentCoordinates(id_document, coords);
     }
 
 }
