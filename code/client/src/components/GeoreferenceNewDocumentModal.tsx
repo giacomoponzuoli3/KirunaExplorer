@@ -7,7 +7,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap,  Marker as LeafletMarker, MarkerProps, FeatureGroup } from 'react-leaflet';
-import { LatLngExpression, LatLngTuple, LatLngBounds, Icon, LeafletMouseEvent, LatLng, Layer } from 'leaflet'; // Import del tipo corretto
+import { LatLngExpression, LatLngTuple, LatLngBounds, Icon, LeafletMouseEvent, LatLng, Layer, marker } from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import Alert from "./Alert";
@@ -87,6 +87,7 @@ interface SetMapViewInterface{
   setMarkerPosition: (position: LatLng) => void;
   setPolygon: (polygon: LatLng[]) => void;
 }
+const featureGroup = new L.FeatureGroup();
 
 function SetMapView({resetForm, setMarkerPosition, setPolygon}: SetMapViewInterface) {
     const map = useMap(); // Ottieni l'istanza della mappa
@@ -129,28 +130,26 @@ function SetMapView({resetForm, setMarkerPosition, setPolygon}: SetMapViewInterf
         },
         polyline: false,
       },
+      edit: {
+        featureGroup: featureGroup, // Group for editable layers
+        remove: true, // Enable delete functionality
+      },
     });
 
     const clearOtherLayers = () => {
       map.eachLayer((layer) => { 
         if ( layer instanceof L.Polygon ||                 //can't only delete layer of instance markers because it intercepts
             (layer instanceof L.Marker && layer.options.isStandalone) //with some drawing tools and polygon drawing doesn't work then
-        ) {                                                         //that's why we need to add standalone to destinguish them
-            map.removeLayer(layer);
+        )                                                             //that's why we need to add standalone to destinguish them
+        {                                                         
+            featureGroup.removeLayer(layer);
         }
       });
     };
 
     const handleDrawStart = (e: any) => {
-      const { layerType } = e;
-      
-      if ( layerType === 'marker') {
           clearOtherLayers();
           resetForm();
-      }else if(layerType === 'polygon'){
-        clearOtherLayers();
-        resetForm();
-      }
     };
 
     const handleCreated = (e: any) => {
@@ -161,15 +160,31 @@ function SetMapView({resetForm, setMarkerPosition, setPolygon}: SetMapViewInterf
           setMarkerPosition(layer.getLatLng());
       } 
       else if (layerType === 'polygon') {
-          const latLngs = layer.getLatLngs()[0].map((latLng: L.LatLng) => ({
-              lat: latLng.lat,
-              lng: latLng.lng,
-          }));
+          const latLngs = layer.getLatLngs()[0]
           setPolygon(latLngs);
           console.log(latLngs);
       }
-      layer.addTo(map);
+      featureGroup.addLayer(layer);
     };
+
+    const handleEdit = (e: any) => {
+      // Iterate through each edited layer
+      e.layers.eachLayer((layer: L.Layer) => {
+        if (layer instanceof L.Marker) {
+          setMarkerPosition(layer.getLatLng());
+          console.log("Edited marker:", layer.getLatLng());
+        } else if (layer instanceof L.Polygon) {
+          // Handle polygon edits
+          const latLngs = (layer.getLatLngs() as LatLng[][])[0]
+          setPolygon(latLngs);
+          console.log("Edited polygon:", latLngs);
+        }
+      });
+    }
+
+    const handleDelete = (e: any) => {
+      resetForm();
+    }
   
   
     useEffect(() => {
@@ -190,6 +205,7 @@ function SetMapView({resetForm, setMarkerPosition, setPolygon}: SetMapViewInterf
         { attribution: '&copy; <a href="https://www.opentopomap.org">OpenTopoMap</a>' }
       );
       satelliteLayer.addTo(map);
+      map.addLayer(featureGroup);
 
       // Add the EditControl to the map
       map.addControl(newDrawControl);
@@ -197,6 +213,8 @@ function SetMapView({resetForm, setMarkerPosition, setPolygon}: SetMapViewInterf
       // Bind event listeners for draw events
       map.on(L.Draw.Event.DRAWSTART, handleDrawStart); // For drawing start
       map.on(L.Draw.Event.CREATED, handleCreated); // For created shape (marker or polygon)
+      map.on(L.Draw.Event.EDITED, handleEdit);
+      map.on(L.Draw.Event.DELETED,handleDelete);
   
   
       // Pulizia dei listener e degli elementi aggiunti quando il componente viene smontato
@@ -204,6 +222,8 @@ function SetMapView({resetForm, setMarkerPosition, setPolygon}: SetMapViewInterf
         map.removeControl(newDrawControl);
         map.off(L.Draw.Event.DRAWSTART, handleDrawStart);
         map.off(L.Draw.Event.CREATED, handleCreated);
+        map.off(L.Draw.Event.EDITED, handleEdit);
+        map.off(L.Draw.Event.DELETED,handleDelete);
         map.removeLayer(satelliteLayer);
       };
     }, []); // Dipendenze vuote per assicurarsi che il codice venga eseguito solo una volta al montaggio
@@ -269,8 +289,9 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
       mapRef.current?.eachLayer((layer) => { 
         if ( layer instanceof L.Polygon ||                 //can't only delete layer of instance markers because it intercepts
             (layer instanceof L.Marker && layer.options.isStandalone) //with some drawing tools and polygon drawing doesn't work then
-        ) {                                                         //that's why we need to add standalone to destinguish them
-            mapRef.current?.removeLayer(layer);
+        )                                                             //that's why we need to add standalone to destinguish them
+        {                                                          
+          featureGroup.removeLayer(layer);
         }
       });
     };
@@ -281,8 +302,7 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
       
       // If the whole map polygon is already selected, remove it
       if (wholeMapPolygon) {
-        mapRef.current.removeLayer(wholeMapPolygon);
-        //setPolygon([]);
+        featureGroup.removeLayer(wholeMapPolygon);
         setWholeMapPolygon(null); // Update state to reflect no selection
       } else {
         const bounds = mapRef.current.getBounds();
@@ -308,7 +328,8 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
             setPolygon(coordinatesCity); // First array in LatLngs represents the outer boundary
 
             // Add the new polygon to the map
-            newPolygon.addTo(mapRef.current);
+            //newPolygon.addTo(mapRef.current);
+            featureGroup.addLayer(newPolygon);
             setWholeMapPolygon(newPolygon); // Update state to store the polygon
         }
       }
@@ -333,7 +354,7 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
             setMarkerPosition(newPosition);
             // Add the marker to the map (make sure mapRef is defined in your code)
             if (mapRef.current) {
-                L.marker(newPosition,{isStandalone: true, icon: customIcon}).addTo(mapRef.current);
+                featureGroup.addLayer(L.marker(newPosition,{isStandalone: true, icon: customIcon}));
                 setIsEnterCoordinatesMode(false);
                 setLatitude('');
                 setLongitude('');
