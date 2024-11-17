@@ -1,19 +1,16 @@
 
-import React, { useState,useEffect } from 'react';
-import { Container, Modal, Row, Col, Form, Button, Dropdown, ListGroup } from 'react-bootstrap';
+import { useState } from 'react';
+import { Container, Modal, Row, Col } from 'react-bootstrap';
 import { Document } from '../models/document';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { User } from '../models/user';
 import API from '../API/API';
 import '../modal.css'
-import { TrashIcon, PencilIcon, } from "@heroicons/react/24/outline";
+import { TrashIcon, PencilIcon, MapIcon} from "@heroicons/react/24/outline";
 import { DocCoordinates } from '../models/document_coordinate';
 import { useNavigate } from 'react-router-dom';
+import { ModalEditGeoreference } from './ModalEditGeoreference';
 
-interface TruncatedTextProps {
-    text: string;
-    maxLength: number;
-}
   
 interface ShowDocumentInfoModalProps {
     selectedDocument: Document;
@@ -27,25 +24,39 @@ interface ShowDocumentInfoModalProps {
     refreshDocumentsCoordinates: () => void;
 }
 
-function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, selectedDocumentCoordinates, show, onHide, user, handleEdit, refreshDocuments }: ShowDocumentInfoModalProps) {
+function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, selectedDocumentCoordinates, refreshDocumentsCoordinates, show, onHide, user, handleEdit, refreshDocuments }: ShowDocumentInfoModalProps) {
     const navigate = useNavigate();  
   
+    const [showModalEditGeoreference, setShowModalEditGeoreference] = useState<boolean>(false);
+
     const handleEditClick = () => {
         handleEdit();
-        // onHide()
+    };
+
+    const handleEditGeoreference = () => {
+    
+        if(selectedDocumentCoordinates.coordinates.length !== 0){
+          setShowModalEditGeoreference(true);
+        }
+    
     };
   
     const handleDeleteClick = async () => {
-        await API.deleteDocument(selectedDocument.id).then();
-        refreshDocuments();
-        onHide();
-        refreshDocuments();
+        try{
+            await API.deleteDocument(selectedDocument.id).then();
+            refreshDocuments();
+            refreshDocumentsCoordinates();
+        }catch(err){
+
+        }finally{
+            onHide();
+        }
     };
   
     return (
         <>
             <Modal 
-                show={show} 
+                show={show && !showModalEditGeoreference} 
                 onHide={onHide} 
                 dialogClassName="custom-modal-width" 
                 aria-labelledby="example-custom-modal-styling-title"
@@ -85,6 +96,12 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, selectedDocu
                                             >
                                                 <PencilIcon className="h-5 w-5" />
                                             </button>
+                                            <button
+                                                className="p-2 rounded-full border-2 bg-yellow-500 text-white hover:bg-yellow-600 transition-colors duration-200"
+                                                onClick={handleEditGeoreference}
+                                            >
+                                                <MapIcon className="h-5 w-5 text-white" />
+                                          </button>
                                         </div>
                                     )}
                                 </Col>
@@ -134,6 +151,18 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, selectedDocu
                     </button>
                 </Modal.Footer>
             </Modal>
+
+            {showModalEditGeoreference && selectedDocumentCoordinates.coordinates.length !== 0 &&
+                <ModalEditGeoreference
+                    documentCoordinates={selectedDocumentCoordinates}
+
+                    refreshDocuments={refreshDocuments}
+                    refreshDocumentsCoordinates={refreshDocumentsCoordinates}
+
+                    onClose={() => setShowModalEditGeoreference(false)}
+
+                />
+            }
         </>
     );
 }
