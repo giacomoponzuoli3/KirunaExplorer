@@ -70,12 +70,6 @@ class CoordinatesDAO {
             }
         });
     }
-
-    /**
-     * Update the coordinates of a document
-     * @param id is the id of document
-     * @param coordinates is the vector of coordinate
-     */
     
     /**
      * Sets the coordinates of a document with the given id.
@@ -151,13 +145,6 @@ class CoordinatesDAO {
             throw error; // Propagate error to caller
         }
     }
-
-    /**
-     * Get the coordinates of a specific document by id
-     * @param id the id of a document
-     * @return A Promise that returns an array of coords
-     */
-
 
 }
 
