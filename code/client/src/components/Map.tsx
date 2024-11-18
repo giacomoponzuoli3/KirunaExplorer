@@ -2,7 +2,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from "react";
 import { useMap } from 'react-leaflet';
-import { LatLngTuple, LatLngBounds, ControlOptions } from 'leaflet'; // Import del tipo corretto
+import { LatLngTuple, LatLngBounds, ControlOptions, map, polygon, Polygon } from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -70,34 +70,30 @@ function areCoordinatesEqual(coord1: any, coord2: L.LatLng): boolean {
   return coord1.latitude === coord2.lat && coord1.longitude === coord2.lng;
 }
 
+// Funzione che verifica se le coordinate di un documento sono dentro l'area definita
+function areCoordinatesInCityArea(coordinates: any[]): boolean {
+  const cityCoords = createCityCoordinates();  // Ottieni le coordinate dell'area della città
+
+  // Verifica se tutte le coordinate del documento sono all'interno dell'area
+  return coordinates.every((coord: any) => {
+    // Confronta ogni coordinata con quelle dell'area della città
+    return cityCoords.some((cityCoord: L.LatLng) => 
+      cityCoord.lat === coord.latitude && cityCoord.lng === coord.longitude
+    );
+  });
+}
 
 
 function SetMapViewHome(props: any) {
   const map = useMap();
   const [showPolygonMessage, setShowPolygonMessage] = useState(false);
 
-  const [occupiedCoordinates, setOccupiedCoordinates] = useState<Set<string>>(new Set());
 
   // Funzione per generare una chiave unica per una coordinata
   const coordinateKey = (latitude: number, longitude: number): string => {
     return `${latitude.toFixed(6)},${longitude.toFixed(6)}`;
   };
 
-  // Funzione per trovare la prossima coordinata disponibile
-  const findAvailableCoordinate = (latitude: number, longitude: number): [number, number] => {
-    let newLat = latitude;
-    let newLng = longitude;
-    let offset = 0.0001; // Il valore di offset per spostare la coordinata
-
-    // Continua a cercare una nuova posizione finché non trovi una coordinata libera
-    while (occupiedCoordinates.has(coordinateKey(newLat, newLng))) {
-      newLat = latitude + offset;
-      newLng = longitude + offset;
-      offset += 0.01; // Incrementa l'offset per evitare la collisione
-    }
-
-    return [newLat, newLng];
-  };
 
   // Coordinates of Kiruna town hall means the center of the city
   const position: LatLngTuple = [67.8558, 20.2253];
@@ -143,78 +139,102 @@ function SetMapViewHome(props: any) {
         map.removeLayer(layer);
       }
     });
-
-    props.documentsCoordinates.filter((d: DocCoordinates) => d.coordinates.length !== 0).forEach((doc: any) => {
-      const latitude = doc.coordinates[0].latitude;
-      const longitude = doc.coordinates[0].longitude;
-      console.log(doc.coordinates[0].latitude);
-      console.log(occupiedCoordinates)
-      // Verifica se la coordinata è già occupata
-      const key = coordinateKey(latitude, longitude);
-      if (occupiedCoordinates.has(key)) {
-        console.log("entrato");
-        // Trova una nuova coordinata disponibile
-        const [newLat, newLng] = findAvailableCoordinate(latitude, longitude);
-        // Aggiungi la nuova coordinata alla lista delle coordinate occupate
-        setOccupiedCoordinates((prev) => new Set(prev).add(coordinateKey(newLat, newLng)));
-      } else {
-        console.log("Entratos")
-        // Aggiungi la coordinata originale alla lista delle coordinate occupate
-        setOccupiedCoordinates((prev) => new Set(prev).add(key));
-      }
-
-      const iconHtml = ReactDOMServer.renderToString(props.getDocumentIcon(doc.type, 5) || <></>);
-      const marker = L.marker([latitude, longitude], {
-        icon: L.divIcon({
-          html: `
-            <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95">
-              ${iconHtml}
-            </div>
-          `,
-          iconSize: [20, 20],
-          className: '',
-        }),
-      }).addTo(map);
-
-      if (doc.coordinates.length > 1) {
+  
+    const occupiedPositions: Set<string> = new Set(); // Tiene traccia delle posizioni occupate
+  
+    props.documentsCoordinates
+      .filter((d: DocCoordinates) => d.coordinates.length !== 0)
+      .forEach((doc: any) => {
         const latLngs = doc.coordinates.map((coord: any) => [coord.latitude, coord.longitude]);
-
-        const relatedLayer: L.Polygon = L.polygon(latLngs, {
-          color: '#B22222',
-          weight: 1,
-          opacity: 0.8,
-          fillColor: '#FFD700',
-          fillOpacity: 0.1,
-          smoothFactor: 2,
-        });
-
-        marker.on('mouseover', () => {
-          if (!map.hasLayer(relatedLayer)) {
-            relatedLayer.addTo(map);
-            relatedLayer.setStyle({ color: '#8B0000', weight: 2, fillOpacity: 0.2 });
-            console.log(doc.coordinates)
-            // Controlla se le coordinate corrispondono
-            if (doc.coordinates.every((coord: any) => createCityCoordinates().some((cityCoord: L.LatLng) => areCoordinatesEqual(coord, cityCoord)))) {
-              setShowPolygonMessage(true); // Mostra il messaggio se le coordinate sono uguali
-            }
+  
+        if (latLngs.length > 1) {
+          const relatedLayer: L.Polygon = L.polygon(latLngs, {
+            color: '#B22222',
+            weight: 1,
+            opacity: 0.8,
+            fillColor: '#FFD700',
+            fillOpacity: 0.1,
+            smoothFactor: 2,
+          });
+  
+          const centralCoord = latLngs[0]; // Punto centrale del poligono
+          let adjustedPosition: LatLngTuple = [centralCoord[0], centralCoord[1]]; // LatLngTuple, array con due numeri
+  
+          const zoom = map.getZoom();
+          const offset = (18 - zoom) * 0.0001; // Distanza minima tra i marker in base allo zoom
+  
+          let attempts = 0;
+          while (occupiedPositions.has(adjustedPosition.toString()) && attempts < 10) {
+            // Spostiamo il marker se la posizione è occupata
+            adjustedPosition = [
+              centralCoord[0] + offset * (Math.random() > 0.5 ? 1 : -1), // Spostamento orizzontale
+              centralCoord[1] + offset * (Math.random() > 0.5 ? 1 : -1), // Spostamento verticale
+            ];
+            attempts++;
           }
-        });
+  
+          occupiedPositions.add(adjustedPosition.toString());
+  
+          const iconHtml = ReactDOMServer.renderToString(props.getDocumentIcon(doc.type, 5) || <></>);
+  
+          const marker = L.marker(adjustedPosition, {
+            icon: L.divIcon({
+              html: `
+                <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95">
+                  ${iconHtml}
+                </div>
+              `,
+              iconSize: [20, 20],
+              className: '',
+            }),
+          }).addTo(map);
+  
+          marker.on('mouseover', () => {
+            relatedLayer.setStyle({ color: '#8B0000', weight: 2, fillOpacity: 0.2 }).addTo(map);
+            // Verifica se le coordinate del documento sono dentro il poligono definito da createCityCoordinates
+          const cityCoordinates = createCityCoordinates();
+          const polygon = L.polygon(cityCoordinates);
 
-        marker.on('mouseout', () => {
-          if (map.hasLayer(relatedLayer)) {
-            map.removeLayer(relatedLayer);
-
-            setShowPolygonMessage(false); // Nascondi il messaggio
+          // Usa il metodo .contains() del poligono per verificare se il marker è all'interno
+          if (areCoordinatesInCityArea(doc.coordinates)) {
+            setShowPolygonMessage(true);  // Mostra il messaggio
           }
-        });
-      }
-
-      marker.on('click', () => {
-        props.onMarkerClick(doc);
+          });
+  
+          marker.on('mouseout', () => {
+            relatedLayer.setStyle({ color: '#B22222', weight: 1, fillOpacity: 0.1 }).removeFrom(map);
+            setShowPolygonMessage(false);
+          });
+  
+          marker.on('click', () => {
+            props.onMarkerClick(doc);
+          });
+        } else {
+          // Nel caso di documenti con una sola coordinata
+          const coord = doc.coordinates[0];
+          const marker = L.marker([coord.latitude, coord.longitude]).addTo(map);
+  
+          const iconHtml = ReactDOMServer.renderToString(props.getDocumentIcon(doc.type, 5) || <></>);
+  
+          marker.setIcon(L.divIcon({
+            html: `
+              <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95">
+                ${iconHtml}
+              </div>
+            `,
+            iconSize: [20, 20],
+            className: '',
+          }));
+  
+          marker.on('click', () => {
+            props.onMarkerClick(doc);
+          });
+        }
       });
-    });
   }, [props.documentsCoordinates]);
-
+  
+  
+  
   return (
     <>
       {showPolygonMessage && (
@@ -226,6 +246,9 @@ function SetMapViewHome(props: any) {
     </>
   );
 }
+
+
+
 
 
 

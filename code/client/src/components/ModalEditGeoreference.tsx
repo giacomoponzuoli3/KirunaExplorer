@@ -37,7 +37,6 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   console.log(selectedPosition);
 
   const handleUpdate = async () => {
-    console.log("update: " + selectedPosition);
     if (selectedPosition != null && selectedPosition.length !== 0) {
       setIsLoading(true);
       setError(null);
