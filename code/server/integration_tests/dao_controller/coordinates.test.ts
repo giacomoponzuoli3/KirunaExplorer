@@ -61,6 +61,12 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
 
             await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
         });
+
+        test("It should successfully It should successfully set multiple coordinate for a document", async () => {
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
+        });
     });
     /**describe('getAllDocumentsCoordinates', () => {
 
