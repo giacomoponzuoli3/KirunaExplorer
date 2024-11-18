@@ -9,3 +9,27 @@
     border-radius: 50%;       /* Rendi i punti circolari */
     border: 1px solid #ffffff; /* Bordi per una migliore visibilità */
 }
+
+.custom-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #1d4ed8;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .custom-marker:hover {
+    transform: scale(1.2);
+  }
+  
+  .popup-content {
+    font-family: Arial, sans-serif;
+    color: #333;
+  }

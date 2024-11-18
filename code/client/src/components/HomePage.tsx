@@ -26,6 +26,8 @@ import { EditDocumentModal } from "./EditDocumentModal";
 import { AddNewDocumentLinksModal } from "./AddNewDocumentLinksModal";
 import { SetMapViewHome } from "./Map";
 
+//----------- Functions -------------//
+
 // Funzione per ottenere una "firma" unica per un poligono
 function getPolygonKey(latLngs: LatLngTuple[]): string {
   // Ordina le coordinate del poligono per latitudine e longitudine
@@ -35,14 +37,8 @@ function getPolygonKey(latLngs: LatLngTuple[]): string {
   return sortedCoords.join(";");
 }
 
-// Funzione per confrontare se due poligoni sono uguali
-function comparePolygons(poly1: LatLngTuple[], poly2: LatLngTuple[]): boolean {
-  // Ottieni la firma di entrambi i poligoni
-  return getPolygonKey(poly1) === getPolygonKey(poly2);
-}
 
-//coordinates of Kiruna Town Hall
-const kiruna_town_hall: LatLngTuple = [67.8558, 20.2253];
+//----------- Interfaces -------------//
 
 interface HomepageProps {
     documents: Document[];
@@ -55,7 +51,7 @@ interface HomepageProps {
 }
 
 
-
+//----------- Components -------------//
 
 function HomePage({documentsCoordinates, documents, user, refreshDocuments, refreshDocumentsCoordinates, getDocumentIcon, stakeholders} : HomepageProps) {
 

@@ -1,6 +1,6 @@
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useMap } from 'react-leaflet';
 import { LatLngTuple, LatLngBounds, ControlOptions } from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
@@ -10,102 +10,125 @@ import 'leaflet-draw';
 import { DocCoordinates } from "../models/document_coordinate";
 import ReactDOMServer from 'react-dom/server';
 
-// Funzione per ottenere una "firma" unica per un poligono
-function getPolygonKey(latLngs: LatLngTuple[]): string {
-// Ordina le coordinate del poligono per latitudine e longitudine
-const sortedCoords = latLngs
-    .map(coord => `${coord[0]},${coord[1]}`)  // Converti le coordinate in stringhe
-    .sort();  // Ordina le coordinate in ordine crescente
-return sortedCoords.join(";");
-}
-  
-// Funzione per confrontare se due poligoni sono uguali
-function comparePolygons(poly1: LatLngTuple[], poly2: LatLngTuple[]): boolean {
-// Ottieni la firma di entrambi i poligoni
-return getPolygonKey(poly1) === getPolygonKey(poly2);
+//coordinates of Kiruna Town Hall
+const kiruna_town_hall: LatLngTuple = [67.8558, 20.2253];
+
+function createCityCoordinates(): L.LatLng[] {
+  return [
+    L.latLng(67.8753332, 20.1841097),
+    L.latLng(67.8749453, 20.1866846),
+    L.latLng(67.8738462, 20.1880579),
+    L.latLng(67.8731996, 20.1878862),
+    L.latLng(67.8710012, 20.193551),
+    L.latLng(67.8689318, 20.1969843),
+    L.latLng(67.8659569, 20.1988725),
+    L.latLng(67.8638871, 20.2023058),
+    L.latLng(67.8620112, 20.204709),
+    L.latLng(67.8603939, 20.205224),
+    L.latLng(67.8586471, 20.2011041),
+    L.latLng(67.8573531, 20.1971559),
+    L.latLng(67.857159, 20.1923494),
+    L.latLng(67.8563826, 20.1921778),
+    L.latLng(67.8561885, 20.1944093),
+    L.latLng(67.8541826, 20.1870279),
+    L.latLng(67.8528883, 20.182908),
+    L.latLng(67.8534707, 20.1793031),
+    L.latLng(67.8552179, 20.1798181),
+    L.latLng(67.8567061, 20.1808481),
+    L.latLng(67.8577414, 20.1823931),
+    L.latLng(67.858259, 20.183938),
+    L.latLng(67.8583236, 20.1868562),
+    L.latLng(67.857159, 20.1873712),
+    L.latLng(67.8577414, 20.1894312),
+    L.latLng(67.8588412, 20.1880579),
+    L.latLng(67.8596176, 20.185483),
+    L.latLng(67.8618171, 20.1880579),
+    L.latLng(67.8623993, 20.1875429),
+    L.latLng(67.8620759, 20.185483),
+    L.latLng(67.8633696, 20.1851396),
+    L.latLng(67.8640811, 20.1823931),
+    L.latLng(67.8634343, 20.1803331),
+    L.latLng(67.8590353, 20.17381),
+    L.latLng(67.8598117, 20.1688318),
+    L.latLng(67.8602645, 20.163167),
+    L.latLng(67.8587765, 20.150464),
+    L.latLng(67.8428555, 20.1463442),
+    L.latLng(67.8337899, 20.2012758),
+    L.latLng(67.8384526, 20.2012758),
+    L.latLng(67.8289966, 20.2541475),
+    L.latLng(67.8229065, 20.2901964),
+    L.latLng(67.8384526, 20.3166323),
+    L.latLng(67.8381936, 20.3561144),
+    L.latLng(67.851141, 20.3619509),
+    L.latLng(67.8604586, 20.3066759),
+    L.latLng(67.8781777, 20.2129488),
+    L.latLng(67.8753332, 20.1841097)
+  ];
 }
 
-// Componente per la costruzione della mappa
+function areCoordinatesEqual(coord1: any, coord2: L.LatLng): boolean {
+  return coord1.latitude === coord2.lat && coord1.longitude === coord2.lng;
+}
+
+
+
 function SetMapViewHome(props: any) {
-  // Ottieni l'istanza della mappa
-  const map = useMap(); 
+  const map = useMap();
+  const [showPolygonMessage, setShowPolygonMessage] = useState(false);
 
-  // coordinates of Kiruna town hall means the centre of the city
+  const [occupiedCoordinates, setOccupiedCoordinates] = useState<Set<string>>(new Set());
+
+  // Funzione per generare una chiave unica per una coordinata
+  const coordinateKey = (latitude: number, longitude: number): string => {
+    return `${latitude.toFixed(6)},${longitude.toFixed(6)}`;
+  };
+
+  // Funzione per trovare la prossima coordinata disponibile
+  const findAvailableCoordinate = (latitude: number, longitude: number): [number, number] => {
+    let newLat = latitude;
+    let newLng = longitude;
+    let offset = 0.0001; // Il valore di offset per spostare la coordinata
+
+    // Continua a cercare una nuova posizione finché non trovi una coordinata libera
+    while (occupiedCoordinates.has(coordinateKey(newLat, newLng))) {
+      newLat = latitude + offset;
+      newLng = longitude + offset;
+      offset += 0.01; // Incrementa l'offset per evitare la collisione
+    }
+
+    return [newLat, newLng];
+  };
+
+  // Coordinates of Kiruna town hall means the center of the city
   const position: LatLngTuple = [67.8558, 20.2253];
 
   const kirunaBounds = new LatLngBounds(
-    [67.790390, 20.416509],  // Sud-ovest
-    [67.889194, 20.050656]   // Nord-est
-  );
-
-  // Gestire gli eventi di creazione delle geometrie
-  map.on(L.Draw.Event.CREATED, (event: any) => {
-    const layer = event.layer;
-    
-    if (event.layerType === 'polygon') {
-      layer.editing.disable(); // Disabilita l'editing del poligono
-      layer.options.interactive = false; // Disabilita l'interazione (clic, hover) sul poligono
-      
-      // Ottieni le coordinate del poligono
-      const coordinates = layer.getLatLngs(); // Questo restituirà un array di coordinate
-    }
-
-    // Aggiungi il layer creato alla mappa
-    layer.addTo(map);
-  });
-
-  //classic layer
-  const classicLayer = L.tileLayer(
-    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
-    { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }
-  );
-
-  // Configurazione layer satellitare alla mappa
-  const satelliteLayer = L.tileLayer(
-    'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', 
+    [67.79039, 20.416509], // Sud-ovest
+    [67.889194, 20.050656] // Nord-est
   );
 
   useEffect(() => {
-    // Impostare la vista iniziale solo al primo rendering
     if (map.getZoom() === undefined) {
       map.setView(position, 12);
     }
 
-    // Imposta i limiti di zoom
     map.setMaxZoom(18);
     map.setMinZoom(12);
-
-    // Limita l'area visibile della mappa alla bounding box di Kiruna
     map.setMaxBounds(kirunaBounds);
-    map.options.maxBoundsViscosity = 1.0; // Imposta viscosità per bloccare l'utente al bounding box
+    map.options.maxBoundsViscosity = 1.0;
 
-    // Aggiungi il layer satellitare alla mappa
-    satelliteLayer.addTo(map);
-
-    // Add the classic layer
-    classicLayer.addTo(map);
-
-    // Add the control of the layers
-    L.control.layers(
-      {
-        'Classic': classicLayer,
-        'Satellite': satelliteLayer
-      },
-      {},
-      {
-        position: 'topleft'  // Posizione del controllo dei layer
-      }
+    const satelliteLayer = L.tileLayer(
+      'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
     ).addTo(map);
 
-    // Pulizia dei listener e degli elementi aggiunti quando il componente viene smontato
-    return () => {
-      // Rimuovi il controllo di disegno quando il componente viene smontato
-      map.eachLayer((layer) => {
-        if (layer instanceof L.Control.Draw) {
-          map.removeControl(layer); // Rimuove il controllo di disegno
-        }
-      });
+    const classicLayer = L.tileLayer(
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }
+    ).addTo(map);
 
+    L.control.layers({ Classic: classicLayer, Satellite: satelliteLayer }, {}, { position: 'topleft' }).addTo(map);
+
+    return () => {
       map.eachLayer((layer) => {
         if (layer !== satelliteLayer && layer !== classicLayer) {
           map.removeLayer(layer);
@@ -115,36 +138,29 @@ function SetMapViewHome(props: any) {
   }, [map]);
 
   useEffect(() => {
-    // Rimuovere i marker vecchi prima di aggiungere i nuovi
     map.eachLayer((layer) => {
       if (layer instanceof L.Marker || layer instanceof L.Polygon) {
         map.removeLayer(layer);
       }
     });
 
-    // Mappa per associare documenti a poligoni o punti
-    const documentLayers = new Map();
-
-    // Mappa per tenere traccia delle coordinate già utilizzate (in formato stringa) con il numero di duplicati
-    const usedCoordinates = new Map<string, number>();
-
-    // Creazione e aggiunta dei marker personalizzati
     props.documentsCoordinates.filter((d: DocCoordinates) => d.coordinates.length !== 0).forEach((doc: any) => {
-      let latitude = doc.coordinates[0].latitude;
-      let longitude = doc.coordinates[0].longitude;
-
-      // Genera una chiave per le coordinate
-      const key = `${latitude},${longitude}`;
-
-      // Se la coordinata è già stata utilizzata, incrementa il contatore e sposta il marker
-      let offset = usedCoordinates.get(key) ?? 0; // Usa 0 se offset è undefined
-      if (offset > 0) {
-        usedCoordinates.set(key, offset + 1);
-        // Sposta leggermente il marker (a sinistra o destra) a seconda del contatore
-        longitude += 0.0004 * (offset % 2 === 0 ? 1 : -1);  // Alterna il segno per evitare che si accumulino nello stesso punto
+      const latitude = doc.coordinates[0].latitude;
+      const longitude = doc.coordinates[0].longitude;
+      console.log(doc.coordinates[0].latitude);
+      console.log(occupiedCoordinates)
+      // Verifica se la coordinata è già occupata
+      const key = coordinateKey(latitude, longitude);
+      if (occupiedCoordinates.has(key)) {
+        console.log("entrato");
+        // Trova una nuova coordinata disponibile
+        const [newLat, newLng] = findAvailableCoordinate(latitude, longitude);
+        // Aggiungi la nuova coordinata alla lista delle coordinate occupate
+        setOccupiedCoordinates((prev) => new Set(prev).add(coordinateKey(newLat, newLng)));
       } else {
-        // Se è la prima volta che vediamo questa coordinata, aggiungiamo un nuovo contatore
-        usedCoordinates.set(key, 1);
+        console.log("Entratos")
+        // Aggiungi la coordinata originale alla lista delle coordinate occupate
+        setOccupiedCoordinates((prev) => new Set(prev).add(key));
       }
 
       const iconHtml = ReactDOMServer.renderToString(props.getDocumentIcon(doc.type, 5) || <></>);
@@ -160,53 +176,57 @@ function SetMapViewHome(props: any) {
         }),
       }).addTo(map);
 
-      // Se il documento ha più di una coordinata (poligono), crea il poligono
       if (doc.coordinates.length > 1) {
         const latLngs = doc.coordinates.map((coord: any) => [coord.latitude, coord.longitude]);
 
-        // Definire il poligono, ma non aggiungerlo alla mappa immediatamente
         const relatedLayer: L.Polygon = L.polygon(latLngs, {
-          color: '#B22222',  // Bordo rosso più scuro (Rosso fuoco)
-          weight: 1,         // Bordo molto sottile
-          opacity: 0.8,      // Opacità del bordo (visibile ma non troppo forte)
-          fillColor: '#FFD700',  // Colore di riempimento giallo oro
-          fillOpacity: 0.1,  // Opacità del riempimento (più opaco per non oscurare la mappa sottostante)
-          smoothFactor: 2,   // Rende il poligono con bordi più arrotondati
+          color: '#B22222',
+          weight: 1,
+          opacity: 0.8,
+          fillColor: '#FFD700',
+          fillOpacity: 0.1,
+          smoothFactor: 2,
         });
 
-        documentLayers.set(doc, relatedLayer);
-
-        // Evento per mostrare il poligono quando si passa sopra il marker
         marker.on('mouseover', () => {
           if (!map.hasLayer(relatedLayer)) {
-            relatedLayer.addTo(map);  // Aggiungi il poligono alla mappa quando il mouse passa sopra il marker
-
-            // Cambia il colore del bordo e riempimento quando il mouse passa sopra
-            relatedLayer.setStyle({
-              color: '#8B0000', // Cambia il colore del bordo a un rosso scuro più intenso
-              weight: 2,        // Aumenta leggermente lo spessore del bordo
-              fillOpacity: 0.2, // Aumenta l'opacità del riempimento
-            });
+            relatedLayer.addTo(map);
+            relatedLayer.setStyle({ color: '#8B0000', weight: 2, fillOpacity: 0.2 });
+            console.log(doc.coordinates)
+            // Controlla se le coordinate corrispondono
+            if (doc.coordinates.every((coord: any) => createCityCoordinates().some((cityCoord: L.LatLng) => areCoordinatesEqual(coord, cityCoord)))) {
+              setShowPolygonMessage(true); // Mostra il messaggio se le coordinate sono uguali
+            }
           }
         });
 
-        // Evento per nascondere il poligono quando il mouse esce dal marker
         marker.on('mouseout', () => {
           if (map.hasLayer(relatedLayer)) {
-            map.removeLayer(relatedLayer);  // Rimuovi il poligono dalla mappa quando il mouse esce dal marker
+            map.removeLayer(relatedLayer);
+
+            setShowPolygonMessage(false); // Nascondi il messaggio
           }
         });
       }
-        
-      // Listener per aprire il componente ShowDocumentInfoModal al clic del marker
+
       marker.on('click', () => {
         props.onMarkerClick(doc);
       });
     });
   }, [props.documentsCoordinates]);
 
-  return null;
+  return (
+    <>
+      {showPolygonMessage && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] bg-gray-200 text-black text-sm px-2 py-1 rounded-md shadow-lg border">
+          area: <strong>the entire municipality of Kiruna</strong>
+        </div>
+      )}
+      {null}
+    </>
+  );
 }
+
 
 
 // Componente per la costruzione della mappa nel modal edit
@@ -325,5 +345,5 @@ function SetMapViewEdit(props: any) {
 
 
 
-export {SetMapViewHome, SetMapViewEdit}
+export {SetMapViewHome, SetMapViewEdit, createCityCoordinates}
   
