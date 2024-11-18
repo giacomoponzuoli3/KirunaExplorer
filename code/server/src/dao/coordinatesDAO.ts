@@ -145,7 +145,6 @@ class CoordinatesDAO {
             throw error; // Propagate error to caller
         }
     }
-
 }
 
 export {CoordinatesDAO};
