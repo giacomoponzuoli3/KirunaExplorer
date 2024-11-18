@@ -124,12 +124,6 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, selectedDocu
                                     <p className="text-sm text-gray-600"><strong>Pages:</strong> 
                                         {selectedDocument.pages ? selectedDocument.pages : '-'}
                                     </p>
-                                    {/*
-                                      <p className="text-sm text-gray-600"><strong>Coordinates:</strong> 
-                                          {selectedDocument.coordinates ? selectedDocument.coordinates : '-'}
-                                      </p>
-                                      */
-                                    }
                                     
                                     
                                 </Col>
