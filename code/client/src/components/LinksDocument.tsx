@@ -208,7 +208,7 @@ function LinksDocument(props: any) {
               <h2 className="text-xl font-normal text-gray-600 mb-1 text-center">
                 Connections of
               </h2>
-              <h2 className="text-3xl font-bold text-green-600 text-center mb-6">
+              <h2 className="text-3xl font-bold text-black-600 text-center mb-6">
                 {document.title}
               </h2>
           
