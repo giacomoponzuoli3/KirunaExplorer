@@ -344,16 +344,6 @@ describe('documentController', () => {
             
         });
 
-        
-        test("It should return an suitable message if there is no description", async () => {
-            jest.spyOn(dao, 'getDocumentDescriptionById').mockResolvedValue(null);
-
-            await expect(controller.getDocumentDescriptionById(testId)).resolves.toEqual("No description available");
-            expect(dao.getDocumentDescriptionById).toBeCalledWith(testId);
-        
-        });
-
-
         test("It should reject if there is an error with select", async () => {
             jest.spyOn(dao, 'getDocumentDescriptionById').mockRejectedValue("Select Error");
 

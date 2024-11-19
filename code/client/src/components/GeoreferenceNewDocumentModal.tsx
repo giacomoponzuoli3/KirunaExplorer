@@ -82,6 +82,11 @@ const coordinatesCity: L.LatLng[] = [
   L.latLng(67.8753332, 20.1841097)
 ];
 
+const kirunaBounds = new LatLngBounds(
+  [67.7758, 20.1003],  // Sud-ovest
+  [67.9358, 20.3503]   // Nord-est
+);
+
 interface SetMapViewInterface{
   resetForm: () => void;
   setMarkerPosition: (position: LatLng) => void;
@@ -101,11 +106,6 @@ function SetMapView({resetForm, setMarkerPosition, setPolygon}: SetMapViewInterf
   
     // Coordinate di Kiruna, Svezia
     const position: LatLngTuple = [67.8558, 20.2253];
-  
-    const kirunaBounds = new LatLngBounds(
-      [67.7758, 20.1003],  // Sud-ovest
-      [67.9358, 20.3503]   // Nord-est
-    );
 
 
     // Create the EditControl manually
@@ -272,11 +272,12 @@ function GeoreferenceNewDocumentModal({
     setAlertMessage('');
   };
 
-  const handleClose = () => {
-    onHide();
-    showAddNewDocumentLinks(document);
-    resetForm();
-  };
+    const handleClose = () => {
+        onHide();
+        showAddNewDocumentLinks(document)
+        clearOtherLayers();
+        resetForm();
+    };
 
   const handleSubmit = async () => {
     if (polygon.length === 0 && markerPosition !== null) {
@@ -299,44 +300,62 @@ function GeoreferenceNewDocumentModal({
     });
   };
 
-  const handleSelectWholeMap = () => {
-    if (!mapRef.current) return; // Ensure mapRef.current is not null
+    // Function to handle selecting the whole map
+    // Function to handle selecting the whole map
+    const handleSelectWholeMap = () => {
+      if (!mapRef.current) return; // Ensure mapRef.current is not null
+      
+      // If the whole map polygon is already selected, remove it
+      if (wholeMapPolygon) {
+        featureGroup.removeLayer(wholeMapPolygon);
+        setWholeMapPolygon(null); // Update state to reflect no selection
+      } else {
+        const bounds = mapRef.current.getBounds();
+        if (bounds) {
+            // Get the corners of the current map view
+            const KnorthWest = kirunaBounds.getNorthWest();
+            const KnorthEast = kirunaBounds.getNorthEast();
+            const KsouthEast = kirunaBounds.getSouthEast();
+            const KsouthWest = kirunaBounds.getSouthWest();
 
-    if (wholeMapPolygon) {
-      featureGroup.removeLayer(wholeMapPolygon);
-      setWholeMapPolygon(null); 
-    } else {
-      const bounds = mapRef.current.getBounds();
-      if (bounds) {
-        const northWest = bounds.getNorthWest();
-        const northEast = bounds.getNorthEast();
-        const southEast = bounds.getSouthEast();
-        const southWest = bounds.getSouthWest();
+            const northWest = bounds.getNorthWest();
+            const northEast = bounds.getNorthEast();
+            const southEast = bounds.getSouthEast();
+            const southWest = bounds.getSouthWest();
 
-        const newPolygon = L.polygon([northWest, northEast, southEast, southWest]);
+            // Define a polygon that covers the map bounds
+            const newPolygon = L.polygon([
+              [KsouthWest.lat, southWest.lng],
+              [KnorthWest.lat, northWest.lng],
+              [KnorthEast.lat, northEast.lng],
+              [KsouthEast.lat, southEast.lng],
+              [KsouthWest.lat, southWest.lng],
+            ]);
 
-        clearOtherLayers();
+            // Clear any existing polygons or markers, if needed
+            clearOtherLayers();
 
-        setPolygon(coordinatesCity); 
+            // Save the coordinates of the whole map polygon
+            setPolygon(coordinatesCity); // First array in LatLngs represents the outer boundary
 
-        featureGroup.addLayer(newPolygon);
-        setWholeMapPolygon(newPolygon); 
+            // Add the new polygon to the map
+            //newPolygon.addTo(mapRef.current);
+            featureGroup.addLayer(newPolygon);
+            setWholeMapPolygon(newPolygon); // Update state to store the polygon
+        }
       }
-    }
-  };
+    };
 
-  const handleCoordinatesSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); 
-    const kirunaBounds = new LatLngBounds(
-      [67.7758, 20.1003], 
-      [67.9358, 20.3503] 
-    );
-    if (latitude.trim() !== '' && longitude.trim() !== '') {
-      const lat = parseFloat(latitude);
-      const lng = parseFloat(longitude);
-
-      if (!isNaN(lat) && !isNaN(lng)) {
-        const newPosition = new L.LatLng(lat, lng);
+    // Handle form submission or Enter key press
+    const handleCoordinatesSubmit = (e: React.FormEvent) => {
+      e.preventDefault(); // Prevent form submission
+      
+      if (latitude.trim() !== '' && longitude.trim() !== '') {
+        const lat = parseFloat(latitude);
+        const lng = parseFloat(longitude);
+          
+        if (!isNaN(lat) && !isNaN(lng)) {
+          const newPosition = new L.LatLng(lat, lng);
 
         if (kirunaBounds.contains(newPosition)) {
           setMarkerPosition(newPosition);
