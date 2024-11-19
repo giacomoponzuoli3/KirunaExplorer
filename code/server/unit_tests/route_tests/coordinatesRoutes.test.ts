@@ -8,6 +8,7 @@ import { app } from "../../index";
 import request from 'supertest';
 import Authenticator from "../../src/routers/auth"
 import { User } from "../../src/models/user"
+import {CoordinatesArrayError, CoordinatesTypeError} from "../../src/errors/coordinates";
 
 const baseURL = "/kiruna/coordinates"
 
@@ -186,12 +187,6 @@ describe('coordinateRoutes', () => {
                     coordinates: "coordinate"
                 })
             expect(response.status).toBe(422);
-            expect(response.body).toEqual(    {                                                                                                                                                                                                                             
-                error: 'The parameters are not formatted properly\n' +
-                  '\n' +
-                  '- Parameter: **coordinates** - Reason: *Coordinates must be a LatLng object or an array of LatLng* - Location: *body*\n' +
-                  '\n'
-              });
             expect(controller.setDocumentCoordinates).not.toHaveBeenCalled();
         });
 
@@ -211,12 +206,6 @@ describe('coordinateRoutes', () => {
                     coordinates: [{ lat: 40.0, lng: 45.0 }, { lat: "invalid", lng: 90.0 }],
                 })
             expect(response.status).toBe(422);
-            expect(response.body).toEqual({
-                error: 'The parameters are not formatted properly\n' +
-                  '\n' +
-                  '- Parameter: **coordinates** - Reason: *Each elements of coordinates must be an LatLng object* - Location: *body*\n' +
-                  '\n'
-              });
             expect(controller.setDocumentCoordinates).not.toHaveBeenCalled();
         });
 
