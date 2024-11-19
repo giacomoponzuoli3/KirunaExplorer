@@ -156,36 +156,29 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocuments, doc
 
   const handleLink = () => {
     // Check for errors
-    if (documentLinks.length === 0) {
-      setAlertMessage('Choose documents to link before linking')
-      setShowAlert(true);
-      return; // Prevent submission if there are errors
+    if (documentLinks.length !== 0) {
+      try{
+        // Implement API call to add link
+        documentLinks.forEach(async link => {
+          if(link.documentId && link.linkId){
+            await API.addLink(document.id, link.documentId, link.linkId);
+          }
+          
+        });
+      }catch(err){
+        setShowAlert(true);
+        setAlertMessage('Something went wrong...')
+      }
     }
-     console.log(document)
-    try{
-      // Implement API call to add link
-      documentLinks.forEach(async link => {
-        if(link.documentId && link.linkId){
-          await API.addLink(document.id, link.documentId, link.linkId);
-        }
-        
-      });
-
       onHide();
-
       //refresh of documents
-      refreshDocuments();
-      
+      refreshDocuments();    
       //reset values 
       setSelectedDocument(null)
       setSelectedTypeLink(null)
       setSelectedDocumentName('')
       setSelectedTypeLinkName('')
       setDocumentLinks([])
-  }catch(err){
-      setShowAlert(true);
-      setAlertMessage('Something went wrong...')
-  }
 };
 
  const confirmDelete = (documentId:number | null, linkId: number | null) => {
