@@ -115,6 +115,8 @@ function SetMapView({resetForm, setMarkerPosition, setPolygon}: SetMapViewInterf
         rectangle: false,
         circle: false,
         circlemarker: false,
+        polygon: false,
+        /*
         polygon: {
           shapeOptions: {
             color: '#3388ff', // Colore del bordo
@@ -125,6 +127,7 @@ function SetMapView({resetForm, setMarkerPosition, setPolygon}: SetMapViewInterf
             dashArray: '5,5', // Linea tratteggiata (opzionale)
           },
         },
+        */
         marker: {
           icon: customIcon,
         },
@@ -241,62 +244,63 @@ interface GeoreferenceNewDocumentModalProps {
     refreshDocumentsCoordinates: () => void;
 }
 
-function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocumentLinks, refreshDocumentsCoordinates }: GeoreferenceNewDocumentModalProps) {
-    
-    const [markerPosition, setMarkerPosition] = useState<LatLng | null>(null);
-    const [isEnterCoordinatesMode, setIsEnterCoordinatesMode] = useState(false);
-    const [polygon, setPolygon] = useState<LatLng[]>([]);
-    const [wholeMapPolygon, setWholeMapPolygon] = useState<L.Polygon | null>(null); // Track the whole map polygon
-    const [latitude, setLatitude] = useState('');
-    const [longitude, setLongitude] = useState('');
-    const [showAlert, setShowAlert] = useState(false); // alert state
-    const [alertMessage, setAlertMessage] = useState('');
-    const mapRef = useRef<L.Map>(null);
+function GeoreferenceNewDocumentModal({
+  show,
+  onHide,
+  document,
+  showAddNewDocumentLinks,
+  refreshDocumentsCoordinates
+}: GeoreferenceNewDocumentModalProps) {
+  const [markerPosition, setMarkerPosition] = useState<LatLng | null>(null);
+  const [isEnterCoordinatesMode, setIsEnterCoordinatesMode] = useState(false);
+  const [polygon, setPolygon] = useState<LatLng[]>([]);
+  const [wholeMapPolygon, setWholeMapPolygon] = useState<L.Polygon | null>(null); // Track the whole map polygon
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
+  const [showAlert, setShowAlert] = useState(false); // alert state
+  const [alertMessage, setAlertMessage] = useState('');
+  const mapRef = useRef<L.Map>(null);
 
-
-    const resetForm = () => {
-        setLatitude('');
-        setLongitude('');
-        setIsEnterCoordinatesMode(false);
-        setMarkerPosition(null);
-        setPolygon([]);
-        setWholeMapPolygon(null);
-        setShowAlert(false);
-        setAlertMessage('');
-    };
+  const resetForm = () => {
+    setLatitude('');
+    setLongitude('');
+    setIsEnterCoordinatesMode(false);
+    setMarkerPosition(null);
+    setPolygon([]);
+    setWholeMapPolygon(null);
+    setShowAlert(false);
+    setAlertMessage('');
+  };
 
     const handleClose = () => {
         onHide();
-        showAddNewDocumentLinks(document);
+        showAddNewDocumentLinks(document)
         clearOtherLayers();
         resetForm();
     };
 
-    const handleSubmit = async () => {
-        //API call to georeference the document
-        if(polygon.length === 0 && markerPosition !== null){ 
-          API.setDocumentCoordinates(document.id, markerPosition);
-        } else if (polygon.length !== 0 && markerPosition === null){
-          API.setDocumentCoordinates(document.id, polygon);
-        }
-        console.log(polygon);
-        console.log(markerPosition);
-        refreshDocumentsCoordinates();
-        handleClose();
-        refreshDocumentsCoordinates();
-    };
+  const handleSubmit = async () => {
+    if (polygon.length === 0 && markerPosition !== null) {
+      await API.setDocumentCoordinates(document.id, markerPosition);
+    } else if (polygon.length !== 0 && markerPosition === null) {
+      await API.setDocumentCoordinates(document.id, polygon);
+    }
+    refreshDocumentsCoordinates();
+    handleClose();
+  };
 
-    const clearOtherLayers = () => {
-      mapRef.current?.eachLayer((layer) => { 
-        if ( layer instanceof L.Polygon ||                 //can't only delete layer of instance markers because it intercepts
-            (layer instanceof L.Marker && layer.options.isStandalone) //with some drawing tools and polygon drawing doesn't work then
-        )                                                             //that's why we need to add standalone to destinguish them
-        {                                                          
-          featureGroup.removeLayer(layer);
-        }
-      });
-    };
+  const clearOtherLayers = () => {
+    mapRef.current?.eachLayer((layer) => {
+      if (
+        layer instanceof L.Polygon || 
+        (layer instanceof L.Marker && layer.options.isStandalone) 
+      ) {
+        featureGroup.removeLayer(layer);
+      }
+    });
+  };
 
+    // Function to handle selecting the whole map
     // Function to handle selecting the whole map
     const handleSelectWholeMap = () => {
       if (!mapRef.current) return; // Ensure mapRef.current is not null
@@ -353,171 +357,188 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
         if (!isNaN(lat) && !isNaN(lng)) {
           const newPosition = new L.LatLng(lat, lng);
 
-          // Check if coordinates are within the bounds of Kiruna
-          if (kirunaBounds.contains(newPosition)) {
-            setMarkerPosition(newPosition);
-            // Add the marker to the map (make sure mapRef is defined in your code)
-            if (mapRef.current) {
-                featureGroup.addLayer(L.marker(newPosition,{isStandalone: true, icon: customIcon}));
-                setIsEnterCoordinatesMode(false);
-                setLatitude('');
-                setLongitude('');
-            }
-          } else {
-            setShowAlert(true);
-            setAlertMessage("Coordinates are out of bounds for Kiruna.");
+        if (kirunaBounds.contains(newPosition)) {
+          setMarkerPosition(newPosition);
+          if (mapRef.current) {
+            featureGroup.addLayer(L.marker(newPosition, { isStandalone: true, icon: customIcon }));
+            setIsEnterCoordinatesMode(false);
+            setLatitude('');
+            setLongitude('');
           }
         } else {
           setShowAlert(true);
-          setAlertMessage("Invalid coordinates entered");
+          setAlertMessage("Coordinates are out of bounds for Kiruna.");
         }
-      }else{
+      } else {
         setShowAlert(true);
-        setAlertMessage("Please enter coordinates");
+        setAlertMessage("Invalid coordinates entered");
       }
-    };
+    } else {
+      setShowAlert(true);
+      setAlertMessage("Please enter coordinates");
+    }
+  };
 
-   
-    return (
-      <Modal dialogClassName="custom-modal-width" show={show} onHide={handleClose} aria-labelledby="example-modal-sizes-title-lg">
-          <Modal.Header closeButton style={{ backgroundColor: 'rgb(148, 137, 121,0.4)' }}>
-            <Modal.Title id="example-modal-sizes-title-lg">Would u like to georeference the new document?</Modal.Title>
-          </Modal.Header>
-          <Modal.Body style={{ backgroundColor: 'rgb(148, 137, 121,0.2)' }}>
-            <Container>
-              {showAlert &&
-                <Alert
-                    message= {alertMessage}
-                    onClose={() => {
-                      setShowAlert(false);
-                      setAlertMessage('')
-                    }}
-                />
-              }
-              {/* Container to show the map */}
-              <MapContainer  ref={mapRef} style={{ height: "100vh", width: "100%" }}>
-                 <SetMapView  resetForm={resetForm} 
-                 setMarkerPosition={(position: LatLng) => setMarkerPosition(position)}
-                 setPolygon={(polygon: LatLng[]) => setPolygon(polygon)}/>
-                </MapContainer>
-                
-                {/* A button for the possibility of selecting the whole area*/}
-                <Button title="Select the whole area"
-                 style={{
-                    position: 'absolute',
-                    top: '200px',  // Adjust based on position under zoom controls
-                    right: '40px', // Adjust for placement on map
-                    zIndex: 1000,
-                    width: '30px',
-                    height: '30px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    
-                 }}
-                    variant={wholeMapPolygon ? "primary" : "secondary"}
-                    onClick={() => {
-                       setLatitude('');
-                       setLongitude('');
-                       setPolygon([])
-                       setMarkerPosition(null);
-                       setIsEnterCoordinatesMode(false);
-                       handleSelectWholeMap();
-                    }}
-                >
-                    <i className="bi bi-arrows-fullscreen fs-8"></i>
-                </Button>
+  useEffect(() => {
+    if (show && mapRef.current) {
+      // Trigger a re-render of the map when modal is shown
+      mapRef.current.invalidateSize();
+    }
+  }, [show]); // Trigger this when the modal visibility (`show`) changes
 
-                {wholeMapPolygon && (
-                 <div style={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  zIndex: 1000,
-                  transform: "translate(-50%, -50%)",
-                  backgroundColor: "rgba(0, 0, 0, 0.5)",
-                  color: "white",
-                  padding: "10px",
-                  borderRadius: "8px",
-                  pointerEvents: "none" // Prevent interaction with the label
-                 }}>
-                  Selected area: The whole municipality of Kiruna
-                 </div>
-                )}
-                <div>
-                  {/* A button for the possibility of manually adding coordinates*/}
-                  <Button title="Enter coordinates"
-                    style={{
-                     position: 'absolute',
-                     top: '235px',  // Adjust based on position under zoom controls
-                     right: '40px', // Adjust for placement on map
-                     zIndex: 1000,
-                     width: '30px',
-                     height: '30px',
-                     display: 'flex',
-                     alignItems: 'center',
-                     justifyContent: 'center',   
-                    }}
-                    variant={isEnterCoordinatesMode ? "primary" : "secondary"}
-                    onClick={() => {
-                      setLatitude('');
-                      setLongitude('');
-                      setWholeMapPolygon(null)
-                      setPolygon([])
-                      setMarkerPosition(null);
-                      setIsEnterCoordinatesMode((prev) => !prev);
-                      clearOtherLayers();
-                    }}
-                  >
-                    <i className="bi bi-card-text fs-8"></i>
-                  </Button>
-                 {/* Coordinates input form */}
-                 {isEnterCoordinatesMode && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '235px',
-                    right: '80px', // Position next to the button
-                    zIndex: 1000,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    backgroundColor: 'white',
-                    padding: '10px',
-                    borderRadius: '5px',
-                    boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
-                  }}>
-                    <Form onSubmit={handleCoordinatesSubmit}>
-                      <Form.Group className="mb-2">
-                        <Form.Control
-                          type="text"
-                          placeholder="Latitude"
-                          value={latitude}
-                          onChange={(e) => setLatitude(e.target.value)}
-                        />
-                      </Form.Group>
-                      <Form.Group className="mb-2">
-                          <Form.Control
-                            type="text"
-                            placeholder="Longitude"
-                            value={longitude}
-                            onChange={(e) => setLongitude(e.target.value)}
-                          />
-                      </Form.Group>
-                      <Button type="submit">Place Marker</Button>
-                    </Form>
-                  </div>
-                 )}
-                </div> 
-             </Container>
-          </Modal.Body>
-          <Modal.Footer style={{ backgroundColor: 'rgb(148, 137, 121,0.4)' }}>
-            <Button variant="secondary" className="text-white rounded-md" onClick={handleClose}>
-              Cancel
-            </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-md" onClick={handleSubmit} style={{ borderColor: 'white' }}>
-              Submit
-            </Button>
-          </Modal.Footer>
-      </Modal>
-    );
+  return (
+    <Modal 
+      size="xl" 
+      aria-labelledby="example-modal-sizes-title-lg"
+      show={show} 
+      onHide={handleClose} 
+    >
+      <Modal.Header closeButton className="bg-gray-100">
+        <Modal.Title id="example-modal-sizes-title-lg" className="text-2xl font-bold text-gray-800">
+          Would you like to georeference the new document?
+        </Modal.Title>
+      </Modal.Header>
+
+      <Modal.Body 
+        className="bg-white overflow-auto relative h-[calc(100vh-200px)]" // Prevent vertical scrollbar, ensure content fits
+      >
+        <Container>
+          {showAlert && (
+            <Alert
+              message={alertMessage}
+              onClose={() => {
+                setShowAlert(false);
+                setAlertMessage('');
+              }}
+
+            />
+          )}
+
+          <p className="text-sm text-gray-600 mt-2">
+            This step is optional. You can skip it if you don't wish to georeference the document at this time.
+          </p>
+
+          {/* Map Container */}
+          <MapContainer 
+            ref={mapRef} 
+            style={{ height: "calc(100vh - 250px)", width: "100%" }} // Ensure the map takes available height
+          >
+            <SetMapView
+              resetForm={resetForm} 
+              setMarkerPosition={(position: LatLng) => setMarkerPosition(position)}
+              setPolygon={(polygon: LatLng[]) => setPolygon(polygon)}
+            />
+          </MapContainer>
+
+          {/* Button for selecting whole area */}
+          <Button title="Select the whole area"
+            style={{
+              position: 'absolute',
+              top: '200px',  // Adjust based on position under zoom controls
+              right: '40px', // Adjust for placement on map
+              zIndex: 1000,
+              width: '30px',
+              height: '30px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              
+            }}
+            variant={wholeMapPolygon ? "primary" : "secondary"}
+            onClick={() => {
+                setLatitude('');
+                setLongitude('');
+                setPolygon([])
+                setMarkerPosition(null);
+                setIsEnterCoordinatesMode(false);
+                handleSelectWholeMap();
+            }}
+          >
+            <i className="bi bi-arrows-fullscreen fs-8"></i>
+          </Button>
+
+          {/* Display the selected area label */}
+          {wholeMapPolygon && (
+            <div 
+              className="absolute top-1/2 left-1/2 z-[1002] transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-lg pointer-events-none"
+            >
+              Selected area: The whole municipality of Kiruna
+            </div>
+          )}
+
+          {/* A button for the possibility of manually adding coordinates*/}
+          <Button title="Enter coordinates"
+            style={{
+            position: 'absolute',
+            top: '235px',  // Adjust based on position under zoom controls
+            right: '40px', // Adjust for placement on map
+            zIndex: 1000,
+            width: '30px',
+            height: '30px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',   
+            }}
+            variant={isEnterCoordinatesMode ? "primary" : "secondary"}
+            onClick={() => {
+              setLatitude('');
+              setLongitude('');
+              setWholeMapPolygon(null)
+              setPolygon([])
+              setMarkerPosition(null);
+              setIsEnterCoordinatesMode((prev) => !prev);
+              clearOtherLayers();
+            }}
+          >
+            <i className="bi bi-card-text fs-8"></i>
+          </Button>
+
+          {/* Coordinates input form */}
+          {isEnterCoordinatesMode && (
+            <div 
+              className="absolute top-36 right-24 z-[1002] flex flex-col bg-white p-4 rounded-lg shadow-lg"
+            >
+              <Form onSubmit={handleCoordinatesSubmit}>
+                <Form.Group className="mb-2">
+                  <Form.Control
+                    type="text"
+                    placeholder="Latitude"
+                    value={latitude}
+                    onChange={(e) => setLatitude(e.target.value)}
+                  />
+                </Form.Group>
+                <Form.Group className="mb-2">
+                  <Form.Control
+                    type="text"
+                    placeholder="Longitude"
+                    value={longitude}
+                    onChange={(e) => setLongitude(e.target.value)}
+                  />
+                </Form.Group>
+                <Button type="submit">Place Marker</Button>
+              </Form>
+            </div>
+          )}
+        </Container>
+      </Modal.Body>
+
+      <Modal.Footer className="bg-gray-100 flex justify-end space-x-4">
+          <button
+            className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md"
+            onClick={handleClose}
+          >
+            Skip
+          </button>
+          <button
+            className="px-4 py-2 bg-blue-950 hover:bg-blue-500 text-white rounded-md"
+            onClick={handleSubmit}
+          >
+            Next
+          </button>
+        </Modal.Footer>
+    </Modal>
+
+  );
 }
+
 export {GeoreferenceNewDocumentModal}
