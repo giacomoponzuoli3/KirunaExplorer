@@ -50,6 +50,8 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocuments, doc
     const [currentPage, setCurrentPage] = useState(1);  // Track the current page
     const [paginatedLinks, setPaginatedLinks] = useState<DocumentLink[]>([]);
     const itemsPerPage = 3; // Number of items to show per page
+    const [searchQuery, setSearchQuery] = useState('');
+
 
     // Calculate total pages
     const totalPages = Math.ceil(documentLinks.length / itemsPerPage);
@@ -201,6 +203,11 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocuments, doc
    
   };
 
+  const filteredDocuments = documents.filter((doc) =>
+    doc.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+
 
   return (
       <>
@@ -251,10 +258,22 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocuments, doc
 
                         {showDocumentDropdown && (
                           <div className="absolute left-0 right-0 bg-white border border-gray-200 rounded-md mt-1 shadow-lg max-h-60 overflow-y-auto z-10 animate-dropdown-open">
-                            {documents.length === 0 ? (
+                            
+                            <div className="p-2">
+                              <input
+                                type="text"
+                                placeholder="Search documents..."
+                                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                value={searchQuery}
+                                onChange={(element) => setSearchQuery(element.target.value)}
+                              />
+                            </div>
+
+
+                            {filteredDocuments.length === 0 ? (
                               <div className="p-2 text-gray-500">No documents available</div>
                             ) : (
-                              documents.map((document) => (
+                              filteredDocuments.map((document) => (
                                 <label
                                   key={document.id}
                                   className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
