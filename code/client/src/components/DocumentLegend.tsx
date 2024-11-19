@@ -7,15 +7,15 @@ function DocumentLegend() {
     setIsLegendVisible(!isLegendVisible);
   };
 
-  const documentTypes = [
-    { type: 'Informative document', icon: 'informativeDocument.png' },
-    { type: 'Prescriptive document', icon: 'prescriptiveDocument.png' },
-    { type: 'Material effect', icon: 'construction.png' },
-    { type: 'Design document', icon: 'designDocument.png' },
-    { type: 'Technical document', icon: 'technicalDocument.png' },
-    { type: 'Agreement', icon: 'agreement.png' },
-    { type: 'Conflict', icon: 'conflict.png' },
-    { type: 'Consultation', icon: 'consultation.png' },
+const documentTypes = [
+    { type: 'Informative document', icon: 'informativeDocument-icon.png' },
+    { type: 'Prescriptive document', icon: 'prescriptiveDocument-icon.png' },
+    { type: 'Material effect', icon: 'construction-icon.png' },
+    { type: 'Design document', icon: 'designDocument-icon.png' },
+    { type: 'Technical document', icon: 'technicalDocument-icon.png' },
+    { type: 'Agreement', icon: 'agreement-icon.png' },
+    { type: 'Conflict', icon: 'conflict-icon.png' },
+    { type: 'Consultation', icon: 'consultation-icon.png' },
   ];
 
   // Close the legend if clicking outside of it
