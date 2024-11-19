@@ -163,7 +163,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                       type="text"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
-                      className="w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-2 py-2"
                     />
                   </div>
 
@@ -177,7 +177,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                       type="text"
                       value={issuanceDate}
                       onChange={(e) => setIssuanceDate(e.target.value)}
-                      className="w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-2 py-2"
                     />
                   </div>
                 </div>
@@ -314,7 +314,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                       rows={4}
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      className="w-full border border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500"
+                      className="w-full border border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 px-2 py-2"
                     />
                   </div>
 
@@ -341,7 +341,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                         type="text"
                         value={pages || ''}
                         onChange={(e) => setPages(e.target.value ? e.target.value : null)}
-                        className="w-full border border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500"
+                        className="w-full border border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 px-2 py-2"
                       />
                     </div>
                   </div>
