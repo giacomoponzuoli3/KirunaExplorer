@@ -208,20 +208,20 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocuments, doc
 
   return (
       <>
-      <Modal show={show} onHide={handleClose}  dialogClassName="custom-modal-width" aria-labelledby="example-custom-modal-styling-title">
-        <Modal.Header closeButton style={{backgroundColor: 'rgb(148, 137, 121,0.4)'}}>
-          <Modal.Title id="example-custom-modal-styling-title">
+      <Modal show={show} onHide={handleClose}  size="xl" aria-labelledby="example-custom-modal-styling-title">
+        <Modal.Header closeButton className="bg-gray-100">
+          <Modal.Title id="example-custom-modal-styling-title" className="text-2xl font-bold text-gray-800">
             Would you like to add links to the new document?
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{backgroundColor: 'rgb(148, 137, 121,0.2)'}}>
+        <Modal.Body className="bg-white">
           <Container>
           <p className="text-sm text-gray-600 mt-2">
             This step is optional. You can submit without linking the new document to other documents at this time.
           </p>
             <Row>
               <Col xs={12} md={4}>
-                <div className=" flex items-center justify-center" style={{backgroundColor: 'rgb(148, 137, 121,0.2)'}}>
+                <div className=" flex items-center justify-center bg-gray-100">
                   {showAlert &&
                     <Alert
                         message={alertMessage}
