@@ -70,6 +70,7 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
   const [showGeoreferenceDocument, setShowGeoreferenceDocument] = useState<boolean>(false);
 
   const handleEdit = () => {
+    setShowDetails(false);
     setShowEditDocumentModal(true);
   };
 
@@ -147,7 +148,10 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
     {selectedDocument && (
       <EditDocumentModal 
         document={selectedDocument} show={showEditDocumentModal} 
-        onHide={() => setShowEditDocumentModal(false)} refreshSelectedDocument={refreshSelectedDocument}
+        onHide={() => setShowEditDocumentModal(false)} 
+        
+        refreshSelectedDocument={refreshSelectedDocument}
+        
         stakeholders={stakeholders}
       />
     )}
