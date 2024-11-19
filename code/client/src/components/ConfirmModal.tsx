@@ -4,11 +4,12 @@ import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 
 interface ConfirmModalProps {
     show: boolean;
+    text: string;
     onHide: () => void;
     onConfirm: () => void;
 }
 
-const ConfirmModal: React.FC<ConfirmModalProps> = ({ show, onHide, onConfirm }) => {
+const ConfirmModal: React.FC<ConfirmModalProps> = ({ show, onHide, onConfirm, text }) => {
     const [open, setOpen] = useState(show);
 
     useEffect(() => {
@@ -16,7 +17,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({ show, onHide, onConfirm }) 
     }, [show]);
 
     return (
-        <Dialog open={open} onClose={onHide} className="relative z-10">
+        <Dialog open={open} onClose={onHide} className="relative z-[1100]">
             {/* Overlay */}
             <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity animate-slide-in-left" aria-hidden="true" />
 
@@ -34,8 +35,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({ show, onHide, onConfirm }) 
                                     </DialogTitle>
                                     <div className="mt-2">
                                         <p className="text-sm text-gray-500">
-                                            Are you sure you want to delete this document?
-                                            This action cannot be undone.
+                                            {text}
                                         </p>
                                     </div>
                                 </div>
