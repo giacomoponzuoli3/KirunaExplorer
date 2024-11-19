@@ -103,6 +103,12 @@ function LinksDocument(props: any) {
         }
     };
 
+    const confirmDelete = (docId: number, linkId: number) => {
+      setDocumentToDelete(docId);
+      setLinkToDelete(linkId);
+      setShowModal(true);
+    };
+
 
     const refreshLinks = async () => {
         try {
@@ -169,12 +175,6 @@ function LinksDocument(props: any) {
       }
       
     }, [documentLinks]);
-
-    const confirmDelete = (docId: number, linkId: number) => {
-        setDocumentToDelete(docId);
-        setLinkToDelete(linkId);
-        setShowModal(true);
-    };
 
     const handleAddLink = () => {
         setShowModalAddLink(true);
@@ -313,6 +313,8 @@ function LinksDocument(props: any) {
                     show={showModal}
                     onHide={() => setShowModal(false)}
                     onConfirm={handleDelete}
+                    text={`Are you sure you want to delete this link of the document?
+                    This action cannot be undone.`}
                   />
                   <AddLinkModal  
                     show={showModalAddLink}

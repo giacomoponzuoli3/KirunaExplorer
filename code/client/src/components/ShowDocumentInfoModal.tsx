@@ -10,6 +10,7 @@ import { TrashIcon, PencilIcon, MapIcon} from "@heroicons/react/24/outline";
 import { DocCoordinates } from '../models/document_coordinate';
 import { useNavigate } from 'react-router-dom';
 import { ModalEditGeoreference } from './ModalEditGeoreference';
+import ConfirmModal from './ConfirmModal';
 
   
 interface ShowDocumentInfoModalProps {
@@ -28,6 +29,7 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, selectedDocu
     const navigate = useNavigate();  
   
     const [showModalEditGeoreference, setShowModalEditGeoreference] = useState<boolean>(false);
+    const [showModalConfirmDelete, setShowModalConfirmDelete] = useState<boolean>(false);
 
     const handleEditClick = () => {
         handleEdit();
@@ -51,6 +53,10 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, selectedDocu
         }finally{
             onHide();
         }
+    };
+
+    const confirmDelete = () => {
+        setShowModalConfirmDelete(true);
     };
   
     return (
@@ -86,7 +92,7 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, selectedDocu
                                         <div className="flex space-x-2 mt-4">
                                             <button
                                                 className="p-2 rounded-full border-2 bg-red-400 text-white hover:bg-red-700 transition-colors duration-200"
-                                                onClick={handleDeleteClick}
+                                                onClick={confirmDelete}
                                             >
                                                 <TrashIcon className="h-5 w-5" />
                                             </button>
@@ -157,6 +163,14 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, selectedDocu
 
                 />
             }
+
+            <ConfirmModal
+                show={showModalConfirmDelete}
+                onHide={() => setShowModalConfirmDelete(false)}
+                onConfirm={handleDeleteClick}
+                text={`Are you sure you want to delete this document?
+                This action cannot be undone.`}
+            />
         </>
     );
 }
