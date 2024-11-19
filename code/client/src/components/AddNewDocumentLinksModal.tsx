@@ -164,13 +164,17 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocuments, doc
       // Implement API call to add link
       documentLinks.forEach(async link => {
         if(link.documentId && link.linkId){
-        await API.addLink(document.id, link.documentId, link.linkId);
+          await API.addLink(document.id, link.documentId, link.linkId);
         }
-        console.log(link); // This will log each link object to the console
+        
       });
 
       onHide();
+
+      //refresh of documents
       refreshDocuments();
+      
+      //reset values 
       setSelectedDocument(null)
       setSelectedTypeLink(null)
       setSelectedDocumentName('')
@@ -391,11 +395,8 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocuments, doc
           </Container>
         </Modal.Body>
         <Modal.Footer style={{ backgroundColor: 'rgb(148, 137, 121,0.4)' }}>
-          <Button variant="secondary" className="text-white rounded-md" onClick={handleClose}>
-              Cancel
-          </Button>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-md" onClick={handleLink} style={{borderColor: 'white'}}>
-              Link
+          <Button className="bg-blue-950 hover:bg-blue-500 text-white rounded-md" onClick={handleLink} style={{borderColor: 'white'}}>
+              Submit
           </Button>
         </Modal.Footer>
       </Modal>

@@ -144,7 +144,6 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
       showGeoreferenceNewDocumentModal = {(doc: Document) => {setNewDocument(doc); setShowGeoreferenceDocument(true); }}
     />
 
-
     {selectedDocument && (
       <EditDocumentModal 
         document={selectedDocument} show={showEditDocumentModal} 
