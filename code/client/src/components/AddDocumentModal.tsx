@@ -129,7 +129,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
       <Modal size="xl" show={show} onHide={handleClose} aria-labelledby="example-modal-sizes-title-lg">
         <Modal.Header closeButton className="bg-gray-100">
           <Modal.Title id="example-modal-sizes-title-lg" className="text-2xl font-bold text-gray-800">
-            📝 Add New Document
+            Add New Document
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="bg-white">
