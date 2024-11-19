@@ -409,10 +409,13 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocuments, doc
             </Row>
           </Container>
         </Modal.Body>
-        <Modal.Footer style={{ backgroundColor: 'rgb(148, 137, 121,0.4)' }}>
-          <Button className="bg-blue-950 hover:bg-blue-500 text-white rounded-md" onClick={handleLink} style={{borderColor: 'white'}}>
-              Submit
-          </Button>
+        <Modal.Footer className="bg-gray-100 flex justify-end space-x-4">
+          <button 
+              className="px-4 py-2 bg-blue-950 hover:bg-blue-500 text-white rounded-md" 
+              onClick={handleLink} 
+          >
+              Update
+          </button>
         </Modal.Footer>
       </Modal>
     </>

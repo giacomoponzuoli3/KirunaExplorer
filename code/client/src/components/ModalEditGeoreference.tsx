@@ -107,7 +107,10 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
 
             {/* Mappa Leaflet */}
             <div className={`h-80 ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}>
-              <MapContainer style={{ height: '100%' }}>
+            <MapContainer
+              className={`relative w-full ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}
+              style={{ height: '100%' }} // Regola in base alla tua esigenza
+            >
                 {/* TileLayer per visualizzare la mappa */}
                 <SetMapViewEdit
                   setSelectedPosition={setSelectedPosition}
