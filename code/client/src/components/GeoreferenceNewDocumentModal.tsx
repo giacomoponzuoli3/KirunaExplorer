@@ -82,6 +82,11 @@ const coordinatesCity: L.LatLng[] = [
   L.latLng(67.8753332, 20.1841097)
 ];
 
+const kirunaBounds = new LatLngBounds(
+  [67.7758, 20.1003],  // Sud-ovest
+  [67.9358, 20.3503]   // Nord-est
+);
+
 interface SetMapViewInterface{
   resetForm: () => void;
   setMarkerPosition: (position: LatLng) => void;
@@ -101,11 +106,6 @@ function SetMapView({resetForm, setMarkerPosition, setPolygon}: SetMapViewInterf
   
     // Coordinate di Kiruna, Svezia
     const position: LatLngTuple = [67.8558, 20.2253];
-  
-    const kirunaBounds = new LatLngBounds(
-      [67.7758, 20.1003],  // Sud-ovest
-      [67.9358, 20.3503]   // Nord-est
-    );
 
 
     // Create the EditControl manually
@@ -267,7 +267,8 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
 
     const handleClose = () => {
         onHide();
-        showAddNewDocumentLinks(document)
+        showAddNewDocumentLinks(document);
+        clearOtherLayers();
         resetForm();
     };
 
@@ -308,6 +309,11 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
         const bounds = mapRef.current.getBounds();
         if (bounds) {
             // Get the corners of the current map view
+            const KnorthWest = kirunaBounds.getNorthWest();
+            const KnorthEast = kirunaBounds.getNorthEast();
+            const KsouthEast = kirunaBounds.getSouthEast();
+            const KsouthWest = kirunaBounds.getSouthWest();
+
             const northWest = bounds.getNorthWest();
             const northEast = bounds.getNorthEast();
             const southEast = bounds.getSouthEast();
@@ -315,10 +321,11 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
 
             // Define a polygon that covers the map bounds
             const newPolygon = L.polygon([
-                northWest,
-                northEast,
-                southEast,
-                southWest,
+              [KsouthWest.lat, southWest.lng],
+              [KnorthWest.lat, northWest.lng],
+              [KnorthEast.lat, northEast.lng],
+              [KsouthEast.lat, southEast.lng],
+              [KsouthWest.lat, southWest.lng],
             ]);
 
             // Clear any existing polygons or markers, if needed
@@ -338,10 +345,7 @@ function GeoreferenceNewDocumentModal({ show, onHide, document, showAddNewDocume
     // Handle form submission or Enter key press
     const handleCoordinatesSubmit = (e: React.FormEvent) => {
       e.preventDefault(); // Prevent form submission
-      const kirunaBounds = new LatLngBounds(
-        [67.7758, 20.1003],  // Sud-ovest
-        [67.9358, 20.3503]   // Nord-est
-      );
+      
       if (latitude.trim() !== '' && longitude.trim() !== '') {
         const lat = parseFloat(latitude);
         const lng = parseFloat(longitude);
