@@ -15,4 +15,4 @@ docker compose up
 
 ## Access the application
 
-The application can be accessed at http://localhost:3000/kiruna
+The application can be accessed at http://localhost:3000/
