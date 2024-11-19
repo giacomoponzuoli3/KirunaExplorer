@@ -115,8 +115,7 @@ class CoordinatesDAO {
     deleteDocumentCoordinatesById(id_document: number): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try{
-                const sql = `DELETE FROM document_coordinates
-                                WHERE document_id = ?`;
+                const sql = `DELETE FROM document_coordinates WHERE document_id = ?`;
                 db.run(sql, [id_document],  function (err: Error | null) { 
                     if(err){
                         //error in the db
