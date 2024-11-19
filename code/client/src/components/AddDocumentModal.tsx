@@ -209,33 +209,36 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                   </div>
 
                   {/* Type Field */}
-                  <div>
-                    <Dropdown>
-                      <Dropdown.Toggle
-                        id="dropdown-button-dark-example1"
-                        className="bg-gray-800 hover:bg-gray-900 text-white font-medium rounded-md w-full"
-                      >
-                        {type ? type : <RequiredLabel text="Choose a type" />}
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu className="w-full">
-                        {[
-                          'Informative document',
-                          'Prescriptive document',
-                          'Design document',
-                          'Technical document',
-                          'Material effect',
-                          'Agreement',
-                          'Conflict',
-                          'Consultation',
-                        ].map((option, index) => (
-                          <Dropdown.Item
-                            key={index}
-                            onClick={() => setType(option)}
-                          >
-                            {option}
-                          </Dropdown.Item>
-                        ))}
-                      </Dropdown.Menu>
+                  <div className="flex items-center">
+                    <label htmlFor="formIssuanceDate" className="w-1/3 font-medium">
+                        <RequiredLabel text="Type of document" />
+                    </label>
+                    <Dropdown className='w-2/3'>
+                        <Dropdown.Toggle
+                            id="dropdown-button-dark-example1"
+                            className="bg-gray-800 hover:bg-gray-900 text-white font-medium rounded-md w-full"
+                        >
+                            {type ? type : <RequiredLabel text="Choose a type" />}
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu className="w-full">
+                            {[
+                            'Informative document',
+                            'Prescriptive document',
+                            'Design document',
+                            'Technical document',
+                            'Material effect',
+                            'Agreement',
+                            'Conflict',
+                            'Consultation',
+                            ].map((option, index) => (
+                            <Dropdown.Item
+                                key={index}
+                                onClick={() => setType(option)}
+                            >
+                                {option}
+                            </Dropdown.Item>
+                            ))}
+                        </Dropdown.Menu>
                     </Dropdown>
                   </div>
                 </div>

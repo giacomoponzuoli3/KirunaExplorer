@@ -39,7 +39,11 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
     const [language, setLanguage] = useState<string | null>(document.language);
     const [pages, setPages] = useState<string | null>(document.pages);
     const [description, setDescription] = useState(document.description);
+    
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+
     const [showAlert, setShowAlert] = useState(false); // alert state
+    const [showAlertErrorDate, setShowAlertErrorDate] = useState<boolean>(false);
 
     const toggleSelect = (option: Stakeholder) => {
       setSelectedStakeholders((prevSelectedStakeholders) => {
@@ -61,6 +65,14 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
         ) {
             setShowAlert(true);
             return;
+        }
+
+        // Validate Issuance Date formats: "mm/yyyy", "dd/mm/yyyy", or "yyyy"
+        const issuanceDateRegex = /^(0[1-9]|1[0-2])\/\d{4}$|^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$|^\d{4}$/;
+      
+        if (!issuanceDateRegex.test(issuanceDate)) {
+            setShowAlertErrorDate(true);
+            return; // Exit the function early if the format is invalid
         }
         // API call to edit a document
         const doc: Document = await API.editDocument(document.id, title, selectedStakeholders, scale, issuanceDate, type, language, pages,  description).then();
@@ -89,12 +101,15 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
     };
     
     return (
-        <Modal size="lg" show={show} onHide={onHide} aria-labelledby="example-modal-sizes-title-lg">
-            <Modal.Header closeButton style={{ backgroundColor: 'rgb(167, 199, 231,0.8)' }}>
-                <Modal.Title id="example-modal-sizes-title-lg">Edit Document</Modal.Title>
+        <Modal size="xl" show={show} onHide={onHide} aria-labelledby="example-modal-sizes-title-lg">
+            <Modal.Header closeButton className="bg-gray-100">
+                <Modal.Title id="example-modal-sizes-title-lg" className="text-2xl font-bold text-gray-800">
+                    Edit Document
+                </Modal.Title>
             </Modal.Header>
-            <Modal.Body style={{ backgroundColor: 'rgb(167, 199, 231,0.4)' }}>
+            <Modal.Body className="bg-white">
                 <Container>
+                    {/* Alerts */}
                     {showAlert &&
                         <Alert
                             message="Please fill in the mandatory fields marked with the red star (*)."
@@ -103,136 +118,231 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                             }}
                         />
                     }
-                    <Form>
-                        <Row className="mb-3">
-                            <Form.Group as={Row} controlId="formTitle">
-                                <Form.Label column md={2}><RequiredLabel text="Title" /></Form.Label>
-                                <Col md={10}>
-                                    <Form.Control
-                                        type="text"
-                                        value={title}
-                                        onChange={(e) => setTitle(e.target.value)}
-                                        style={{ width: '100%' }}
+                    {!showAlert && showAlertErrorDate && (
+                        <Alert
+                            message="Invalid date format. Please use one of the following formats: mm/yyyy, dd/mm/yyyy, or yyyy."
+                            onClose={() => setShowAlertErrorDate(false)}
+                        />
+                    )}
+                    <form className="space-y-6">
+                        {/* Section 1: Basic Information */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold text-gray-700">Basic Information</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Title Field */}
+                            <div className="flex items-center">
+                                <label htmlFor="formTitle" className="w-1/4 font-medium">
+                                <RequiredLabel text="Title" />
+                                </label>
+                                <input
+                                id="formTitle"
+                                type="text"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                className="w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-2 py-2"
+                                />
+                            </div>
+
+                            {/* Issuance Date Field */}
+                            <div className="flex items-center">
+                                <label htmlFor="formIssuanceDate" className="w-1/3 font-medium">
+                                    <RequiredLabel text="Issuance Date" />
+                                </label>
+                                <input
+                                id="formIssuanceDate"
+                                type="text"
+                                value={issuanceDate}
+                                onChange={(e) => setIssuanceDate(e.target.value)}
+                                className="w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-2 py-2"
+                                />
+                            </div>
+                            </div>
+                        </div>
+                        {/* Section 2: Classification */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold text-gray-700">Classification</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Scale Field */}
+                                <div className="flex items-center">
+                                    <label htmlFor="formScale" className="w-1/4 font-medium">
+                                        <RequiredLabel text="Scale" />
+                                    </label>
+                                    <CreatableSelect
+                                    isClearable
+                                    options={scaleOptions}
+                                    value={scale ? { value: scale, label: scale } : null}
+                                    onChange={handleScale}
+                                    placeholder="Select or type a scale..."
+                                    formatCreateLabel={(inputValue) => `Use custom scale: "${inputValue}"`}
+                                    styles={{
+                                        control: (base) => ({
+                                        ...base,
+                                        borderColor: 'rgba(0, 0, 0, 0.2)',
+                                        }),
+                                    }}
                                     />
-                                </Col>
-                            </Form.Group>
-                        </Row>
-                        <Row className="mb-3">
-                            <Col md={6} className="mt-4 mr-5">
-                                <Form.Group as={Row} controlId="formScale" className="mb-3">
-                                    <Form.Label column md={5}><RequiredLabel text="Scale" /></Form.Label>
-                                    <Col md={7}>
-                                        <CreatableSelect
-                                            isClearable
-                                            options={scaleOptions}
-                                            value={scale ? { value: scale, label: scale } : null}
-                                            onChange={handleScale}
-                                            placeholder="Select or type a scale..."
-                                            formatCreateLabel={(inputValue) => `Use custom scale: "${inputValue}"`}
-                                            styles={{
-                                                control: (base) => ({
-                                                ...base,
-                                                borderColor: 'rgba(0, 0, 0, 0.2)',
-                                                }),
-                                            }}
-                                        />
-                                    </Col>
-                                </Form.Group>
-                                <Form.Group as={Row} controlId="formIssuanceDate" className="mb-3">
-                                    <Form.Label column md={5}><RequiredLabel text="Issuance Date" /></Form.Label>
-                                    <Col md={7}>
-                                        <Form.Control
-                                            type="text"
-                                            value={issuanceDate}
-                                            onChange={(e) => setIssuanceDate(e.target.value)}
-                                            style={{ width: '100%' }}
-                                        />
-                                    </Col>
-                                </Form.Group>
-                            </Col>
-                            <Col xs={12} md={4} className="mt-3">
-                                <Row>
-                                    <Dropdown className="mt-2">
-                                        <Dropdown.Toggle variant="success" id="dropdown-basic"
-                                            style={{ backgroundColor: 'rgb(164,135,121)' }}
-                                        >
-                                            <span><RequiredLabel text="Choose Stakeholders" /></span>
-                                        </Dropdown.Toggle>
-                                        <Dropdown.Menu style={{ width: '200px' }}>
-                                            {stakeholders.map((option, index) => (
+                                </div>
+
+                                {/* Type Field */}
+                                <div>
+                                    <div className="flex items-center">
+                                        <label htmlFor="formIssuanceDate" className="w-1/3 font-medium">
+                                            <RequiredLabel text="Type of document" />
+                                        </label>
+                                        <Dropdown className='w-2/3'>
+                                            <Dropdown.Toggle
+                                                id="dropdown-button-dark-example1"
+                                                className="bg-gray-800 hover:bg-gray-900 text-white font-medium rounded-md w-full"
+                                            >
+                                                {type ? type : <RequiredLabel text="Choose a type" />}
+                                            </Dropdown.Toggle>
+                                            <Dropdown.Menu className="w-full">
+                                                {[
+                                                'Informative document',
+                                                'Prescriptive document',
+                                                'Design document',
+                                                'Technical document',
+                                                'Material effect',
+                                                'Agreement',
+                                                'Conflict',
+                                                'Consultation',
+                                                ].map((option, index) => (
                                                 <Dropdown.Item
                                                     key={index}
-                                                    onClick={() => toggleSelect(option)}
-                                                    active={selectedStakeholders.some(stakeholder => stakeholder.id === option.id)}
+                                                    onClick={() => setType(option)}
                                                 >
-                                                    {option.name}
+                                                    {option}
                                                 </Dropdown.Item>
+                                                ))}
+                                            </Dropdown.Menu>
+                                        </Dropdown>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Section 3: Stakeholders */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold text-gray-700">Stakeholders</h3>
+                            <div className="flex items-start gap-4">
+                                {/* Dropdown compatto */}
+                                <div className="w-1/2">
+                                    <Dropdown
+                                    show={dropdownOpen}
+                                    onToggle={(isOpen) => setDropdownOpen(isOpen)}
+                                    >
+                                        <Dropdown.Toggle
+                                            id="dropdown-basic"
+                                            className="bg-gray-800 hover:bg-gray-900 text-white font-medium rounded-md w-full"
+                                            onClick={() => setDropdownOpen(!dropdownOpen)}
+                                        >
+                                            <span>
+                                            <RequiredLabel text="Choose one or more Stakeholders" />
+                                            </span>
+                                        </Dropdown.Toggle>
+                                        <Dropdown.Menu className="w-full">
+                                            {stakeholders.map((option, index) => (
+                                            <Dropdown.Item
+                                                key={index}
+                                                onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleSelect(option);
+                                                }}
+                                            >
+                                                {option.name}
+                                            </Dropdown.Item>
                                             ))}
                                         </Dropdown.Menu>
                                     </Dropdown>
-                                </Row>
-                                <Row>
-                                    <Dropdown className="w-100 mt-3">
-                                        <Dropdown.Toggle id="dropdown-button-dark-example1"
-                                            style={{ backgroundColor: 'rgb(164,135,121)', width: '200px' }}
-                                        >
-                                            {type ? type : <RequiredLabel text="Choose a type" />}
-                                        </Dropdown.Toggle>
-                                        <Dropdown.Menu style={{ width: '200px' }}>
-                                            <Dropdown.Item onClick={() => setType("Informative document")}>Informative document</Dropdown.Item>
-                                            <Dropdown.Item onClick={() => setType("Prescriptive document")}>Prescriptive document</Dropdown.Item>
-                                            <Dropdown.Item onClick={() => setType("Design document")}>Design document</Dropdown.Item>
-                                            <Dropdown.Item onClick={() => setType("Technical document")}>Technical document</Dropdown.Item>
-                                            <Dropdown.Item onClick={() => setType("Material effect")}>Material effect</Dropdown.Item>
-                                        </Dropdown.Menu>
-                                    </Dropdown>
-                                </Row>
-                            </Col>
-                        </Row>
-                        <Row className="mb-3">
-                            <Form.Group as={Col} md={6} controlId="formDescription">
-                                <Form.Label><RequiredLabel text="Description" /></Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    rows={3}
+                                </div>
+
+                                {/* Stakeholders selezionati, visualizzati a destra */}
+                                <div className="flex flex-wrap gap-2">
+                                    {selectedStakeholders.map((stakeholder, index) => (
+                                    <span
+                                        key={index}
+                                        className="flex items-center px-3 py-1 bg-gray-200 text-gray-800 rounded-full text-sm shadow-sm"
+                                    >
+                                        {stakeholder.name}
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault(); // Prevenire la propagazione
+                                                toggleSelect(stakeholder);
+                                            }}
+                                            className="ml-2 text-gray-500 hover:text-gray-700"
+                                        > 
+                                            ✕
+                                        </button>
+                                    </span>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* Section 4: Additional Information */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold text-gray-700">Classification</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Description Field */}
+                                <div className="space-y-2">
+                                    <label htmlFor="formDescription" className="block text-sm font-medium text-gray-600">
+                                    <RequiredLabel text="Description" />
+                                    </label>
+                                    <textarea
+                                    id="formDescription"
+                                    rows={4}
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
-                                />
-                            </Form.Group>
-                            <Col md={6} className="mt-4">
-                                <Form.Group as={Row} controlId="formLanguage" className="mb-3">
-                                <Form.Label column md={4}>Language</Form.Label>
-                                <Col md={8}>
-                                  <Select
-                                    options={languageOptions}
-                                    value={language ? languageOptions.find(lang => lang.value === language) : null}
-                                    onChange={(selectedOption) => setLanguage(selectedOption ? selectedOption.label : null)}
-                                    placeholder="Select Language"
-                                  />
-                                </Col>
-                                </Form.Group>
-                                <Form.Group as={Row} controlId="formPages" className="mb-3">
-                                    <Form.Label column md={4}>Pages</Form.Label>
-                                    <Col md={8}>
-                                        <Form.Control
-                                            type="text"
-                                            value={pages || ''}
-                                            onChange={(e) => setPages(e.target.value ? e.target.value : null)}
-                                        />
-                                    </Col>
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                    </Form>
+                                    className="w-full border border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 px-2 py-2"
+                                    />
+                                </div>
+
+                                {/* Language and Pages */}
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                    <label htmlFor="formLanguage" className="block text-sm font-medium text-gray-600">
+                                        Language
+                                    </label>
+                                    <Select
+                                        options={languageOptions}
+                                        value={language ? languageOptions.find((lang) => lang.value === language) : null}
+                                        onChange={(selectedOption) => setLanguage(selectedOption ? selectedOption.label : null)}
+                                        placeholder="Select Language"
+                                        className="shadow-sm"
+                                    />
+                                    </div>
+                                    <div className="space-y-2">
+                                    <label htmlFor="formPages" className="block text-sm font-medium text-gray-600">
+                                        Pages
+                                    </label>
+                                    <input
+                                        id="formPages"
+                                        type="text"
+                                        value={pages || ''}
+                                        onChange={(e) => setPages(e.target.value ? e.target.value : null)}
+                                        className="w-full border border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 px-2 py-2"
+                                    />
+                                    </div>
+                                </div>
+                            
+                            </div>
+                        </div>  
+                    </form>
                 </Container>
             </Modal.Body>
-            <Modal.Footer style={{ backgroundColor: 'rgb(167, 199, 231,0.8)' }}>
-                <Button variant="secondary" className="text-white rounded-md" onClick={onHide}>
-                    Cancel
-                </Button>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-md" onClick={handleSubmit} style={{ borderColor: 'white' }}>
-                    Submit
-                </Button>
+            <Modal.Footer  className="bg-gray-100 flex justify-end space-x-4">
+                <button  
+                    className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md" 
+                    onClick={onHide}
+                >
+                        Cancel
+                </button>
+                <button 
+                    className="px-4 py-2 bg-blue-950 hover:bg-blue-500 text-white rounded-md" 
+                    onClick={handleSubmit} 
+                >
+                    Update
+                </button>
             </Modal.Footer>
         </Modal>
     );
