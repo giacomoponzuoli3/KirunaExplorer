@@ -334,4 +334,143 @@ describe('coordinatesDAO', () => {
 
     });
 
+
+        describe('deleteDocumentCoordinatesById', () => {
+  
+        test('It should successfully delete document coordinates by ID', async () => {
+          const documentId = 1;
+      
+          // Mock `db.run` to simulate a successful delete
+          jest.spyOn(db, 'run').mockImplementationOnce((sql, params, callback) => {
+            callback(null);
+            return {} as Database;
+          });
+      
+          // Test that the promise resolves without error
+          await expect(dao.deleteDocumentCoordinatesById(documentId)).resolves.toBeUndefined();
+      
+          // Check that `db.run` was called with the correct SQL and parameters
+          expect(db.run).toHaveBeenCalledWith(
+            `DELETE FROM document_coordinates WHERE document_id = ?`,
+            [documentId],
+            expect.any(Function)
+          );
+        });
+      
+        test('It should reject if there is an error in deleting document coordinates', async () => {
+          const documentId = 1;
+      
+          // Mock `db.run` to simulate an error during delete
+          jest.spyOn(db, 'run').mockImplementationOnce((sql, params, callback) => {
+            callback(new Error('Failed to delete'));
+            return {} as Database;
+          });
+      
+          // Test that the promise rejects with the correct error message
+          await expect(dao.deleteDocumentCoordinatesById(documentId)).rejects.toThrow('Failed to delete');
+      
+          // Ensure `db.run` was called as expected
+          expect(db.run).toHaveBeenCalledWith(
+            `DELETE FROM document_coordinates WHERE document_id = ?`,
+            [documentId],
+            expect.any(Function)
+          );
+        });
+      
+        test('It should reject if there is an unexpected error', async () => {
+          const documentId = 1;
+      
+          // Mock `db.run` to throw an unexpected error
+          jest.spyOn(db, 'run').mockImplementation(() => {
+            throw new Error('Unexpected error');
+          });
+      
+          // Test that the promise rejects with the correct error message
+          await expect(dao.deleteDocumentCoordinatesById(documentId)).rejects.toThrow('Unexpected error');
+        });
+    });
+
+
+    describe('updateDocumentCoordinates', () => {
+  
+        test('It should successfully update document coordinates with a single coordinate', async () => {
+          const documentId = 1;
+          const coordinate: LatLng = { lat: 40.7128, lng: -74.0060 };
+      
+          // Mock `deleteDocumentCoordinatesById` and `setDocumentCoordinates`
+          const deleteSpy = jest.spyOn(dao, 'deleteDocumentCoordinatesById').mockResolvedValueOnce(undefined);
+          const setSpy = jest.spyOn(dao, 'setDocumentCoordinates').mockResolvedValueOnce(undefined);
+      
+          // Call the function
+          await expect(dao.updateDocumentCoordinates(documentId, coordinate)).resolves.toBeUndefined();
+      
+          // Verify that both methods were called with the correct arguments
+          expect(deleteSpy).toHaveBeenCalledWith(documentId);
+          expect(setSpy).toHaveBeenCalledWith(documentId, coordinate);
+        });
+      
+        test('It should successfully update document coordinates with multiple coordinates', async () => {
+          const documentId = 2;
+          const coordinates: LatLng[] = [
+            { lat: 40.7128, lng: -74.0060 },
+            { lat: 34.0522, lng: -118.2437 }
+          ];
+      
+          // Mock `deleteDocumentCoordinatesById` and `setDocumentCoordinates`
+          const deleteSpy = jest.spyOn(dao, 'deleteDocumentCoordinatesById').mockResolvedValueOnce(undefined);
+          const setSpy = jest.spyOn(dao, 'setDocumentCoordinates').mockResolvedValueOnce(undefined);
+      
+          // Call the function
+          await expect(dao.updateDocumentCoordinates(documentId, coordinates)).resolves.toBeUndefined();
+      
+          // Verify that both methods were called with the correct arguments
+          expect(deleteSpy).toHaveBeenCalledWith(documentId);
+          expect(setSpy).toHaveBeenCalledWith(documentId, coordinates);
+        });
+      
+        test('It should reject if deleting document coordinates fails', async () => {
+          const documentId = 3;
+          const coordinate: LatLng = { lat: 51.5074, lng: -0.1278 };
+      
+          // Mock `deleteDocumentCoordinatesById` to simulate an error
+          jest.spyOn(dao, 'deleteDocumentCoordinatesById').mockRejectedValueOnce(new Error('Delete failed'));
+      
+          // Mock `setDocumentCoordinates` to ensure it is not called
+          const setSpy = jest.spyOn(dao, 'setDocumentCoordinates');
+      
+          // Call the function and expect it to reject
+          await expect(dao.updateDocumentCoordinates(documentId, coordinate)).rejects.toThrow('Delete failed');
+      
+          // Ensure `setDocumentCoordinates` was never called
+          expect(setSpy).not.toHaveBeenCalled();
+        });
+      
+        test('It should reject if setting new coordinates fails', async () => {
+          const documentId = 4;
+          const coordinate: LatLng = { lat: 48.8566, lng: 2.3522 };
+      
+          // Mock `deleteDocumentCoordinatesById` to succeed
+          jest.spyOn(dao, 'deleteDocumentCoordinatesById').mockResolvedValueOnce(undefined);
+      
+          // Mock `setDocumentCoordinates` to simulate an error
+          jest.spyOn(dao, 'setDocumentCoordinates').mockRejectedValueOnce(new Error('Insert failed'));
+      
+          // Call the function and expect it to reject
+          await expect(dao.updateDocumentCoordinates(documentId, coordinate)).rejects.toThrow('Insert failed');
+        });
+      
+        test('It should propagate unexpected errors', async () => {
+          const documentId = 5;
+          const coordinate: LatLng = { lat: 37.7749, lng: -122.4194 };
+      
+          // Mock `deleteDocumentCoordinatesById` to throw an unexpected error
+          jest.spyOn(dao, 'deleteDocumentCoordinatesById').mockImplementation(() => {
+            throw new Error('Unexpected error');
+          });
+      
+          // Call the function and expect it to reject
+          await expect(dao.updateDocumentCoordinates(documentId, coordinate)).rejects.toThrow('Unexpected error');
+        });
+    });
+
 });
