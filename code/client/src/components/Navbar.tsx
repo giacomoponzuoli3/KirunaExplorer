@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Disclosure } from '@headlessui/react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { LogoutButton, LoginButton } from './Login';
-import logo from '../img/logoKiruna.png';
+// import logo from '../img/logoKiruna.png';
+import logo from '../img/iconKiruna.png';
 import { ButtonHomePage } from './HomePage';
 import { Button } from 'react-bootstrap';
 
