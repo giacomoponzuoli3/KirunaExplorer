@@ -9,6 +9,8 @@ import Alert from "./Alert";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import Select from 'react-select';
 import ISO6391 from 'iso-639-1';
+import CreatableSelect from 'react-select/creatable';
+import { SingleValue } from 'react-select';
 
 interface RequiredLabelProps {
     text: string; // Explicitly define the type of 'text' as string
@@ -73,6 +75,18 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
       value: code,
       label: ISO6391.getName(code),
     }));
+
+    const scaleOptions = [
+        { value: '1:1000', label: '1:1000' },
+        { value: '1:2000', label: '1:2000' },
+        { value: '1:5000', label: '1:5000' },
+        { value: '1:7500', label: '1:7500' },
+        { value: '1:10000', label: '1:10000' },
+      ];
+  
+    const handleScale = (selectedOption: SingleValue<{ value: string; label: string }>) => {
+    setScale(selectedOption ? selectedOption.value : '');
+    };
     
     return (
         <Modal size="lg" show={show} onHide={onHide} aria-labelledby="example-modal-sizes-title-lg">
@@ -108,11 +122,19 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                                 <Form.Group as={Row} controlId="formScale" className="mb-3">
                                     <Form.Label column md={5}><RequiredLabel text="Scale" /></Form.Label>
                                     <Col md={7}>
-                                        <Form.Control
-                                            type="text"
-                                            value={scale}
-                                            onChange={(e) => setScale(e.target.value)}
-                                            style={{ width: '100%' }}
+                                        <CreatableSelect
+                                            isClearable
+                                            options={scaleOptions}
+                                            value={scale ? { value: scale, label: scale } : null}
+                                            onChange={handleScale}
+                                            placeholder="Select or type a scale..."
+                                            formatCreateLabel={(inputValue) => `Use custom scale: "${inputValue}"`}
+                                            styles={{
+                                                control: (base) => ({
+                                                ...base,
+                                                borderColor: 'rgba(0, 0, 0, 0.2)',
+                                                }),
+                                            }}
                                         />
                                     </Col>
                                 </Form.Group>
