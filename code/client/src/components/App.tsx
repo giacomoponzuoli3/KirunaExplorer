@@ -15,21 +15,21 @@ function getDocumentIcon(type: string, size: number = 16): JSX.Element | null {
   const sizeClass = `w-${size} h-${size}`;
   switch (type) {
       case 'Informative document':
-        return <img src="/img/informativeDocument.png" alt="Informative Document" className={sizeClass}/>;
+        return <img src="/img/informativeDocument-icon.png" alt="Informative Document" className={sizeClass}/>;
       case 'Prescriptive document':
-        return <img src="/img/prescriptiveDocument.png" alt="Prescriptive Document" className={sizeClass}/>;
+        return <img src="/img/prescriptiveDocument-icon.png" alt="Prescriptive Document" className={sizeClass}/>;
       case 'Material effect':
-        return <img src="/img/construction.png" alt="Material Effect" className={sizeClass}/>;
+        return <img src="/img/construction-icon.png" alt="Material Effect" className={sizeClass}/>;
       case 'Design document':
-        return <img src="/img/designDocument.png" alt="Design Document" className={sizeClass}/>;
+        return <img src="/img/designDocument-icon.png" alt="Design Document" className={sizeClass}/>;
       case 'Technical document':
-        return <img src="/img/technicalDocument.png" alt="Technical Document" className={sizeClass}/>;
+        return <img src="/img/technicalDocument-icon.png" alt="Technical Document" className={sizeClass}/>;
       case 'Agreement':
-        return <img src="/img/agreement.png" alt="Technical Document" className={sizeClass}/>;
+        return <img src="/img/agreement-icon.png" alt="Technical Document" className={sizeClass}/>;
       case 'Conflict':
-        return <img src="/img/conflict.png" alt="Technical Document" className={sizeClass}/>;
+        return <img src="/img/conflict-icon.png" alt="Technical Document" className={sizeClass}/>;
       case 'Consultation':
-        return <img src="/img/consultation.png" alt="Technical Document" className={sizeClass}/>;
+        return <img src="/img/consultation-icon.png" alt="Technical Document" className={sizeClass}/>;
       default:
         return null; // Return null if no matching type
     }
