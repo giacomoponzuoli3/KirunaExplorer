@@ -146,6 +146,7 @@ function SetMapView({resetForm, setMarkerPosition, setPolygon}: SetMapViewInterf
         )                                                             //that's why we need to add standalone to destinguish them
         {                                                         
             featureGroup.removeLayer(layer);
+            map.removeLayer(layer);
         }
       });
     };
@@ -296,18 +297,19 @@ function GeoreferenceNewDocumentModal({
         (layer instanceof L.Marker && layer.options.isStandalone) 
       ) {
         featureGroup.removeLayer(layer);
+        mapRef.current?.removeLayer(layer);
       }
     });
   };
 
-    // Function to handle selecting the whole map
     // Function to handle selecting the whole map
     const handleSelectWholeMap = () => {
       if (!mapRef.current) return; // Ensure mapRef.current is not null
       
       // If the whole map polygon is already selected, remove it
       if (wholeMapPolygon) {
-        featureGroup.removeLayer(wholeMapPolygon);
+        //featureGroup.removeLayer(wholeMapPolygon);
+        mapRef.current?.removeLayer(wholeMapPolygon);
         setWholeMapPolygon(null); // Update state to reflect no selection
       } else {
         const bounds = mapRef.current.getBounds();
@@ -339,8 +341,8 @@ function GeoreferenceNewDocumentModal({
             setPolygon(coordinatesCity); // First array in LatLngs represents the outer boundary
 
             // Add the new polygon to the map
-            //newPolygon.addTo(mapRef.current);
-            featureGroup.addLayer(newPolygon);
+            newPolygon.addTo(mapRef.current);
+            //featureGroup.addLayer(newPolygon);
             setWholeMapPolygon(newPolygon); // Update state to store the polygon
         }
       }
