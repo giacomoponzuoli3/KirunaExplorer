@@ -263,4 +263,122 @@ describe('coordinateRoutes', () => {
         });
     });
 
+    describe('POST /update', () => {
+
+        test('It should update document coordinates and return 200 status', async () => {
+            // Mock the Authenticator methods to simulate a logged-in and authorized user
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user = u; // Simulate a logged-in user
+                return next();
+            });
+        
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user = u; // Simulate a user with the "planner" role
+                return next();
+            });
+        
+            // Mock the controller method to simulate a successful update
+            jest.spyOn(controller, "updateDocumentCoordinates").mockResolvedValueOnce(undefined);
+        
+            // Perform the request
+            const response = await request(app).post(baseURL + "/update").send({
+                idDoc: 1,            // Valid document ID
+                coordinates: coordinate, // Valid coordinate
+            });
+        
+            // Assertions
+            expect(response.status).toBe(200); // Should return 200 OK
+            expect(response.body).toEqual({ message: "Coordinates updated successfully" }); // Verify response message
+            expect(controller.updateDocumentCoordinates).toHaveBeenCalledWith(1, coordinate); // Ensure correct arguments passed
+        });
+
+        test('It should return 422 status if the body is missing', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user = u;
+                return next();
+            });
+
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user = u;
+                return next();
+            });
+
+            const response = await request(app).post(baseURL).send({});
+
+            expect(response.status).toBe(422);
+            expect(controller.updateDocumentCoordinates).not.toHaveBeenCalled();
+        });
+
+        test('It should return 422 status if idDoc is not numeric', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user = u;
+                return next();
+            });
+
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user = u;
+                return next();
+            });
+
+            const response = await request(app).post(baseURL).send({
+                idDoc: "abc",
+                coordinates: coordinate,
+            });
+
+            expect(response.status).toBe(422);
+            expect(controller.updateDocumentCoordinates).not.toHaveBeenCalled();
+        });
+
+        test('It should return 503 if there is an error', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user = u;
+                return next();
+            });
+
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user = u;
+                return next();
+            });
+
+            jest.spyOn(controller, "updateDocumentCoordinates").mockRejectedValueOnce(new Error("Internal Server Error"));
+
+            const response = await request(app).post(baseURL).send({
+                idDoc: 1,
+                coordinates: coordinate,
+            });
+
+            expect(response.status).toBe(503);
+            expect(response.body.error).toBe("Internal Server Error");
+        });
+
+        test('It should return 422 status if coordinates is invalid', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user = u;
+                return next();
+            });
+
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user = u;
+                return next();
+            });
+
+            const response = await request(app).post(baseURL).send({
+                idDoc: 1,
+                coordinates: "invalid",
+            });
+
+            expect(response.status).toBe(422);
+            console.log(response.body.error)
+            expect(response.body).toEqual({
+                error: 'The parameters are not formatted properly\n' +
+                  '\n' +
+                  '- Parameter: **coordinates** - Reason: *Invalid value* - Location: *body*\n' +
+                  '\n'
+              });
+            //expect(response.body.error).toMatch(/Coordinates must be a LatLng object or an array of LatLng/);
+            expect(controller.updateDocumentCoordinates).not.toHaveBeenCalled();
+            
+        });
+    });
+    
 });
