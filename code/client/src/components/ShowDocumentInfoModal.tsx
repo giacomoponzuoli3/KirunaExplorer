@@ -11,6 +11,7 @@ import { DocCoordinates } from '../models/document_coordinate';
 import { useNavigate } from 'react-router-dom';
 import { ModalEditGeoreference } from './ModalEditGeoreference';
 import ConfirmModal from './ConfirmModal';
+import { EditDocumentModal } from './EditDocumentModal';
 
   
 interface ShowDocumentInfoModalProps {
@@ -31,12 +32,15 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, selectedDocu
     const [showModalEditGeoreference, setShowModalEditGeoreference] = useState<boolean>(false);
     const [showModalConfirmDelete, setShowModalConfirmDelete] = useState<boolean>(false);
 
+    const [showModalEditDocument, setShowModalEditDocument] = useState<boolean>(false);
+
     const handleEditClick = () => {
         handleEdit();
+        setShowModalEditDocument(true);
     };
 
     const handleEditGeoreference = () => {
-    
+        
         if(selectedDocumentCoordinates.coordinates.length !== 0){
           setShowModalEditGeoreference(true);
         }
@@ -163,6 +167,7 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, selectedDocu
 
                 />
             }
+
 
             <ConfirmModal
                 show={showModalConfirmDelete}
