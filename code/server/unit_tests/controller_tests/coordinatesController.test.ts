@@ -102,7 +102,7 @@ describe('coordinatesController', () => {
             expect(dao.setDocumentCoordinates).toHaveBeenCalledWith(1,coordinates);
         });
 
-        test('It should reject if there is an database error error', async () => {
+        test('It should reject if there is an database error', async () => {
             const coordinate: LatLng = { lat: 40.7128, lng: -74.0060 };
 
             jest.spyOn(dao, 'setDocumentCoordinates').mockRejectedValue(new Error('Database error'));
@@ -112,7 +112,7 @@ describe('coordinatesController', () => {
         });
 
 
-        test('It should reject if there is an unexpected error error', async () => {
+        test('It should reject if there is an unexpected error', async () => {
             const coordinate: LatLng = { lat: 40.7128, lng: -74.0060 };
 
             jest.spyOn(dao, 'setDocumentCoordinates').mockRejectedValue(new Error('Unexpected error'));
