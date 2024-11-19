@@ -216,6 +216,9 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocuments, doc
         </Modal.Header>
         <Modal.Body style={{backgroundColor: 'rgb(148, 137, 121,0.2)'}}>
           <Container>
+          <p className="text-sm text-gray-600 mt-2">
+            This step is optional. You can submit without linking the new document to other documents at this time.
+          </p>
             <Row>
               <Col xs={12} md={4}>
                 <div className=" flex items-center justify-center" style={{backgroundColor: 'rgb(148, 137, 121,0.2)'}}>
