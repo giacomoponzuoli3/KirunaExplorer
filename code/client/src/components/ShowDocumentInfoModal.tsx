@@ -99,19 +99,19 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, selectedDocu
     
                                     {user.role === "Urban Planner" && (
                                         <div className="flex space-x-2 mt-4">
-                                            <button
+                                            <button title="Delete document"
                                                 className="p-2 rounded-full border-2 bg-red-400 text-white hover:bg-red-700 transition-colors duration-200"
                                                 onClick={confirmDelete}
                                             >
                                                 <TrashIcon className="h-5 w-5" />
                                             </button>
-                                            <button
+                                            <button title="Edit document"
                                                 className="p-2 rounded-full border-2 bg-blue-400 text-white hover:bg-blue-700 transition-colors duration-200"
                                                 onClick={handleEditClick}
                                             >
                                                 <PencilIcon className="h-5 w-5" />
                                             </button>
-                                            <button
+                                            <button title="Edit document's georeference"
                                                 className="p-2 rounded-full border-2 bg-yellow-500 text-white hover:bg-yellow-600 transition-colors duration-200"
                                                 onClick={handleEditGeoreference}
                                             >
@@ -144,7 +144,7 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, selectedDocu
                                 </Col>
                                 <Col xs={12} md={7}>
                                     <p><strong>Description:</strong></p>
-                                    <p>{selectedDocument.description ? selectedDocument.description : '-'}</p>
+                                    <p>{selectedDocument.description}</p>
                                 </Col>
                             </Row>
                         </div>
