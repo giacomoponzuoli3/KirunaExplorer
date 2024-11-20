@@ -24,9 +24,10 @@ interface ShowDocumentInfoModalProps {
     handleEdit: () => void;
     refreshDocuments: () => void;
     refreshDocumentsCoordinates: () => void;
+    setShow: (arg: boolean) => void;
 }
 
-function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, selectedDocumentCoordinates, refreshDocumentsCoordinates, show, onHide, user, handleEdit, refreshDocuments }: ShowDocumentInfoModalProps) {
+function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, selectedDocumentCoordinates, refreshDocumentsCoordinates, setShow, show, onHide, user, handleEdit, refreshDocuments }: ShowDocumentInfoModalProps) {
     const navigate = useNavigate();  
   
     const [showModalEditGeoreference, setShowModalEditGeoreference] = useState<boolean>(false);
@@ -46,6 +47,10 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, selectedDocu
         }
     
     };
+
+    const onBack = () => {
+        setShowModalEditGeoreference(false);
+    }
   
     const handleDeleteClick = async () => {
         try{
@@ -131,7 +136,7 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, selectedDocu
                                     <p className="text-sm text-gray-600"><strong>Language: </strong> 
                                         {selectedDocument.language ? selectedDocument.language : '-'}
                                     </p>
-                                    <p className="text-sm text-gray-600"><strong>Pages:</strong> 
+                                    <p className="text-sm text-gray-600"><strong>Pages: </strong> 
                                         {selectedDocument.pages ? selectedDocument.pages : '-'}
                                     </p>
                                     
@@ -163,7 +168,14 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocument, selectedDocu
                     refreshDocuments={refreshDocuments}
                     refreshDocumentsCoordinates={refreshDocumentsCoordinates}
 
-                    onClose={() => setShowModalEditGeoreference(false)}
+                    onClose={() => {
+                        
+                        refreshDocumentsCoordinates();
+                        setShowModalEditGeoreference(false)
+                        setShow(false)
+                    }}
+
+                    onBack = {onBack}
 
                 />
             }
