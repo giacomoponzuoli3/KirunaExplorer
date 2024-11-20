@@ -33,7 +33,7 @@ Contains the navbar and an error message
 - GET `/doc/:id`: retrieves a given document's info:
   - has, as the only parameter, the ID of the document to search for
   - has no body
-  - returns a 200 code and the requested document's info when successful, a 503 code in case of errors
+  - returns a 200 code and the requested document's info when successful, a 404 code if the document is not present in the database, a 503 code in case of errors
 - DELETE `/doc/:id`: removes a given document from the database:
   - has, as the only parameter, the ID of the document to delete
   - has no body
@@ -51,15 +51,36 @@ Contains the navbar and an error message
 - POST `/link`: adds a new link between two documents:
   - has no parameters
   - body contains the IDs of the documents to link, and the ID of the link itself
-  - returns a 200 code in case of success, a 503 code in case of errors
+  - returns a 200 code in case of success, a 409 code if the link is already present in the database, a 503 code in case of errors
 - GET `/link`: retrieves a list of all the links in the database:
   - has no parameters nor body
-  - returns a 200 code and a list with the retrieved links' info when successful, a 503 code in case of errors
+  - returns a 200 code and a list with the retrieved links' info when successful, a 404 code if no links are present in the database, a 503 code in case of errors
+- DELETE `/link`: removes a link from the database:
+  - has no parameters
+  - body contains the IDs of the documents to link, and the ID of the link itself
+  - returns a 200 code in case of success, a 503 code in case of errors
+- PATCH `/link`: modifies a link's information
+  - has no parameters
+  - body contains the IDs of the documents to link, and the ID of the link itself
+  - returns a 200 code in case of success, a 404 code if the link is not present in the database, a 409 code if the updated link is already present in the database, a 503 code in case of errors
 
 
 - GET `/stakeholders`: retrieves a list of all the stakeholders in the database:
   - has no parameters nor body
-  - returns a 200 code and a list with the retrieved stakeholders' info when successful, a 503 code in case of errors
+  - returns a 200 code and a list with the retrieved stakeholders' info when successful,a 404 code if no stakeholder information is on the database, a 503 code in case of errors
+
+
+- GET `/coordinates`: retrieves all the geo-referenced documents in the database:
+  - has no parameters nor body
+  - returns a 200 code and a list with all the documents' information when successful, a 503 code in case of errors
+- POST `/coordinates`: adds geo-referencing information to a document:
+  - has no parameters
+  - body contains the id of the document to update and the coordinates (or list of coordinates) to geo-reference the document
+  - returns a 200 code when successful, a 503 code in case of errors
+- PATCH `/coordinates/update`: edits the geo-referencing information of a document:
+  - has no parameters
+  - body contains the id of the document to update and the new coordinates (or list of coordinates)
+  - returns a 200 code when successful, a 503 code in case of errors
 
 ## Database Tables
 
@@ -78,14 +99,14 @@ Contains the navbar and an error message
   - type TEXT NOT NULL
   - language TEXT
   - pages TEXT
-  - description TEXT
+  - description TEXT NOT NULL
 - Table `links`: contains a row for each link type (Direct consequence, Collateral consequence, Prevision, Update), with attributes:
   - id INTEGER NOT NULL UNIQUE (primary key with autoincrement)
   - name TEXT NOT NULL
 - Table `documents_links`: contains a row for each link, with attributes:
   - id_document1 INTEGER NOT NULL (foreign key `documents.id`)
   - id_document2 INTEGER NOT NULL (foreign key `documents.id`)
-  - id_link TEXT NOT NULL
+  - id_link TEXT NOT NULL (foreign key `links.id`)
   - the combination of all 3 attributes acts as primary key
 - Table `stakeholders`: contains a row for each stakeholder, with attributes:
   - id INTEGER NOT NULL UNIQUE (primary key with autoincrement)
@@ -95,6 +116,12 @@ Contains the navbar and an error message
   - id_stakeholder INTEGER NOT NULL (foreign key `stakeholders.id` ON DELETE CASCADE)
   - id_document INTEGER NOT NULL (foreign key `documents.id` ON DELETE CASCADE)
   - the combination of both attributes serves as primary key
+-  Table `documents_coordinates`: contains a row for each set of coordinates and information on the order of the points in the list of coordinates associated with a document
+  - id INTEGER (primary key with autoincrement)
+  - document_id INTEGER (foreign key `documents.id`)
+  - latitude REAL
+  - longitude REAL
+  - point_order INTEGER
 
 ## Main React Components
 
@@ -104,22 +131,32 @@ Contains the navbar and an error message
 when the user is not logged in.
 - `LogoutButton` (in `Login.tsx`): a button used to log out a user. It's shown in the navbar of the homepage when the
 user is logged in.
-- `Homepage` (in `Homepage.tsx`): shows a grid of cards showing, for each document in the database, the title and an icon
-indicating the type. Also, clicking on the card opens a modal showing the document's information.
+- `Homepage` (in `Homepage.tsx`): shows a map showing, for each document in the database with geo-referencing information, an icon
+indicating the type. Clicking on the icon opens a modal showing the document's information.
 - `ButtonHomePage` (in `Homepage.tsx`): a button used to return to the home page. It's shown in the navbar of the login
 page, to return to the homepage without logging in.
 - `AddDocumentModal` (in `DocumentModals.tsx`): shows a form to fill in the information for a document to add.
 Filling and submitting the form will call the API to add a new document to the database, with the filled-in info.
+- `AddNewDocumentLinksModal` (in `AddNewDocumentLinksModal.tsx`): shows a form to add links to a newly created document.
+Filling and submitting the form will call the API to add the specified connections.
+- `GeoreferenceNewDocumentModal` in (`GeoreferenceNewDocumentModal.tsx`): shows a map and options to specify the geo-referencing
+information of a newly created document. Submitting the form will call the API to add geo-referencing information to a document.
 - `ShowDocumentInfoModal` (in `DocumentModals.tsx`): shows a document's information. If the user is logged in as an
-urban planner, also shows two buttons to, respectively, edit and delete the document.
+urban planner, also shows two buttons to, respectively, edit, delete and update the geo-referencing information of the document.
 - `EditDocumentModal` (in `DocumentModals.tsx`): shows a form, pre-filled with the relative document's information.
 Editing the information and then submitting the form will call the API to edit the document.
-- `LinksDocument` (in `LinksDocument.tsx`): shows a table, containing the title, stakeholders and an icon indicating the
+- `ModalEditGeoreference` (in `ModalEditGeoreference.tsx`): shows a map and the current geo-referencing information of the
+relative document, with options to specify new geo-referencing information. Submitting the form will call the API to update
+the geo-referencing information of the document.
+- `LinksDocument` (in `LinksDocument.tsx`): shows a paged table, containing the title, stakeholders and an icon indicating the
 document type of every document connected to a given one, together with the connection type. If the user is logged in as
 an urban planner, additionally shows, for each connection, a button to delete it. At the end of the page, if the user
 is logged in as an urban planner, shows a button which, when clicked, opens a modal to add a new connection.
 - `AddLinkModal` (in `AddLinkModal.tsx`): shows a form to select a document, with which to add a new connection, and the
 connection type. When the form is filled in and submitted, an API call to add the connection is performed.
+- `EditLinkModal` (in `EditLinkModal.tsx`): shows a form, prefilled with the relative link's information.
+Editing and submitting the form will call the API to update a link.
+- `Map` (in `Map.tsx`): the component used to display the map, on top of which the icons for the documents will be displayed, in the homepage.
 - `Alert` (in `Alert.tsx`): shows an alert that notifies the user that a given connection already exists. It's used in
 AddLinkModal component, and shown when an urban planner tries to add an already existing connection.
 - `ConfirmModal` (in `ConfirmModal.tsx`): shows a simple confirmation modal to delete a connection. It's used in the LinksDocument
@@ -142,11 +179,23 @@ Login page:
 New document modal:
 ![New document](./screenshots/NewDocumentModal.png "New document")
 
+New document geo-referencing modal:
+![New document geo-referencing](./screenshots/NewDocumentGeoreferencing.png "New document geo-referencing")
+
+New document connections modal:
+![New document connections](./screenshots/NewDocumentLinks.png "New document connections")
+
 Edit document modal:
 ![Edit document](./screenshots/EditDocumentModal.png "Edit document")
 
+Edit document geo-referencing modal:
+![Edit document geo-referencing](./screenshots/UpdateGeoreferencing.png "Edit document geo-referencing")
+
 New connection modal:
 ![New connection](./screenshots/NewConnectionModal.png "New connection")
+
+Update connection modal:
+![Update connection](./screenshots/UpdateConnection.png "Update connection")
 
 ## Users credentials
 
