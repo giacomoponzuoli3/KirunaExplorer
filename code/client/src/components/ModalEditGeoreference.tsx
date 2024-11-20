@@ -15,13 +15,15 @@ interface ModalEditGeoreferenceProps {
   onClose: () => void;  // Funzione per chiudere il modal
   refreshDocuments: () => void;  // Funzione per ricaricare la lista dei documenti dopo la modifica
   refreshDocumentsCoordinates: () => void;  // Funzione per ricaricare la lista dei documenti dopo la modifica
+  onBack: () => void;
 }
 
 const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   documentCoordinates,
   onClose,
   refreshDocuments,
-  refreshDocumentsCoordinates
+  refreshDocumentsCoordinates,
+  onBack
 }) => {
   const [selectedPosition, setSelectedPosition] = useState<LatLng[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,8 +35,6 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
 
   // Determina se le coordinate rappresentano un poligono o un punto
   const isPolygon = documentCoordinates.coordinates && documentCoordinates.coordinates.length > 1;
-
-  console.log(selectedPosition);
 
   const handleUpdate = async () => {
     if (selectedPosition != null && selectedPosition.length !== 0) {
@@ -139,7 +139,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
           <div className="mt-6 flex justify-between">
             <button
               type="button"
-              onClick={onClose}
+              onClick={onBack}
               className="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 focus:outline-none"
             >
               Back

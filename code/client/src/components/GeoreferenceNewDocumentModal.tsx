@@ -520,12 +520,6 @@ function GeoreferenceNewDocumentModal({
 
       <Modal.Footer className="bg-gray-100 flex justify-end space-x-4">
           <button
-            className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md"
-            onClick={()=>{showAddNewDocumentLinks(coordinates); handleClose();}}
-          >
-            Skip
-          </button>
-          <button
             className="px-4 py-2 bg-blue-950 hover:bg-blue-500 text-white rounded-md"
             onClick={handleSubmit}
           >

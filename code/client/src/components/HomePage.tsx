@@ -117,7 +117,8 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
     {/* Modal to show the document info */}
     {selectedDocumentCoordinates && selectedDocument && ( 
       <ShowDocumentInfoModal 
-        show={showDetails} 
+        show={showDetails}
+        setShow={setShowDetails} 
         selectedDocument={selectedDocument} 
         selectedDocumentCoordinates={selectedDocumentCoordinates}
         onHide={handleCloseDetailsModal} getDocumentIcon={getDocumentIcon} 
