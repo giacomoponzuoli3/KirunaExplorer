@@ -214,12 +214,12 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                         <RequiredLabel text="Type of document" />
                     </label>
                     <Dropdown className='w-2/3'>
-                        <Dropdown.Toggle
-                            id="dropdown-button-dark-example1"
-                            className="bg-gray-800 hover:bg-gray-900 text-white font-medium rounded-md w-full"
-                        >
-                            {type ? type : <RequiredLabel text="Choose a type" />}
-                        </Dropdown.Toggle>
+                    <Dropdown.Toggle
+                      id="dropdown-button-dark-example1"
+                      className="custom-dropdown-toggle"
+                    >
+                      {type ? type : <RequiredLabel text="Choose a type" />}
+                    </Dropdown.Toggle>
                         <Dropdown.Menu className="w-full">
                             {[
                             'Informative document',
@@ -256,8 +256,8 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                     >
                       <Dropdown.Toggle
                         id="dropdown-basic"
-                        className="bg-gray-800 hover:bg-gray-900 text-white font-medium rounded-md w-full"
                         onClick={() => setDropdownOpen(!dropdownOpen)}
+                        className="custom-dropdown-toggle"
                       >
                         <span>
                           <RequiredLabel text="Choose one or more Stakeholders" />

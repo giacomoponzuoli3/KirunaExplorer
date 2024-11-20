@@ -192,7 +192,7 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                                         <Dropdown className='w-2/3'>
                                             <Dropdown.Toggle
                                                 id="dropdown-button-dark-example1"
-                                                className="bg-gray-800 hover:bg-gray-900 text-white font-medium rounded-md w-full"
+                                                className="custom-dropdown-toggle"
                                             >
                                                 {type ? type : <RequiredLabel text="Choose a type" />}
                                             </Dropdown.Toggle>
@@ -233,8 +233,8 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                                     >
                                         <Dropdown.Toggle
                                             id="dropdown-basic"
-                                            className="bg-gray-800 hover:bg-gray-900 text-white font-medium rounded-md w-full"
                                             onClick={() => setDropdownOpen(!dropdownOpen)}
+                                            className="custom-dropdown-toggle"
                                         >
                                             <span>
                                             <RequiredLabel text="Choose one or more Stakeholders" />

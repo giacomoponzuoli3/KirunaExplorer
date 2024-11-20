@@ -180,7 +180,7 @@ function SetMapViewHome(props: any) {
           const marker = L.marker(adjustedPosition, {
             icon: L.divIcon({
               html: `
-                <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95">
+                <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95 border-1 border-blue-950">
                   ${iconHtml}
                 </div>
               `,
@@ -218,7 +218,7 @@ function SetMapViewHome(props: any) {
   
           marker.setIcon(L.divIcon({
             html: `
-              <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95">
+              <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95 border-1 border-blue-950">
                 ${iconHtml}
               </div>
             `,

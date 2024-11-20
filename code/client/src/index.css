@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .custom-dropdown-toggle {
+    @apply bg-blue-600 text-white hover:bg-blue-500  rounded-md w-full border border-blue-600 hover:border-blue-500 !important;
+  }
+}
+
 .leaflet-div-icon.leaflet-editing-icon {
     width: 6px !important;   /* Riduci la larghezza */
     height: 6px !important;  /* Riduci l'altezza */
@@ -33,3 +39,5 @@
     font-family: Arial, sans-serif;
     color: #333;
   }
+
+  
