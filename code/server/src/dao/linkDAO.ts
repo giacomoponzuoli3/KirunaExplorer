@@ -6,11 +6,7 @@ class LinkDAO {
     addLink(idDoc1: number, idDoc2: number, idLink: number): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
             try {
-                const sqlCheckLink = `SELECT *
-                                      FROM documents_links
-                                      WHERE ((id_document1 = ? AND id_document2 = ?) OR
-                                             (id_document1 = ? AND id_document2 = ?))
-                                        AND id_link = ?`;
+                const sqlCheckLink = `SELECT * FROM documents_links WHERE ((id_document1 = ? AND id_document2 = ?) OR (id_document1 = ? AND id_document2 = ?)) AND id_link = ?`;
                 await new Promise<void>((resolve, reject) => {
                     db.all(sqlCheckLink, [idDoc1, idDoc2, idDoc2, idDoc1, idLink], (err: Error | null, rows: any[]) => {
                         if (err) return reject(err)
