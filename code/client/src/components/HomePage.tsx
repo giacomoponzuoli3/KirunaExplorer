@@ -13,7 +13,7 @@ import {DocumentLegend} from "./DocumentLegend"
 import Alert from "./Alert"
 import { DocumentPlusIcon } from "@heroicons/react/24/outline";
 import { MapContainer, useMap } from 'react-leaflet';
-import { LatLngTuple, LatLngBounds, ControlOptions } from 'leaflet'; // Import del tipo corretto
+import { LatLngTuple, LatLngBounds, ControlOptions, LatLng } from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { GeoreferenceNewDocumentModal } from "./GeoreferenceNewDocumentModal";
@@ -57,7 +57,7 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
 
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
   const [selectedDocumentCoordinates, setSelectedDocumentCoordinates] = useState<DocCoordinates | null>(null);
-
+  const [newDocumentCoordinates,setNewDocumentCoordinates] = useState<LatLng | LatLng[] | null>(null);
   const [newDocument, setNewDocument] = useState<Document | null>(null);
 
   //modals
@@ -157,10 +157,8 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
     )}
 
     {newDocument && (
-      <GeoreferenceNewDocumentModal show={showGeoreferenceDocument} 
-      onHide={() => setShowGeoreferenceDocument(false)} document={newDocument}
-      showAddNewDocumentLinks = {(doc: Document) => {setNewDocument(doc); setShowAddLinks(true);}}
-      refreshDocumentsCoordinates={refreshDocumentsCoordinates}
+      <GeoreferenceNewDocumentModal show={showGeoreferenceDocument} onHide={() => setShowGeoreferenceDocument(false)}
+      showAddNewDocumentLinks = {(coordinates: LatLng | LatLng[] | null) => {setNewDocumentCoordinates(coordinates); setShowAddLinks(true);}}
     />
     )}
 
@@ -169,8 +167,10 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
         document={newDocument} 
         show={showAddLinks} 
         onHide={() => setShowAddLinks(false)} 
-        refreshDocuments={refreshDocuments}
+        refreshDocumentsCoordinates={()=>{setNewDocument(null); setNewDocumentCoordinates(null); refreshDocumentsCoordinates();}}
         docs={documents}
+        newDocumentCoordinates={newDocumentCoordinates}
+
       />
     )}
   </>

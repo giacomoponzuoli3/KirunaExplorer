@@ -99,12 +99,12 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
       }
   
       // If all validations pass, proceed to add the document
-      const doc = await API.addDocument(title, selectedStakeholders, scale, issuanceDate, type, language, pages, description).then();
-      console.log(doc.id);
+      //const doc = await API.addDocument(title, selectedStakeholders, scale, issuanceDate, type, language, pages, description).then();
+      //console.log(doc.id);
       refreshDocuments();
       handleClose();
       refreshDocuments();
-      showGeoreferenceNewDocumentModal(doc);
+      showGeoreferenceNewDocumentModal(new Document(0,title,selectedStakeholders,scale,issuanceDate,type, language, pages, description));
   };
 
     // Ottieni tutte le lingue disponibili da ISO 639-1

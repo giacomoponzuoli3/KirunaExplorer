@@ -89,12 +89,11 @@ const kirunaBounds = new LatLngBounds(
 
 interface SetMapViewInterface{
   resetForm: () => void;
-  setMarkerPosition: (position: LatLng) => void;
-  setPolygon: (polygon: LatLng[]) => void;
+  setCoordinates: (position: LatLng | LatLng[]) => void;
 }
 const featureGroup = new L.FeatureGroup();
 
-function SetMapView({resetForm, setMarkerPosition, setPolygon}: SetMapViewInterface) {
+function SetMapView({resetForm, setCoordinates}: SetMapViewInterface) {
     const map = useMap(); // Ottieni l'istanza della mappa
     
     const [zoomLevel, setZoomLevel] = useState(10); // Stato per il livello di zoom
@@ -161,11 +160,11 @@ function SetMapView({resetForm, setMarkerPosition, setPolygon}: SetMapViewInterf
 
       if (layerType === 'marker') {
           layer.options.isStandalone = true;
-          setMarkerPosition(layer.getLatLng());
+          setCoordinates(layer.getLatLng());
       } 
       else if (layerType === 'polygon') {
           const latLngs = layer.getLatLngs()[0]
-          setPolygon(latLngs);
+          setCoordinates(latLngs);
           console.log(latLngs);
       }
       featureGroup.addLayer(layer);
@@ -175,12 +174,12 @@ function SetMapView({resetForm, setMarkerPosition, setPolygon}: SetMapViewInterf
       // Iterate through each edited layer
       e.layers.eachLayer((layer: L.Layer) => {
         if (layer instanceof L.Marker) {
-          setMarkerPosition(layer.getLatLng());
+          setCoordinates(layer.getLatLng());
           console.log("Edited marker:", layer.getLatLng());
         } else if (layer instanceof L.Polygon) {
           // Handle polygon edits
           const latLngs = (layer.getLatLngs() as LatLng[][])[0]
-          setPolygon(latLngs);
+          setCoordinates(latLngs);
           console.log("Edited polygon:", latLngs);
         }
       });
@@ -240,21 +239,18 @@ function SetMapView({resetForm, setMarkerPosition, setPolygon}: SetMapViewInterf
 interface GeoreferenceNewDocumentModalProps {
     show: boolean;
     onHide: () => void;
-    document: Document;
-    showAddNewDocumentLinks: (doc: Document) => void;
-    refreshDocumentsCoordinates: () => void;
+    showAddNewDocumentLinks: (coordinates: LatLng | LatLng[] | null) => void;
 }
 
 function GeoreferenceNewDocumentModal({
   show,
   onHide,
-  document,
-  showAddNewDocumentLinks,
-  refreshDocumentsCoordinates
+  showAddNewDocumentLinks
 }: GeoreferenceNewDocumentModalProps) {
-  const [markerPosition, setMarkerPosition] = useState<LatLng | null>(null);
+  //const [markerPosition, setMarkerPosition] = useState<LatLng | null>(null);
   const [isEnterCoordinatesMode, setIsEnterCoordinatesMode] = useState(false);
-  const [polygon, setPolygon] = useState<LatLng[]>([]);
+  //const [polygon, setPolygon] = useState<LatLng[]>([]);
+  const [coordinates,setCoordinates] = useState<LatLng | LatLng[] | null>(null);
   const [wholeMapPolygon, setWholeMapPolygon] = useState<L.Polygon | null>(null); // Track the whole map polygon
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
@@ -266,8 +262,9 @@ function GeoreferenceNewDocumentModal({
     setLatitude('');
     setLongitude('');
     setIsEnterCoordinatesMode(false);
-    setMarkerPosition(null);
-    setPolygon([]);
+    //setMarkerPosition(null);
+    //setPolygon([]);
+    setCoordinates(null);
     setWholeMapPolygon(null);
     setShowAlert(false);
     setAlertMessage('');
@@ -275,18 +272,18 @@ function GeoreferenceNewDocumentModal({
 
     const handleClose = () => {
         onHide();
-        showAddNewDocumentLinks(document)
         clearOtherLayers();
         resetForm();
     };
 
   const handleSubmit = async () => {
-    if (polygon.length === 0 && markerPosition !== null) {
-      await API.setDocumentCoordinates(document.id, markerPosition);
-    } else if (polygon.length !== 0 && markerPosition === null) {
-      await API.setDocumentCoordinates(document.id, polygon);
-    }
-    refreshDocumentsCoordinates();
+    // if (polygon.length === 0 && markerPosition !== null) {
+    //   await API.setDocumentCoordinates(document.id, markerPosition);
+    // } else if (polygon.length !== 0 && markerPosition === null) {
+    //   await API.setDocumentCoordinates(document.id, polygon);
+    // }
+    //refreshDocumentsCoordinates();
+    showAddNewDocumentLinks(coordinates);
     handleClose();
   };
 
@@ -338,7 +335,7 @@ function GeoreferenceNewDocumentModal({
             clearOtherLayers();
 
             // Save the coordinates of the whole map polygon
-            setPolygon(coordinatesCity); // First array in LatLngs represents the outer boundary
+            setCoordinates(coordinatesCity); // First array in LatLngs represents the outer boundary
 
             // Add the new polygon to the map
             newPolygon.addTo(mapRef.current);
@@ -360,7 +357,7 @@ function GeoreferenceNewDocumentModal({
           const newPosition = new L.LatLng(lat, lng);
 
         if (kirunaBounds.contains(newPosition)) {
-          setMarkerPosition(newPosition);
+          setCoordinates(newPosition);
           if (mapRef.current) {
             featureGroup.addLayer(L.marker(newPosition, { isStandalone: true, icon: customIcon }));
             setIsEnterCoordinatesMode(false);
@@ -427,8 +424,7 @@ function GeoreferenceNewDocumentModal({
           >
             <SetMapView
               resetForm={resetForm} 
-              setMarkerPosition={(position: LatLng) => setMarkerPosition(position)}
-              setPolygon={(polygon: LatLng[]) => setPolygon(polygon)}
+              setCoordinates={(position: LatLng | LatLng[]) => setCoordinates(position)}
             />
           </MapContainer>
 
@@ -450,8 +446,7 @@ function GeoreferenceNewDocumentModal({
             onClick={() => {
                 setLatitude('');
                 setLongitude('');
-                setPolygon([])
-                setMarkerPosition(null);
+                setCoordinates(null);
                 setIsEnterCoordinatesMode(false);
                 handleSelectWholeMap();
             }}
@@ -486,8 +481,7 @@ function GeoreferenceNewDocumentModal({
               setLatitude('');
               setLongitude('');
               setWholeMapPolygon(null)
-              setPolygon([])
-              setMarkerPosition(null);
+              setCoordinates(null);
               setIsEnterCoordinatesMode((prev) => !prev);
               clearOtherLayers();
             }}
@@ -527,7 +521,7 @@ function GeoreferenceNewDocumentModal({
       <Modal.Footer className="bg-gray-100 flex justify-end space-x-4">
           <button
             className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md"
-            onClick={handleClose}
+            onClick={()=>{showAddNewDocumentLinks(coordinates); handleClose();}}
           >
             Skip
           </button>
