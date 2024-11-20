@@ -69,6 +69,14 @@ class CoordinatesRoutes {
             this.authenticator.isLoggedIn,
             this.authenticator.isPlanner, 
             body("idDoc").isNumeric(),
+            body("coordinates").custom((value) => {
+                const isLatLng = (obj: any): boolean => obj && typeof obj.lat === 'number' && typeof obj.lng === 'number';
+        
+                if (!Array.isArray(value) && !isLatLng(value)) throw new CoordinatesTypeError;
+                if (Array.isArray(value) && !value.every(isLatLng)) throw new CoordinatesArrayError;
+
+                return true;
+            }),
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
                 try {

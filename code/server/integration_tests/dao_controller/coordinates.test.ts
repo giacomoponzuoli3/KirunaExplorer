@@ -140,9 +140,9 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
         });
     });
 
-    describe('updateDocumentCoordinatess', () => {
+    describe('updateDocumentCoordinates', () => {
 
-        test("It should Modify the coordinates of a document", async () => {
+        test("It should modify the coordinates of a document", async () => {
             
             await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
 

@@ -6,6 +6,7 @@ import { Stakeholder } from "../../src/models/stakeholder"
 import { DocLink } from "../../src/models/document_link"
 import { Database } from "sqlite3";
 import Link from "../../src/models/link"
+import {DocumentNotFoundError} from "../../src/errors/document";
 
 jest.mock("../../src/db/db.ts");
 
@@ -232,7 +233,7 @@ describe('documentDAO', () => {
                     return {} as Database;
                 })
 
-            await expect(dao.getDocumentById(testId)).rejects.toThrow(`Document not found.`);
+            await expect(dao.getDocumentById(testId)).rejects.toThrow(new DocumentNotFoundError());
 
             expect(db.all).toHaveBeenCalledWith(
                 `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.id = ?`,
@@ -910,7 +911,7 @@ describe('documentDAO', () => {
             );
         });
 
-        test("It should reject if there is a no document", async () => {
+        test("It should reject if there is no document", async () => {
 
             jest.spyOn(db, 'all')
                 .mockImplementationOnce((sql, params, callback) => {
@@ -935,7 +936,7 @@ describe('documentDAO', () => {
                     return {} as Database;
                 })
 
-            await expect(dao.getDocumentLinksById(testId)).rejects.toThrow("Document not found.");
+            await expect(dao.getDocumentLinksById(testId)).rejects.toThrow(new DocumentNotFoundError());
 
             expect(db.all).toHaveBeenNthCalledWith(
                 1,
@@ -1126,7 +1127,7 @@ describe('documentDAO', () => {
                 return {} as Database;
             })
 
-            await expect(dao.getDocumentTitleById(testId)).rejects.toThrow("Document not found.");
+            await expect(dao.getDocumentTitleById(testId)).rejects.toThrow(new DocumentNotFoundError());
 
             expect(db.get).toHaveBeenCalledWith(
                 'SELECT title FROM documents WHERE id = ?',
@@ -1172,7 +1173,7 @@ describe('documentDAO', () => {
                 return {} as Database;
             })
 
-            await expect(dao.getDocumentDescriptionById(testId)).resolves.toBeNull();
+            await expect(dao.getDocumentDescriptionById(testId)).resolves.toEqual("No description available...");
 
             expect(db.get).toHaveBeenCalledWith(
                 'SELECT description FROM documents WHERE id = ?',
@@ -1205,7 +1206,7 @@ describe('documentDAO', () => {
                 return {} as Database;
             })
 
-            await expect(dao.getDocumentDescriptionById(testId)).rejects.toThrow("Document not found.");
+            await expect(dao.getDocumentDescriptionById(testId)).rejects.toThrow(new DocumentNotFoundError());
 
             expect(db.get).toHaveBeenCalledWith(
                 'SELECT description FROM documents WHERE id = ?',
@@ -1267,7 +1268,7 @@ describe('documentDAO', () => {
                 return {} as Database;
             })
 
-            await expect(dao.getDocumentIssuanceDateById(testId)).rejects.toThrow("Document not found.");
+            await expect(dao.getDocumentIssuanceDateById(testId)).rejects.toThrow(new DocumentNotFoundError());
 
             expect(db.get).toHaveBeenCalledWith(
                 'SELECT issuance_date FROM documents WHERE id = ?',
@@ -1317,8 +1318,8 @@ describe('documentDAO', () => {
             await expect(dao.getAllDocumentsOfSameType("Material effect")).resolves.toEqual([testDocument3]);
 
             expect(db.all).toHaveBeenCalledWith(
-                'SELECT * FROM documents WHERE type = ?',
-                ["Material effect"],
+                'SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.type = ?',
+                [],
                 expect.any(Function)
             );
 
@@ -1334,24 +1335,24 @@ describe('documentDAO', () => {
             await expect(dao.getAllDocumentsOfSameType("Material effect")).rejects.toThrow("Select Error");
 
             expect(db.all).toHaveBeenCalledWith(
-                'SELECT * FROM documents WHERE type = ?',
-                ["Material effect"],
+                'SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.type = ?',
+                [],
                 expect.any(Function)
             );
 
         });
 
-        test("It should reject if there are no documents with the specified type", async () => {
+        test("It should resolve with an empty array if there is no document with the specified type", async () => {
             jest.spyOn(db, 'all').mockImplementationOnce((sql, params, callback) => {
                 callback(null, null);
                 return {} as Database;
             })
 
-            await expect(dao.getAllDocumentsOfSameType("Material effect")).rejects.toThrow("No documents found.");
+            await expect(dao.getAllDocumentsOfSameType("Material effect")).resolves.toEqual([]);
 
             expect(db.all).toHaveBeenCalledWith(
-                'SELECT * FROM documents WHERE type = ?',
-                ["Material effect"],
+                'SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.type = ?',
+                [],
                 expect.any(Function)
             );
 
