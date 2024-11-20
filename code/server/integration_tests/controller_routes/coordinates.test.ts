@@ -1,7 +1,6 @@
 import { describe, afterAll, beforeAll, beforeEach, test, expect, jest } from "@jest/globals"
 import db from "../../src/db/db"
 import { Database } from "sqlite3";
-import { CoordinatesDAO } from "../../src/dao/coordinatesDAO"
 import { CoordinatesController } from "../../src/controllers/coordinatesController"
 import DocumentController from "../../src/controllers/documentController"
 import Coordinate from '../../src/models/coordinate';
@@ -13,13 +12,52 @@ import { cleanup } from "../../src/db/cleanup";
 import { setup } from "../../src/db/setup";
 import { app } from "../../index";
 import request from 'supertest';
-import Authenticator from "../../src/routers/auth"
-import { User } from "../../src/models/user"
-import {CoordinatesArrayError, CoordinatesTypeError} from "../../src/errors/coordinates";
+import { Role } from "../../src/models/user"
+import { CoordinatesArrayError, CoordinatesTypeError } from "../../src/errors/coordinates";
 
 const baseURL = "/kiruna/coordinates"
 
 describe('coordinatesRoutes/coordinatesController Integration tests', () => {
+
+    const testUrbanPlanner = { username: "urban_planner", name: "urban", surname: "planner", password: "admin", role: Role.PLANNER };
+    const testResident = { username: "resident", name: "resident", surname: "resident", password: "admin", role: Role.PLANNER };
+    const controller = new CoordinatesController();
+    const documentController = new DocumentController();
+    const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
+    const testCoordinate1 = new Coordinate(1, 1, 40.7128, -74.0060);
+    const testCoordinate2 = new Coordinate(2, 1, -55.7128, 45.0060);
+    const testCoordinate3 = new Coordinate(3, 2, 40.7128, -74.0060);
+    const coordinate: LatLng = { lat: 40.7128, lng: -74.0060 };
+    const coordinates: LatLng[] = [
+        { lat: 40.7128, lng: -74.0060 },
+        { lat: 34.0522, lng: -118.2437 },
+      ];
+    const newCoordinate: LatLng = { lat: -55.7128, lng: 45.0060 };
+    const newCoordinates: LatLng[] = [
+        { lat: -50.7128, lng: -88.0060 },
+        { lat: 94.0522, lng: -18.2437 },
+      ];
+    const testDocument = new Document(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
+    const testDocCoordinate = new DocCoordinates(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description", [testCoordinate1]);
+    const newTestDocCoordinate = new DocCoordinates(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description", [testCoordinate2]);
+    const newTestDocCoordinate2 = new DocCoordinates(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description", [testCoordinate2,testCoordinate3]);
+
+    // Helper function that logs in a user and returns the cookie
+    // Can be used to log in a user before the tests or in the tests
+    const login = async (userInfo: any) => {
+        return new Promise<string>((resolve, reject) => {
+            request(app)
+                .post(`/kiruna/sessions`)
+                .send(userInfo)
+                .expect(200)
+                .end((err, res) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    resolve(res.header["set-cookie"][0]);
+                });
+        });
+    }
 
     beforeAll(async () => {
         await setup();
@@ -37,212 +75,424 @@ describe('coordinatesRoutes/coordinatesController Integration tests', () => {
 
     beforeEach(async () => {
         await cleanup();
- 
-         const query = `INSERT INTO stakeholders (name, category) VALUES (?, ?)`;
-         db.run(query, ["John", "urban developer"], function (err) {
-             if (err) {
-                 console.log("Stakeholder insertion error")
-             }
-         });
+
+        let query = `INSERT INTO stakeholders (name, category) VALUES (?, ?)`;
+        db.run(query, ["John", "urban developer"], function (err) {
+            if (err) {
+                console.log("Stakeholder insertion error")
+            }
+        });
+
+        query = `INSERT INTO users (username, name, surname, role, password, salt) VALUES (?, ?, ?, ?, ?, ?)`;
+        db.run(query, ["urban_planner", "urban", "planner", "Urban Planner", "84f2763be5408b77c05292178b08b4a3", "1f39956c7101ff188ce0a015786f0493"], function (err) {
+            if (err) {
+                console.log("User insertion error")
+            }
+        });
+
+        query = `INSERT INTO users (username, name, surname, role, password, salt) VALUES (?, ?, ?, ?, ?, ?)`;
+        db.run(query, ["resident", "resident", "resident", "Resident", "84f2763be5408b77c05292178b08b4a3", "1f39956c7101ff188ce0a015786f0493"], function (err) {
+            if (err) {
+                console.log("User insertion error")
+            }
+        });
 
         jest.resetAllMocks();
 
-      });
-
-    const dao = new CoordinatesDAO();
-    const controller = new CoordinatesController();;
-    const u = new User("urban_planner", "urban", "planner", "Urban Planner");
-    const coordinate: LatLng = { lat: 40.7128, lng: -74.0060 };
-    const coordinates: LatLng[] = [
-        { lat: 40.7128, lng: -74.0060 },
-        { lat: 34.0522, lng: -118.2437 },
-    ];
-    const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
-    const testStakeholder2 = new Stakeholder(2, "Bob", "urban developer");
-    const testCoordinate1 = new Coordinate(1, 5, 100, 200);
-    const testCoordinate2 = new Coordinate(2, 10, 200, 100);
-    const testCoordinate3 = new Coordinate(3, 1, 150, 150);
-    const testDocCoordinate = new DocCoordinates(1, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description", [testCoordinate1, testCoordinate2, testCoordinate3]);
+    });
 
     describe('POST /', () => {
         test('It should set a coordinate for a document and return 200 status', async () => {
-            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-    
-            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-            jest.spyOn(controller, "setDocumentCoordinates").mockResolvedValueOnce(undefined);
+
+            const cookie = await login(testUrbanPlanner);
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
 
             const response = await request(app).post(baseURL + "/")
                 .send({
                     idDoc: 1,
                     coordinates: coordinate
-                })
+                }).set("Cookie", cookie).expect(200);
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual({ message: "Coordinates added successfully" });
-            expect(controller.setDocumentCoordinates).toHaveBeenCalledWith(1, coordinate);
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
         });
 
         test('It should set multiple coordinates for a document and return 200 status', async () => {
-            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-    
-            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-            jest.spyOn(controller, "setDocumentCoordinates").mockResolvedValueOnce(undefined);
+            const cookie = await login(testUrbanPlanner);
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
 
             const response = await request(app).post(baseURL + "/")
                 .send({
                     idDoc: 1,
                     coordinates: coordinates
-                })
+                }).set("Cookie", cookie).expect(200);
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual({ message: "Coordinates added successfully" });
-            expect(controller.setDocumentCoordinates).toHaveBeenCalledWith(1, coordinates);
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
         });
 
         test('It should return 422 status if the body is missing', async () => {
-            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-    
-            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-            const response = await request(app).post(baseURL + "/")
-                .send({});
-            expect(response.status).toBe(422);
-            expect(controller.setDocumentCoordinates).not.toHaveBeenCalled();
+            const cookie = await login(testUrbanPlanner);
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await request(app).post(baseURL + "/").send({}).set("Cookie", cookie).expect(422);
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
         });
 
         test('It should return 422 status if idDoc is not numeric', async () => {
-            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-    
-            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-            const response = await request(app).post(baseURL + "/")
+            const cookie = await login(testUrbanPlanner);
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await request(app).post(baseURL + "/")
                 .send({
                     idDoc: "abc",
                     coordinates: coordinate
-                })
-            expect(response.status).toBe(422);
-            expect(controller.setDocumentCoordinates).not.toHaveBeenCalled();
+                }).set("Cookie", cookie).expect(422);
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
         });
 
         test('It should return 422 status if idDoc is missing', async () => {
-            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-    
-            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-            const response = await request(app).post(baseURL + "/")
+            const cookie = await login(testUrbanPlanner);
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await request(app).post(baseURL + "/")
                 .send({
                     idDoc: null,
                     coordinates: coordinate
-                })
-            expect(response.status).toBe(422);
-            expect(controller.setDocumentCoordinates).not.toHaveBeenCalled();
+                }).set("Cookie", cookie).expect(422);
+ 
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
         });
 
         test('It should return 422 status if coordinates is not LatLng', async () => {
-            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-    
-            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-            const response = await request(app).post(baseURL + "/")
+            const cookie = await login(testUrbanPlanner);
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await request(app).post(baseURL + "/")
                 .send({
                     idDoc: 1,
                     coordinates: "coordinate"
-                })
-            expect(response.status).toBe(422);
-            expect(controller.setDocumentCoordinates).not.toHaveBeenCalled();
+                }).set("Cookie", cookie).expect(422);
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+
         });
 
         test('It should return 422 status if at least on element of coordinates is not numeric', async () => {
-            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-    
-            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-            const response = await request(app).post(baseURL + "/")
+            const cookie = await login(testUrbanPlanner);
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await request(app).post(baseURL + "/")
                 .send({
                     idDoc: 1,
                     coordinates: [{ lat: 40.0, lng: 45.0 }, { lat: "invalid", lng: 90.0 }],
-                })
-            expect(response.status).toBe(422);
-            expect(controller.setDocumentCoordinates).not.toHaveBeenCalled();
+                }).set("Cookie", cookie).expect(422);
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
         });
 
         test('It should return 422 status if coordinates is missing', async () => {
-            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-    
-            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-            const response = await request(app).post(baseURL + "/")
+            const cookie = await login(testUrbanPlanner);
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await request(app).post(baseURL + "/")
                 .send({
                     idDoc: 1,
                     coordinates: null
-                })
-            expect(response.status).toBe(422);
-            expect(controller.setDocumentCoordinates).not.toHaveBeenCalled();
+                }).set("Cookie", cookie).expect(422);
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+        });
+
+        test('It should return 401 status if the user is not logged in', async () => {
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            const response = await request(app).post(baseURL + "/").send({ 
+                idDoc: 1,
+                coordinates: coordinates
+            }).expect(401);
+
+            expect(response.body.error).toBe('Unauthenticated user');
+        });
+
+        
+        test('It should return 403 status if the user is not an urban planner', async () => {
+            const cookie = await login(testResident);
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            const response = await request(app).post(baseURL + "/").send({ 
+                idDoc: 1,
+                coordinates: coordinates
+            }).set("Cookie", cookie).expect(403);
+
+            expect(response.body.error).toBe('User is not an urban planner');
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
         });
 
         test('It should return 503 if there is an error', async () => {
-            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-    
-            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
+
+            const cookie = await login(testUrbanPlanner);
+
+            const dbSpy = jest.spyOn(db, 'run').mockImplementation(function (sql, params, callback) {
+                callback(new Error('Database error'), null);
+                return {} as Database;
             });
 
-            jest.spyOn(controller, 'setDocumentCoordinates').mockRejectedValueOnce(new Error('Internal Server Error'));
-           
-            const response = await request(app).post(baseURL+"/")
-            .send({
-                idDoc: 1,
-                coordinates: coordinate
-            })
+            const response = await request(app).post(baseURL + "/")
+                .send({
+                    idDoc: 1,
+                    coordinates: coordinate
+                }).set("Cookie", cookie).expect(503);
+
+            expect(response.body.error).toBe('Internal Server Error');
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+
+            dbSpy.mockRestore();
+        });
+    });
+
+    describe('GET /', () => {
+        test('It should retrieves all documents with their coordinates and return 200 status', async () => {
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toStrictEqual(testDocument);
+
+            await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
+
+            const response = await request(app).get(baseURL + "/");
+
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual([testDocCoordinate]);
+
+        });
+
+        test('It should return an empty array if there are no documents and return 200 status', async () => {
+
+            const response = await request(app).get(baseURL + "/");
+
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual([]);
+
+        });
+
+        test('It should return 503 if there is an error', async () => {
+
+            const dbSpy = jest.spyOn(db, 'all').mockImplementation(function (sql, params, callback) {
+                callback(new Error('Database error'), null);
+                return {} as Database;
+            });
+
+            const response = await request(app).get(baseURL + "/");
 
             expect(response.status).toBe(503);
             expect(response.body.error).toBe('Internal Server Error');
+
+            dbSpy.mockRestore();
+        });
+    });
+
+    
+    describe('POST /update', () => {
+        test('It should modify the coordinates of a document and return 200 status', async () => {
+            const cookie = await login(testUrbanPlanner);
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toStrictEqual(testDocument);
+
+            await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
+     
+            const response = await request(app).post(baseURL + "/update")
+                .send({
+                    idDoc: 1,
+                    coordinates: newCoordinate
+                }).set("Cookie", cookie).expect(200);
+
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual({ message: "Coordinates updated successfully" });
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+        });
+
+        test('It should modify multiple coordinates of a document and return 200 status', async () => {
+            const cookie = await login(testUrbanPlanner);
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
+     
+            const response = await request(app).post(baseURL + "/update")
+                .send({
+                    idDoc: 1,
+                    coordinates: newCoordinates
+                }).set("Cookie", cookie).expect(200);
+
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual({ message: "Coordinates updated successfully" });
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+        });
+
+        test('It should return 422 status if the body is missing', async () => {
+            const cookie = await login(testUrbanPlanner);
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
+
+            await request(app).post(baseURL + "/update").send({}).set("Cookie", cookie).expect(422);
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+        });
+
+        test('It should return 422 status if idDoc is not numeric', async () => {
+            const cookie = await login(testUrbanPlanner);
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
+
+            await request(app).post(baseURL + "/update")
+                .send({
+                    idDoc: "abc",
+                    coordinates: newCoordinate
+                }).set("Cookie", cookie).expect(422);
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+        });
+
+        test('It should return 422 status if idDoc is missing', async () => {
+            const cookie = await login(testUrbanPlanner);
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
+
+            await request(app).post(baseURL + "/update")
+                .send({
+                    idDoc: null,
+                    coordinates: newCoordinate
+                }).set("Cookie", cookie).expect(422);
+ 
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+        });
+
+        test('It should return 422 status if coordinates is not LatLng', async () => {
+            const cookie = await login(testUrbanPlanner);
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
+
+            await request(app).post(baseURL + "/update")
+                .send({
+                    idDoc: 1,
+                    coordinates: "newCoordinate"
+                }).set("Cookie", cookie).expect(422);
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+
+        });
+
+        test('It should return 422 status if at least on element of coordinates is not numeric', async () => {
+            const cookie = await login(testUrbanPlanner);
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
+
+            await request(app).post(baseURL + "/update")
+                .send({
+                    idDoc: 1,
+                    coordinates: [{ lat: 40.0, lng: 45.0 }, { lat: "invalid", lng: 90.0 }],
+                }).set("Cookie", cookie).expect(422);
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+        });
+
+        test('It should return 422 status if coordinates is missing', async () => {
+            const cookie = await login(testUrbanPlanner);
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
+
+            await request(app).post(baseURL + "/update")
+                .send({
+                    idDoc: 1,
+                    coordinates: null
+                }).set("Cookie", cookie).expect(422);
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+        });
+
+        test('It should return 401 status if the user is not logged in', async () => {
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
+
+            const response = await request(app).post(baseURL + "/update").send({ 
+                idDoc: 1,
+                coordinates: newCoordinates
+            }).expect(401);
+
+            expect(response.body.error).toBe('Unauthenticated user');
+        });
+
+        
+        test('It should return 403 status if the user is not an urban planner', async () => {
+            const cookie = await login(testResident);
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
+
+            const response = await request(app).post(baseURL + "/update").send({ 
+                idDoc: 1,
+                coordinates: newCoordinates
+            }).set("Cookie", cookie).expect(403);
+
+            expect(response.body.error).toBe('User is not an urban planner');
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+        });
+
+        test('It should return 503 if there is an error', async () => {
+
+            const cookie = await login(testUrbanPlanner);
+
+            const dbSpy = jest.spyOn(db, 'run').mockImplementation(function (sql, params, callback) {
+                callback(new Error('Database error'), null);
+                return {} as Database;
+            });
+
+            const response = await request(app).post(baseURL + "/update")
+                .send({
+                    idDoc: 1,
+                    coordinates: coordinate
+                }).set("Cookie", cookie).expect(503);
+
+            expect(response.body.error).toBe('Internal Server Error');
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+
+            dbSpy.mockRestore();
         });
     });
 });
