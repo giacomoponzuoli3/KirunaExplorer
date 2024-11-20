@@ -253,7 +253,7 @@ function LinksDocument(props: any) {
                             </td>
                             <td className="pl-4 pr-4 pt-3 pb-3">{doc.relatedLink.name}</td>
                             {props.isLogged && props.user.role == "Urban Planner" && (
-                              <td className="pl-4 pr-4 pt-3 pb-3 items-center justify-center space-x-4">
+                              <td className="pl-4 pr-4 pt-3 pb-3 flex items-center justify-center space-x-4">
                               <button
                                 className="text-red-500 hover:text-red-700"
                                 onClick={() => confirmDelete(doc.id, doc.relatedLink.id)}

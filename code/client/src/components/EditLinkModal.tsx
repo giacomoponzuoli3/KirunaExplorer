@@ -79,9 +79,18 @@ function EditLinkModal(props: any) {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50 transition-opacity animate-slide-in-left">
-            <div className="bg-white rounded-lg shadow-lg w-full sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-1/2 p-6">
+            <div className="bg-white rounded-lg shadow-lg w-full sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-1/2 p-6 relative">
+                {/* Close Button */}
+                <button
+                    className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 focus:outline-none"
+                    onClick={handleHide} // Usa la funzione che nasconde il modal
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
                 {/* Modal Header */}
-                <div className="mb-4 border-b pb-4">
+                <div className="mb-4 border-b pb-4">   
                     <h2 className="text-3xl font-semibold text-gray-800 text-center">
                         Modify Link Type
                     </h2>
@@ -121,7 +130,7 @@ function EditLinkModal(props: any) {
                         >
                             {selectedNewTypeLink
                                 ? typesLink.find((link) => link.id === selectedNewTypeLink)?.name
-                                : "Choose a link type"}
+                                : "Choose a new link type"}
                         </button>
                         {showTypeLinkDropdown && (
                             <div className="absolute mt-2 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 transition-all ease-in-out duration-500 opacity-100">
@@ -143,12 +152,6 @@ function EditLinkModal(props: any) {
                 </div>
 
                 <div className="flex justify-end space-x-4 mt-4">
-                    <button
-                        onClick={handleHide}
-                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-                    >
-                        Back
-                    </button>
                     <button
                         onClick={handleSubmit}
                         className="px-4 py-2 bg-blue-950 text-white rounded-md hover:bg-blue-600 transition duration-200 ease-in-out"

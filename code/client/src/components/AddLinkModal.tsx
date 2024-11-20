@@ -114,7 +114,16 @@ function AddLinkModal(props: any) {
                     }}
                 />
             }
-            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-4">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-4 relative">
+                {/* Close Button */}
+                <button
+                    className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+                    onClick={handleHide} // Usa la stessa funzione per nascondere il modal
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
                 <h2 className="text-xl font-semibold mb-2 text-center">Add New Link</h2>
                 {/* Separator Line */}
                 <hr className="border-gray-300 my-4" />
@@ -223,12 +232,6 @@ function AddLinkModal(props: any) {
 
                 {/* Buttons */}
                 <div className="flex justify-end">
-                    <button
-                        className="bg-gray-300 text-gray-700 rounded-md px-4 py-2 mr-2 hover:bg-gray-400"
-                        onClick={handleHide}  
-                    >
-                        Cancel
-                    </button>
                     <button
                         className="bg-blue-950 text-white rounded-md px-4 py-2 hover:bg-blue-700"
                         onClick={handleSubmit}
