@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">44.44% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>8/18</span>
+                <span class='fraction'>18/18</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">41.17% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>7/17</span>
+                <span class='fraction'>17/17</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -179,31 +179,31 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">&nbsp;
+<span class="cline-any cline-yes">7x</span></td><td class="text"><pre class="prettyprint lang-js">&nbsp;
 // noinspection DuplicatedCode
 &nbsp;
 import Coordinate from "./coordinate"
@@ -237,7 +237,7 @@ class DocCoordinates {
      * @param description - The description of the document.
      * @param coordinates - The array of coordinates
      */
-<span class="fstat-no" title="function not covered" >    constructor(</span>
+    constructor(
         id: number,
         title: string,
         stakeHolders: Stakeholder[],
@@ -249,16 +249,16 @@ class DocCoordinates {
         description: string,
         coordinates: Coordinate[]
     ) {
-<span class="cstat-no" title="statement not covered" >        this.id = id</span>
-<span class="cstat-no" title="statement not covered" >        this.title = title</span>
-<span class="cstat-no" title="statement not covered" >        this.stakeHolders = stakeHolders</span>
-<span class="cstat-no" title="statement not covered" >        this.scale = scale</span>
-<span class="cstat-no" title="statement not covered" >        this.issuanceDate = issuanceDate</span>
-<span class="cstat-no" title="statement not covered" >        this.type = type</span>
-<span class="cstat-no" title="statement not covered" >        this.language = language</span>
-<span class="cstat-no" title="statement not covered" >        this.pages = pages</span>
-<span class="cstat-no" title="statement not covered" >        this.description = description</span>
-<span class="cstat-no" title="statement not covered" >        this.coordinates = coordinates</span>
+        this.id = id
+        this.title = title
+        this.stakeHolders = stakeHolders
+        this.scale = scale
+        this.issuanceDate = issuanceDate
+        this.type = type
+        this.language = language
+        this.pages = pages
+        this.description = description
+        this.coordinates = coordinates
     }
 }
 /**
@@ -280,7 +280,7 @@ export { DocCoordinates, Type}</pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-11-15T08:25:32.239Z
+                at 2024-11-20T20:21:16.098Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
