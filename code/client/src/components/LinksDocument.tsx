@@ -245,7 +245,7 @@ function LinksDocument(props: any) {
                       <tbody>
                         {paginatedLinks.map((doc, index) => (
                           <tr key={index} className="border-b hover:bg-gray-50 transition duration-200 ease-in-out">
-                            <td className="pl-4 pr-4 pt-3 pb-3">{props.getDocumentIcon(doc.type, 8)}</td>
+                            <td className="pl-4 pr-4 pt-3 pb-3">{props.getDocumentIcon(doc.type, 7)}</td>
                             <td className="pl-4 pr-4 pt-3 pb-3">{doc.title}</td>
                             <td className="pl-4 pr-4 pt-3 pb-3">{doc.stakeHolders.map(sh => sh.name).join(' / ')}</td>
                             <td className="pl-4 pr-4 pt-3 pb-3">
