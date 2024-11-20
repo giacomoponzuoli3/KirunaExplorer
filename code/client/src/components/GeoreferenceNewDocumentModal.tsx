@@ -247,9 +247,7 @@ function GeoreferenceNewDocumentModal({
   onHide,
   showAddNewDocumentLinks
 }: GeoreferenceNewDocumentModalProps) {
-  //const [markerPosition, setMarkerPosition] = useState<LatLng | null>(null);
   const [isEnterCoordinatesMode, setIsEnterCoordinatesMode] = useState(false);
-  //const [polygon, setPolygon] = useState<LatLng[]>([]);
   const [coordinates,setCoordinates] = useState<LatLng | LatLng[] | null>(null);
   const [wholeMapPolygon, setWholeMapPolygon] = useState<L.Polygon | null>(null); // Track the whole map polygon
   const [latitude, setLatitude] = useState('');
@@ -262,8 +260,6 @@ function GeoreferenceNewDocumentModal({
     setLatitude('');
     setLongitude('');
     setIsEnterCoordinatesMode(false);
-    //setMarkerPosition(null);
-    //setPolygon([]);
     setCoordinates(null);
     setWholeMapPolygon(null);
     setShowAlert(false);
@@ -277,12 +273,6 @@ function GeoreferenceNewDocumentModal({
     };
 
   const handleSubmit = async () => {
-    // if (polygon.length === 0 && markerPosition !== null) {
-    //   await API.setDocumentCoordinates(document.id, markerPosition);
-    // } else if (polygon.length !== 0 && markerPosition === null) {
-    //   await API.setDocumentCoordinates(document.id, polygon);
-    // }
-    //refreshDocumentsCoordinates();
     showAddNewDocumentLinks(coordinates);
     handleClose();
   };
@@ -494,6 +484,9 @@ function GeoreferenceNewDocumentModal({
             <div 
               className="absolute top-36 right-24 z-[1002] flex flex-col bg-white p-4 rounded-lg shadow-lg"
             >
+            <p className="text-sm text-gray-600 mt-2">
+             Note: Enter the coordinates in decimal degrees.
+            </p>
               <Form onSubmit={handleCoordinatesSubmit}>
                 <Form.Group className="mb-2">
                   <Form.Control
