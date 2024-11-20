@@ -15,16 +15,18 @@ import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import Select from 'react-select';
 import ISO6391 from 'iso-639-1';  // Utilizziamo ISO 639-1 per ottenere le lingue
 import { DocCoordinates } from '../models/document_coordinate';
+import { LatLng } from 'leaflet';
 
 interface AddNewDocumentLinksModalProps {
     document: Document;
     show: boolean;
     onHide: () => void;
-    refreshDocuments: () => void;
+    refreshDocumentsCoordinates: () => void;
     docs: Document[];
+    newDocumentCoordinates: LatLng | LatLng[] | null
 }
 
-function AddNewDocumentLinksModal({ document,show, onHide, refreshDocuments, docs}: AddNewDocumentLinksModalProps) {
+function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoordinates, docs,newDocumentCoordinates}: AddNewDocumentLinksModalProps) {
     const [typesLink, setTypesLink] = useState<Link[]>([]); // vector of types of links
     const [documents, setDocuments] = useState<Document[]>(docs.filter((d: Document) => d.id != document.id)); // vector of all documents except one
 
@@ -154,25 +156,34 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocuments, doc
     setSelectedTypeLinkName('')
   };
 
-  const handleLink = () => {
-    // Check for errors
-    if (documentLinks.length !== 0) {
-      try{
+  const handleLink = async () => {
+    //First add the document
+    try{
+      const doc = await API.addDocument(document.title, document.stakeHolders, document.scale, document.issuanceDate, document.type, document.language, document.pages, document.description).then();
+      if(newDocumentCoordinates){
+        console.log(doc.id)
+        //add the coordinates if they exist
+        await API.setDocumentCoordinates(doc.id, newDocumentCoordinates);
+      }
+      if (documentLinks.length !== 0) {
+        console.log(doc.id)
         // Implement API call to add link
         documentLinks.forEach(async link => {
           if(link.documentId && link.linkId){
-            await API.addLink(document.id, link.documentId, link.linkId);
+            await API.addLink(doc.id, link.documentId, link.linkId);
           }
-          
+            
         });
-      }catch(err){
-        setShowAlert(true);
-        setAlertMessage('Something went wrong...')
       }
     }
+    catch(err){
+      setShowAlert(true);
+      setAlertMessage('Something went wrong...')
+    }
+      refreshDocumentsCoordinates();
       onHide();
       //refresh of documents
-      refreshDocuments();    
+      refreshDocumentsCoordinates();    
       //reset values 
       setSelectedDocument(null)
       setSelectedTypeLink(null)
@@ -191,7 +202,7 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocuments, doc
  const handleClose = () => {
 
     onHide();
-    refreshDocuments();
+    refreshDocumentsCoordinates();
     setSelectedDocument(null)
     setSelectedTypeLink(null)
     setSelectedDocumentName('')
@@ -414,7 +425,7 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocuments, doc
               className="px-4 py-2 bg-blue-950 hover:bg-blue-500 text-white rounded-md" 
               onClick={handleLink} 
           >
-              Update
+              Submit
           </button>
         </Modal.Footer>
       </Modal>
