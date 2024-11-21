@@ -113,7 +113,7 @@ Retrospective index:
 
 - **Improvement goals for the next sprint and how to achieve them (technical tasks, team coordination, etc.)**
 
-For the next sprint we should finish the most of the task few days before the deadline and avoid to rush the day before the demo. And also try to split better the 16h during the 2 weeks.
+For the next sprint we should finish the most of the task few days before the deadline and avoid to rush the day before the demo.
 
 - **One thing you are proud of as a Team!!**
 
