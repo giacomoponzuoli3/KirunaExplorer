@@ -1,4 +1,4 @@
-TEMPLATE FOR RETROSPECTIVE (Team 12)
+RETROSPECTIVE SPRINT 2 (Team 12)
 =====================================
 
 
@@ -48,6 +48,8 @@ sections:
 |  KX4   |    7    |   8    |    18h     |   15h 55m    |
 |  KX5   |    6    |   5    |  14h 30m   |   11h 10m    |
 
+> story `#0` is for technical tasks, leave out story points (not applicable in this case)
+
 
 - **Hours per task average, standard deviation (estimate and actual)**
 
@@ -67,7 +69,7 @@ sections:
 - **Absolute relative task estimation error: sum( abs( spent-task-i / estimation-task-i - 1))/n**
 
 
-    $$\frac{1}{n}\sum_i^n \left| \frac{spent_{task_i}}{estimation_task_i}-1 \right| = \frac{1}{3} ( -0,0238 + 0,125 + 0,3182 ) = 0,4194  $$
+    $$\frac{1}{n}\sum_i^n \left| \frac{spent_{task_i}}{estimation_task_i}-1 \right| = \frac{1}{4} ( 0,0830 + 0,0244 - 0,1111 - 0,2414 ) = - 0,0613  $$
   
 ## QUALITY MEASURES 
 
@@ -113,7 +115,7 @@ sections:
 
 - **Which ones you were not able to achieve? Why?**
 
-  1. **Time management**: We need to try to finish all the code part a few days before the deadline, so that we can do E2E testing with more calm.
+  1. **Time management**: We need to try to start the review of the code a few days before the deadline, so that we can do it with more calm.
 
 - **Improvement goals for the next sprint and how to achieve them (technical tasks, team coordination, etc.)**
 
@@ -121,4 +123,4 @@ For the next sprint we should finish the most of the task few days before the de
 
 - **One thing you are proud of as a Team!!**
 
-We did 3 stories and now the project is really taking shape and it's really nice in my opinion.
+We did 3 stories and now the project is really taking shape and it's really nice in my opinion, also the demo goes really well.
