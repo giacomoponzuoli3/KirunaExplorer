@@ -2,8 +2,7 @@ RETROSPECTIVE SPRINT 2 (Team 12)
 =====================================
 
 
-The retrospective should include _at least_ the following
-sections:
+Retrospective index:
 
 
 - [process measures](#process-measures)
@@ -69,11 +68,9 @@ sections:
 - **Absolute relative task estimation error: sum( abs( spent-task-i / estimation-task-i - 1))/n**
 
 
-    $$\frac{1}{n}\sum_i^n \left| \frac{spent_{task_i}}{estimation_task_i}-1 \right| = \frac{1}{4} ( 0,0830 + 0,0244 - 0,1111 - 0,2414 ) = - 0,0613  $$
+    $$\frac{1}{n}\sum_i^n \left| \frac{spent_{task_i}}{estimation_task_i}-1 \right| = \frac{1}{4} ( 0,0830 + 0,0244 + 0,1111 + 0,2414 ) = 0,1150  $$
   
 ## QUALITY MEASURES 
-
-
 - Unit Testing:
   - Total hours estimated: **9h**
   - Total hours spent: **9h**
@@ -86,22 +83,17 @@ sections:
   - Total hours estimated: **5h**
   - Total hours spent: **5h**
   
-
-
-
-
 ## ASSESSMENT
-
 
 - **What caused your errors in estimation (if any)?**
 
-   We made fewer estimation errors than in the previous sprint, this time we estimate well the time for the testing, but we overestimated the time for other tasks (like integration the frontend and backend).
+   We made fewer estimation errors than in the previous sprint, this time we estimate well the time for the testing, but we overestimated the time for other tasks (like integration the frontend and backend). It took less time than expected beacause frontend and backend were developed by the same person.
 
 - **What lessons did you learn (both positive and negative) in this sprint?**
 
  ***Positive Lessons***:
 
-  1. **Increased productivity**: In this sprint we commited 3 stories and we completed all of them well and on time.
+  1. **Increased productivity**: In this sprint we commited 3 stories and we completed all of them well and on time, keeping the quality high.
 
   2. **Proper communication**: We had many comparisons on how to develop the frontend that helped to get a good result.
 
@@ -109,18 +101,20 @@ sections:
 
  1. **Understimating the time required for the new icons**: We estimated too little time to choose new icons and implement them in the application.
 
+  2. **Overstimating the time required for integration between Frontend and Backend**: We estimated too much time not taking into account that the development of the frontend and the backend was done by the same person.
+
 - **Which improvement goals set in the previous retrospective were you able to achieve?**
 
   1. **Faster and better testing**: We have achived faster and better testing in this sprint, people who developed tests talked a lot with the developers of the backend.
 
 - **Which ones you were not able to achieve? Why?**
 
-  1. **Time management**: We need to try to start the review of the code a few days before the deadline, so that we can do it with more calm.
+  1. **Time management**: We need to try to start the review of the code a few days before the deadline, in this way we can do it with more calm.
 
 - **Improvement goals for the next sprint and how to achieve them (technical tasks, team coordination, etc.)**
 
-For the next sprint we should finish the most of the task few days before the deadline and avoid to rush the day before the demo.
+For the next sprint we should finish the most of the task few days before the deadline and avoid to rush the day before the demo. And also try to split better the 16h during the 2 weeks.
 
 - **One thing you are proud of as a Team!!**
 
-We did 3 stories and now the project is really taking shape and it's really nice in my opinion, also the demo goes really well.
+We did 3 stories and now the project is really taking shape and it's really nice, also the demo goes really well.
