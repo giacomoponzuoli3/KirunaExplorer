@@ -9,6 +9,7 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet-draw';
 import { DocCoordinates } from "../models/document_coordinate";
 import ReactDOMServer from 'react-dom/server';
+import 'leaflet.markercluster';
 
 //coordinates of Kiruna Town Hall
 const kiruna_town_hall: LatLngTuple = [67.8558, 20.2253];
@@ -66,6 +67,7 @@ function createCityCoordinates(): L.LatLng[] {
   ];
 }
 
+//function that calculates the centre of polygon
 function calculateCentroid(latLngs: [number, number][]): [number, number] {
   let centroidLat = 0;
   let centroidLng = 0;
@@ -89,12 +91,8 @@ function calculateCentroid(latLngs: [number, number][]): [number, number] {
   return [centroidLat, centroidLng];
 }
 
-function areCoordinatesEqual(coord1: any, coord2: L.LatLng): boolean {
-  return coord1.latitude === coord2.lat && coord1.longitude === coord2.lng;
-}
-
 // Funzione che verifica se le coordinate di un documento sono dentro l'area definita
-function areCoordinatesInCityArea(coordinates: any[]): boolean {
+function isPolygonMunicipal(coordinates: any[]): boolean {
   const cityCoords = createCityCoordinates();  // Ottieni le coordinate dell'area della città
 
   // Verifica se tutte le coordinate del documento sono all'interno dell'area
@@ -109,14 +107,8 @@ function areCoordinatesInCityArea(coordinates: any[]): boolean {
 
 function SetMapViewHome(props: any) {
   const map = useMap();
+
   const [showPolygonMessage, setShowPolygonMessage] = useState(false);
-
-
-  // Funzione per generare una chiave unica per una coordinata
-  const coordinateKey = (latitude: number, longitude: number): string => {
-    return `${latitude.toFixed(6)},${longitude.toFixed(6)}`;
-  };
-
 
   // Coordinates of Kiruna town hall means the center of the city
   const position: LatLngTuple = [67.8558, 20.2253];
@@ -162,9 +154,66 @@ function SetMapViewHome(props: any) {
         map.removeLayer(layer);
       }
     });
-  
-    const occupiedPositions: Set<string> = new Set(); // Tiene traccia delle posizioni occupate
-  
+    
+    // Inizializza un set per tenere traccia dei poligoni attivi
+    const activePolygons: Set<L.Polygon> = new Set();
+
+    const markersCluster = L.markerClusterGroup({
+      maxClusterRadius: 50, // Raggio per il clustering generale
+      spiderfyOnMaxZoom: true,
+      removeOutsideVisibleBounds: true,
+      iconCreateFunction: (cluster) => {
+        const childCount = cluster.getChildCount();
+        const samePoint = cluster
+          .getAllChildMarkers()
+          .every((marker) => marker.getLatLng().equals(cluster.getLatLng()));
+
+        // Cluster per documenti nello stesso punto
+        if (samePoint) {
+          return L.divIcon({
+            html: `
+              <div class="cluster-icon flex items-center justify-center w-10 h-10 bg-red-600 text-white text-lg font-bold rounded-full border-1 border-red-800 shadow-lg hover:scale-110 transform transition duration-200 ease-out">
+                ${childCount}
+              </div>
+            `,
+            className: 'custom-cluster-icon',
+            iconSize: [20, 20],
+          });
+        }
+    
+        // Cluster standard per documenti vicini
+        return L.divIcon({
+          html: `
+          <div class="cluster-icon flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 text-white text-lg font-bold rounded-full border-1 border-blue-800 shadow-lg hover:scale-110 transform transition duration-200 ease-out">
+          ${childCount}
+        </div>
+          `,
+          className: 'custom-cluster-icon',
+          iconSize: [20, 20],
+        });
+      },
+    });
+    
+
+    // Rimuovi poligoni quando i marker vengono raggruppati in un cluster
+    markersCluster.on('clusterclick', () => {
+      setShowPolygonMessage(false)
+      activePolygons.forEach((polygon) => polygon.removeFrom(map));
+      activePolygons.clear();
+    });
+
+    // Listener per gestire il termine dell'animazione del clustering
+    markersCluster.on('animationend', () => {
+      setShowPolygonMessage(false)
+      // Nascondi tutti i poligoni attualmente attivi
+      activePolygons.forEach((polygon) => {
+        polygon.removeFrom(map);
+      });
+      activePolygons.clear();
+    });
+    
+
+    //for each Document
     props.documentsCoordinates
       .filter((d: DocCoordinates) => d.coordinates.length !== 0)
       .forEach((doc: any) => {
@@ -181,26 +230,10 @@ function SetMapViewHome(props: any) {
           });
   
           const centralCoord = calculateCentroid(latLngs);; // Punto centrale del poligono
-          let adjustedPosition: LatLngTuple = [centralCoord[0], centralCoord[1]]; // LatLngTuple, array con due numeri
-  
-          const zoom = map.getZoom();
-          const offset = (18 - zoom) * 0.0001; // Distanza minima tra i marker in base allo zoom
-  
-          let attempts = 0;
-          while (occupiedPositions.has(adjustedPosition.toString()) && attempts < 10) {
-            // Spostiamo il marker se la posizione è occupata
-            adjustedPosition = [
-              centralCoord[0] + offset * (Math.random() > 0.5 ? 1 : -1), // Spostamento orizzontale
-              centralCoord[1] + offset * (Math.random() > 0.5 ? 1 : -1), // Spostamento verticale
-            ];
-            attempts++;
-          }
-  
-          occupiedPositions.add(adjustedPosition.toString());
   
           const iconHtml = ReactDOMServer.renderToString(props.getDocumentIcon(doc.type, 5) || <></>);
   
-          const marker = L.marker(adjustedPosition, {
+          const marker = L.marker(centralCoord, {
             icon: L.divIcon({
               html: `
                 <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95 border-1 border-blue-950">
@@ -210,50 +243,68 @@ function SetMapViewHome(props: any) {
               iconSize: [20, 20],
               className: '',
             }),
-          }).addTo(map);
+          });
   
           marker.on('mouseover', () => {
-            relatedLayer.setStyle({ color: '#8B0000', weight: 2, fillOpacity: 0.2 }).addTo(map);
-            // Verifica se le coordinate del documento sono dentro il poligono definito da createCityCoordinates
-          const cityCoordinates = createCityCoordinates();
-          const polygon = L.polygon(cityCoordinates);
 
-          // Usa il metodo .contains() del poligono per verificare se il marker è all'interno
-          if (areCoordinatesInCityArea(doc.coordinates)) {
-            setShowPolygonMessage(true);  // Mostra il messaggio
-          }
+            relatedLayer.addTo(map);
+            
+            activePolygons.add(relatedLayer);
+
+            if (isPolygonMunicipal(doc.coordinates)) {
+              setShowPolygonMessage(true);  // Mostra il messaggio
+            }
           });
   
           marker.on('mouseout', () => {
-            relatedLayer.setStyle({ color: '#B22222', weight: 1, fillOpacity: 0.1 }).removeFrom(map);
-            setShowPolygonMessage(false);
+            relatedLayer.removeFrom(map);
+            activePolygons.delete(relatedLayer);
+
+            if (isPolygonMunicipal(doc.coordinates)) {
+              setShowPolygonMessage(false); //nascondi il messaggio
+            }
+
           });
   
           marker.on('click', () => {
             props.onMarkerClick(doc);
           });
+
+          // Aggiungi il marker al cluster
+          markersCluster.addLayer(marker);
+
         } else {
           // Nel caso di documenti con una sola coordinata
           const coord = doc.coordinates[0];
-          const marker = L.marker([coord.latitude, coord.longitude]).addTo(map);
-  
+
           const iconHtml = ReactDOMServer.renderToString(props.getDocumentIcon(doc.type, 5) || <></>);
-  
-          marker.setIcon(L.divIcon({
-            html: `
-              <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95 border-1 border-blue-950">
-                ${iconHtml}
-              </div>
-            `,
-            iconSize: [20, 20],
-            className: '',
-          }));
+
+          const marker = L.marker([coord.latitude, coord.longitude], {
+            icon: L.divIcon({
+              html: `
+                <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95 border-1 border-blue-950">
+                  ${iconHtml}
+                </div>
+              `,
+              iconSize: [20, 20],
+              className: '',
+            })
+
+          });
+
   
           marker.on('click', () => {
             props.onMarkerClick(doc);
           });
+
+          // Aggiungi il marker al cluster
+          markersCluster.addLayer(marker);
         }
       });
+
+      // Aggiungi il gruppo di cluster alla mappa
+      map.addLayer(markersCluster);
+
   }, [props.documentsCoordinates]);
   
   
@@ -269,8 +320,6 @@ function SetMapViewHome(props: any) {
     </>
   );
 }
-
-
 
 
 
