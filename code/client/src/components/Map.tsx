@@ -66,6 +66,29 @@ function createCityCoordinates(): L.LatLng[] {
   ];
 }
 
+function calculateCentroid(latLngs: [number, number][]): [number, number] {
+  let centroidLat = 0;
+  let centroidLng = 0;
+  let signedArea = 0;
+  
+  for (let i = 0; i < latLngs.length; i++) {
+    const [x0, y0] = latLngs[i];
+    const [x1, y1] = latLngs[(i + 1) % latLngs.length];
+
+    const a = x0 * y1 - x1 * y0;
+    signedArea += a;
+
+    centroidLat += (x0 + x1) * a;
+    centroidLng += (y0 + y1) * a;
+  }
+
+  signedArea *= 0.5;
+  centroidLat /= (6 * signedArea);
+  centroidLng /= (6 * signedArea);
+
+  return [centroidLat, centroidLng];
+}
+
 function areCoordinatesEqual(coord1: any, coord2: L.LatLng): boolean {
   return coord1.latitude === coord2.lat && coord1.longitude === coord2.lng;
 }
@@ -157,7 +180,7 @@ function SetMapViewHome(props: any) {
             smoothFactor: 2,
           });
   
-          const centralCoord = latLngs[0]; // Punto centrale del poligono
+          const centralCoord = calculateCentroid(latLngs);; // Punto centrale del poligono
           let adjustedPosition: LatLngTuple = [centralCoord[0], centralCoord[1]]; // LatLngTuple, array con due numeri
   
           const zoom = map.getZoom();
