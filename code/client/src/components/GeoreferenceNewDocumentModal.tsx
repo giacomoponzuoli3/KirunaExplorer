@@ -248,6 +248,7 @@ function GeoreferenceNewDocumentModal({
   showAddNewDocumentLinks
 }: GeoreferenceNewDocumentModalProps) {
   const [isEnterCoordinatesMode, setIsEnterCoordinatesMode] = useState(false);
+  const [isInfoMode, setIsInfoMode] = useState(false);
   const [coordinates,setCoordinates] = useState<LatLng | LatLng[] | null>(null);
   const [wholeMapPolygon, setWholeMapPolygon] = useState<L.Polygon | null>(null); // Track the whole map polygon
   const [latitude, setLatitude] = useState('');
@@ -430,9 +431,11 @@ function GeoreferenceNewDocumentModal({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              backgroundColor: wholeMapPolygon ? "#0d6efd" : "white", 
+              color: wholeMapPolygon ? "white" : "#4a4a4a", // Text color adjusts based on mode   
+              borderColor: wholeMapPolygon ? "#0d6efd" : "black",
               
             }}
-            variant={wholeMapPolygon ? "primary" : "secondary"}
             onClick={() => {
                 setLatitude('');
                 setLongitude('');
@@ -464,9 +467,11 @@ function GeoreferenceNewDocumentModal({
             height: '30px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',   
+            justifyContent: 'center',
+            backgroundColor: isEnterCoordinatesMode ? "#0d6efd" : "white", 
+            color: isEnterCoordinatesMode ? "white" : "#4a4a4a", // Text color adjusts based on mode   
+            borderColor: isEnterCoordinatesMode ? "#0d6efd" : "black",
             }}
-            variant={isEnterCoordinatesMode ? "primary" : "secondary"}
             onClick={() => {
               setLatitude('');
               setLongitude('');
@@ -506,6 +511,71 @@ function GeoreferenceNewDocumentModal({
                 </Form.Group>
                 <Button type="submit">Place Marker</Button>
               </Form>
+            </div>
+          )}
+
+          {/** Info button */}
+          <Button title="Info"
+            style={{
+            position: 'absolute',
+            top: '145px',  // Adjust based on position under zoom controls
+            left: '40px', // Adjust for placement on map
+            zIndex: 1000,
+            width: '30px',
+            height: '30px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',   
+            }}
+            variant={isInfoMode ? "primary" : "secondary"}
+            onClick={() => {
+              setIsInfoMode(!isInfoMode)
+            }}
+          >
+            <i className="bi bi-info-square fs-8"></i>
+          </Button>
+
+          {/* Coordinates input form */}
+          {isInfoMode && (
+            <div 
+              className="absolute top-36 left-24 z-[1002] flex flex-col bg-white p-4 rounded-lg shadow-lg"
+            >
+
+            <h3 className="text-lg font-semibold mb-2">Map Control Information</h3>
+            <ul className="list-disc pl-4 text-sm text-gray-600">
+            <li>
+            <i className="bi bi-info-square fs-8"></i>
+            <strong> Info Button:</strong> Toggles this info panel.
+            </li>
+            <li>
+              <i className="bi bi-geo-alt-fill fs-8"></i>
+              <strong> Draw a Marker Button:</strong> Lets you select a
+              specific coordinate on the map by placing a marker.
+            </li>
+            <li>
+              <i className="bi bi-pentagon-fill fs-8"></i>
+              <strong> Draw a Polygon Button:</strong> Enables drawing a custom
+              polygon area on the map.
+            </li>
+            <li>
+              <i className="bi bi-arrows-fullscreen fs-8"></i>
+              <strong> Select the whole area Button:</strong> Gives you the option to
+               select the whole municipality of Kiruna.
+            </li>
+            <li>
+              <i className="bi bi-card-text fs-8"></i>
+              <strong> Enter Coordinates Button:</strong> Allows you to input
+              latitude and longitude to place a marker on the map.
+            </li>
+            <li>
+              <i className="bi bi-pencil-square fs-8"></i>
+              <strong> Edit Layers Button:</strong> Lets you edit the marker or the area you drew on the map.
+            </li>
+            <li>
+            <i className="bi bi-trash3 fs-8"></i>
+              <strong> Delete Layers Button:</strong> Allows you to delete the marker or the area you drew on the map.
+            </li>
+            </ul>  
             </div>
           )}
         </Container>
