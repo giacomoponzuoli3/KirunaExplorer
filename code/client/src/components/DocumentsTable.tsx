@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import API from "../API/API";
-import { TrashIcon, MapPinIcon, MapIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, MapPinIcon, MapIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon, PlusCircleIcon, ClipboardIcon } from "@heroicons/react/24/outline";
 import { TruncatedText } from "./LinksDocument";
 import { useNavigate } from "react-router-dom";
 import Alert from "./Alert";
@@ -147,7 +147,7 @@ function DocumentsTable(props: any){
         );
     }else{
       return (
-        <div className="px-4 mt-4">
+        <div className="px-4 mt-4 mb-4">
           <h2 className="text-3xl font-bold text-black-600 text-center mb-6">
                 List of all Documents
           </h2>
@@ -199,17 +199,14 @@ function DocumentsTable(props: any){
                 <table className="min-w-full bg-white border border-gray-200 shadow-lg rounded-lg table-auto">
                   <thead>
                     <tr className="bg-gray-200 text-gray-600">
-                      <th className="p-4 text-left text-sm font-semibold w-16">Icon</th>
-                      <th className="p-4 text-left text-sm font-semibold w-32">Title</th>
-                      <th className="p-4 text-left text-sm font-semibold w-36">Stakeholder(s)</th>
-                      <th className="p-4 text-left text-sm font-semibold w-28">Date</th>
-                      <th className="p-4 text-left text-sm font-semibold w-24">Scale</th>
-                      <th className="p-4 text-left text-sm font-semibold w-20">Pages</th>
-                      <th className="p-4 text-left text-sm font-semibold w-20">Language</th>
-                      <th className="p-4 text-left text-sm font-semibold w-64">Description</th>  {/* Colonna più grande */}
-                      <th className="p-4 text-left text-sm font-semibold w-24">Links</th>
-                      <th className="p-4 text-left text-sm font-semibold w-32">Georeference</th>
-                      <th className="p-4 text-left text-sm font-semibold w-32">Resources</th>
+                      <th className="p-4 text-left text-sm font-semibold w-4">Icon</th>
+                      <th className="p-4 text-center text-sm font-semibold w-36">Title</th>
+                      <th className="p-4 text-center text-sm font-semibold w-36">Stakeholder(s)</th>
+                      <th className="p-4 text-center text-sm font-semibold w-80">Description</th>  {/* Colonna più grande */}
+                      <th className="p-4 text-center text-sm font-semibold w-16">Links</th>
+                      <th className="p-4 text-center text-sm font-semibold w-32">Georeference</th>
+                      <th className="p-4 text-center text-sm font-semibold w-16">Resources</th>
+                      <th className="p-4 text-center text-sm font-semibold w-32">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -220,32 +217,35 @@ function DocumentsTable(props: any){
                           index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
                         }`}
                       >
-                        <td className="p-4">{props.getDocumentIcon(doc.type, 8)}</td>
-                        <td className="p-4 text-sm text-gray-600 w-32">{doc.title}</td>
-                        <td className="p-4 text-sm text-gray-600 w-36">
+                        <td className="p-4 relative justify-center items-center w-4">{props.getDocumentIcon(doc.type, 8)}</td>
+                        <td className="p-4 text-sm text-gray-600 w-36 text-center">{doc.title}</td>
+                        <td className="p-4 text-sm text-gray-600 w-36 text-center">
                           {doc.stakeHolders.map((sh) => sh.name).join(' / ')}
                         </td>
-                        <td className="p-4 text-sm text-gray-600 w-28">{doc.issuanceDate}</td>
-                        <td className="p-4 text-sm text-gray-600 w-24">{doc.scale}</td>
-                        <td className="p-4 text-sm text-gray-600 w-20">{doc.pages ?? '-'}</td>
-                        <td className="p-4 text-sm text-gray-600 w-20">{doc.language ?? '-'}</td>
-                        <td className="p-4 text-sm text-gray-600 w-64">
+                        <td className="p-4 text-sm text-gray-600 w-80 text-center">
                           <TruncatedText
                             text={doc.description ?? 'No description available'}
                             maxWords={10}
                           />
                         </td>
-                        <td className="p-4 text-sm text-gray-600 w-24">
+                        <td className="p-4 text-sm text-gray-600 w-16 relative justify-center items-center text-center">
                           {documentsLinksCount.get(doc.id) ? (
                             <button
                               title="Number of links"
                               onClick={() => navigate(`/documents/${doc.id}/links`)}
-                              className="bg-white text-gray-600 hover:bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center text-xs font-medium border-1 hover:border-gray-800 hover:shadow-lg transition-all duration-300 ease-in-out"
+                              className="bg-white text-gray-600 hover:bg-gray-200 rounded-full w-8 h-8 relative items-center justify-center text-xs font-medium border-1 hover:border-gray-800 hover:shadow-lg transition-all duration-300 ease-in-out"
                             >
                               {documentsLinksCount.get(doc.id)}
                             </button>
                           ) : (
-                            'Loading...'
+                            <button
+                              title="Number of links"
+                              onClick={() => navigate(`/documents/${doc.id}/links`)}
+                              className="bg-white text-gray-600 hover:bg-gray-200 rounded-full w-8 h-8 relative items-center justify-center text-xs font-medium border-1 hover:border-gray-800 hover:shadow-lg transition-all duration-300 ease-in-out"
+                            >
+                              0
+                            </button>
+
                           )}
                         </td>
                         <td className="p-4 text-sm text-gray-600 w-32">
@@ -281,10 +281,52 @@ function DocumentsTable(props: any){
                               )}
                             </>
                           ) : (
-                            'No available'
+                            props.user.role === 'Urban Planner' ? 
+                            <div className="flex items-center justify-center space-x-2">
+                              <button
+                                title="View georeference"
+                                onClick={() => {}}
+                                className="bg-white text-green-600 hover:text-green-800 rounded-full w-14 h-8 flex items-center justify-center text-xs font-medium border-1 border-green-600 hover:border-green-800 hover:shadow-lg transition-all duration-300 ease-in-out"
+                              >
+                                <PlusCircleIcon className="w-4 h-4 mr-1" />
+                                Add
+                              </button>
+                            </div>                     
+                            : 'No available'
+                            
                           )}
                         </td>
-                        <td className="p-4 text-sm text-gray-600 w-32">-</td>
+                        <td className="p-4 text-sm text-gray-600 w-16 text-center">
+                          {documentsLinksCount.get(doc.id) ? (
+                              <button
+                                title="Number of resources"
+                                onClick={() => {}}
+                                className="bg-white text-gray-600 hover:bg-gray-200 rounded-full w-8 h-8 relative items-center justify-center text-xs font-medium border-1 hover:border-gray-800 hover:shadow-lg transition-all duration-300 ease-in-out"
+                              >
+                                {documentsLinksCount.get(doc.id)}
+                              </button>
+                            ) : (
+                              <button
+                                title="Number of links"
+                                onClick={() => navigate(`/documents/${doc.id}/links`)}
+                                className="bg-white text-gray-600 hover:bg-gray-200 rounded-full w-8 h-8 relative items-center justify-center text-xs font-medium border-1 hover:border-gray-800 hover:shadow-lg transition-all duration-300 ease-in-out"
+                              >
+                                0
+                              </button>
+                            )}
+                        </td>
+                        <td className="p-4 text-sm text-gray-600 w-32 text-center">
+                          <div className="flex items-center justify-center space-x-2">
+                            <button
+                              title="View georeference"
+                              onClick={() => {}}
+                              className="bg-white text-blue-600 hover:text-blue-800 rounded-full w-24 h-8 flex items-center justify-center text-xs font-medium border-1 border-blue-500 hover:border-blue-700 hover:shadow-lg transition-all duration-300 ease-in-out"
+                            >
+                              <ClipboardIcon className="w-4 h-4 mr-1" />
+                              Show Card
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

@@ -29,7 +29,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({ text, maxWords }) => {
     <div className="relative inline-block">
 
       {/* Pulsante per alternare tra Show more/Show less */}
-      {shouldTruncate && (
+      {shouldTruncate ? 
         <>
           <span className={`inline-block transition-all duration-300 ease-in-out ${
             isExpanded ? 'opacity-100 max-h-screen' : 'opacity-0 max-h-0 overflow-hidden'
@@ -46,8 +46,9 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({ text, maxWords }) => {
           >
             {isExpanded ? 'Show less' : 'Show more'}
           </button>
-        </>
-      ) }
+        </> : <span>{visibleText}</span>
+
+       }
     </div>
   );
 };
@@ -281,8 +282,7 @@ function LinksDocument(props: any) {
                           <th className="p-4 text-left text-sm font-semibold">Title</th>
                           <th className="p-4 text-left text-sm font-semibold">Stakeholder(s)</th>
                           <th className="p-4 text-left text-sm font-semibold">Date</th>
-                          <th className="p-4 text-left text-sm font-semibold">Pages</th>
-                          <th className="p-4 text-left text-sm font-semibold">Language</th>
+                          <th className="p-4 text-left text-sm font-semibold">Scale</th>
                           <th className="p-4 text-left text-sm font-semibold">Description</th>
                           <th className="p-4 text-left text-sm font-semibold">Type of Link</th>
                           {props.isLogged && props.user.role == "Urban Planner" && (
@@ -299,8 +299,7 @@ function LinksDocument(props: any) {
                             <td className="p-4 text-sm text-gray-600">{doc.title}</td>
                             <td className="p-4 text-sm text-gray-600">{doc.stakeHolders.map(sh => sh.name).join(' / ')}</td>
                             <td className="p-4 text-sm text-gray-600">{doc.issuanceDate}</td>
-                            <td className="p-4 text-sm text-gray-600">{doc.pages != null ? doc.pages : "-"}</td>
-                            <td className="p-4 text-sm text-gray-600">{doc.language != null ? doc.language : "-"}</td>
+                            <td className="p-4 text-sm text-gray-600">{doc.scale}</td>
                             <td className="p-4 text-sm text-gray-600">
                                 <TruncatedText text={doc.description ?? 'No description available'} maxWords={20}  />
                             </td>
