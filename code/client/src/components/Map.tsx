@@ -332,11 +332,11 @@ function SetMapViewHome(props: any) {
         {`
           .custom-popup .leaflet-popup-tip {
             display: none; /* Remove the triangular tip */
-            //background-color: rgba(0, 123, 255);
           }
 
           .custom-popup .leaflet-popup-content-wrapper {
-            background-color: rgba(0, 123, 255); /* Blue background colour */
+            //background-color: rgba(10, 25, 51, 0.9); /* Blue background colour */
+            background-color: rgba(0, 123, 255, 0.9);
             border-radius: 10px;       /* Rounded corners */
             padding: 1px;             /* Add padding */
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Add shadow */
