@@ -83,7 +83,6 @@ function LinksDocument(props: any) {
     // Calculate total pages
     const totalPages = Math.ceil(documentLinks.length / itemsPerPage);
 
-
     // Handle pagination button clicks
     const handleNextPage = () => {
      if (currentPage < totalPages) {
@@ -157,10 +156,6 @@ function LinksDocument(props: any) {
                 const documentsConnections = await API.getDocumentLinksById(documentId);
         
                 setDocumentLinks(documentsConnections);
-                // setPaginatedLinks(documentsConnections.slice(
-                //   (currentPage - 1) * itemsPerPage, 
-                //   currentPage * itemsPerPage
-                // ))
             }catch (err){
                 setShowAlert(true);
             }
@@ -223,7 +218,45 @@ function LinksDocument(props: any) {
               <h2 className="text-3xl font-bold text-black-600 text-center mb-6">
                 {document.title}
               </h2>
-          
+              <div className="relative mb-2">
+                <div className="flex justify-between items-center mt-0">
+                  {/* Add Link Button */}
+                  {props.isLogged && props.user.role === "Urban Planner" && documentLinks.length !== 0 ? (
+                    <button
+                      className="flex items-center justify-center bg-green-600 text-white rounded px-4 py-2 hover:bg-green-700 transition duration-200"
+                      onClick={handleAddLink}
+                    >
+                      <PlusIcon className="h-5 w-5 mr-2" />
+                      <span>Add Link</span>
+                    </button>
+                  ) : (
+                    <div></div> /* Empty div to maintain spacing when Add Link is not present */
+                  )}
+
+                  {/* Pagination Controls */}
+                  {totalPages > 1 && (
+                    <div className="flex justify-end space-x-4">
+                      <button
+                        onClick={handlePrevPage}
+                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                        disabled={currentPage === 1}
+                      >
+                        <ChevronLeftIcon className="h-5 w-5" />
+                      </button>
+                      <span className="text-gray-700 mt-2">Page {currentPage} of {totalPages}</span>
+                      <button
+                        onClick={handleNextPage}
+                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                        disabled={currentPage === totalPages}
+                      >
+                        <ChevronRightIcon className="h-5 w-5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              
               {documentLinks.length === 0 ? (
                 <div className="flex flex-col items-center mt-6">
                   <FaceFrownIcon className="h-10 w-10 text-gray-400" />
@@ -241,43 +274,51 @@ function LinksDocument(props: any) {
               ) : (
                 <>
                   <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
+                    <table className="min-w-full bg-white border border-gray-200 shadow-lg rounded-lg table-auto">
                       <thead>
                         <tr className="bg-gray-100 border-b">
-                          <th className="pl-4 pr-4 pt-3 pb-3 text-left text-gray-600 font-semibold">Icon</th>
-                          <th className="pl-4 pr-4 pt-3 pb-3 text-left text-gray-600 font-semibold">Title</th>
-                          <th className="pl-4 pr-4 pt-3 pb-3 text-left text-gray-600 font-semibold">Stakeholder(s)</th>
-                          <th className="pl-4 pr-4 pt-3 pb-3 text-left text-gray-600 font-semibold">Description</th>
-                          <th className="pl-4 pr-4 pt-3 pb-3 text-left text-gray-600 font-semibold">Type of Link</th>
+                          <th className="p-4 text-left text-sm font-semibold">Icon</th>
+                          <th className="p-4 text-left text-sm font-semibold">Title</th>
+                          <th className="p-4 text-left text-sm font-semibold">Stakeholder(s)</th>
+                          <th className="p-4 text-left text-sm font-semibold">Date</th>
+                          <th className="p-4 text-left text-sm font-semibold">Pages</th>
+                          <th className="p-4 text-left text-sm font-semibold">Language</th>
+                          <th className="p-4 text-left text-sm font-semibold">Description</th>
+                          <th className="p-4 text-left text-sm font-semibold">Type of Link</th>
                           {props.isLogged && props.user.role == "Urban Planner" && (
-                            <th className="pl-4 pr-4 pt-3 pb-3 text-center text-gray-600 font-semibold">Actions</th>
+                            <th className="p-4 text-left text-sm font-semibold">Actions</th>
                           )}
                         </tr>
                       </thead>
                       <tbody>
                         {paginatedLinks.map((doc, index) => (
-                          <tr key={index} className="border-b hover:bg-gray-50 transition duration-200 ease-in-out">
-                            <td className="pl-4 pr-4 pt-3 pb-3">{props.getDocumentIcon(doc.type, 7)}</td>
-                            <td className="pl-4 pr-4 pt-3 pb-3">{doc.title}</td>
-                            <td className="pl-4 pr-4 pt-3 pb-3">{doc.stakeHolders.map(sh => sh.name).join(' / ')}</td>
-                            <td className="pl-4 pr-4 pt-3 pb-3">
+                          <tr key={index}className={`border-b transition duration-200 ease-in-out 
+                          ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} 
+                          `}>
+                            <td className="p-4">{props.getDocumentIcon(doc.type, 7)}</td>
+                            <td className="p-4 text-sm text-gray-600">{doc.title}</td>
+                            <td className="p-4 text-sm text-gray-600">{doc.stakeHolders.map(sh => sh.name).join(' / ')}</td>
+                            <td className="p-4 text-sm text-gray-600">{doc.issuanceDate}</td>
+                            <td className="p-4 text-sm text-gray-600">{doc.pages != null ? doc.pages : "-"}</td>
+                            <td className="p-4 text-sm text-gray-600">{doc.language != null ? doc.language : "-"}</td>
+                            <td className="p-4 text-sm text-gray-600">
                                 <TruncatedText text={doc.description ?? 'No description available'} maxWords={20}  />
                             </td>
-                            <td className="pl-4 pr-4 pt-3 pb-3">{doc.relatedLink.name}</td>
+                            <td className="p-4 text-sm text-gray-600">{doc.relatedLink.name}</td>
                             {props.isLogged && props.user.role == "Urban Planner" && (
-                              <td className="pl-4 pr-4 pt-3 pb-3 flex items-center justify-center space-x-4">
-                              <button
-                                className="text-red-500 hover:text-red-700"
-                                onClick={() => confirmDelete(doc.id, doc.relatedLink.id)}
-                              >
-                                <TrashIcon className="h-5 w-5" />
-                              </button>
-                              <button
-                                className="text-blue-500 hover:text-blue-700 ml-2"
-                                onClick={() => handleUpdate(doc)}
-                              >
-                                <PencilIcon className="h-5 w-5" />
-                              </button>
+                              <td className="p-3 items-center justify-center space-x-4">
+                                <button
+                                  className="text-red-500 hover:text-red-700"
+                                  onClick={() => confirmDelete(doc.id, doc.relatedLink.id)}
+                                >
+                                  <TrashIcon className="h-5 w-5" />
+                                </button>
+                                <button
+                                  className="text-blue-500 hover:text-blue-700 ml-2"
+                                  onClick={() => handleUpdate(doc)}
+                                >
+                                  <PencilIcon className="h-5 w-5" />
+                                </button>
                             </td>
                             )}
                           </tr>
@@ -286,41 +327,11 @@ function LinksDocument(props: any) {
                     </table>
                   </div>
           
-                  {/* Pagination Controls */}
-                    {totalPages > 1 && (
-                      <div className="flex justify-center space-x-4 mt-4">
-                       <button onClick={handlePrevPage}
-                         className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-                         disabled={currentPage === 1}
-                        >
-                          <ChevronLeftIcon className="h-5 w-5" />
-                        </button>
-                        <span className="text-gray-700 mt-2">Page {currentPage} of {totalPages}</span>
-                        <button onClick={handleNextPage}
-                         className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-                         disabled={currentPage === totalPages}
-                        >
-                          <ChevronRightIcon className="h-5 w-5" />
-                        </button>
-                      </div>
-                    )}
                 </>
               )}
           
               {props.isLogged && props.user.role == "Urban Planner" && (
                 <>
-                  <div className="mt-4 text-center">
-                  {documentLinks.length !== 0 && 
-                    <button 
-                    className="flex items-center justify-center bg-green-600 text-white rounded px-4 py-2 hover:bg-green-600 transition duration-200"  
-                    onClick={handleAddLink}
-                    > 
-                      <PlusIcon className="h-5 w-5 mr-2" />
-                      <span>Add Link</span>
-                    </button>
-                  }
-                    
-                  </div>
                   <ConfirmModal
                     show={showModal}
                     onHide={() => setShowModal(false)}
