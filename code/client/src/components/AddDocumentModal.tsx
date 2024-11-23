@@ -52,6 +52,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
     const [description, setDescription] = useState('');
 
     const [showAlert, setShowAlert] = useState(false); // alert state
+    const [alertMessage, setAlertMessage] = useState('');
     const [showAlertErrorDate, setShowAlertErrorDate] = useState<boolean>(false);
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -86,6 +87,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
       // Validation check
       if (!title || selectedStakeholders.length === 0 || !scale || !issuanceDate || !type 
           || title.trim() === '' || scale.trim() === '' || description.trim() === '') {
+          setAlertMessage("Please fill in the mandatory fields marked with the red star (*).")
           setShowAlert(true);
           return; // Exit the function early
       }
@@ -94,13 +96,30 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
       const issuanceDateRegex = /^(0[1-9]|1[0-2])\/\d{4}$|^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$|^\d{4}$/;
       
       if (!issuanceDateRegex.test(issuanceDate)) {
-          setShowAlertErrorDate(true);
+          setAlertMessage("Invalid date format. Please use one of the following formats: mm/yyyy, dd/mm/yyyy, or yyyy.")
+          setShowAlert(true);
           return; // Exit the function early if the format is invalid
       }
   
-      // If all validations pass, proceed to add the document
-      //const doc = await API.addDocument(title, selectedStakeholders, scale, issuanceDate, type, language, pages, description).then();
-      //console.log(doc.id);
+      const pagesRegex = /^\d+(-\d+)?$/;
+
+      if(pages){
+        if (!pagesRegex.test(pages)) {
+         setAlertMessage("Invalid pages format. Please use a single number or a page range in the format: number-number.");
+         setShowAlert(true);
+         return; // Exit the function early if the format is invalid
+        }
+
+        // Additional validation for range order
+        const [start, end] = pages.split("-").map(Number);
+
+        if (end !== undefined && start >= end) {
+          setAlertMessage("Invalid page range. When you enter a range the first number must be less than the second.");
+          setShowAlert(true);
+          return; // Exit the function early if the range is invalid
+        }
+      }
+
       refreshDocuments();
       handleClose();
       refreshDocuments();
@@ -137,14 +156,8 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
             {/* Alerts */}
             {showAlert && (
               <Alert
-                message="Please fill in the mandatory fields marked with the red star (*)."
-                onClose={() => setShowAlert(false)}
-              />
-            )}
-            {!showAlert && showAlertErrorDate && (
-              <Alert
-                message="Invalid date format. Please use one of the following formats: mm/yyyy, dd/mm/yyyy, or yyyy."
-                onClose={() => setShowAlertErrorDate(false)}
+                message={alertMessage}
+                onClose={() => {setShowAlert(false); setAlertMessage('')}}
               />
             )}
 
