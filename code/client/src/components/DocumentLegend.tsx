@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import iconLegendMap from '../img/iconLegendMap.png'
 
 function DocumentLegend() {
   const [isLegendVisible, setIsLegendVisible] = useState(false);
@@ -31,30 +32,63 @@ const documentTypes = [
 
   return (
     <div className="relative">
-      
-      {/* Toggle Icon Button in Bottom-Left */}
-      <button
-        id="toggle-button"
-        onClick={toggleLegend}
-        className="fixed bottom-4 left-4 z-[1000] bg-blue-950 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition duration-200"
-        aria-label="Toggle Legend"
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
-        </svg>
-      </button>
+  
+  {/* Toggle Icon Button in Bottom-Left */}
+  <button
+    id="toggle-button"
+    onClick={toggleLegend}
+    className="fixed bottom-4 left-4 z-[1000] bg-blue-950 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition duration-200"
+    aria-label="Toggle Legend"
+  >
+    <img
+      src={iconLegendMap}
+      alt="Legend Map Icon"
+      className="w-5 h-5 object-contain" // Customize the size
+    />
+  </button>
 
-      {/* Overlay for closing legend */}
-      {isLegendVisible && <div className="fixed inset-0 bg-black opacity-25 z-40"></div>}
+  {/* Overlay for closing legend */}
+  {isLegendVisible && <div className="fixed inset-0 bg-black opacity-25 z-40"></div>}
 
-      {/* Legend Modal */}
-      {isLegendVisible && (
-        <div
-          id="legend-box"
-          className="fixed bottom-16 left-4 max-w-sm w-full bg-white rounded-lg shadow-lg p-4 border border-gray-200 z-[1000] animate-rotate-in"
-          style={{ zIndex: 1000 }}
-        >
-          <h3 className="text-center text-lg font-semibold text-gray-800 mb-3">Document Type Legend</h3>
+  {/* Legend Modal */}
+  {isLegendVisible && (
+    <div
+      id="legend-box"
+      className="fixed left-[5rem] bottom-4 transform -translate-y-1/2 flex items-center bg-white rounded-sm shadow-lg px-1 py-1 border border-gray-200 z-[1000] animate-rotate-in mb-2"
+      style={{ zIndex: 1000 }}
+    >
+      {/* Red Cluster */}
+      <div className="flex items-center space-x-2">
+        <div className="flex items-center justify-center w-6 h-6 bg-gradient-to-br from-red-500 via-red-600 to-red-700 text-white text-xs font border border-white shadow-md">
+          N
+        </div>
+        <span className="text-gray-700 text-sm">
+          Points with the same coordinates
+        </span>
+      </div>
+      {/* Separator */}
+      <div className="mx-4 h-6 border-l border-gray-300"></div>
+      {/* Blue Cluster */}
+      <div className="flex items-center space-x-2">
+        <div className="flex items-center justify-center w-6 h-6 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 text-white text-xs font border border-white shadow-md">
+          N
+        </div>
+        <span className="text-gray-700 text-sm">
+          Points with nearby coordinates
+        </span>
+      </div>
+    </div>
+  )}
+</div>
+
+  );
+}
+
+export { DocumentLegend };
+
+
+/*
+<h3 className="text-center text-lg font-semibold text-gray-800 mb-3">Document Type Legend</h3>
           <div className="space-y-3">
             {documentTypes.map((item, index) => (
               <div
@@ -70,10 +104,5 @@ const documentTypes = [
               </div>
             ))}
           </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
-export { DocumentLegend };
+*/
