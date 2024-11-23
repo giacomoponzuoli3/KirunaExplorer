@@ -2,7 +2,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from "react";
 import { useMap } from 'react-leaflet';
-import { LatLngTuple, LatLngBounds, ControlOptions, map, polygon, Polygon } from 'leaflet'; // Import del tipo corretto
+import { LatLngTuple, LatLngBounds, ControlOptions, map, polygon, Polygon, popup } from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -292,6 +292,23 @@ function SetMapViewHome(props: any) {
 
           });
 
+          const popup = L.popup({
+            closeButton: false, // Disable the close button
+            autoClose: false,   // Prevent automatic closing
+            closeOnClick: false, // Prevent closing on click
+            offset: [10, -5],   // Adjust the position above the marker
+            className: "custom-popup"
+          })
+            .setLatLng([coord.latitude, coord.longitude]) // Set popup position to the marker's coordinates
+            .setContent(`<p>Coordinates: ${coord.latitude.toFixed(4)}, ${coord.longitude.toFixed(4)}</p>`)
+
+          marker.on('mouseover', () => {
+              map.openPopup(popup)
+          });
+  
+          marker.on('mouseout', () => {
+            map.closePopup(popup);
+          });
   
           marker.on('click', () => {
             props.onMarkerClick(doc);
@@ -311,6 +328,24 @@ function SetMapViewHome(props: any) {
   
   return (
     <>
+      <style>
+        {`
+          .custom-popup .leaflet-popup-tip {
+            display: none; /* Remove the triangular tip */
+            //background-color: rgba(0, 123, 255);
+          }
+
+          .custom-popup .leaflet-popup-content-wrapper {
+            background-color: rgba(0, 123, 255); /* Blue background colour */
+            border-radius: 10px;       /* Rounded corners */
+            padding: 1px;             /* Add padding */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Add shadow */
+            border: 1px solid rgba(0, 0, 0, 0.2);    /* Add border */
+            font-size: 11px;        
+            color: #ffffff;               /* White text */
+          }
+        `}
+      </style>
       {showPolygonMessage && (
         <div className="fixed top-2/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] bg-gray-200 text-black text-sm px-2 py-1 rounded-md shadow-lg border">
           area: <strong>the entire municipality of Kiruna</strong>
