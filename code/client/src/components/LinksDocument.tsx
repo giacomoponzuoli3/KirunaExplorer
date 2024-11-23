@@ -21,25 +21,37 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({ text, maxWords }) => {
   const words = text.split(" ");
   const shouldTruncate = words.length > maxWords;
 
-  // Mostra solo il numero massimo di parole se non espanso
-  const displayText = isExpanded ? text : words.slice(0, maxWords).join(" ") + '...';
+  // Testo visibile e nascosto
+  const visibleText = words.slice(0, maxWords).join(" ");
+  const hiddenText = words.slice(maxWords).join(" ");
 
   return (
-    <div className="relative">
-      <span className={isExpanded ? '' : 'line-clamp-none'}>
-        {displayText}
-      </span>
+    <div className="relative inline-block">
+
+      {/* Pulsante per alternare tra Show more/Show less */}
       {shouldTruncate && (
-        <button
-          className="text-blue-600 mt-1 ml-2"
-          onClick={() => setIsExpanded(!isExpanded)}
-        >
-          {isExpanded ? 'Show less' : 'Show more'}
-        </button>
-      )}
+        <>
+          <span className={`inline-block transition-all duration-300 ease-in-out ${
+            isExpanded ? 'opacity-100 max-h-screen' : 'opacity-0 max-h-0 overflow-hidden'
+          }`}>{shouldTruncate && (
+
+          visibleText + " " + hiddenText
+          )}</span>
+
+          {!isExpanded && <span>{visibleText}</span>}
+          
+          <button
+            className="text-blue-600 ml-2 inline"
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            {isExpanded ? 'Show less' : 'Show more'}
+          </button>
+        </>
+      ) }
     </div>
   );
 };
+
 
 
 function LinksDocument(props: any) {
