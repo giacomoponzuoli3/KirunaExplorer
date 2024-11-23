@@ -12,7 +12,7 @@ import { DocumentsTable } from './DocumentsTable';
 import { DocCoordinates } from '../models/document_coordinate';
 
 function getDocumentIcon(type: string, size: number = 16): JSX.Element | null {
-  const sizeClass = `w-${size} h-${size}`;
+  const sizeClass = `w-${size} h-${size} m-0 p-0`;
   switch (type) {
       case 'Informative document':
         return <img src="/img/informativeDocument-icon.png" alt="Informative Document" className={sizeClass}/>;
