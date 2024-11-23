@@ -112,7 +112,7 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
     </MapContainer>
 
     {/* Show the Legend of document types */}
-    {/*<DocumentLegend />*/}
+    {<DocumentLegend />}
 
     {/* Modal to show the document info */}
     {selectedDocumentCoordinates && selectedDocument && ( 

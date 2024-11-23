@@ -159,7 +159,7 @@ function SetMapViewHome(props: any) {
     const activePolygons: Set<L.Polygon> = new Set();
 
     const markersCluster = L.markerClusterGroup({
-      maxClusterRadius: 50, // Raggio per il clustering generale
+      maxClusterRadius: 25, // Raggio per il clustering generale
       spiderfyOnMaxZoom: true,
       removeOutsideVisibleBounds: true,
       iconCreateFunction: (cluster) => {
@@ -172,7 +172,7 @@ function SetMapViewHome(props: any) {
         if (samePoint) {
           return L.divIcon({
             html: `
-              <div class="cluster-icon flex items-center justify-center w-10 h-10 bg-red-600 text-white text-lg font-bold rounded-full border-1 border-red-800 shadow-lg hover:scale-110 transform transition duration-200 ease-out">
+              <div class="cluster-icon flex items-center justify-center w-10 h-10 bg-gradient-to-br from-red-500 via-red-600 to-red-700 text-white text-lg font-bold rounded-full border-1 border-red-800 shadow-lg hover:scale-110 transform transition duration-200 ease-out">
                 ${childCount}
               </div>
             `,
@@ -222,10 +222,10 @@ function SetMapViewHome(props: any) {
         if (latLngs.length > 1) {
           const relatedLayer: L.Polygon = L.polygon(latLngs, {
             color: '#B22222',
-            weight: 1,
+            weight: 2,
             opacity: 0.8,
             fillColor: '#FFD700',
-            fillOpacity: 0.1,
+            fillOpacity: 0.2,
             smoothFactor: 2,
           });
   
@@ -312,7 +312,7 @@ function SetMapViewHome(props: any) {
   return (
     <>
       {showPolygonMessage && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] bg-gray-200 text-black text-sm px-2 py-1 rounded-md shadow-lg border">
+        <div className="fixed top-2/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] bg-gray-200 text-black text-sm px-2 py-1 rounded-md shadow-lg border">
           area: <strong>the entire municipality of Kiruna</strong>
         </div>
       )}
