@@ -45,7 +45,6 @@ export default function Navbar(props: any) {
             </div>
 
             {/* Navigation links (Documents and Diagram) */}
-            {/*
             <div className="flex space-x-8 ml-10 items-center"> 
               <Link
                 to="/"
@@ -65,7 +64,7 @@ export default function Navbar(props: any) {
               >
                 Documents
               </Link>
-              <Link
+              {/*<Link
                 to="/diagram"
                 onClick={() => setActiveTab("diagram")}
                 className={`text-yellow-300 hover:text-yellow-400 text-base font-semibold px-2 py-1 no-underline ${
@@ -73,17 +72,13 @@ export default function Navbar(props: any) {
                 } hover:bg-yellow-500/20 rounded-md transition-all duration-300`}
               >
                 Diagram
-              </Link>
+              </Link>*/}
             </div>
-          
-            
-            */}
-            
           </div>
 
           {/* Right-aligned login/logout buttons */}
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-            <ButtonHomePage />
+            {/*<ButtonHomePage />*/}
             {!props.isLogged ? (
               <>
                 <LoginButton />
