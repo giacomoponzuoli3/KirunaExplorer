@@ -5,6 +5,7 @@ import ErrorHandler from "../helper"
 import Authenticator from "./auth"
 import {DocCoordinates} from "../models/document_coordinate";
 import {CoordinatesArrayError, CoordinatesTypeError} from "../errors/coordinates";
+import { LatLng } from "../interfaces"
 
 class CoordinatesRoutes {
     private controller: CoordinatesController
@@ -88,6 +89,23 @@ class CoordinatesRoutes {
                 }
             }
         )
+
+        this.router.get(
+            "/municipality",
+            (_req: any, res: any, next: any) => {
+                try {
+                    this.controller.getMunicipalityArea()
+                        .then((municipalityArea: LatLng[]) => res.status(200).json(municipalityArea))
+                        .catch((err: Error) => {
+                            console.error("Error in controller.getMunicipalityArea:", err);
+                            next(err);
+                        });
+                } catch (err) {
+                    console.error("Unhandled error in /municipality route:", err);
+                    next(err);
+                }
+            }
+        );        
     }
 }
 

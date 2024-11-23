@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapContainer } from 'react-leaflet';
 import { LatLng } from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
@@ -8,7 +8,6 @@ import 'leaflet-draw';
 import API from '../API/API';
 import { DocCoordinates } from "../models/document_coordinate";
 import { SetMapViewEdit } from './Map';
-import {createCityCoordinates} from './Map'
 
 interface ModalEditGeoreferenceProps {
   documentCoordinates: DocCoordinates;  // Documento con latitudine e longitudine
@@ -29,9 +28,25 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [useMunicipalArea, setUseMunicipalArea] = useState(false);  // Stato per la checkbox
+  const [coordinates, setCoordinates] = useState<L.LatLng[]>([]);
 
-  // Default coordinate of municipal city
-  const coordinatesCity: L.LatLng[] = createCityCoordinates();
+  // Fetch municipality area coordinates
+  useEffect(() => {
+    const getMunicipalityArea = async () => {
+      try {
+        const coord = await API.getMunicipalityArea();
+        setCoordinates(coord);
+      } catch (err) {
+        console.log("Error getting municipality area");
+      }
+    };
+    getMunicipalityArea();
+  }, []);
+
+  function createCityCoordinates(): L.LatLng[] {
+    console.log(coordinates);
+    return coordinates.map(coord => L.latLng(coord.lat, coord.lng));
+  }
 
   // Determina se le coordinate rappresentano un poligono o un punto
   const isPolygon = documentCoordinates.coordinates && documentCoordinates.coordinates.length > 1;
@@ -63,7 +78,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   // Funzione per gestire il cambio di stato della checkbox
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUseMunicipalArea(event.target.checked);
-    setSelectedPosition(coordinatesCity);
+    setSelectedPosition(coordinates);
   };
 
   // Impostiamo il map component all'interno del modal

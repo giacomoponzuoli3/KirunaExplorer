@@ -2,11 +2,8 @@ import Coordinate from '../models/coordinate';
 import db from '../db/db'
 import { DocCoordinates } from '../models/document_coordinate'
 import { Stakeholder } from "../models/stakeholder"
-
-interface LatLng {
-    lat: number;
-    lng: number;
-}
+import fs from 'fs'
+import { LatLng } from "../interfaces"
 
 class CoordinatesDAO {
      /**
@@ -143,6 +140,34 @@ class CoordinatesDAO {
         } catch (error) {
             throw error; // Propagate error to caller
         }
+    }
+
+    /**
+     * Retrieves the municipality area as an array of LatLng objects.
+     * @returns A Promise that resolves to an array of LatLng objects representing the municipality area.
+     */
+    getMunicipalityArea(): Promise<LatLng[]> {
+        return new Promise<LatLng[]>((resolve, reject) => {
+            const filePath = '../server/utility/KirunaMunicipality.geojson';
+            try {
+                const geojsonData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+                const latLngArray: LatLng[] = [];
+
+                geojsonData.features.forEach((feature: any) => {
+                    feature.geometry.coordinates.forEach((polygon: any) => {
+                        polygon.forEach((ring: any) => {
+                            ring.forEach(([lng, lat]: [number, number]) => {
+                                latLngArray.push({ lat, lng });
+                            });
+                        });
+                    });
+                });
+
+                resolve(latLngArray);
+            } catch (error) {
+                reject("Error in getMunicipalityArea: " + error);
+            }
+        });
     }
 }
 

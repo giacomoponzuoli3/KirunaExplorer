@@ -9,101 +9,53 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet-draw';
 import { DocCoordinates } from "../models/document_coordinate";
 import ReactDOMServer from 'react-dom/server';
+import API from '../API/API';
+import LatLng from '../interfaces';
 
-//coordinates of Kiruna Town Hall
+// Coordinates of Kiruna Town Hall
 const kiruna_town_hall: LatLngTuple = [67.8558, 20.2253];
-
-function createCityCoordinates(): L.LatLng[] {
-  return [
-    L.latLng(67.8753332, 20.1841097),
-    L.latLng(67.8749453, 20.1866846),
-    L.latLng(67.8738462, 20.1880579),
-    L.latLng(67.8731996, 20.1878862),
-    L.latLng(67.8710012, 20.193551),
-    L.latLng(67.8689318, 20.1969843),
-    L.latLng(67.8659569, 20.1988725),
-    L.latLng(67.8638871, 20.2023058),
-    L.latLng(67.8620112, 20.204709),
-    L.latLng(67.8603939, 20.205224),
-    L.latLng(67.8586471, 20.2011041),
-    L.latLng(67.8573531, 20.1971559),
-    L.latLng(67.857159, 20.1923494),
-    L.latLng(67.8563826, 20.1921778),
-    L.latLng(67.8561885, 20.1944093),
-    L.latLng(67.8541826, 20.1870279),
-    L.latLng(67.8528883, 20.182908),
-    L.latLng(67.8534707, 20.1793031),
-    L.latLng(67.8552179, 20.1798181),
-    L.latLng(67.8567061, 20.1808481),
-    L.latLng(67.8577414, 20.1823931),
-    L.latLng(67.858259, 20.183938),
-    L.latLng(67.8583236, 20.1868562),
-    L.latLng(67.857159, 20.1873712),
-    L.latLng(67.8577414, 20.1894312),
-    L.latLng(67.8588412, 20.1880579),
-    L.latLng(67.8596176, 20.185483),
-    L.latLng(67.8618171, 20.1880579),
-    L.latLng(67.8623993, 20.1875429),
-    L.latLng(67.8620759, 20.185483),
-    L.latLng(67.8633696, 20.1851396),
-    L.latLng(67.8640811, 20.1823931),
-    L.latLng(67.8634343, 20.1803331),
-    L.latLng(67.8590353, 20.17381),
-    L.latLng(67.8598117, 20.1688318),
-    L.latLng(67.8602645, 20.163167),
-    L.latLng(67.8587765, 20.150464),
-    L.latLng(67.8428555, 20.1463442),
-    L.latLng(67.8337899, 20.2012758),
-    L.latLng(67.8384526, 20.2012758),
-    L.latLng(67.8289966, 20.2541475),
-    L.latLng(67.8229065, 20.2901964),
-    L.latLng(67.8384526, 20.3166323),
-    L.latLng(67.8381936, 20.3561144),
-    L.latLng(67.851141, 20.3619509),
-    L.latLng(67.8604586, 20.3066759),
-    L.latLng(67.8781777, 20.2129488),
-    L.latLng(67.8753332, 20.1841097)
-  ];
-}
-
-function areCoordinatesEqual(coord1: any, coord2: L.LatLng): boolean {
-  return coord1.latitude === coord2.lat && coord1.longitude === coord2.lng;
-}
-
-// Funzione che verifica se le coordinate di un documento sono dentro l'area definita
-function areCoordinatesInCityArea(coordinates: any[]): boolean {
-  const cityCoords = createCityCoordinates();  // Ottieni le coordinate dell'area della città
-
-  // Verifica se tutte le coordinate del documento sono all'interno dell'area
-  return coordinates.every((coord: any) => {
-    // Confronta ogni coordinata con quelle dell'area della città
-    return cityCoords.some((cityCoord: L.LatLng) => 
-      cityCoord.lat === coord.latitude && cityCoord.lng === coord.longitude
-    );
-  });
-}
-
 
 function SetMapViewHome(props: any) {
   const map = useMap();
   const [showPolygonMessage, setShowPolygonMessage] = useState(false);
+  const [coordinates, setCoordinates] = useState<L.LatLng[]>([]);
 
 
-  // Funzione per generare una chiave unica per una coordinata
-  const coordinateKey = (latitude: number, longitude: number): string => {
-    return `${latitude.toFixed(6)},${longitude.toFixed(6)}`;
-  };
-
-
-  // Coordinates of Kiruna town hall means the center of the city
-  const position: LatLngTuple = [67.8558, 20.2253];
-
-  const kirunaBounds = new LatLngBounds(
-    [67.79039, 20.416509], // Sud-ovest
-    [67.889194, 20.050656] // Nord-est
-  );
-
+  // Fetch municipality area coordinates
   useEffect(() => {
+    const getMunicipalityArea = async () => {
+      try {
+        const coord = await API.getMunicipalityArea();
+        setCoordinates(coord);
+      } catch (err) {
+        console.log("Error getting municipality area");
+      }
+    };
+    getMunicipalityArea();
+  }, []);
+
+  function createCityCoordinates(): L.LatLng[] {
+    console.log(coordinates);
+    return coordinates.map(coord => L.latLng(coord.lat, coord.lng));
+  }
+
+  function areCoordinatesInCityArea(docCoordinates: any[]): boolean {
+    const cityCoords = createCityCoordinates();
+    return docCoordinates.every((coord: any) =>
+      cityCoords.some((cityCoord: L.LatLng) =>
+        cityCoord.lat === coord.latitude && cityCoord.lng === coord.longitude
+      )
+    );
+  }
+
+  // Map setup and adding layers
+  useEffect(() => {
+    const position: LatLngTuple = [67.8558, 20.2253];
+    const kirunaBounds = new LatLngBounds(
+      [67.79039, 20.416509], // Southwest
+      [67.889194, 20.050656] // Northeast
+    );
+
     if (map.getZoom() === undefined) {
       map.setView(position, 12);
     }
@@ -133,20 +85,21 @@ function SetMapViewHome(props: any) {
     };
   }, [map]);
 
+  // Marker and polygon handling
   useEffect(() => {
     map.eachLayer((layer) => {
       if (layer instanceof L.Marker || layer instanceof L.Polygon) {
         map.removeLayer(layer);
       }
     });
-  
-    const occupiedPositions: Set<string> = new Set(); // Tiene traccia delle posizioni occupate
-  
+
+    const occupiedPositions: Set<string> = new Set();
+
     props.documentsCoordinates
       .filter((d: DocCoordinates) => d.coordinates.length !== 0)
       .forEach((doc: any) => {
         const latLngs = doc.coordinates.map((coord: any) => [coord.latitude, coord.longitude]);
-  
+
         if (latLngs.length > 1) {
           const relatedLayer: L.Polygon = L.polygon(latLngs, {
             color: '#B22222',
@@ -156,27 +109,26 @@ function SetMapViewHome(props: any) {
             fillOpacity: 0.1,
             smoothFactor: 2,
           });
-  
-          const centralCoord = latLngs[0]; // Punto centrale del poligono
-          let adjustedPosition: LatLngTuple = [centralCoord[0], centralCoord[1]]; // LatLngTuple, array con due numeri
-  
+
+          const centralCoord = latLngs[0];
+          let adjustedPosition: LatLngTuple = [centralCoord[0], centralCoord[1]];
+
           const zoom = map.getZoom();
-          const offset = (18 - zoom) * 0.0001; // Distanza minima tra i marker in base allo zoom
-  
+          const offset = (18 - zoom) * 0.0001;
+
           let attempts = 0;
           while (occupiedPositions.has(adjustedPosition.toString()) && attempts < 10) {
-            // Spostiamo il marker se la posizione è occupata
             adjustedPosition = [
-              centralCoord[0] + offset * (Math.random() > 0.5 ? 1 : -1), // Spostamento orizzontale
-              centralCoord[1] + offset * (Math.random() > 0.5 ? 1 : -1), // Spostamento verticale
+              centralCoord[0] + offset * (Math.random() > 0.5 ? 1 : -1),
+              centralCoord[1] + offset * (Math.random() > 0.5 ? 1 : -1),
             ];
             attempts++;
           }
-  
+
           occupiedPositions.add(adjustedPosition.toString());
-  
+
           const iconHtml = ReactDOMServer.renderToString(props.getDocumentIcon(doc.type, 5) || <></>);
-  
+
           const marker = L.marker(adjustedPosition, {
             icon: L.divIcon({
               html: `
@@ -188,34 +140,28 @@ function SetMapViewHome(props: any) {
               className: '',
             }),
           }).addTo(map);
-  
+
           marker.on('mouseover', () => {
             relatedLayer.setStyle({ color: '#8B0000', weight: 2, fillOpacity: 0.2 }).addTo(map);
-            // Verifica se le coordinate del documento sono dentro il poligono definito da createCityCoordinates
-          const cityCoordinates = createCityCoordinates();
-          const polygon = L.polygon(cityCoordinates);
-
-          // Usa il metodo .contains() del poligono per verificare se il marker è all'interno
-          if (areCoordinatesInCityArea(doc.coordinates)) {
-            setShowPolygonMessage(true);  // Mostra il messaggio
-          }
+            if (areCoordinatesInCityArea(doc.coordinates)) {
+              setShowPolygonMessage(true);
+            }
           });
-  
+
           marker.on('mouseout', () => {
             relatedLayer.setStyle({ color: '#B22222', weight: 1, fillOpacity: 0.1 }).removeFrom(map);
             setShowPolygonMessage(false);
           });
-  
+
           marker.on('click', () => {
             props.onMarkerClick(doc);
           });
         } else {
-          // Nel caso di documenti con una sola coordinata
           const coord = doc.coordinates[0];
           const marker = L.marker([coord.latitude, coord.longitude]).addTo(map);
-  
+
           const iconHtml = ReactDOMServer.renderToString(props.getDocumentIcon(doc.type, 5) || <></>);
-  
+
           marker.setIcon(L.divIcon({
             html: `
               <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95 border-1 border-blue-950">
@@ -225,77 +171,62 @@ function SetMapViewHome(props: any) {
             iconSize: [20, 20],
             className: '',
           }));
-  
+
           marker.on('click', () => {
             props.onMarkerClick(doc);
           });
         }
       });
   }, [props.documentsCoordinates]);
-  
-  
-  
+
   return (
     <>
       {showPolygonMessage && (
         <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] bg-gray-200 text-black text-sm px-2 py-1 rounded-md shadow-lg border">
-          area: <strong>the entire municipality of Kiruna</strong>
+          Area: <strong>the entire municipality of Kiruna</strong>
         </div>
       )}
-      {null}
     </>
   );
 }
 
-
-
-
-
-
-// Componente per la costruzione della mappa nel modal edit
+// Map component for the modal edit
 function SetMapViewEdit(props: any) {
   const { setSelectedPosition, useMunicipalArea } = props;
-  const map = useMap(); // Ottieni l'istanza della mappa
+  const map = useMap(); // Get map instance
 
-  // Coordinate di esempio (come punto centrale della mappa)
+  // Coordinates for the initial view
   const position: LatLngTuple = [67.8558, 20.2253];
 
-  // Limiti della mappa per Kiruna
+  // Bounds for Kiruna area
   const kirunaBounds = new LatLngBounds(
-    [67.790390, 20.416509],  // Sud-ovest
-    [67.889194, 20.050656]   // Nord-est
+    [67.790390, 20.416509],  // Southwest
+    [67.889194, 20.050656]   // Northeast
   );
 
-  // Icona personalizzata per il marker
   const defaultIcon = new L.Icon({
     iconUrl: '/img/marker.png',
-    iconSize: [41, 41],  // Dimensioni dell'icona
-    iconAnchor: [12, 41], // Punto di ancoraggio dell'icona
-    popupAnchor: [1, -34], // Punto da cui si apre il popup
+    iconSize: [41, 41],  // Icon size
+    iconAnchor: [12, 41], // Anchor point of the icon
+    popupAnchor: [1, -34], // Popup anchor point
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-    shadowSize: [41, 41]  // Dimensioni dell'ombra
+    shadowSize: [41, 41]  // Shadow size
   });
 
-  // Marker per il punto selezionato
   let currentMarker: L.Marker | null = null;
 
   useEffect(() => {
-    // Imposta la vista iniziale solo una volta
     if (map.getZoom() === undefined) {
       map.setView(position, 12);
     }
 
-    // Imposta i limiti di zoom
     map.setMaxZoom(18);
     map.setMinZoom(3);
-
-    // Limita la mappa alla zona di Kiruna
     map.setMaxBounds(kirunaBounds);
 
-    // Aggiungi i controlli per il disegno
     const drawControl = new L.Control.Draw({
       draw: {
-        marker: { icon: defaultIcon }, // Abilita i marker con l'icona personalizzata
+        marker: { icon: defaultIcon }, // Enable custom icon for markers
         polygon: false,
         polyline: false,
         rectangle: false,
@@ -305,68 +236,37 @@ function SetMapViewEdit(props: any) {
     });
     map.addControl(drawControl);
 
-    // Layer satellitare
     const satelliteLayer = L.tileLayer(
-      'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-      { attribution: '&copy; <a href="https://www.opentopomap.org">OpenTopoMap</a>' }
-    );
-    satelliteLayer.addTo(map);
+      'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
+    ).addTo(map);
 
-    // Pulizia del componente (rimuovi i controlli e layer)
+    const classicLayer = L.tileLayer(
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }
+    ).addTo(map);
+
+    L.control.layers({ Classic: classicLayer, Satellite: satelliteLayer }, {}, { position: 'topleft' }).addTo(map);
+
+    map.on(L.Draw.Event.CREATED, (e) => {
+      const { layer } = e;
+      currentMarker = layer;
+
+      setSelectedPosition({
+        latitude: layer.getLatLng().lat,
+        longitude: layer.getLatLng().lng
+      });
+    });
+
     return () => {
-      map.removeControl(drawControl);
-      map.removeLayer(satelliteLayer);
-    };
-  }, [map]);
-
-  // Se la checkbox è selezionata, disabilita la mappa
-  useEffect(() => {
-
-    if (useMunicipalArea) {
-      map.doubleClickZoom.disable();
-      map.dragging.disable();
-      map.touchZoom.disable();
-      map.scrollWheelZoom.disable();
-    } else {
-      // Rimuovere il vecchio marker, se presente
       map.eachLayer((layer) => {
-        if (layer instanceof L.Marker) {
+        if (layer !== satelliteLayer && layer !== classicLayer) {
           map.removeLayer(layer);
         }
       });
-      map.doubleClickZoom.enable();
-      map.dragging.enable();
-      map.touchZoom.enable();
-      map.scrollWheelZoom.enable();
-      setSelectedPosition(null);
-    }
-  }, [map, useMunicipalArea]);
-
-  // Gestione dell'evento di creazione del marker
-  map?.on(L.Draw.Event.CREATED, (event: any) => {
-    const layer = event.layer;
-
-    if (event.layerType === 'marker') {
-      const newPosition = layer.getLatLng();
-      
-      // Rimuovere il vecchio marker, se presente
-      if (currentMarker) {
-        map.removeLayer(currentMarker);
-      }
-
-      // Aggiungi il nuovo marker sulla mappa
-      currentMarker = layer;
-      layer.addTo(map);
-
-      // Aggiorna la posizione selezionata
-      setSelectedPosition([{lat: newPosition.lat, lng: newPosition.lng}]);
-    }
-  });
+    };
+  }, [map]);
 
   return null;
 }
 
-
-
-export {SetMapViewHome, SetMapViewEdit, createCityCoordinates}
-  
+export { SetMapViewHome, SetMapViewEdit };
