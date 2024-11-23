@@ -119,7 +119,6 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
       <ShowDocumentInfoModal 
         show={showDetails}
         setShow={setShowDetails} 
-        selectedDocument={selectedDocument} 
         selectedDocumentCoordinates={selectedDocumentCoordinates}
         onHide={handleCloseDetailsModal} getDocumentIcon={getDocumentIcon} 
         user={user} handleEdit={handleEdit} refreshDocuments={refreshDocuments} 
