@@ -129,10 +129,10 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
     {/* Add Document Button */}
     {user.role==="Urban Planner" ? (
       <button
-        className="bg-blue-950 z-[999] hover:border-blue-700 hover:bg-blue-700 fixed bottom-6 right-6 rounded-full w-14 h-14 flex items-center justify-center text-2xl font-bold border-2 border-blue-950"
+        className="fixed bottom-6 right-4 z-[999] bg-blue-950 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg"
         onClick={() => setShowAddDocumentModal(true)}
       >
-        <DocumentPlusIcon className="h-7 w-7 text-white" />
+        <DocumentPlusIcon className="h-5 w-5" />
       </button>
       ) : null
     }
