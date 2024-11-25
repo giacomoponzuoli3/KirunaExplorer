@@ -275,55 +275,55 @@ function LinksDocument(props: any) {
               ) : (
                 <>
                   <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white border border-gray-200 shadow-lg rounded-lg table-auto">
-                      <thead>
-                        <tr className="bg-gray-100 border-b">
-                          <th className="p-4 text-left text-sm font-semibold">Icon</th>
-                          <th className="p-4 text-left text-sm font-semibold">Title</th>
-                          <th className="p-4 text-left text-sm font-semibold">Stakeholder(s)</th>
-                          <th className="p-4 text-left text-sm font-semibold">Date</th>
-                          <th className="p-4 text-left text-sm font-semibold">Scale</th>
-                          <th className="p-4 text-left text-sm font-semibold">Description</th>
-                          <th className="p-4 text-left text-sm font-semibold">Type of Link</th>
+                  <table className="min-w-full bg-white border border-gray-200 shadow-lg rounded-lg table-auto">
+                    <thead>
+                      <tr className="bg-gray-100 border-b">
+                        <th className="p-4 text-left text-sm font-semibold w-[5%]">Icon</th>
+                        <th className="p-4 text-left text-sm font-semibold w-[15%]">Title</th>
+                        <th className="p-4 text-left text-sm font-semibold w-[15%]">Stakeholder(s)</th>
+                        <th className="p-4 text-left text-sm font-semibold w-[10%]">Date</th>
+                        <th className="p-4 text-left text-sm font-semibold w-[10%]">Scale</th>
+                        <th className="p-4 text-left text-sm font-semibold w-[40%]">Description</th>
+                        <th className="p-4 text-left text-sm font-semibold w-[10%]">Type of Link</th>
+                        {props.isLogged && props.user.role == "Urban Planner" && (
+                          <th className="p-4 text-left text-sm font-semibold w-[5%]">Actions</th>
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paginatedLinks.map((doc, index) => (
+                        <tr key={index} className={`border-b transition duration-200 ease-in-out 
+                          ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                        `}>
+                          <td className="p-4 w-[5%]">{props.getDocumentIcon(doc.type, 7)}</td>
+                          <td className="p-4 text-sm text-gray-600 w-[15%]">{doc.title}</td>
+                          <td className="p-4 text-sm text-gray-600 w-[15%]">{doc.stakeHolders.map(sh => sh.name).join(' / ')}</td>
+                          <td className="p-4 text-sm text-gray-600 w-[10%]">{doc.issuanceDate}</td>
+                          <td className="p-4 text-sm text-gray-600 w-[10%]">{doc.scale}</td>
+                          <td className="p-4 text-sm text-gray-600 w-[40%]">
+                            <TruncatedText text={doc.description ?? 'No description available'} maxWords={20} />
+                          </td>
+                          <td className="p-4 text-sm text-gray-600 w-[10%]">{doc.relatedLink.name}</td>
                           {props.isLogged && props.user.role == "Urban Planner" && (
-                            <th className="p-4 text-left text-sm font-semibold">Actions</th>
+                            <td className="p-3 items-center justify-center space-x-4 w-[5%]">
+                              <button
+                                className="text-red-500 hover:text-red-700"
+                                onClick={() => confirmDelete(doc.id, doc.relatedLink.id)}
+                              >
+                                <TrashIcon className="h-5 w-5" />
+                              </button>
+                              <button
+                                className="text-blue-500 hover:text-blue-700 ml-2"
+                                onClick={() => handleUpdate(doc)}
+                              >
+                                <PencilIcon className="h-5 w-5" />
+                              </button>
+                            </td>
                           )}
                         </tr>
-                      </thead>
-                      <tbody>
-                        {paginatedLinks.map((doc, index) => (
-                          <tr key={index}className={`border-b transition duration-200 ease-in-out 
-                          ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} 
-                          `}>
-                            <td className="p-4">{props.getDocumentIcon(doc.type, 7)}</td>
-                            <td className="p-4 text-sm text-gray-600">{doc.title}</td>
-                            <td className="p-4 text-sm text-gray-600">{doc.stakeHolders.map(sh => sh.name).join(' / ')}</td>
-                            <td className="p-4 text-sm text-gray-600">{doc.issuanceDate}</td>
-                            <td className="p-4 text-sm text-gray-600">{doc.scale}</td>
-                            <td className="p-4 text-sm text-gray-600">
-                                <TruncatedText text={doc.description ?? 'No description available'} maxWords={20}  />
-                            </td>
-                            <td className="p-4 text-sm text-gray-600">{doc.relatedLink.name}</td>
-                            {props.isLogged && props.user.role == "Urban Planner" && (
-                              <td className="p-3 items-center justify-center space-x-4">
-                                <button
-                                  className="text-red-500 hover:text-red-700"
-                                  onClick={() => confirmDelete(doc.id, doc.relatedLink.id)}
-                                >
-                                  <TrashIcon className="h-5 w-5" />
-                                </button>
-                                <button
-                                  className="text-blue-500 hover:text-blue-700 ml-2"
-                                  onClick={() => handleUpdate(doc)}
-                                >
-                                  <PencilIcon className="h-5 w-5" />
-                                </button>
-                            </td>
-                            )}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                      ))}
+                    </tbody>
+                  </table>
                   </div>
           
                 </>
