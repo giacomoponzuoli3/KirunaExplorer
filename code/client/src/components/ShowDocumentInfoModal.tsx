@@ -152,7 +152,7 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocumentCoordinates, r
                 </Modal.Body>
                 <Modal.Footer style={{ backgroundColor: 'rgb(148, 137, 121,0.2)' }}>
                     <button 
-                        onClick={() => navigate(`/documents/${selectedDocumentCoordinates.id}/links`)}
+                        onClick={() => navigate(`/${selectedDocumentCoordinates.id}/links`)}
                         className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium"
                     >
                         View connections

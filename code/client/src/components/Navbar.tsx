@@ -6,10 +6,19 @@ import { LogoutButton, LoginButton } from './Login';
 import logo from '../img/iconKiruna.png';
 import { ButtonHomePage } from './HomePage';
 import { Button } from 'react-bootstrap';
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
 
 
 export default function Navbar(props: any) {
+  const navigate = useNavigate();
   const location = useLocation();
+
+  const previousPath: string | null = location.state?.from || null;
+
+  // Funzione per tornare alla lista dei documenti
+  const handleReturnToDocuments = () => {
+    navigate("/documents");
+  };
 
   // State to track the active option 
   const [activeTab, setActiveTab] = useState("home");
@@ -20,6 +29,9 @@ export default function Navbar(props: any) {
       setActiveTab("home");
     } else if (location.pathname === "/documents") {
       setActiveTab("documents");
+    } else if (previousPath === "/documents") {
+      console.log("entrato")
+      setActiveTab("links"); 
     } else if (location.pathname === "/diagram") {
       setActiveTab("diagram");
     } else {
@@ -33,7 +45,7 @@ export default function Navbar(props: any) {
       <div className="mx-auto px-3 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           <div className="flex flex-1 items-center justify-left sm:items-stretch sm:justify-start">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
               <img
                 alt="Kimura Company"
                 src={logo}
@@ -45,11 +57,11 @@ export default function Navbar(props: any) {
             </div>
 
             {/* Navigation links (Documents and Diagram) */}
-            <div className="flex space-x-8 ml-10 items-center"> 
+            <div className="flex space-x-2 ml-10 items-center"> 
               <Link
                 to="/"
                 onClick={() => setActiveTab("home")}
-                className={`text-yellow-300 hover:text-yellow-400 text-base font-semibold px-2 py-1 no-underline ${
+                className={`text-yellow-300 hover:text-yellow-400 text-base font-semibold px-2 py-1 no-underline mr-2 ${
                   activeTab === "home" ? "border-b-2 border-yellow-400" : "border-transparent"
                 } hover:bg-yellow-500/20 rounded-md transition-all duration-300`}
               >
@@ -64,6 +76,18 @@ export default function Navbar(props: any) {
               >
                 Documents
               </Link>
+              {/* Show ChevronRight and "Links" if the previous path is "/documents" */}
+              {previousPath === "/documents" && (
+                <>
+                <ChevronRightIcon className=" text-yellow-300 h-5 w-5" />
+                <div className={`text-yellow-300 hover:text-yellow-400 text-base font-semibold px-2 py-1 no-underline ${
+                  activeTab === "links" ? "border-b-2 border-yellow-400 " : "border-transparent"
+                } hover:bg-yellow-500/20 rounded-md transition-all duration-300`}>
+                  
+                  <span className="text-base font-semibold">Links</span>
+                </div>
+                </>
+              )}
               {/*<Link
                 to="/diagram"
                 onClick={() => setActiveTab("diagram")}
