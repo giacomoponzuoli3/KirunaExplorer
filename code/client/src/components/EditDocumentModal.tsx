@@ -11,6 +11,7 @@ import Select from 'react-select';
 import ISO6391 from 'iso-639-1';
 import CreatableSelect from 'react-select/creatable';
 import { SingleValue } from 'react-select';
+import { DocCoordinates } from '../models/document_coordinate';
 
 interface RequiredLabelProps {
     text: string; // Explicitly define the type of 'text' as string
@@ -26,7 +27,7 @@ interface EditDocumentModalProps {
     document: Document;
     show: boolean;
     onHide: () => void;
-    refreshSelectedDocument: (doc: Document) => void;
+    refreshSelectedDocument: (doc: DocCoordinates) => void;
     stakeholders: Stakeholder[]
 }
 
@@ -75,9 +76,8 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
             return; // Exit the function early if the format is invalid
         }
         // API call to edit a document
-        const doc: Document = await API.editDocument(document.id, title, selectedStakeholders, scale, issuanceDate, type, language, pages,  description).then();
+        const doc: DocCoordinates = await API.editDocument(document.id, title, selectedStakeholders, scale, issuanceDate, type, language, pages,  description).then();
         console.log(doc)
-        //doc.stakeHolders = sh;
         refreshSelectedDocument(doc);
         onHide();
     };

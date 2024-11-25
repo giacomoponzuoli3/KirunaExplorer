@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import API from "../API/API";
-import { TrashIcon, MapPinIcon, MapIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon, PlusCircleIcon, ClipboardIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, MapPinIcon, MapIcon, PencilIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon, PlusCircleIcon, ClipboardIcon } from "@heroicons/react/24/outline";
 import { TruncatedText } from "./LinksDocument";
 import { useNavigate } from "react-router-dom";
 import Alert from "./Alert";
-
+import { ShowDocumentInfoModal } from "./ShowDocumentInfoModal";
 import { DocCoordinates } from "../models/document_coordinate";
+import { EditDocumentModal } from "./EditDocumentModal";
+import ConfirmModal from "./ConfirmModal";
 
 
 function DocumentsTable(props: any){
@@ -19,8 +21,16 @@ function DocumentsTable(props: any){
     const [filteredDocuments, setFilteredDocuments] = useState<DocCoordinates[]>([]); // Stato per documenti filtrati
     const [searchTerm, setSearchTerm] = useState(""); // Stato per la barra di ricerca
 
+    //document edit
+    const [documentEdit, setDocumentEdit] = useState<DocCoordinates | null>(null);
+    //document delete
+    const [documentDelete, setDocumentDelete] = useState<DocCoordinates | null>(null);
+
     //modal
     const [showAlert, setShowAlert] = useState(false); // alert state
+    const [showModalEditDocument, setShowModalEditDocument] = useState<boolean>(false);
+    const [showModalDeleteDocument, setShowModalDeleteDocument] = useState<boolean>(false);
+    const [showModalConfirmDelete, setShowModalConfirmDelete] = useState<boolean>(false);
 
     //pagination controls
     const [currentPage, setCurrentPage] = useState(1);  // Track the current page
@@ -74,15 +84,16 @@ function DocumentsTable(props: any){
     }
   };
 
+  //get all DocCoordinates
+  const getDocuments = async () => {
+    const allDocuments = await API.getAllDocumentsCoordinates();
+    setDocumentsCoordinates(allDocuments);
+    setFilteredDocuments(allDocuments); // Inizializza i documenti filtrati
+  }
+
   useEffect(() => {
       try{
-        const getDocuments = async () => {
-            const allDocuments = await API.getAllDocumentsCoordinates();
-            setDocumentsCoordinates(allDocuments);
-            setFilteredDocuments(allDocuments); // Inizializza i documenti filtrati
-        }
         getDocuments().then();
-
       }catch(err){
         setShowAlert(true);
       }
@@ -131,6 +142,35 @@ function DocumentsTable(props: any){
     }
     
   }, [documentsCoordinates]);
+
+  //handle of edit document
+  const handleEditDocument = (doc: DocCoordinates) => {
+    setShowModalEditDocument(true);
+    setDocumentEdit(doc);
+  } 
+
+  //handle of delete document
+  const handleDeleteDocument = (doc: DocCoordinates) => {
+    setShowModalConfirmDelete(true);
+    setDocumentDelete(doc);
+  } 
+
+  const handleDeleteClick = async () => {
+    try{
+        if(documentDelete){
+          await API.deleteDocument(documentDelete.id).then();
+          getDocuments();
+        }
+    }catch(err){
+
+    }finally{
+    }
+  };
+
+  function refreshSelectedDocument(doc: DocCoordinates) {
+    setDocumentEdit(doc)
+  }
+
 
 
     if(showAlert){
@@ -199,14 +239,17 @@ function DocumentsTable(props: any){
                 <table className="min-w-full bg-white border border-gray-200 shadow-lg rounded-lg table-auto">
                   <thead>
                     <tr className="bg-gray-200 text-gray-600">
-                      <th className="p-4 text-left text-sm font-semibold w-4">Icon</th>
-                      <th className="p-4 text-center text-sm font-semibold w-36">Title</th>
-                      <th className="p-4 text-center text-sm font-semibold w-36">Stakeholder(s)</th>
-                      <th className="p-4 text-center text-sm font-semibold w-80">Description</th>  {/* Colonna più grande */}
-                      <th className="p-4 text-center text-sm font-semibold w-16">Links</th>
-                      <th className="p-4 text-center text-sm font-semibold w-32">Georeference</th>
-                      <th className="p-4 text-center text-sm font-semibold w-16">Resources</th>
-                      <th className="p-4 text-center text-sm font-semibold w-32">Actions</th>
+                      <th className="px-2 py-4 text-left text-sm font-semibold w-[5%]">Icon</th>
+                      <th className="px-2 py-4 text-center text-sm font-semibold w-[15%]">Title</th>
+                      <th className="px-2 py-4 text-center text-sm font-semibold w-[15%]">Stakeholder(s)</th>
+                      <th className="px-2 py-4 text-center text-sm font-semibold w-[5%]">Scale</th>
+                      <th className="px-2 py-4 text-center text-sm font-semibold w-[5%]">Pages</th>
+                      <th className="px-2 py-4 text-center text-sm font-semibold w-[5%]">Language</th>
+                      <th className="px-2 py-4 text-center text-sm font-semibold w-[25%]">Description</th>
+                      <th className="px-2 py-4 text-center text-sm font-semibold w-[5%]">Links</th>
+                      <th className="px-2 py-4 text-center text-sm font-semibold w-[10%]">Georeference</th>
+                      <th className="px-2 py-4 text-center text-sm font-semibold w-[5%]">Resources</th>
+                      {props.user.role === "Urban Planner" && <th className="px-2 py-4 text-center text-sm font-semibold w-[10%]">Actions</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -217,18 +260,21 @@ function DocumentsTable(props: any){
                           index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
                         }`}
                       >
-                        <td className="p-4 relative justify-center items-center w-4">{props.getDocumentIcon(doc.type, 8)}</td>
-                        <td className="p-4 text-sm text-gray-600 w-36 text-center">{doc.title}</td>
-                        <td className="p-4 text-sm text-gray-600 w-36 text-center">
+                        <td className="px-2 py-4 relative justify-center items-center w-[5%]">{props.getDocumentIcon(doc.type, 8)}</td>
+                        <td className="px-2 py-4 text-sm text-gray-600 w-[15%] text-center">{doc.title}</td>
+                        <td className="px-2 py-4 text-sm text-gray-600 w-[15%] text-center">
                           {doc.stakeHolders.map((sh) => sh.name).join(' / ')}
                         </td>
-                        <td className="p-4 text-sm text-gray-600 w-80 text-center">
+                        <td className="px-2 py-4 text-sm text-gray-600 w-[5%] text-center">{doc.scale}</td>
+                        <td className="px-2 py-4 text-sm text-gray-600 w-[5%] text-center">{doc.pages != null ? doc.pages : "-"}</td>
+                        <td className="px-2 py-4 text-sm text-gray-600 w-[5%] text-center">{doc.language != null ? doc.language : "-"}</td>
+                        <td className="px-2 py-4 text-sm text-gray-600 w-[25%] text-center">
                           <TruncatedText
                             text={doc.description ?? 'No description available'}
                             maxWords={10}
                           />
                         </td>
-                        <td className="p-4 text-sm text-gray-600 w-16 relative justify-center items-center text-center">
+                        <td className="px-2 py-4 text-sm text-gray-600 w-[5%] relative justify-center items-center text-center">
                           {documentsLinksCount.get(doc.id) ? (
                             <button
                               title="Number of links"
@@ -248,7 +294,7 @@ function DocumentsTable(props: any){
 
                           )}
                         </td>
-                        <td className="p-4 text-sm text-gray-600 w-32">
+                        <td className="px-2 py-4 text-sm text-gray-600 w-[10%]">
                           {doc.coordinates.length !== 0 ? (
                             <>
                               <div className="flex items-center justify-center space-x-2">
@@ -265,17 +311,17 @@ function DocumentsTable(props: any){
                                 <div className="flex items-center justify-center space-x-2 mt-2">
                                   <button
                                     title="Delete georeference"
-                                    className="flex items-center justify-center text-red-500 hover:text-red-700 border-1 border-red-500 rounded-full hover:border-red-700 w-8 h-8 hover:shadow-lg"
+                                    className="flex items-center justify-center text-red-500 hover:text-red-700 border-1 border-red-500 rounded-full hover:border-red-700 w-7 h-7 hover:shadow-lg"
                                     onClick={() => {}}
                                   >
-                                    <TrashIcon className="h-5 w-5" />
+                                    <TrashIcon className="h-4 w-4" />
                                   </button>
                                   <button
                                     title="Edit georeference"
-                                    className="flex items-center justify-center rounded-full border-1 border-yellow-500 hover:border-yellow-600 text-yellow-500 hover:text-yellow-600 w-8 h-8 hover:shadow-lg"
+                                    className="flex items-center justify-center rounded-full border-1 border-yellow-500 hover:border-yellow-600 text-yellow-500 hover:text-yellow-600 w-7 h-7 hover:shadow-lg"
                                     onClick={() => {}}
                                   >
-                                    <MapIcon className="h-5 w-5" />
+                                    <MapIcon className="h-4 w-4" />
                                   </button>
                                 </div>
                               )}
@@ -292,11 +338,13 @@ function DocumentsTable(props: any){
                                 Add
                               </button>
                             </div>                     
-                            : 'No available'
-                            
+                            : 
+                              <div className="flex items-center justify-center w-full h-full text-gray-500 text-sm">
+                                No available
+                              </div>  
                           )}
                         </td>
-                        <td className="p-4 text-sm text-gray-600 w-16 text-center">
+                        <td className="px-2 py-4 text-sm text-gray-600 w-[5%] text-center">
                           {documentsLinksCount.get(doc.id) ? (
                               <button
                                 title="Number of resources"
@@ -315,18 +363,24 @@ function DocumentsTable(props: any){
                               </button>
                             )}
                         </td>
-                        <td className="p-4 text-sm text-gray-600 w-32 text-center">
-                          <div className="flex items-center justify-center space-x-2">
-                            <button
-                              title="View georeference"
-                              onClick={() => {}}
-                              className="bg-white text-blue-600 hover:text-blue-800 rounded-full w-24 h-8 flex items-center justify-center text-xs font-medium border-1 border-blue-500 hover:border-blue-700 hover:shadow-lg transition-all duration-300 ease-in-out"
-                            >
-                              <ClipboardIcon className="w-4 h-4 mr-1" />
-                              Show Card
-                            </button>
-                          </div>
-                        </td>
+                        {props.user.role === "Urban Planner" && (
+                          <td className="px-2 py-4 text-sm text-gray-600 w-[10%]">
+                            <div className="flex items-center justify-center space-x-2">
+                                <button title="Delete document"
+                                    className="flex items-center justify-center text-red-500 hover:text-red-700 border-1 border-red-500 rounded-full hover:border-red-700 w-7 h-7 hover:shadow-lg"
+                                    onClick={() => {handleDeleteDocument(doc)}}
+                                >
+                                    <TrashIcon className="h-4 w-4" />
+                                </button>
+                                <button title="Edit document"
+                                    className="flex items-center justify-center rounded-full border-1 border-yellow-500 hover:border-yellow-600 text-yellow-500 hover:text-yellow-600 w-7 h-7 hover:shadow-lg"
+                                    onClick={() => {handleEditDocument(doc)}}
+                                >
+                                    <PencilIcon className="h-4 w-4" />
+                                </button>
+                            </div>
+                            </td>
+                        )} 
                       </tr>
                     ))}
                   </tbody>
@@ -334,6 +388,32 @@ function DocumentsTable(props: any){
               </div>
             </>
           )}
+
+          {documentEdit && (
+            <EditDocumentModal 
+              document={documentEdit} 
+              show={showModalEditDocument} 
+              onHide={() => {
+                setShowModalEditDocument(false)
+                setDocumentEdit(null);
+                getDocuments(); //refresh of documents
+                
+              }} 
+              refreshSelectedDocument={refreshSelectedDocument}
+              
+              stakeholders={documentEdit.stakeHolders}
+            />
+          )}
+
+
+          <ConfirmModal
+              show={showModalConfirmDelete}
+              onHide={() => setShowModalConfirmDelete(false)}
+              onConfirm={handleDeleteClick}
+              text={`Are you sure you want to delete this document?
+              This action cannot be undone.`}
+          />
+
         </div>
       );
       
