@@ -473,6 +473,12 @@ function SetMapViewEdit(props: any) {
   return null;
 }
 
+//componente per la visualizzazione del documento
+function SetViewDocumentCoordinates(props: any){
+  return(<>
+  
+  </>);
+}
 
 
 export {SetMapViewHome, SetMapViewEdit, createCityCoordinates}

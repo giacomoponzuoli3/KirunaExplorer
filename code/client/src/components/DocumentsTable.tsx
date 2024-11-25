@@ -25,12 +25,14 @@ function DocumentsTable(props: any){
     const [documentEdit, setDocumentEdit] = useState<DocCoordinates | null>(null);
     //document delete
     const [documentDelete, setDocumentDelete] = useState<DocCoordinates | null>(null);
+    //document's georeference delete
+    const [documentGeoreferenceDelete, setDocumentGeoreferenceDelete] = useState<DocCoordinates | null>(null);
 
     //modal
     const [showAlert, setShowAlert] = useState(false); // alert state
     const [showModalEditDocument, setShowModalEditDocument] = useState<boolean>(false);
-    const [showModalDeleteDocument, setShowModalDeleteDocument] = useState<boolean>(false);
     const [showModalConfirmDelete, setShowModalConfirmDelete] = useState<boolean>(false);
+    const [showModalConfirmDeleteGeoreference, setShowModalConfirmDeleteGeoreference] = useState<boolean>(false);
 
     //pagination controls
     const [currentPage, setCurrentPage] = useState(1);  // Track the current page
@@ -153,6 +155,7 @@ function DocumentsTable(props: any){
   const handleDeleteDocument = (doc: DocCoordinates) => {
     setShowModalConfirmDelete(true);
     setDocumentDelete(doc);
+    console.log(documentDelete)
   } 
 
   const handleDeleteClick = async () => {
@@ -161,17 +164,33 @@ function DocumentsTable(props: any){
           await API.deleteDocument(documentDelete.id).then();
           getDocuments();
         }
+        setDocumentDelete(null);
     }catch(err){
-
-    }finally{
+      setShowAlert(true);
     }
   };
+
+  //handle delete of a document's georeference 
+  const handleDeleteDocumentGeoreference = (doc: DocCoordinates) => {
+    setShowModalConfirmDeleteGeoreference(true);
+    setDocumentGeoreferenceDelete(doc);
+  }
+
+  const handleDeleteGeoreferenceClick = async () => {
+    try{
+      if(documentGeoreferenceDelete){
+        await API.deleteDocumentCoordinates(documentGeoreferenceDelete.id);
+        getDocuments();
+      }
+      setDocumentGeoreferenceDelete(null);
+    }catch(err){
+      setShowAlert(true);
+    }
+  }
 
   function refreshSelectedDocument(doc: DocCoordinates) {
     setDocumentEdit(doc)
   }
-
-
 
     if(showAlert){
         return (
@@ -191,7 +210,7 @@ function DocumentsTable(props: any){
           <h2 className="text-3xl font-bold text-black-600 text-center mb-6">
                 List of all Documents
           </h2>
-          {/* Barra di ricerca e paginazione su una riga */}
+          {/* Search Bar */}
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-600 font-medium whitespace-nowrap">Search a document by title:</span>
@@ -275,24 +294,13 @@ function DocumentsTable(props: any){
                           />
                         </td>
                         <td className="px-2 py-4 text-sm text-gray-600 w-[5%] relative justify-center items-center text-center">
-                          {documentsLinksCount.get(doc.id) ? (
-                            <button
-                              title="Number of links"
-                              onClick={() => navigate(`/documents/${doc.id}/links`)}
-                              className="bg-white text-gray-600 hover:bg-gray-200 rounded-full w-8 h-8 relative items-center justify-center text-xs font-medium border-1 hover:border-gray-800 hover:shadow-lg transition-all duration-300 ease-in-out"
-                            >
-                              {documentsLinksCount.get(doc.id)}
-                            </button>
-                          ) : (
-                            <button
-                              title="Number of links"
-                              onClick={() => navigate(`/documents/${doc.id}/links`)}
-                              className="bg-white text-gray-600 hover:bg-gray-200 rounded-full w-8 h-8 relative items-center justify-center text-xs font-medium border-1 hover:border-gray-800 hover:shadow-lg transition-all duration-300 ease-in-out"
-                            >
-                              0
-                            </button>
-
-                          )}
+                          <button
+                            title="Number of links"
+                            onClick={() => navigate(`/documents/${doc.id}/links`)}
+                            className="bg-white text-gray-600 hover:bg-gray-200 rounded-full w-8 h-8 relative items-center justify-center text-xs font-medium border-1 hover:border-gray-800 hover:shadow-lg transition-all duration-300 ease-in-out"
+                          >
+                            {documentsLinksCount.get(doc.id) != undefined ? documentsLinksCount.get(doc.id) : 0}
+                          </button>
                         </td>
                         <td className="px-2 py-4 text-sm text-gray-600 w-[10%]">
                           {doc.coordinates.length !== 0 ? (
@@ -312,7 +320,7 @@ function DocumentsTable(props: any){
                                   <button
                                     title="Delete georeference"
                                     className="flex items-center justify-center text-red-500 hover:text-red-700 border-1 border-red-500 rounded-full hover:border-red-700 w-7 h-7 hover:shadow-lg"
-                                    onClick={() => {}}
+                                    onClick={() => handleDeleteDocumentGeoreference(doc)}
                                   >
                                     <TrashIcon className="h-4 w-4" />
                                   </button>
@@ -345,23 +353,13 @@ function DocumentsTable(props: any){
                           )}
                         </td>
                         <td className="px-2 py-4 text-sm text-gray-600 w-[5%] text-center">
-                          {documentsLinksCount.get(doc.id) ? (
-                              <button
-                                title="Number of resources"
-                                onClick={() => {}}
-                                className="bg-white text-gray-600 hover:bg-gray-200 rounded-full w-8 h-8 relative items-center justify-center text-xs font-medium border-1 hover:border-gray-800 hover:shadow-lg transition-all duration-300 ease-in-out"
-                              >
-                                {documentsLinksCount.get(doc.id)}
-                              </button>
-                            ) : (
-                              <button
-                                title="Number of links"
-                                onClick={() => navigate(`/documents/${doc.id}/links`)}
-                                className="bg-white text-gray-600 hover:bg-gray-200 rounded-full w-8 h-8 relative items-center justify-center text-xs font-medium border-1 hover:border-gray-800 hover:shadow-lg transition-all duration-300 ease-in-out"
-                              >
-                                0
-                              </button>
-                            )}
+                            <button
+                              title="Number of resources"
+                              onClick={() => {}}
+                              className="bg-white text-gray-600 hover:bg-gray-200 rounded-full w-8 h-8 relative items-center justify-center text-xs font-medium border-1 hover:border-gray-800 hover:shadow-lg transition-all duration-300 ease-in-out"
+                            >
+                              {documentsLinksCount.get(doc.id) != undefined ? documentsLinksCount.get(doc.id) : 0}
+                            </button>
                         </td>
                         {props.user.role === "Urban Planner" && (
                           <td className="px-2 py-4 text-sm text-gray-600 w-[10%]">
@@ -405,14 +403,23 @@ function DocumentsTable(props: any){
             />
           )}
 
-
-          <ConfirmModal
+          {/* Show when confirm the delete of a document */}
+          {documentDelete && <ConfirmModal
               show={showModalConfirmDelete}
-              onHide={() => setShowModalConfirmDelete(false)}
+              onHide={() => {setShowModalConfirmDelete(false)}}
               onConfirm={handleDeleteClick}
               text={`Are you sure you want to delete this document?
               This action cannot be undone.`}
-          />
+          />}
+
+          {/* Show when confirm the delete of a georeference of a specific document */}
+          {documentGeoreferenceDelete && <ConfirmModal
+              show={showModalConfirmDeleteGeoreference}
+              onHide={() => setShowModalConfirmDeleteGeoreference(false)}
+              onConfirm={handleDeleteGeoreferenceClick}
+              text={`Are you sure you want to delete this document's georeference?
+              This action cannot be undone.`}
+          />}
 
         </div>
       );

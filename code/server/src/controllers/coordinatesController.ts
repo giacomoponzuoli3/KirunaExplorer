@@ -37,6 +37,15 @@ class CoordinatesController {
         return this.dao.updateDocumentCoordinates(id_document, coords);
     }
 
+    /**
+     * Delete the coordinates of a document
+     * @param id_document the id of the document to update the coordinates
+     * @return A Promise that resolves when the coordinates have been deleted
+     */
+    deleteDocumentCoordinates(id_document: number): Promise<void> {
+        return this.dao.deleteDocumentCoordinatesById(id_document);
+    }
+
 }
 
 export { CoordinatesController };
