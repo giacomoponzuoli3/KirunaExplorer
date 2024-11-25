@@ -15,11 +15,6 @@ export default function Navbar(props: any) {
 
   const previousPath: string | null = location.state?.from || null;
 
-  // Funzione per tornare alla lista dei documenti
-  const handleReturnToDocuments = () => {
-    navigate("/documents");
-  };
-
   // State to track the active option 
   const [activeTab, setActiveTab] = useState("home");
 

@@ -58,9 +58,6 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({ text, maxWords }) => {
 function LinksDocument(props: any) {
     const navigate = useNavigate();
 
-    const location = useLocation();
-  
-
     const { idDocument } = useParams();
     const [document, setDocument] = useState<Document | null>(null);
     const [documentLinks, setDocumentLinks] = useState<DocLink[]>([]);
@@ -222,7 +219,7 @@ function LinksDocument(props: any) {
               <h2 className="text-3xl font-bold text-black-600 text-center mb-6">
                 {document.title}
               </h2>
-              
+
               <div className="relative mb-2">
                 <div className="flex justify-between items-center mt-0">
                   {/* Add Link Button */}
