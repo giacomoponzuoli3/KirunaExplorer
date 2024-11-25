@@ -27,12 +27,16 @@ function DocumentsTable(props: any){
     const [documentDelete, setDocumentDelete] = useState<DocCoordinates | null>(null);
     //document's georeference delete
     const [documentGeoreferenceDelete, setDocumentGeoreferenceDelete] = useState<DocCoordinates | null>(null);
+    //view document's georeference 
+    const [viewDocumentGeoreference, setViewDocumentGeoreference] = useState<DocCoordinates | null>(null);
 
     //modal
     const [showAlert, setShowAlert] = useState(false); // alert state
     const [showModalEditDocument, setShowModalEditDocument] = useState<boolean>(false);
     const [showModalConfirmDelete, setShowModalConfirmDelete] = useState<boolean>(false);
     const [showModalConfirmDeleteGeoreference, setShowModalConfirmDeleteGeoreference] = useState<boolean>(false);
+
+    const [showModalViewDocumentCoordinates, setShowModalViewDocumentCoordinates] = useState<boolean>(false);
 
     //pagination controls
     const [currentPage, setCurrentPage] = useState(1);  // Track the current page
@@ -145,13 +149,13 @@ function DocumentsTable(props: any){
     
   }, [documentsCoordinates]);
 
-  //handle of edit document
+  //---------- EDIT DOCUMENT -----------//
   const handleEditDocument = (doc: DocCoordinates) => {
     setShowModalEditDocument(true);
     setDocumentEdit(doc);
   } 
 
-  //handle of delete document
+    //---------- DELETE DOCUMENT -----------//
   const handleDeleteDocument = (doc: DocCoordinates) => {
     setShowModalConfirmDelete(true);
     setDocumentDelete(doc);
@@ -170,7 +174,7 @@ function DocumentsTable(props: any){
     }
   };
 
-  //handle delete of a document's georeference 
+  //---------- DELETE DOCUMENT'S GEOREFERENCE -----------//
   const handleDeleteDocumentGeoreference = (doc: DocCoordinates) => {
     setShowModalConfirmDeleteGeoreference(true);
     setDocumentGeoreferenceDelete(doc);
@@ -188,6 +192,14 @@ function DocumentsTable(props: any){
     }
   }
 
+  //---------- VIEW DOCUMENT'S GEOREFERENCE -----------//
+  const handleViewDocumentCoordinates = (doc: DocCoordinates) => {
+    setShowModalViewDocumentCoordinates(true);
+    setViewDocumentGeoreference(doc);
+  }
+
+
+  //function for the edit document modal
   function refreshSelectedDocument(doc: DocCoordinates) {
     setDocumentEdit(doc)
   }
@@ -308,7 +320,7 @@ function DocumentsTable(props: any){
                               <div className="flex items-center justify-center space-x-2">
                                 <button
                                   title="View georeference"
-                                  onClick={() => {}}
+                                  onClick={() => handleViewDocumentCoordinates(doc)}
                                   className="bg-white text-blue-600 hover:text-blue-800 rounded-full w-14 h-8 flex items-center justify-center text-xs font-medium border-1 border-blue-500 hover:border-blue-700 hover:shadow-lg transition-all duration-300 ease-in-out"
                                 >
                                   <MapPinIcon className="w-4 h-4" />
@@ -420,6 +432,9 @@ function DocumentsTable(props: any){
               text={`Are you sure you want to delete this document's georeference?
               This action cannot be undone.`}
           />}
+
+          {/* Show the map with the coordinates of a specific document */}
+          {viewDocumentGeoreference ? <>{console.log("view")}</> : <></>}
 
         </div>
       );
