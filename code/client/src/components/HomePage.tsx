@@ -87,7 +87,7 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
       setShowDetails(true);
   }
 
-  function refreshSelectedDocument(doc: Document) {
+  function refreshSelectedDocument(doc: DocCoordinates) {
     setSelectedDocument(doc)
   }
 
@@ -149,7 +149,6 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
       <EditDocumentModal 
         document={selectedDocument} show={showEditDocumentModal} 
         onHide={() => setShowEditDocumentModal(false)} 
-        
         refreshSelectedDocument={refreshSelectedDocument}
         
         stakeholders={stakeholders}
