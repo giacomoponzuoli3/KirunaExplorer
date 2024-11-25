@@ -33,54 +33,56 @@ const documentTypes = [
   return (
     <div className="relative">
   
-  {/* Toggle Icon Button in Bottom-Left */}
-  <button
-    id="toggle-button"
-    onClick={toggleLegend}
-    className="fixed bottom-4 left-4 z-[1000] bg-blue-950 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition duration-200"
-    aria-label="Toggle Legend"
-  >
-    <img
-      src={iconLegendMap}
-      alt="Legend Map Icon"
-      className="w-5 h-5 object-contain" // Customize the size
-    />
-  </button>
+      {/* Toggle Icon Button in Bottom-Left */}
+      <button
+        id="toggle-button"
+        onClick={toggleLegend}
+        className="fixed bottom-4 left-4 z-[1000] bg-blue-950 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition duration-200"
+        aria-label="Toggle Legend"
+      >
+        <img
+          src={iconLegendMap}
+          alt="Legend Map Icon"
+          className="w-5 h-5 object-contain" // Customize the size
+        />
+      </button>
 
-  {/* Overlay for closing legend */}
-  {isLegendVisible && <div className="fixed inset-0 bg-black opacity-25 z-40"></div>}
-
-  {/* Legend Modal */}
-  {isLegendVisible && (
-    <div
-      id="legend-box"
-      className="fixed left-[5rem] bottom-4 transform -translate-y-1/2 flex items-center bg-white rounded-sm shadow-lg px-1 py-1 border border-gray-200 z-[1000] animate-rotate-in mb-2"
-      style={{ zIndex: 1000 }}
-    >
-      {/* Red Cluster */}
-      <div className="flex items-center space-x-2">
-        <div className="flex items-center justify-center w-6 h-6 bg-gradient-to-br from-red-500 via-red-600 to-red-700 text-white text-xs font border border-white shadow-md">
-          N
+      {/* Overlay for closing legend */}
+      {isLegendVisible && (
+        <div
+          className="absolute left-[4rem] bottom-[3rem] w-[20rem] h-[10rem] bg-black opacity-25 z-40"
+        ></div>
+      )}
+      {/* Legend Modal */}
+      {isLegendVisible && (
+        <div
+          id="legend-box"
+          className="fixed left-[5rem] bottom-4 transform -translate-y-1/2 flex items-center bg-white rounded-sm shadow-lg px-1 py-1 border border-gray-200 z-[1000] animate-rotate-in mb-2"
+          style={{ zIndex: 1000 }}
+        >
+          {/* Red Cluster */}
+          <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-center w-6 h-6 bg-gradient-to-br from-red-500 via-red-600 to-red-700 text-white text-xs font border border-white shadow-md">
+              N
+            </div>
+            <span className="text-gray-700 text-sm">
+              Points with the same coordinates
+            </span>
+          </div>
+          {/* Separator */}
+          <div className="mx-4 h-6 border-l border-gray-300"></div>
+          {/* Blue Cluster */}
+          <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-center w-6 h-6 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 text-white text-xs font border border-white shadow-md">
+              N
+            </div>
+            <span className="text-gray-700 text-sm">
+              Points with nearby coordinates
+            </span>
+          </div>
         </div>
-        <span className="text-gray-700 text-sm">
-          Points with the same coordinates
-        </span>
-      </div>
-      {/* Separator */}
-      <div className="mx-4 h-6 border-l border-gray-300"></div>
-      {/* Blue Cluster */}
-      <div className="flex items-center space-x-2">
-        <div className="flex items-center justify-center w-6 h-6 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 text-white text-xs font border border-white shadow-md">
-          N
-        </div>
-        <span className="text-gray-700 text-sm">
-          Points with nearby coordinates
-        </span>
-      </div>
+      )}
     </div>
-  )}
-</div>
-
   );
 }
 
