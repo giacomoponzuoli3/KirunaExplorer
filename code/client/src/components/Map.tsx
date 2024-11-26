@@ -458,6 +458,24 @@ function SetMapViewEdit(props: any) {
       // Aggiungi il nuovo marker sulla mappa
       currentMarker = layer;
       layer.addTo(map);
+      //popup of the coordinates 
+      const popup = L.popup({
+        closeButton: false, // Disable the close button
+        autoClose: false,   // Prevent automatic closing
+        closeOnClick: false, // Prevent closing on click
+        offset: [10, -5],   // Adjust the position above the marker
+        className: "custom-popup"
+      })
+        .setLatLng(newPosition) // Set popup position to the marker's coordinates
+        .setContent(`<p>Coordinates: ${decimalToDMS(newPosition.lat)} ${newPosition.lat >= 0 ? "N" : "S"} , ${decimalToDMS(newPosition.lng)} ${newPosition.lng >= 0 ? "E" : "W"}</p>`)
+
+      layer.on('mouseover', () => {
+          map.openPopup(popup)
+      });
+
+      layer.on('mouseout', () => {
+        map.closePopup(popup);
+      });
 
       // Aggiorna la posizione selezionata
       setSelectedPosition([{lat: newPosition.lat, lng: newPosition.lng}]);
