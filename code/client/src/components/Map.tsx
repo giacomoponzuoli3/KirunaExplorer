@@ -501,7 +501,6 @@ const SetViewDocumentCoordinates = (props: any) => {
           iconSize: [20, 20],
           className: '',
         }),
-        interactive: false
       }).addTo(map);
 
       if(props.documentCoordinates.coordinates.length === 1){ //if it is a point
