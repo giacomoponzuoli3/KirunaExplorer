@@ -24,15 +24,18 @@ export default function Navbar(props: any) {
       setActiveTab("home");
     } else if (location.pathname === "/documents") {
       setActiveTab("documents");
-    } else if (previousPath === "/documents") {
-      console.log("entrato")
+    } else if (location.pathname.endsWith("/links") && previousPath === "/documents") {
       setActiveTab("links"); 
+    } else if (location.pathname.endsWith("/map") && previousPath === "/documents") {
+      setActiveTab("map"); 
+    } else if (location.pathname.endsWith("/resources") && previousPath === "/documents") {
+      setActiveTab("resources"); 
     } else if (location.pathname === "/diagram") {
       setActiveTab("diagram");
     } else {
       setActiveTab("");
     }
-  }, [location.pathname]);
+  }, [location.pathname, previousPath]);
 
 
   return (
@@ -72,14 +75,36 @@ export default function Navbar(props: any) {
                 Documents
               </Link>
               {/* Show ChevronRight and "Links" if the previous path is "/documents" */}
-              {previousPath === "/documents" && (
+              {location.pathname.endsWith("/links") && previousPath === "/documents" && (
                 <>
                 <ChevronRightIcon className=" text-yellow-300 h-5 w-5" />
                 <div className={`text-yellow-300 hover:text-yellow-400 text-base font-semibold px-2 py-1 no-underline ${
                   activeTab === "links" ? "border-b-2 border-yellow-400 " : "border-transparent"
-                } hover:bg-yellow-500/20 rounded-md transition-all duration-300`}>
+                }  rounded-md `}>
                   
                   <span className="text-base font-semibold">Links</span>
+                </div>
+                </>
+              )}
+              {location.pathname.endsWith("/map") && previousPath === "/documents" && (
+                <>
+                <ChevronRightIcon className=" text-yellow-300 h-5 w-5" />
+                <div className={`text-yellow-300 hover:text-yellow-400 text-base font-semibold px-2 py-1 no-underline ${
+                  activeTab === "map" ? "border-b-2 border-yellow-400 " : "border-transparent"
+                }  rounded-md `}>
+                  
+                  <span className="text-base font-semibold">Map</span>
+                </div>
+                </>
+              )}
+              {location.pathname.endsWith("/resources") && previousPath === "/documents" && (
+                <>
+                <ChevronRightIcon className=" text-yellow-300 h-5 w-5" />
+                <div className={`text-yellow-300 hover:text-yellow-400 text-base font-semibold px-2 py-1 no-underline ${
+                  activeTab === "resources" ? "border-b-2 border-yellow-400 " : "border-transparent"
+                }  rounded-md `}>
+                  
+                  <span className="text-base font-semibold">Resources</span>
                 </div>
                 </>
               )}

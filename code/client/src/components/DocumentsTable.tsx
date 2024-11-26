@@ -193,10 +193,7 @@ function DocumentsTable(props: any){
   }
 
   //---------- VIEW DOCUMENT'S GEOREFERENCE -----------//
-  const handleViewDocumentCoordinates = (doc: DocCoordinates) => {
-    setShowModalViewDocumentCoordinates(true);
-    setViewDocumentGeoreference(doc);
-  }
+
 
 
   //function for the edit document modal
@@ -308,7 +305,7 @@ function DocumentsTable(props: any){
                         <td className="px-2 py-4 text-sm text-gray-600 w-[5%] relative justify-center items-center text-center">
                           <button
                             title="Number of links"
-                            onClick={() => navigate(`/${doc.id}/links`, { state: { from: "/documents" } })}
+                            onClick={() => navigate(`${doc.id}/links`, { state: { from: "/documents" } })}
                             className="bg-white text-gray-600 hover:bg-gray-200 rounded-full w-8 h-8 relative items-center justify-center text-xs font-medium border-1 hover:border-gray-800 hover:shadow-lg transition-all duration-300 ease-in-out"
                           >
                             {documentsLinksCount.get(doc.id) != undefined ? documentsLinksCount.get(doc.id) : 0}
@@ -320,7 +317,7 @@ function DocumentsTable(props: any){
                               <div className="flex items-center justify-center space-x-2">
                                 <button
                                   title="View georeference"
-                                  onClick={() => handleViewDocumentCoordinates(doc)}
+                                  onClick={() => navigate(`${doc.id}/map`, { state: { from: "/documents" } })}
                                   className="bg-white text-blue-600 hover:text-blue-800 rounded-full w-14 h-8 flex items-center justify-center text-xs font-medium border-1 border-blue-500 hover:border-blue-700 hover:shadow-lg transition-all duration-300 ease-in-out"
                                 >
                                   <MapPinIcon className="w-4 h-4" />

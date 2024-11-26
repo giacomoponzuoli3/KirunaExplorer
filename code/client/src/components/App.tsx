@@ -10,6 +10,7 @@ import { LinksDocument } from './LinksDocument';
 import { Stakeholder } from '../models/stakeholder';
 import { DocumentsTable } from './DocumentsTable';
 import { DocCoordinates } from '../models/document_coordinate';
+import { MapView } from './Map';
 
 function getDocumentIcon(type: string, size: number = 16): JSX.Element | null {
   const sizeClass = `w-${size} h-${size} m-0 p-0`;
@@ -137,6 +138,7 @@ function App() {
           <Route path="/:idDocument/links" element={<LinksDocument user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} />} />
           <Route path="/documents" element={<DocumentsTable user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} />} />
           <Route path="documents/:idDocument/links" element={<LinksDocument user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} />} />
+          <Route path="documents/:idDocument/map" element={<MapView user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} documentsCoordinates={documentsCoordinates}/>} />
         </Route>
       </Routes>
     </>
