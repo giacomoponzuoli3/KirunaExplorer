@@ -84,7 +84,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
 
   // Impostiamo il map component all'interno del modal
   return (
-    <div className="size-xl fixed inset-0 z-[1000] bg-gray-500 bg-opacity-75 flex items-center justify-center">
+<div className="size-xl fixed inset-0 z-[1000] bg-gray-500 bg-opacity-75 flex items-center justify-center">
       <div className="bg-white rounded-lg shadow-lg w-full h-[90%] max-w-6xl p-8 flex flex-col">
         <div className="flex justify-between items-center border-b mb-7">
           <h2 className="text-lg font-semibold text-gray-900">
@@ -97,18 +97,14 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
             <strong>{error}</strong>
           </div>
         )}
-
-
-        <form>
-          {/* Cambia il contenuto del modal */}
-          <div className="mb-4">
-
-            {/* Mappa Leaflet */}
-            <div className={`h-80 ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}>
-              <MapContainer
-                className={`relative w-full ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}
-                style={{ height: '100%' }} // Impostiamo l'altezza della mappa al 100% dello spazio disponibile
-              >
+  
+        <form className="flex flex-col flex-grow">
+          {/* Mappa Leaflet */}
+          <div className={`h-[500px] mb-4 ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}>
+            <MapContainer
+              className={`relative w-full ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}
+              style={{ height: '100%' }} // Impostiamo l'altezza della mappa al 100% dello spazio disponibile
+            >
                 <button
                   onClick={() => {}}
                   className="relative left-2 top-20 bg-gray-50 text-blue-600 p-2 rounded-full border-gray-50 border-1 shadow-lg hover:text-blue-950 hover:border-blu-600 z-[1000]"
@@ -166,7 +162,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
                 {isLoading ? 'Updating...' : 'Update'}
               </button>
             </div>
-          </div>
+   
         </form>
       </div>
     </div>
