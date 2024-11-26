@@ -9,6 +9,8 @@ import API from '../API/API';
 import { DocCoordinates } from "../models/document_coordinate";
 import { SetMapViewEdit } from './Map';
 import {createCityCoordinates} from './Map'
+import { Button } from 'react-bootstrap';
+import {ArrowsPointingOutIcon, InformationCircleIcon} from '@heroicons/react/24/solid'
 
 interface ModalEditGeoreferenceProps {
   documentCoordinates: DocCoordinates;  // Documento con latitudine e longitudine
@@ -68,60 +70,52 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
 
   // Impostiamo il map component all'interno del modal
   return (
-    <div className="fixed inset-0 z-[1000] bg-gray-500 bg-opacity-75 flex items-center justify-center">
-      <div className="bg-white rounded-lg shadow-lg w-full h-5/6 max-w-4xl p-8">
+    <div className="size-xl fixed inset-0 z-[1000] bg-gray-500 bg-opacity-75 flex items-center justify-center">
+      <div className="bg-white rounded-lg shadow-lg w-full h-[90%] max-w-6xl p-8 flex flex-col">
         <div className="flex justify-between items-center border-b mb-7">
-          <h2 className="text-lg font-semibold text-gray-900">Edit Document Georeference</h2>
+          <h2 className="text-lg font-semibold text-gray-900">
+            Edit the Georeference of <span className="text-blue-600">{documentCoordinates.title}</span>
+          </h2>
         </div>
-
+  
         {error && (
           <div className="mb-4 text-red-600">
             <strong>{error}</strong>
           </div>
         )}
-
-        <form>
-          {/* Cambia il contenuto del modal */}
-          <div className="mb-4">
-            {isPolygon ? (
-              <div className="flex items-center text-blue-600 mb-3">
-              <span className="font-semibold">This document is associated with an area of the city, and not a single point.</span>
-            </div>
-            ) : (
-              <>
-                <label htmlFor="location" className="block text-sm font-medium text-gray-800 mb-2 hover:text-blue-500">
-                  <span className="text-gray-600">Actual latitude: </span>
-                  <span className="font-semibold text-blue-600">{documentCoordinates.coordinates[0].latitude}</span>
-                </label>
-
-                <label htmlFor="location" className="block text-sm font-medium text-gray-800 mb-4 hover:text-blue-500">
-                  <span className="text-gray-600">Actual longitude: </span>
-                  <span className="font-semibold text-blue-600">{documentCoordinates.coordinates[0].longitude}</span>
-                </label>
-              </>
-            )}
-
-            <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
-              Select New Georeference
-            </label>
-
-            {/* Mappa Leaflet */}
-            <div className={`h-80 ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}>
+  
+        <form className="flex flex-col flex-grow">
+          {/* Mappa Leaflet */}
+          <div className={`h-[500px] mb-4 ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}>
             <MapContainer
               className={`relative w-full ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}
-              style={{ height: '100%' }} // Regola in base alla tua esigenza
+              style={{ height: '100%' }} // Impostiamo l'altezza della mappa al 100% dello spazio disponibile
             >
-                {/* TileLayer per visualizzare la mappa */}
-                <SetMapViewEdit
-                  setSelectedPosition={setSelectedPosition}
-                  useMunicipalArea={useMunicipalArea}  // Passa lo stato per disabilitare la mappa
-                />
-              </MapContainer>
-            </div>
+              <button
+        onClick={() => {}}
+        className="relative left-2 top-20 bg-gray-50 text-blue-600 p-2 rounded-full border-gray-50 border-1 shadow-lg hover:text-blue-950 hover:border-blu-600 z-[1000]"
+      >
+        <InformationCircleIcon className="w-6 h-6" />
+      </button>
+              {/* TileLayer per visualizzare la mappa */}
+              <SetMapViewEdit
+                setSelectedPosition={setSelectedPosition}
+                useMunicipalArea={useMunicipalArea}  // Passa lo stato per disabilitare la mappa
+              />
+              {/* Button for selecting whole area */}
+              <button
+                title="Select the whole area"
+                className="absolute right-3 top-[160px] z-[1000] w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-blue-200 rounded"
+                onClick={() => {}}
+              >
+                <ArrowsPointingOutIcon className="h-6 w-6 text-gray-600 hover:text-gray-800" />
+              </button>
+            </MapContainer>
+          
           </div>
-
+  
           {/* Toggle switch per l'area municipale */}
-          <div className="mt-4 flex items-center mb-5">
+          <div className="mt-2 flex items-center mb-4">
             <label htmlFor="municipal-area-checkbox" className="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
@@ -135,8 +129,9 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
             </label>
             <span className="ml-3 text-sm text-gray-600">The entire municipal area</span>
           </div>
-
-          <div className="mt-6 flex justify-between">
+  
+          {/* Bottoni di azione */}
+          <div className="flex justify-between  mb-3">
             <button
               type="button"
               onClick={onBack}
@@ -157,6 +152,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
       </div>
     </div>
   );
+  
 };
 
 

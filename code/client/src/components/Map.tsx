@@ -13,6 +13,8 @@ import 'leaflet.markercluster';
 import { useParams } from 'react-router-dom';
 import Alert from './Alert';
 import API from '../API/API';
+import { LatLng } from 'leaflet';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';  // Heroicon per l'icona "info"
 
 //coordinates of Kiruna Town Hall
 const kiruna_town_hall: LatLngTuple = [67.8558, 20.2253];
@@ -346,8 +348,6 @@ function SetMapViewHome(props: any) {
 }
 
 
-
-
 // Componente per la costruzione della mappa nel modal edit
 function SetMapViewEdit(props: any) {
   const { setSelectedPosition, useMunicipalArea } = props;
@@ -356,57 +356,137 @@ function SetMapViewEdit(props: any) {
   // Icona personalizzata per il marker
   const defaultIcon = new L.Icon({
     iconUrl: '/img/marker.png',
-    iconSize: [41, 41],  // Dimensioni dell'icona
+    iconSize: [41, 41], // Dimensioni dell'icona
     iconAnchor: [12, 41], // Punto di ancoraggio dell'icona
     popupAnchor: [1, -34], // Punto da cui si apre il popup
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-    shadowSize: [41, 41]  // Dimensioni dell'ombra
+    shadowSize: [41, 41], // Dimensioni dell'ombra
   });
 
-  // Marker per il punto selezionato
-  let currentMarker: L.Marker | null = null;
+  const drawnItems = new L.FeatureGroup(); // Gruppo di elementi disegnati
+
+  //creation of draw controls
+  const drawControl = new L.Control.Draw({
+    position: 'topright', // Posiziona i controlli di disegno in alto a sinistra
+    draw: {
+      marker: { icon: defaultIcon },
+      polygon: {
+        shapeOptions: {
+          color: '#ff0000',
+          weight: 3,
+          opacity: 0.8,
+          fillColor: '#3388ff',
+          fillOpacity: 0.3,
+        },
+      },
+      polyline: false,
+      rectangle: false,
+      circle: false,
+      circlemarker: false,
+    },
+    edit: {
+      featureGroup: drawnItems, // Gruppo modificabile
+      remove: true, // Abilita la rimozione
+    },
+  });
 
   useEffect(() => {
-    // Imposta la vista iniziale solo una volta
     if (map.getZoom() === undefined) {
       map.setView(position, 12);
     }
 
-    // Imposta i limiti di zoom
     map.setMaxZoom(18);
     map.setMinZoom(3);
-
-    // Limita la mappa alla zona di Kiruna
     map.setMaxBounds(kirunaBounds);
 
-    // Aggiungi i controlli per il disegno
-    const drawControl = new L.Control.Draw({
-      draw: {
-        marker: { icon: defaultIcon }, // Abilita i marker con l'icona personalizzata
-        polygon: false,
-        polyline: false,
-        rectangle: false,
-        circle: false,
-        circlemarker: false,
-      },
-    });
+    map.addLayer(drawnItems); // Aggiungi il gruppo alla mappa
+
     map.addControl(drawControl);
 
-    // Layer satellitare
+    //event create
+    map.on(L.Draw.Event.CREATED, (event: any) => {
+      const layer = event.layer;
+      drawnItems.addLayer(layer); // Aggiungi il nuovo elemento al gruppo
+    
+      // Quando viene aggiunto un nuovo elemento, rimuoviamo i vecchi elementi (marker o poligoni)
+      drawnItems.eachLayer((existingLayer: any) => {
+        if (existingLayer !== layer) {
+          drawnItems.removeLayer(existingLayer); // Rimuovi tutti i layer tranne quello appena creato
+        }
+      });
+
+      if (event.layerType === 'marker') {
+        setSelectedPosition([{ lat: layer.getLatLng().lat, lng: layer.getLatLng().lng }]);
+      } else if (event.layerType === 'polygon') {
+        // Ottenere le coordinate del poligono e verificare il tipo
+        const latLngs = layer.getLatLngs();
+        if (Array.isArray(latLngs) && Array.isArray(latLngs[0])) {
+          const polygonCoordinates = (latLngs[0] as L.LatLng[]).map((latLng) => ({
+            lat: latLng.lat,
+            lng: latLng.lng,
+          }));
+          setSelectedPosition(polygonCoordinates); // Salva tutte le coordinate
+        }
+      }
+    });
+    
+    //event edit
+    map.on(L.Draw.Event.EDITED, (event: any) => {
+      const layers = event.layers;
+    
+      layers.eachLayer((layer: any) => {
+        if (layer instanceof L.Marker) {
+          const newPosition = layer.getLatLng();
+          console.log('Marker spostato a:', newPosition);
+          setSelectedPosition([{ lat: newPosition.lat, lng: newPosition.lng }]);
+        } else if (layer instanceof L.Polygon) {
+          const latLngs = layer.getLatLngs();
+          if (Array.isArray(latLngs) && Array.isArray(latLngs[0])) {
+            const newCoordinates = (latLngs[0] as L.LatLng[]).map((latLng) => ({
+              lat: latLng.lat,
+              lng: latLng.lng,
+            }));
+            console.log('Polygon aggiornato:', newCoordinates);
+            setSelectedPosition(newCoordinates); // Salva le nuove coordinate
+          }
+        }
+      });
+    });
+    
+    //event delete
+    map.on(L.Draw.Event.DELETED, (event: any) => {
+      const layers = event.layers;
+    
+      layers.eachLayer((layer: any) => {
+        if (layer instanceof L.Marker) {
+          console.log('Marker eliminato:', layer.getLatLng());
+          setSelectedPosition(null);
+        } else if (layer instanceof L.Polygon) {
+          console.log('Polygon eliminato:', layer.getLatLngs());
+          setSelectedPosition(null); // Nessuna posizione selezionata dopo l'eliminazione
+        }
+      });
+    });
+    
+
     const satelliteLayer = L.tileLayer(
       'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-      { attribution: '&copy; <a href="https://www.opentopomap.org">OpenTopoMap</a>' }
+      { attribution: '&copy; ' }
     );
     satelliteLayer.addTo(map);
 
-    // Pulizia del componente (rimuovi i controlli e layer)
     return () => {
+      map.off(L.Draw.Event.CREATED);
+      map.off(L.Draw.Event.EDITED);
+      map.off(L.Draw.Event.DELETED);
+
+      map.removeLayer(drawnItems);
       map.removeControl(drawControl);
       map.removeLayer(satelliteLayer);
+      map.removeControl(drawControl);
     };
-  }, [map]);
+  }, [map, setSelectedPosition]);
 
-  // Se la checkbox è selezionata, disabilita la mappa
   useEffect(() => {
 
     if (useMunicipalArea) {
@@ -415,9 +495,8 @@ function SetMapViewEdit(props: any) {
       map.touchZoom.disable();
       map.scrollWheelZoom.disable();
     } else {
-      // Rimuovere il vecchio marker, se presente
       map.eachLayer((layer) => {
-        if (layer instanceof L.Marker) {
+        if (layer instanceof L.Marker || layer instanceof L.Polygon) {
           map.removeLayer(layer);
         }
       });
@@ -429,29 +508,10 @@ function SetMapViewEdit(props: any) {
     }
   }, [map, useMunicipalArea]);
 
-  // Gestione dell'evento di creazione del marker
-  map?.on(L.Draw.Event.CREATED, (event: any) => {
-    const layer = event.layer;
-
-    if (event.layerType === 'marker') {
-      const newPosition = layer.getLatLng();
-      
-      // Rimuovere il vecchio marker, se presente
-      if (currentMarker) {
-        map.removeLayer(currentMarker);
-      }
-
-      // Aggiungi il nuovo marker sulla mappa
-      currentMarker = layer;
-      layer.addTo(map);
-
-      // Aggiorna la posizione selezionata
-      setSelectedPosition([{lat: newPosition.lat, lng: newPosition.lng}]);
-    }
-  });
 
   return null;
 }
+
 
 
 const SetViewDocumentCoordinates = (props: any) => {

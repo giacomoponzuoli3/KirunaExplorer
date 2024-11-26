@@ -8,7 +8,7 @@ import { ShowDocumentInfoModal } from "./ShowDocumentInfoModal";
 import { DocCoordinates } from "../models/document_coordinate";
 import { EditDocumentModal } from "./EditDocumentModal";
 import ConfirmModal from "./ConfirmModal";
-
+import { MagnifyingGlassIcon } from '@heroicons/react/24/solid'
 
 function DocumentsTable(props: any){
     const navigate = useNavigate();
@@ -221,15 +221,22 @@ function DocumentsTable(props: any){
           </h2>
           {/* Search Bar */}
           <div className="flex justify-between items-center mb-4">
+            {/* Search Bar */}
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-600 font-medium whitespace-nowrap">Search a document by title:</span>
-              <input
-                type="text"
-                placeholder="Search the document..."
-                value={searchTerm}
-                onChange={(e) => handleSearch(e.target.value)}
-                className="border border-gray-300 rounded-md px-4 py-1 w-full max-w-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-300 text-sm"
-              />
+              <div className="relative w-full max-w-lg">
+                <input
+                  type="text"
+                  placeholder="Search the document..."
+                  value={searchTerm}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  className="border border-gray-300 rounded-md px-4 py-1 w-full shadow-sm focus:outline-none focus:ring focus:ring-blue-300 text-sm pr-10" // Added padding to right for icon
+                />
+                {/* Magnifying Glass Icon */}
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                  <MagnifyingGlassIcon className="h-5 w-5" />
+                </div>
+              </div>
             </div>
 
             {/* Paginazione */}
@@ -347,7 +354,7 @@ function DocumentsTable(props: any){
                             props.user.role === 'Urban Planner' ? 
                             <div className="flex items-center justify-center space-x-2">
                               <button
-                                title="View georeference"
+                                title="Add new georeference"
                                 onClick={() => {}}
                                 className="bg-white text-green-600 hover:text-green-800 rounded-full w-14 h-8 flex items-center justify-center text-xs font-medium border-1 border-green-600 hover:border-green-800 hover:shadow-lg transition-all duration-300 ease-in-out"
                               >
