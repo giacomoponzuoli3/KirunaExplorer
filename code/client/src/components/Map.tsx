@@ -335,24 +335,6 @@ function SetMapViewHome(props: any) {
   
   return (
     <>
-      <style>
-        {`
-          .custom-popup .leaflet-popup-tip {
-            display: none; /* Remove the triangular tip */
-          }
-
-          .custom-popup .leaflet-popup-content-wrapper {
-            //background-color: rgba(10, 25, 51, 0.9); /* Blue background colour */
-            background-color: rgba(0, 123, 255, 0.9);
-            border-radius: 10px;       /* Rounded corners */
-            padding: 1px;             /* Add padding */
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Add shadow */
-            border: 1px solid rgba(0, 0, 0, 0.2);    /* Add border */
-            font-size: 11px;        
-            color: #ffffff;               /* White text */
-          }
-        `}
-      </style>
       {showPolygonMessage && (
         <div className="fixed top-2/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] bg-gray-200 text-black text-sm px-2 py-1 rounded-md shadow-lg border">
           area: <strong>the entire municipality of Kiruna</strong>
