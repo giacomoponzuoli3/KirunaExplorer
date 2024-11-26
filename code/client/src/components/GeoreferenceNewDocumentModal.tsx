@@ -1,4 +1,4 @@
-import {Button, Container, Form, Modal} from "react-bootstrap"
+import {Button, Col, Container, Form, Modal, Row} from "react-bootstrap"
 import { useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import API from '../API/API';
@@ -30,6 +30,15 @@ const customIcon = new L.Icon({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
   shadowSize: [41, 41]  // Dimensioni dell'ombra
 });
+
+const popup = L.popup({
+  closeButton: false, // Disable the close button
+  autoClose: false,   // Prevent automatic closing
+  closeOnClick: false, // Prevent closing on click
+  offset: [10, -5],   // Adjust the position above the marker
+  className: "custom-popup"
+})
+
 // Default coordinate of municipal city
 const coordinatesCity: L.LatLng[] = [
   L.latLng(67.8753332, 20.1841097),
@@ -86,6 +95,44 @@ const kirunaBounds = new LatLngBounds(
   [67.7758, 20.1003],  // Sud-ovest
   [67.9358, 20.3503]   // Nord-est
 );
+
+function decimalToDMS(decimal: number) {
+  const degrees = Math.floor(decimal);
+  const minutesDecimal = Math.abs((decimal - degrees) * 60);
+  const minutes = Math.floor(minutesDecimal);
+  const seconds = Math.round((minutesDecimal - minutes) * 60);
+
+  // Handle edge case for rounding up seconds
+  if (seconds === 60) {
+      return `${degrees + Math.sign(degrees)}° ${minutes + 1}' 0"`;
+  }
+
+  return `${degrees}° ${minutes}' ${seconds}"`;
+}
+
+const DMSStringToDecimal = (dmsString: string, regex : RegExp) => {
+  // Regular expression to match DMS format: "57° 24' 4''"
+  const match = dmsString.match(regex);
+  
+  if (match) {
+    const degrees = parseInt(match[1], 10);
+    const minutes = parseInt(match[2], 10);
+    const seconds = parseInt(match[3], 10);
+    const direction = match[4];
+    
+    // Convert DMS to decimal degrees
+    let decimal = degrees + (minutes / 60) + (seconds / 3600);
+    
+    // Adjust for direction (N/S/E/W)
+    if (direction === 'S' || direction === 'W') {
+      decimal = -decimal;  // Make negative for South or West
+    }
+    
+    return decimal;
+  } else {
+    return null;
+  }
+};
 
 interface SetMapViewInterface{
   resetForm: () => void;
@@ -161,6 +208,23 @@ function SetMapView({resetForm, setCoordinates}: SetMapViewInterface) {
       if (layerType === 'marker') {
           layer.options.isStandalone = true;
           setCoordinates(layer.getLatLng());
+          
+          popup
+            .setLatLng(layer.getLatLng()) // Set popup position to the marker's coordinates
+            .setContent(
+              `<p>Coordinates: 
+                ${decimalToDMS(layer.getLatLng().lat)} ${layer.getLatLng().lat >= 0 ? "N" : "S"}, 
+                ${decimalToDMS(layer.getLatLng().lng)} ${layer.getLatLng().lng >= 0 ? "E" : "W"}
+              </p>`
+            );
+            layer.bindPopup(popup);
+          layer.on('mouseover', () => {
+            map.openPopup(popup)
+          });
+  
+          layer.on('mouseout', () => {
+              map.closePopup(popup)
+          });
       } 
       else if (layerType === 'polygon') {
           const latLngs = layer.getLatLngs()[0]
@@ -175,7 +239,15 @@ function SetMapView({resetForm, setCoordinates}: SetMapViewInterface) {
       e.layers.eachLayer((layer: L.Layer) => {
         if (layer instanceof L.Marker) {
           setCoordinates(layer.getLatLng());
-          console.log("Edited marker:", layer.getLatLng());
+          popup
+            .setLatLng(layer.getLatLng()) // Update the popup's position
+            .setContent(
+              `<p>Coordinates: 
+                ${decimalToDMS(layer.getLatLng().lat)} ${layer.getLatLng().lat >= 0 ? "N" : "S"}, 
+                ${decimalToDMS(layer.getLatLng().lng)} ${layer.getLatLng().lng >= 0 ? "E" : "W"}
+              </p>`
+            ); // Update popup content
+
         } else if (layer instanceof L.Polygon) {
           // Handle polygon edits
           const latLngs = (layer.getLatLngs() as LatLng[][])[0]
@@ -186,6 +258,7 @@ function SetMapView({resetForm, setCoordinates}: SetMapViewInterface) {
     }
 
     const handleDelete = (e: any) => {
+      clearOtherLayers()
       resetForm();
     }
   
@@ -339,18 +412,43 @@ function GeoreferenceNewDocumentModal({
     // Handle form submission or Enter key press
     const handleCoordinatesSubmit = (e: React.FormEvent) => {
       e.preventDefault(); // Prevent form submission
+      console.log(latitude.trim().replace(/\s+/g, ''));
+      console.log(longitude.trim().replace(/\s+/g, ''))
       
       if (latitude.trim() !== '' && longitude.trim() !== '') {
-        const lat = parseFloat(latitude);
-        const lng = parseFloat(longitude);
+        const regexLat = /(\d+)°(\d+)'(\d+)''(N|S)$/;
+        const regexLng = /(\d+)°(\d+)'(\d+)''(E|W)$/;
+        const lat = DMSStringToDecimal(latitude.trim().replace(/\s+/g, ''),regexLat)
+        const lng = DMSStringToDecimal(longitude.trim().replace(/\s+/g, ''),regexLng)
+        console.log("Latitude: " + lat)
+        console.log("Longitude: " + lng)
           
-        if (!isNaN(lat) && !isNaN(lng)) {
+        if (lat && lng) {
           const newPosition = new L.LatLng(lat, lng);
 
-        if (kirunaBounds.contains(newPosition)) {
+         if (kirunaBounds.contains(newPosition)) {
           setCoordinates(newPosition);
           if (mapRef.current) {
-            featureGroup.addLayer(L.marker(newPosition, { isStandalone: true, icon: customIcon }));
+            const marker = L.marker(newPosition, { isStandalone: true, icon: customIcon }); // Create marker
+            featureGroup.addLayer(marker); // Add marker to the feature group
+            popup
+              .setLatLng(newPosition) // Set popup position to the marker's coordinates
+              .setContent(
+                `<p>Coordinates: 
+                  ${decimalToDMS(newPosition.lat)} ${newPosition.lat >= 0 ? "N" : "S"}, 
+                  ${decimalToDMS(newPosition.lng)} ${newPosition.lng >= 0 ? "E" : "W"}
+                </p>`
+              );
+
+            marker.bindPopup(popup);
+
+            marker.on('mouseover', () => {
+              mapRef.current?.openPopup(popup)
+            });
+    
+            marker.on('mouseout', () => {
+              mapRef.current?.closePopup(popup);
+            });
             setIsEnterCoordinatesMode(false);
             setLatitude('');
             setLongitude('');
@@ -361,7 +459,7 @@ function GeoreferenceNewDocumentModal({
         }
       } else {
         setShowAlert(true);
-        setAlertMessage("Invalid coordinates entered");
+        setAlertMessage("Invalid coordinates entered. The format should be: DMS (° ' '') with direction (N/S/E/W).");
       }
     } else {
       setShowAlert(true);
@@ -490,24 +588,34 @@ function GeoreferenceNewDocumentModal({
               className="absolute top-36 right-24 z-[1002] flex flex-col bg-white p-4 rounded-lg shadow-lg"
             >
             <p className="text-sm text-gray-600 mt-2">
-             Note: Enter the coordinates in decimal degrees.
-            </p>
+             Note: Enter coordinates in DMS (° ' '') with direction (N/S/E/W).
+            </p> 
               <Form onSubmit={handleCoordinatesSubmit}>
-                <Form.Group className="mb-2">
+                <Form.Group as={Row} className="mb-2">
+                  <Form.Label column sm="3">
+                     Latitude
+                  </Form.Label>
+                <Col sm="9">
                   <Form.Control
                     type="text"
-                    placeholder="Latitude"
+                    placeholder="e.g., 67° 51' 27'' N"
                     value={latitude}
                     onChange={(e) => setLatitude(e.target.value)}
                   />
+                </Col>
                 </Form.Group>
-                <Form.Group className="mb-2">
+                <Form.Group as={Row} className="mb-2">
+                 <Form.Label column sm="3">
+                     Longitude
+                  </Form.Label>
+                <Col sm="9">
                   <Form.Control
                     type="text"
-                    placeholder="Longitude"
+                    placeholder="e.g., 20° 12' 24'' E"
                     value={longitude}
                     onChange={(e) => setLongitude(e.target.value)}
                   />
+                  </Col>
                 </Form.Group>
                 <Button type="submit">Place Marker</Button>
               </Form>

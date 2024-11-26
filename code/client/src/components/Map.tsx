@@ -121,6 +121,20 @@ function isPolygonMunicipal(coordinates: any[]): boolean {
   });
 }
 
+function decimalToDMS(decimal: number) {
+  const degrees = Math.floor(decimal);
+  const minutesDecimal = Math.abs((decimal - degrees) * 60);
+  const minutes = Math.floor(minutesDecimal);
+  const seconds = Math.round((minutesDecimal - minutes) * 60);
+
+  // Handle edge case for rounding up seconds
+  if (seconds === 60) {
+      return `${degrees + Math.sign(degrees)}° ${minutes + 1}' 0"`;
+  }
+
+  return `${degrees}° ${minutes}' ${seconds}"`;
+}
+
 
 function SetMapViewHome(props: any) {
   const map = useMap();
@@ -309,7 +323,7 @@ function SetMapViewHome(props: any) {
             className: "custom-popup"
           })
             .setLatLng([coord.latitude, coord.longitude]) // Set popup position to the marker's coordinates
-            .setContent(`<p>Coordinates: ${coord.latitude.toFixed(4)}, ${coord.longitude.toFixed(4)}</p>`)
+            .setContent(`<p>Coordinates: ${decimalToDMS(coord.latitude)} ${coord.latitude >= 0 ? "N" : "S"} , ${decimalToDMS(coord.longitude)} ${coord.longitude >= 0 ? "E" : "W"}</p>`)
 
           marker.on('mouseover', () => {
               map.openPopup(popup)
@@ -364,7 +378,7 @@ function SetMapViewEdit(props: any) {
   });
 
   const drawnItems = new L.FeatureGroup(); // Gruppo di elementi disegnati
-
+  let currentMarker: L.Marker | null = null;
   //creation of draw controls
   const drawControl = new L.Control.Draw({
     position: 'topright', // Posiziona i controlli di disegno in alto a sinistra
@@ -508,6 +522,44 @@ function SetMapViewEdit(props: any) {
     }
   }, [map, useMunicipalArea]);
 
+  // Gestione dell'evento di creazione del marker
+  map?.on(L.Draw.Event.CREATED, (event: any) => {
+    const layer = event.layer;
+
+    if (event.layerType === 'marker') {
+      const newPosition = layer.getLatLng();
+      
+      // Rimuovere il vecchio marker, se presente
+      if (currentMarker) {
+        map.removeLayer(currentMarker);
+      }
+
+      // Aggiungi il nuovo marker sulla mappa
+      currentMarker = layer;
+      layer.addTo(map);
+      //popup of the coordinates 
+      const popup = L.popup({
+        closeButton: false, // Disable the close button
+        autoClose: false,   // Prevent automatic closing
+        closeOnClick: false, // Prevent closing on click
+        offset: [10, -5],   // Adjust the position above the marker
+        className: "custom-popup"
+      })
+        .setLatLng(newPosition) // Set popup position to the marker's coordinates
+        .setContent(`<p>Coordinates: ${decimalToDMS(newPosition.lat)} ${newPosition.lat >= 0 ? "N" : "S"} , ${decimalToDMS(newPosition.lng)} ${newPosition.lng >= 0 ? "E" : "W"}</p>`)
+
+      layer.on('mouseover', () => {
+          map.openPopup(popup)
+      });
+
+      layer.on('mouseout', () => {
+        map.closePopup(popup);
+      });
+
+      // Aggiorna la posizione selezionata
+      setSelectedPosition([{lat: newPosition.lat, lng: newPosition.lng}]);
+    }
+  });
 
   return null;
 }
@@ -574,7 +626,7 @@ const SetViewDocumentCoordinates = (props: any) => {
           className: "custom-popup"
         })
           .setLatLng(centralCoord) // Set popup position to the marker's coordinates
-          .setContent(`<p>Coordinates: ${centralCoord[0].toFixed(4)}, ${centralCoord[1].toFixed(4)}</p>`)
+          .setContent(`<p>Coordinates: ${decimalToDMS(centralCoord[0])} ${centralCoord[0] >= 0 ? "N" : "S"} , ${decimalToDMS(centralCoord[1])} ${centralCoord[1] >= 0 ? "E" : "W"}</p>`)
 
         marker.on('mouseover', () => {
             map.openPopup(popup)

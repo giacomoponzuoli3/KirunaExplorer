@@ -12,6 +12,20 @@ import {createCityCoordinates} from './Map'
 import { Button } from 'react-bootstrap';
 import {ArrowsPointingOutIcon, InformationCircleIcon} from '@heroicons/react/24/solid'
 
+function decimalToDMS(decimal: number) {
+  const degrees = Math.floor(decimal);
+  const minutesDecimal = Math.abs((decimal - degrees) * 60);
+  const minutes = Math.floor(minutesDecimal);
+  const seconds = Math.round((minutesDecimal - minutes) * 60);
+
+  // Handle edge case for rounding up seconds
+  if (seconds === 60) {
+      return `${degrees + Math.sign(degrees)}° ${minutes + 1}' 0"`;
+  }
+
+  return `${degrees}° ${minutes}' ${seconds}"`;
+}
+
 interface ModalEditGeoreferenceProps {
   documentCoordinates: DocCoordinates;  // Documento con latitudine e longitudine
   onClose: () => void;  // Funzione per chiudere il modal
@@ -83,10 +97,41 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
             <strong>{error}</strong>
           </div>
         )}
+<<<<<<< HEAD
   
         <form className="flex flex-col flex-grow">
           {/* Mappa Leaflet */}
           <div className={`h-[500px] mb-4 ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}>
+=======
+
+        <form>
+          {/* Cambia il contenuto del modal */}
+          <div className="mb-4">
+            {isPolygon ? (
+              <div className="flex items-center text-blue-600 mb-3">
+              <span className="font-semibold">This document is associated with an area of the city, and not a single point.</span>
+            </div>
+            ) : (
+              <>
+                <label htmlFor="location" className="block text-sm font-medium text-gray-800 mb-2 hover:text-blue-500">
+                  <span className="text-gray-600">Actual latitude: </span>
+                  <span className="font-semibold text-blue-600">{decimalToDMS(documentCoordinates.coordinates[0].latitude)} {documentCoordinates.coordinates[0].latitude >= 0 ? "N" : "S"}</span>
+                </label>
+
+                <label htmlFor="location" className="block text-sm font-medium text-gray-800 mb-4 hover:text-blue-500">
+                  <span className="text-gray-600">Actual longitude: </span>
+                  <span className="font-semibold text-blue-600">{decimalToDMS(documentCoordinates.coordinates[0].longitude)} {documentCoordinates.coordinates[0].longitude >= 0 ? "E" : "W"}</span>
+                </label>
+              </>
+            )}
+
+            <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
+              Select New Georeference
+            </label>
+
+            {/* Mappa Leaflet */}
+            <div className={`h-80 ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}>
+>>>>>>> 2482b0718001c3c70f437b38495f826856be2475
             <MapContainer
               className={`relative w-full ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}
               style={{ height: '100%' }} // Impostiamo l'altezza della mappa al 100% dello spazio disponibile
