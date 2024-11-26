@@ -10,6 +10,20 @@ import { DocCoordinates } from "../models/document_coordinate";
 import { SetMapViewEdit } from './Map';
 import {createCityCoordinates} from './Map'
 
+function decimalToDMS(decimal: number) {
+  const degrees = Math.floor(decimal);
+  const minutesDecimal = Math.abs((decimal - degrees) * 60);
+  const minutes = Math.floor(minutesDecimal);
+  const seconds = Math.round((minutesDecimal - minutes) * 60);
+
+  // Handle edge case for rounding up seconds
+  if (seconds === 60) {
+      return `${degrees + Math.sign(degrees)}° ${minutes + 1}' 0"`;
+  }
+
+  return `${degrees}° ${minutes}' ${seconds}"`;
+}
+
 interface ModalEditGeoreferenceProps {
   documentCoordinates: DocCoordinates;  // Documento con latitudine e longitudine
   onClose: () => void;  // Funzione per chiudere il modal
@@ -91,12 +105,12 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
               <>
                 <label htmlFor="location" className="block text-sm font-medium text-gray-800 mb-2 hover:text-blue-500">
                   <span className="text-gray-600">Actual latitude: </span>
-                  <span className="font-semibold text-blue-600">{documentCoordinates.coordinates[0].latitude}</span>
+                  <span className="font-semibold text-blue-600">{decimalToDMS(documentCoordinates.coordinates[0].latitude)} {documentCoordinates.coordinates[0].latitude >= 0 ? "N" : "S"}</span>
                 </label>
 
                 <label htmlFor="location" className="block text-sm font-medium text-gray-800 mb-4 hover:text-blue-500">
                   <span className="text-gray-600">Actual longitude: </span>
-                  <span className="font-semibold text-blue-600">{documentCoordinates.coordinates[0].longitude}</span>
+                  <span className="font-semibold text-blue-600">{decimalToDMS(documentCoordinates.coordinates[0].longitude)} {documentCoordinates.coordinates[0].longitude >= 0 ? "E" : "W"}</span>
                 </label>
               </>
             )}

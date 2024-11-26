@@ -119,6 +119,20 @@ function isPolygonMunicipal(coordinates: any[]): boolean {
   });
 }
 
+function decimalToDMS(decimal: number) {
+  const degrees = Math.floor(decimal);
+  const minutesDecimal = Math.abs((decimal - degrees) * 60);
+  const minutes = Math.floor(minutesDecimal);
+  const seconds = Math.round((minutesDecimal - minutes) * 60);
+
+  // Handle edge case for rounding up seconds
+  if (seconds === 60) {
+      return `${degrees + Math.sign(degrees)}° ${minutes + 1}' 0"`;
+  }
+
+  return `${degrees}° ${minutes}' ${seconds}"`;
+}
+
 
 function SetMapViewHome(props: any) {
   const map = useMap();
@@ -307,7 +321,7 @@ function SetMapViewHome(props: any) {
             className: "custom-popup"
           })
             .setLatLng([coord.latitude, coord.longitude]) // Set popup position to the marker's coordinates
-            .setContent(`<p>Coordinates: ${coord.latitude.toFixed(4)}, ${coord.longitude.toFixed(4)}</p>`)
+            .setContent(`<p>Coordinates: ${decimalToDMS(coord.latitude)} ${coord.latitude >= 0 ? "N" : "S"} , ${decimalToDMS(coord.longitude)} ${coord.longitude >= 0 ? "E" : "W"}</p>`)
 
           marker.on('mouseover', () => {
               map.openPopup(popup)
@@ -514,7 +528,7 @@ const SetViewDocumentCoordinates = (props: any) => {
           className: "custom-popup"
         })
           .setLatLng(centralCoord) // Set popup position to the marker's coordinates
-          .setContent(`<p>Coordinates: ${centralCoord[0].toFixed(4)}, ${centralCoord[1].toFixed(4)}</p>`)
+          .setContent(`<p>Coordinates: ${decimalToDMS(centralCoord[0])} ${centralCoord[0] >= 0 ? "N" : "S"} , ${decimalToDMS(centralCoord[1])} ${centralCoord[1] >= 0 ? "E" : "W"}</p>`)
 
         marker.on('mouseover', () => {
             map.openPopup(popup)
