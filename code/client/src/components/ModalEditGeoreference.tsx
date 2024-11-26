@@ -97,101 +97,75 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
             <strong>{error}</strong>
           </div>
         )}
-<<<<<<< HEAD
-  
-        <form className="flex flex-col flex-grow">
-          {/* Mappa Leaflet */}
-          <div className={`h-[500px] mb-4 ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}>
-=======
+
 
         <form>
           {/* Cambia il contenuto del modal */}
           <div className="mb-4">
-            {isPolygon ? (
-              <div className="flex items-center text-blue-600 mb-3">
-              <span className="font-semibold">This document is associated with an area of the city, and not a single point.</span>
-            </div>
-            ) : (
-              <>
-                <label htmlFor="location" className="block text-sm font-medium text-gray-800 mb-2 hover:text-blue-500">
-                  <span className="text-gray-600">Actual latitude: </span>
-                  <span className="font-semibold text-blue-600">{decimalToDMS(documentCoordinates.coordinates[0].latitude)} {documentCoordinates.coordinates[0].latitude >= 0 ? "N" : "S"}</span>
-                </label>
-
-                <label htmlFor="location" className="block text-sm font-medium text-gray-800 mb-4 hover:text-blue-500">
-                  <span className="text-gray-600">Actual longitude: </span>
-                  <span className="font-semibold text-blue-600">{decimalToDMS(documentCoordinates.coordinates[0].longitude)} {documentCoordinates.coordinates[0].longitude >= 0 ? "E" : "W"}</span>
-                </label>
-              </>
-            )}
-
-            <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
-              Select New Georeference
-            </label>
 
             {/* Mappa Leaflet */}
             <div className={`h-80 ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}>
->>>>>>> 2482b0718001c3c70f437b38495f826856be2475
-            <MapContainer
-              className={`relative w-full ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}
-              style={{ height: '100%' }} // Impostiamo l'altezza della mappa al 100% dello spazio disponibile
-            >
-              <button
-        onClick={() => {}}
-        className="relative left-2 top-20 bg-gray-50 text-blue-600 p-2 rounded-full border-gray-50 border-1 shadow-lg hover:text-blue-950 hover:border-blu-600 z-[1000]"
-      >
-        <InformationCircleIcon className="w-6 h-6" />
-      </button>
-              {/* TileLayer per visualizzare la mappa */}
-              <SetMapViewEdit
-                setSelectedPosition={setSelectedPosition}
-                useMunicipalArea={useMunicipalArea}  // Passa lo stato per disabilitare la mappa
-              />
-              {/* Button for selecting whole area */}
-              <button
-                title="Select the whole area"
-                className="absolute right-3 top-[160px] z-[1000] w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-blue-200 rounded"
-                onClick={() => {}}
+              <MapContainer
+                className={`relative w-full ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}
+                style={{ height: '100%' }} // Impostiamo l'altezza della mappa al 100% dello spazio disponibile
               >
-                <ArrowsPointingOutIcon className="h-6 w-6 text-gray-600 hover:text-gray-800" />
-              </button>
-            </MapContainer>
+                <button
+                  onClick={() => {}}
+                  className="relative left-2 top-20 bg-gray-50 text-blue-600 p-2 rounded-full border-gray-50 border-1 shadow-lg hover:text-blue-950 hover:border-blu-600 z-[1000]"
+                >
+                  <InformationCircleIcon className="w-6 h-6" />
+                </button>
+                {/* TileLayer per visualizzare la mappa */}
+                <SetMapViewEdit
+                  setSelectedPosition={setSelectedPosition}
+                  useMunicipalArea={useMunicipalArea}  // Passa lo stato per disabilitare la mappa
+                />
+                {/* Button for selecting whole area */}
+                <button
+                  title="Select the whole area"
+                  className="absolute right-3 top-[160px] z-[1000] w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-blue-200 rounded"
+                  onClick={() => {}}
+                >
+                  <ArrowsPointingOutIcon className="h-6 w-6 text-gray-600 hover:text-gray-800" />
+                </button>
+              </MapContainer>
           
-          </div>
-  
-          {/* Toggle switch per l'area municipale */}
-          <div className="mt-2 flex items-center mb-4">
-            <label htmlFor="municipal-area-checkbox" className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                id="municipal-area-checkbox"
-                checked={useMunicipalArea}
-                onChange={handleCheckboxChange}
-                className="sr-only peer"
-              />
-              <span className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-500 transition"></span>
-              <span className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-5 transition"></span>
-            </label>
-            <span className="ml-3 text-sm text-gray-600">The entire municipal area</span>
-          </div>
-  
-          {/* Bottoni di azione */}
-          <div className="flex justify-between  mb-3">
-            <button
-              type="button"
-              onClick={onBack}
-              className="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 focus:outline-none"
-            >
-              Back
-            </button>
-            <button
-              type="button"
-              onClick={handleUpdate}
-              disabled={isLoading}
-              className="px-4 py-2 bg-blue-950 text-white rounded-lg hover:bg-blue-700 focus:outline-none"
-            >
-              {isLoading ? 'Updating...' : 'Update'}
-            </button>
+            </div>
+    
+            {/* Toggle switch per l'area municipale */}
+            <div className="mt-2 flex items-center mb-4">
+              <label htmlFor="municipal-area-checkbox" className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="municipal-area-checkbox"
+                  checked={useMunicipalArea}
+                  onChange={handleCheckboxChange}
+                  className="sr-only peer"
+                />
+                <span className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-500 transition"></span>
+                <span className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-5 transition"></span>
+              </label>
+              <span className="ml-3 text-sm text-gray-600">The entire municipal area</span>
+            </div>
+    
+            {/* Bottoni di azione */}
+            <div className="flex justify-between  mb-3">
+              <button
+                type="button"
+                onClick={onBack}
+                className="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 focus:outline-none"
+              >
+                Back
+              </button>
+              <button
+                type="button"
+                onClick={handleUpdate}
+                disabled={isLoading}
+                className="px-4 py-2 bg-blue-950 text-white rounded-lg hover:bg-blue-700 focus:outline-none"
+              >
+                {isLoading ? 'Updating...' : 'Update'}
+              </button>
+            </div>
           </div>
         </form>
       </div>
