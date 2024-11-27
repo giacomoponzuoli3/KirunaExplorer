@@ -232,6 +232,26 @@ async function getAllDocumentsOfSameType(type: string) {
     }
 }
 
+async function addResourceToDocument(idDoc: number, name: string, data: Uint8Array) {
+    let response = await fetch(baseURL + "doc/res", {
+        method: 'POST',
+        credentials: "include",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ idDoc: idDoc, name: name, data: data })
+    })
+    if (response.ok) {
+        return await response.json()
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
 
 /** ------------------- Link APIs ------------------------ */
 async function addLink(idDoc1: number, idDoc2: number, idLink: number) {
@@ -372,7 +392,7 @@ async function deleteDocumentCoordinates(idDoc: number){
 
 const API = {
     login, logOut, getUserInfo, register,
-    addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType,
+    addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType, addResourceToDocument,
     addLink, deleteLink, editLink, getAllLinks, getAllStakeholders,
     getAllDocumentsCoordinates, setDocumentCoordinates, updateDocumentCoordinates, deleteDocumentCoordinates
 }
