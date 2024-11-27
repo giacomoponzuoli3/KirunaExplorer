@@ -342,6 +342,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                       </label>
                       <Select
                         options={languageOptions}
+                        isClearable={true}
                         value={language ? languageOptions.find((lang) => lang.value === language) : null}
                         onChange={(selectedOption) => setLanguage(selectedOption ? selectedOption.label : null)}
                         placeholder="Select Language"
