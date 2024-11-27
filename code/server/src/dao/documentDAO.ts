@@ -416,6 +416,27 @@ class DocumentDAO {
             }
         });
     }
+
+    /**
+     * Adds a resource to the specified document in the database.
+     * @param documentId The id of the document to add the resource to.
+     * @param name The name of the resource to add.
+     * @param data The data of the resource to add.
+     * @returns A Promise that resolves when the resource has been added.
+     */
+    addResourceToDocument(documentId: number, name: string, data: Uint8Array): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            try {
+                const sql = "INSERT INTO original_resources (id_doc, name, data) VALUES (?, ?, ?)";
+                db.run(sql, [documentId, name, data], (err: Error | null) => {
+                    if (err) return reject(err);
+                    resolve();
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
 }
 
 export { DocumentDAO }
