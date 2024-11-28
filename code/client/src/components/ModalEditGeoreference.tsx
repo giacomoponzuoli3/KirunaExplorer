@@ -10,7 +10,7 @@ import { DocCoordinates } from "../models/document_coordinate";
 import { SetMapViewEdit } from './Map';
 import {createCityCoordinates} from './Map'
 import { Button } from 'react-bootstrap';
-import {ArrowsPointingOutIcon, InformationCircleIcon} from '@heroicons/react/24/solid'
+import {ArrowsPointingOutIcon, InformationCircleIcon, Square2StackIcon, MapPinIcon, PencilSquareIcon} from '@heroicons/react/24/solid'
 
 function decimalToDMS(decimal: number) {
   const degrees = Math.floor(decimal);
@@ -46,6 +46,9 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [useMunicipalArea, setUseMunicipalArea] = useState(false);  // Stato per la checkbox
 
+  //state for the selection
+  const [selectedButton, setSelectedButton] = useState<string | null>(null); // Stato per il pulsante selezionato
+
   // Default coordinate of municipal city
   const coordinatesCity: L.LatLng[] = createCityCoordinates();
 
@@ -80,89 +83,115 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUseMunicipalArea(event.target.checked);
     setSelectedPosition(coordinatesCity);
+    if (event.target.checked) {
+      setSelectedButton('Entire Area'); // Se l'area municipale è selezionata, resettiamo l'input
+    }
   };
+
+  const handleButtonClick = (buttonType: string) => {
+    setSelectedButton(buttonType); // Imposta il pulsante selezionato
+    setUseMunicipalArea(false);
+  };
+
 
   // Impostiamo il map component all'interno del modal
   return (
-<div className="size-xl fixed inset-0 z-[1000] bg-gray-500 bg-opacity-75 flex items-center justify-center">
-      <div className="bg-white rounded-lg shadow-lg w-full h-[90%] max-w-6xl p-8 flex flex-col">
-        <div className="flex justify-between items-center border-b mb-7">
-          <h2 className="text-lg font-semibold text-gray-900">
+    <div className="size-xl fixed inset-0 z-[1000] bg-gray-500 bg-opacity-75 flex items-center justify-center pt-6 pb-6">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-6xl p-4 sm:p-8 flex flex-col h-full ">
+        <div className="flex justify-between items-center border-b mb-6">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
             Edit the Georeference of <span className="text-blue-600">{documentCoordinates.title}</span>
           </h2>
         </div>
-  
+
         {error && (
           <div className="mb-4 text-red-600">
             <strong>{error}</strong>
           </div>
         )}
-  
+
+        <div className="flex mb-4 space-x-3">
+          {/* New point */}
+          <button
+            className={`px-3 py-1 border border-green-500 text-green-500 text-sm rounded-full hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-300 transition ease-in-out duration-200 ${
+              selectedButton === 'point' ? 'bg-green-100 text-green-500 border-green-500' : ''
+            }`}
+            onClick={() => handleButtonClick('point')}
+          >
+            <MapPinIcon className="w-5 h-5 mr-2 inline" />
+            New point
+          </button>
+
+          {/* New polygon */}
+          <button
+            className={`px-3 py-1 border border-blue-500 text-blue-500 text-sm rounded-full hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-300 transition ease-in-out duration-200 ${
+              selectedButton === 'polygon' ? 'bg-blue-100 text-blue-500 border-blue-500' : ''
+            }`}
+            onClick={() => handleButtonClick('polygon')}
+          >
+            <Square2StackIcon className="w-5 h-5 mr-2 inline" />
+            New polygon
+          </button>
+
+          {/* Edit georeference */}
+          <button
+            className={`px-3 py-1 border border-orange-500 text-orange-500 text-sm rounded-full hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300 transition ease-in-out duration-200 ${
+              selectedButton === 'edit' ? 'bg-orange-100 text-orange-500 border-orange-500' : ''
+            }`}
+            onClick={() => handleButtonClick('edit')}
+          >
+            <PencilSquareIcon className="w-5 h-5 mr-2 inline" />
+            Edit georeference
+          </button>
+
+          <div className="flex items-center mb-0">
+            <label htmlFor="municipal-area-checkbox" className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                id="municipal-area-checkbox"
+                checked={useMunicipalArea}
+                onChange={handleCheckboxChange}
+                className="sr-only peer"
+              />
+              <span className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-500 transition"></span>
+              <span className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-5 transition"></span>
+            </label>
+            <span className="ml-3 text-sm text-gray-600">The entire municipal area</span>
+          </div>
+        </div>
         <form className="flex flex-col flex-grow">
           {/* Mappa Leaflet */}
-          <div className={`h-[500px] mb-4 ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}>
+          <div className={`h-[60vh] sm:h-[550px] mb-6 ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}>
             <MapContainer
               className={`relative w-full ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}
-              style={{ height: '100%' }} // Impostiamo l'altezza della mappa al 100% dello spazio disponibile
+              style={{ height: '100%' }}
             >
-                <button
-                  onClick={() => {}}
-                  className="relative left-2 top-20 bg-gray-50 text-blue-600 p-2 rounded-full border-gray-50 border-1 shadow-lg hover:text-blue-950 hover:border-blu-600 z-[1000]"
-                >
-                  <InformationCircleIcon className="w-6 h-6" />
-                </button>
-                {/* TileLayer per visualizzare la mappa */}
-                <SetMapViewEdit
-                  setSelectedPosition={setSelectedPosition}
-                  useMunicipalArea={useMunicipalArea}  // Passa lo stato per disabilitare la mappa
-                />
-                {/* Button for selecting whole area */}
-                <button
-                  title="Select the whole area"
-                  className="absolute right-3 top-[160px] z-[1000] w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-blue-200 rounded"
-                  onClick={() => {}}
-                >
-                  <ArrowsPointingOutIcon className="h-6 w-6 text-gray-600 hover:text-gray-800" />
-                </button>
-              </MapContainer>
-          
-            </div>
-    
-            {/* Toggle switch per l'area municipale */}
-            <div className="mt-2 flex items-center mb-4">
-              <label htmlFor="municipal-area-checkbox" className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  id="municipal-area-checkbox"
-                  checked={useMunicipalArea}
-                  onChange={handleCheckboxChange}
-                  className="sr-only peer"
-                />
-                <span className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-500 transition"></span>
-                <span className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-5 transition"></span>
-              </label>
-              <span className="ml-3 text-sm text-gray-600">The entire municipal area</span>
-            </div>
-    
-            {/* Bottoni di azione */}
-            <div className="flex justify-between  mb-3">
-              <button
-                type="button"
-                onClick={onBack}
-                className="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 focus:outline-none"
-              >
-                Back
-              </button>
-              <button
-                type="button"
-                onClick={handleUpdate}
-                disabled={isLoading}
-                className="px-4 py-2 bg-blue-950 text-white rounded-lg hover:bg-blue-700 focus:outline-none"
-              >
-                {isLoading ? 'Updating...' : 'Update'}
-              </button>
-            </div>
-   
+              <SetMapViewEdit
+                setSelectedPosition={setSelectedPosition}
+                selectedButton={selectedButton}
+                useMunicipalArea={useMunicipalArea}
+              />
+            </MapContainer>
+          </div>
+
+          {/* Bottoni Back e Update */}
+          <div className="mt-auto flex justify-between">
+            <button
+              type="button"
+              onClick={onBack}
+              className="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 focus:outline-none"
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              onClick={handleUpdate}
+              disabled={isLoading}
+              className="px-4 py-2 bg-blue-950 text-white rounded-lg hover:bg-blue-700 focus:outline-none"
+            >
+              {isLoading ? 'Updating...' : 'Update'}
+            </button>
+          </div>
         </form>
       </div>
     </div>
