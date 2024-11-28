@@ -100,7 +100,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   
         <form className="flex flex-col flex-grow">
           {/* Mappa Leaflet */}
-          <div className={`h-[500px] mb-4 ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}>
+          <div className={`relative w-full h-full mb-4 ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}>
             <MapContainer
               className={`relative w-full ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}
               style={{ height: '100%' }} // Impostiamo l'altezza della mappa al 100% dello spazio disponibile
