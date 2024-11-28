@@ -326,6 +326,25 @@ async function getAllStakeholders() {
     }
 }
 
+async function addStakeholder(name: string, category: string): Promise<number> {
+    const response = await fetch(baseURL + "stakeholders", {
+        method: 'POST',
+        credentials: "include",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, category })
+    });
+
+    if (response.ok) {
+        const data = await response.json(); // Ottieni la risposta del server
+        return data.id; // Restituisci l'ID dello stakeholder
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error) throw errDetail.error;
+        if (errDetail.message) throw errDetail.message;
+        throw new Error("Something went wrong");
+    }
+}
+
 /** ------------------- Coordinates APIs ------------------------ */
 
 async function getAllDocumentsCoordinates() {
@@ -407,7 +426,8 @@ async function getMunicipalityArea() {
 const API = {
     login, logOut, getUserInfo, register,
     addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType, addResourceToDocument,
-    addLink, deleteLink, editLink, getAllLinks, getAllStakeholders,
+    getAllStakeholders, addStakeholder,
+    addLink, deleteLink, editLink, getAllLinks,
     getAllDocumentsCoordinates, setDocumentCoordinates, updateDocumentCoordinates, deleteDocumentCoordinates, getMunicipalityArea
 }
 export default API

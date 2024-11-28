@@ -51,6 +51,10 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
     const [pages, setPages] = useState<string | null>(null);
     const [description, setDescription] = useState('');
 
+    const [addingOther, setAddingOther] = useState(false); // Per mostrare/nascondere il campo "Other"
+    const [newStakeholderName, setNewStakeholderName] = useState(''); // Per gestire l'input
+
+
     const [showAlert, setShowAlert] = useState(false); // alert state
     const [alertMessage, setAlertMessage] = useState('');
     const [showAlertErrorDate, setShowAlertErrorDate] = useState<boolean>(false);
@@ -75,14 +79,16 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
     };
 
     const toggleSelect = (option: Stakeholder) => {
-        setSelectedStakeholders((prevSelectedStakeholders) => {
-            const newSelectedStakeholders = prevSelectedStakeholders.includes(option)
-                ? prevSelectedStakeholders.filter((item) => item !== option)
-                : [...prevSelectedStakeholders, option]; 
-            return newSelectedStakeholders; // Return the new state
-        });
+      setSelectedStakeholders((prevSelectedStakeholders) => {
+        const alreadySelected = prevSelectedStakeholders.some(
+          (item) => item.name === option.name
+        );
+        return alreadySelected
+          ? prevSelectedStakeholders.filter((item) => item.name !== option.name) // Rimuovi se già selezionato
+          : [...prevSelectedStakeholders, option]; // Aggiungi altrimenti
+      });
     };
-
+  
     const handleSubmit = async () => {
       // Validation check
       if (!title || selectedStakeholders.length === 0 || !scale || !issuanceDate || !type 
@@ -288,10 +294,60 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                             {option.name}
                           </Dropdown.Item>
                         ))}
+                        {/* Voce "Other" */}
+                        <Dropdown.Item
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setAddingOther(true); // Mostra il campo di input
+                          }}
+                        >
+                          Other
+                        </Dropdown.Item>
                       </Dropdown.Menu>
                     </Dropdown>
-
                   </div>
+
+              {/* Campo di input per "Other" */}
+              {addingOther && (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={newStakeholderName}
+                    onChange={(e) => setNewStakeholderName(e.target.value)}
+                    placeholder="Enter stakeholder name"
+                    className="border border-gray-300 rounded px-2 py-1 text-sm"
+                  />
+                  <button
+                onClick={async (e) => {
+                  e.preventDefault(); // Previene il comportamento predefinito
+                  e.stopPropagation(); // Impedisce la propagazione dell'evento
+                  if (newStakeholderName.trim()) {
+                    try {
+                      const response = await API.addStakeholder(newStakeholderName.trim(), newStakeholderName.trim());
+                      console.log(response);
+                      const newStakeholder = {
+                        id: response,
+                        name: newStakeholderName.trim(),
+                        category: newStakeholderName.trim(),
+                      };
+                      toggleSelect(newStakeholder); // Seleziona il nuovo stakeholder
+                      stakeholders.push(newStakeholder); // Aggiorna la lista degli stakeholders
+                      setNewStakeholderName(""); // Resetta l'input
+                      setAddingOther(false); // Nascondi il campo
+                    } catch (error) {
+                      setAlertMessage("The stakeholdername inserted already exists.")
+                      setShowAlert(true);
+                    }
+                  }
+                }}
+                className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600">Add</button>
+
+                  <button
+                    onClick={() => setAddingOther(false)}
+                    className="px-3 py-1 bg-gray-300 text-gray-700 rounded text-sm hover:bg-gray-400"> Cancel
+                  </button>
+              </div>
+            )}
 
                   {/* Stakeholders selezionati, visualizzati a destra */}
                   <div className="flex flex-wrap gap-2">
@@ -307,7 +363,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                             toggleSelect(stakeholder);
                           }}
                           className="ml-2 text-gray-500 hover:text-gray-700"
-                        > 
+                        >
                           ✕
                         </button>
                       </span>
@@ -315,6 +371,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                   </div>
                 </div>
               </div>
+
 
               {/* Section 4: Additional Information */}
               <div className="space-y-4">
