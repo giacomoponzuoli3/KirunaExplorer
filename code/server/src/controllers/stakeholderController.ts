@@ -15,6 +15,16 @@ class StakeholderController {
     getAllStakeholders(): Promise<Stakeholder[]> {
         return this.dao.getAllStakeholders();
     }
+
+    /**
+     * Adds a stakeholder to the database.
+     * @param name The name of the stakeholder to add.
+     * @param category The category of the stakeholder to add.
+     * @returns A Promise that resolves when the stakeholder has been added.
+     */
+    addStakeholder(name: string, category: string): Promise<Number> {
+        return this.dao.addStakeholder(name, category);
+    }
 }
 
 export default StakeholderController
