@@ -161,8 +161,6 @@ function SetMapView({resetForm, setCoordinates}: SetMapViewInterface) {
         rectangle: false,
         circle: false,
         circlemarker: false,
-        polygon: false,
-        /*
         polygon: {
           shapeOptions: {
             color: '#3388ff', // Colore del bordo
@@ -173,7 +171,6 @@ function SetMapView({resetForm, setCoordinates}: SetMapViewInterface) {
             dashArray: '5,5', // Linea tratteggiata (opzionale)
           },
         },
-        */
         marker: {
           icon: customIcon,
         },
@@ -521,7 +518,7 @@ function GeoreferenceNewDocumentModal({
           <Button title="Select the whole area"
             style={{
               position: 'absolute',
-              top: '200px',  // Adjust based on position under zoom controls
+              top: '230px',  // Adjust based on position under zoom controls
               right: '40px', // Adjust for placement on map
               zIndex: 1000,
               width: '30px',
@@ -558,7 +555,7 @@ function GeoreferenceNewDocumentModal({
           <Button title="Enter coordinates"
             style={{
             position: 'absolute',
-            top: '235px',  // Adjust based on position under zoom controls
+            top: '265px',  // Adjust based on position under zoom controls
             right: '40px', // Adjust for placement on map
             zIndex: 1000,
             width: '30px',
