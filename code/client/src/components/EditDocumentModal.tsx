@@ -41,23 +41,25 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
     const [pages, setPages] = useState<string | null>(document.pages);
     const [description, setDescription] = useState(document.description);
     
+    const [addingOther, setAddingOther] = useState(false); 
+    const [newStakeholderName, setNewStakeholderName] = useState('');
+
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
     const [showAlert, setShowAlert] = useState(false); // alert state
     const [showAlertErrorDate, setShowAlertErrorDate] = useState<boolean>(false);
+    const [showAlertStakeHoldersError, setShowAlertStakeHoldersError] = useState<boolean>(false);
 
     const toggleSelect = (option: Stakeholder) => {
-      setSelectedStakeholders((prevSelectedStakeholders) => {
-        const isSelected = prevSelectedStakeholders.some((item) => item.id === option.id); // Check if the stakeholder is already selected
-        
-        const newSelectedStakeholders = isSelected
-            ? prevSelectedStakeholders.filter((item) => item.id !== option.id) // Remove by ID
-            : [...prevSelectedStakeholders, option]; // Add by ID
-
-        console.log('Updated Stakeholders:', newSelectedStakeholders); // Log the new state
-        return newSelectedStakeholders; // Return the new state
-    });
-    };
+        setSelectedStakeholders((prevSelectedStakeholders) => {
+          const alreadySelected = prevSelectedStakeholders.some(
+            (item) => item.name === option.name
+          );
+          return alreadySelected
+            ? prevSelectedStakeholders.filter((item) => item.name !== option.name) // Rimuovi se già selezionato
+            : [...prevSelectedStakeholders, option]; // Aggiungi altrimenti
+        });
+      };
 
     const handleSubmit = async () => {
         // Validation check
@@ -122,6 +124,12 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                         <Alert
                             message="Invalid date format. Please use one of the following formats: mm/yyyy, dd/mm/yyyy, or yyyy."
                             onClose={() => setShowAlertErrorDate(false)}
+                        />
+                    )}
+                    {!showAlert && !showAlertErrorDate && showAlertStakeHoldersError && (
+                        <Alert
+                            message="The stakeholder name inserted already exists."
+                            onClose={() => setShowAlertStakeHoldersError(false)}
                         />
                     )}
                     <form className="space-y-6">
@@ -225,57 +233,108 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                         <div className="space-y-4">
                             <h3 className="text-lg font-semibold text-gray-700">Stakeholders</h3>
                             <div className="flex items-start gap-4">
-                                {/* Dropdown compatto */}
-                                <div className="w-1/2">
-                                    <Dropdown
-                                    show={dropdownOpen}
-                                    onToggle={(isOpen) => setDropdownOpen(isOpen)}
-                                    >
-                                        <Dropdown.Toggle
-                                            id="dropdown-basic"
-                                            onClick={() => setDropdownOpen(!dropdownOpen)}
-                                            className="custom-dropdown-toggle"
-                                        >
-                                            <span>
-                                            <RequiredLabel text="Choose one or more Stakeholders" />
-                                            </span>
-                                        </Dropdown.Toggle>
-                                        <Dropdown.Menu className="w-full">
-                                            {stakeholders.map((option, index) => (
-                                            <Dropdown.Item
-                                                key={index}
-                                                onClick={(e) => {
-                                                e.stopPropagation();
-                                                toggleSelect(option);
-                                                }}
-                                            >
-                                                {option.name}
-                                            </Dropdown.Item>
-                                            ))}
-                                        </Dropdown.Menu>
-                                    </Dropdown>
-                                </div>
-
-                                {/* Stakeholders selezionati, visualizzati a destra */}
-                                <div className="flex flex-wrap gap-2">
-                                    {selectedStakeholders.map((stakeholder, index) => (
-                                    <span
-                                        key={index}
-                                        className="flex items-center px-3 py-1 bg-gray-200 text-gray-800 rounded-full text-sm shadow-sm"
-                                    >
-                                        {stakeholder.name}
-                                        <button
-                                            onClick={(e) => {
-                                                e.preventDefault(); // Prevenire la propagazione
-                                                toggleSelect(stakeholder);
-                                            }}
-                                            className="ml-2 text-gray-500 hover:text-gray-700"
-                                        > 
-                                            ✕
-                                        </button>
+                            {/* Dropdown compatto */}
+                            <div className="w-1/2">
+                                <Dropdown
+                                show={dropdownOpen}
+                                onToggle={(isOpen) => setDropdownOpen(isOpen)}
+                                >
+                                <Dropdown.Toggle
+                                    id="dropdown-basic"
+                                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                                    className="custom-dropdown-toggle"
+                                >
+                                    <span>
+                                    <RequiredLabel text="Choose one or more Stakeholders" />
                                     </span>
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu className="w-full">
+                                    {stakeholders.map((option, index) => (
+                                    <Dropdown.Item
+                                        key={index}
+                                        onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleSelect(option);
+                                        }}
+                                    >
+                                        {option.name}
+                                    </Dropdown.Item>
                                     ))}
-                                </div>
+                                    {/* Voce "Other" */}
+                                    <Dropdown.Item
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setAddingOther(true); // Mostra il campo di input
+                                    }}
+                                    >
+                                    Other
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                                </Dropdown>
+                            </div>
+
+                        {/* Campo di input per "Other" */}
+                        {addingOther && (
+                            <div className="flex items-center gap-2">
+                            <input
+                                type="text"
+                                value={newStakeholderName}
+                                onChange={(e) => setNewStakeholderName(e.target.value)}
+                                placeholder="Enter stakeholder name"
+                                className="border border-gray-300 rounded px-2 py-1 text-sm"
+                            />
+                            <button
+                            onClick={async (e) => {
+                            e.preventDefault(); // Previene il comportamento predefinito
+                            e.stopPropagation(); // Impedisce la propagazione dell'evento
+                            if (newStakeholderName.trim()) {
+                                try {
+                                const response = await API.addStakeholder(newStakeholderName.trim(), newStakeholderName.trim());
+                                console.log(response);
+                                const newStakeholder = {
+                                    id: response,
+                                    name: newStakeholderName.trim(),
+                                    category: newStakeholderName.trim(),
+                                };
+                                toggleSelect(newStakeholder); // Seleziona il nuovo stakeholder
+                                stakeholders.push(newStakeholder); // Aggiorna la lista degli stakeholders
+                                setNewStakeholderName(""); // Resetta l'input
+                                setAddingOther(false); // Nascondi il campo
+                                } catch (error) {
+                                console.error(error);
+                                setShowAlertStakeHoldersError(true);
+                                }
+                            }
+                            }}
+                            className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600">Add</button>
+
+                            <button
+                                onClick={() => setAddingOther(false)}
+                                className="px-3 py-1 bg-gray-300 text-gray-700 rounded text-sm hover:bg-gray-400"> Cancel
+                            </button>
+                        </div>
+                        )}
+
+                            {/* Stakeholders selezionati, visualizzati a destra */}
+                            <div className="flex flex-wrap gap-2">
+                                {selectedStakeholders.map((stakeholder, index) => (
+                                <span
+                                    key={index}
+                                    className="flex items-center px-3 py-1 bg-gray-200 text-gray-800 rounded-full text-sm shadow-sm"
+                                >
+                                    {stakeholder.name}
+                                    <button
+                                    onClick={(e) => {
+                                        e.preventDefault(); // Prevenire la propagazione
+                                        toggleSelect(stakeholder);
+                                    }}
+                                    className="ml-2 text-gray-500 hover:text-gray-700"
+                                    >
+                                    ✕
+                                    </button>
+                                </span>
+                                ))}
+                            </div>
                             </div>
                         </div>
                         

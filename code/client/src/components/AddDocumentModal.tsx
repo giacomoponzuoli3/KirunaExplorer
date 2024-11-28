@@ -51,8 +51,8 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
     const [pages, setPages] = useState<string | null>(null);
     const [description, setDescription] = useState('');
 
-    const [addingOther, setAddingOther] = useState(false); // Per mostrare/nascondere il campo "Other"
-    const [newStakeholderName, setNewStakeholderName] = useState(''); // Per gestire l'input
+    const [addingOther, setAddingOther] = useState(false); 
+    const [newStakeholderName, setNewStakeholderName] = useState(''); 
 
 
     const [showAlert, setShowAlert] = useState(false); // alert state
@@ -335,7 +335,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                       setNewStakeholderName(""); // Resetta l'input
                       setAddingOther(false); // Nascondi il campo
                     } catch (error) {
-                      setAlertMessage("The stakeholdername inserted already exists.")
+                      setAlertMessage("The stakeholder name inserted already exists.")
                       setShowAlert(true);
                     }
                   }
@@ -371,7 +371,6 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                   </div>
                 </div>
               </div>
-
 
               {/* Section 4: Additional Information */}
               <div className="space-y-4">
