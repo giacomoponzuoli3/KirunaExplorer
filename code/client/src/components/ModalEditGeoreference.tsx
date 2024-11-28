@@ -11,20 +11,8 @@ import { SetMapViewEdit } from './Map';
 import {createCityCoordinates} from './Map'
 import { Button } from 'react-bootstrap';
 import {ArrowsPointingOutIcon, InformationCircleIcon, Square2StackIcon, MapPinIcon, PencilSquareIcon} from '@heroicons/react/24/solid'
+import Alert from './Alert';
 
-function decimalToDMS(decimal: number) {
-  const degrees = Math.floor(decimal);
-  const minutesDecimal = Math.abs((decimal - degrees) * 60);
-  const minutes = Math.floor(minutesDecimal);
-  const seconds = Math.round((minutesDecimal - minutes) * 60);
-
-  // Handle edge case for rounding up seconds
-  if (seconds === 60) {
-      return `${degrees + Math.sign(degrees)}° ${minutes + 1}' 0"`;
-  }
-
-  return `${degrees}° ${minutes}' ${seconds}"`;
-}
 
 interface ModalEditGeoreferenceProps {
   documentCoordinates: DocCoordinates;  // Documento con latitudine e longitudine
@@ -48,6 +36,9 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
 
   //state for the selection
   const [selectedButton, setSelectedButton] = useState<string | null>(null); // Stato per il pulsante selezionato
+
+  //alert
+  const [showAlert, setShowAlert] = useState<boolean>(false);
 
   // Default coordinate of municipal city
   const coordinatesCity: L.LatLng[] = createCityCoordinates();
@@ -76,6 +67,8 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
       } finally {
         setIsLoading(false);
       }
+    }else{
+      setShowAlert(true);
     }
   };
 
@@ -90,6 +83,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
 
   const handleButtonClick = (buttonType: string) => {
     setSelectedButton(buttonType); // Imposta il pulsante selezionato
+    setSelectedPosition(null); //reset the position
     setUseMunicipalArea(false);
   };
 
@@ -97,24 +91,29 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   // Impostiamo il map component all'interno del modal
   return (
     <div className="size-xl fixed inset-0 z-[1000] bg-gray-500 bg-opacity-75 flex items-center justify-center pt-6 pb-6">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-6xl p-4 sm:p-8 flex flex-col h-full ">
-        <div className="flex justify-between items-center border-b mb-6">
+      <div className="bg-white rounded-lg shadow-lg w-full h-[90%] max-w-6xl p-8 flex flex-col">
+        <div className="flex justify-between items-center border-b mb-7">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
             Edit the Georeference of <span className="text-blue-600">{documentCoordinates.title}</span>
           </h2>
         </div>
 
-        {error && (
-          <div className="mb-4 text-red-600">
-            <strong>{error}</strong>
-          </div>
-        )}
+        {showAlert &&
+          <Alert
+          message={selectedPosition == null 
+            ? "No new georeference was added. Please try again." 
+            : "Sorry, something went wrong..."}
+          onClose={() => {
+            setShowAlert(false);
+          }}
+        />
+        }
 
         <div className="flex mb-4 space-x-3">
           {/* New point */}
           <button
-            className={`px-3 py-1 border border-green-500 text-green-500 text-sm rounded-full hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-300 transition ease-in-out duration-200 ${
-              selectedButton === 'point' ? 'bg-green-100 text-green-500 border-green-500' : ''
+            className={`px-3 py-1 border-1 border-green-500 text-green-500 text-sm rounded-full hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-300 transition ease-in-out duration-200 ${
+              selectedButton === 'point' ? 'bg-green-100 text-green-500 border-green-500 border-2' : ''
             }`}
             onClick={() => handleButtonClick('point')}
           >
@@ -124,8 +123,8 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
 
           {/* New polygon */}
           <button
-            className={`px-3 py-1 border border-blue-500 text-blue-500 text-sm rounded-full hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-300 transition ease-in-out duration-200 ${
-              selectedButton === 'polygon' ? 'bg-blue-100 text-blue-500 border-blue-500' : ''
+            className={`px-3 py-1 border-1 border-blue-500 text-blue-500 text-sm rounded-full hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-300 transition ease-in-out duration-200 ${
+              selectedButton === 'polygon' ? 'bg-blue-100 text-blue-500 border-blue-500 border-2' : ''
             }`}
             onClick={() => handleButtonClick('polygon')}
           >
@@ -135,8 +134,8 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
 
           {/* Edit georeference */}
           <button
-            className={`px-3 py-1 border border-orange-500 text-orange-500 text-sm rounded-full hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300 transition ease-in-out duration-200 ${
-              selectedButton === 'edit' ? 'bg-orange-100 text-orange-500 border-orange-500' : ''
+            className={`px-3 py-1 border-1 border-orange-500 text-orange-500 text-sm rounded-full hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300 transition ease-in-out duration-200 ${
+              selectedButton === 'edit' ? 'bg-orange-100 text-orange-500 border-orange-500 border-2' : ''
             }`}
             onClick={() => handleButtonClick('edit')}
           >
@@ -161,7 +160,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
         </div>
         <form className="flex flex-col flex-grow">
           {/* Mappa Leaflet */}
-          <div className={`h-[60vh] sm:h-[550px] mb-6 ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}>
+          <div  className={`relative w-full h-full mb-4 ${useMunicipalArea || selectedButton === null ? 'pointer-events-none opacity-50' : ''}`}>
             <MapContainer
               className={`relative w-full ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}
               style={{ height: '100%' }}

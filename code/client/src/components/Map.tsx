@@ -364,7 +364,7 @@ function SetMapViewHome(props: any) {
 
 // Componente per la costruzione della mappa nel modal edit
 function SetMapViewEdit(props: any) {
-  const { setSelectedPosition, useMunicipalArea } = props;
+  const { setSelectedPosition, useMunicipalArea, selectedButton } = props;
   const map = useMap(); // Ottieni l'istanza della mappa
 
   // Icona personalizzata per il marker
@@ -379,34 +379,10 @@ function SetMapViewEdit(props: any) {
 
   const drawnItems = new L.FeatureGroup(); // Gruppo di elementi disegnati
   let currentMarker: L.Marker | null = null;
-  //creation of draw controls
-  const drawControl = new L.Control.Draw({
-    position: 'topright', // Posiziona i controlli di disegno in alto a sinistra
-    draw: {
-      marker: { icon: defaultIcon },
-      polygon: {
-        shapeOptions: {
-          color: '#ff0000',
-          weight: 3,
-          opacity: 0.8,
-          fillColor: '#3388ff',
-          fillOpacity: 0.3,
-        },
-      },
-      polyline: false,
-      rectangle: false,
-      circle: false,
-      circlemarker: false,
-    },
-    edit: {
-      featureGroup: drawnItems, // Gruppo modificabile
-      remove: true, // Abilita la rimozione
-    },
-  });
 
   useEffect(() => {
     if (map.getZoom() === undefined) {
-      map.setView(position, 12);
+      map.setView(position, 11);
     }
 
     map.setMaxZoom(18);
@@ -414,6 +390,30 @@ function SetMapViewEdit(props: any) {
     map.setMaxBounds(kirunaBounds);
 
     map.addLayer(drawnItems); // Aggiungi il gruppo alla mappa
+
+    const drawControl = new L.Control.Draw({
+      position: 'topright',
+      draw: {
+        marker: selectedButton === 'point' ? { icon: defaultIcon } : false,
+        polygon: selectedButton === 'polygon' ? {
+          shapeOptions: {
+            color: '#ff0000',
+            weight: 3,
+            opacity: 0.8,
+            fillColor: '#3388ff',
+            fillOpacity: 0.3,
+          },
+        } : false,
+        polyline: false,
+        rectangle: false,
+        circle: false,
+        circlemarker: false,
+      },
+      edit: {
+        featureGroup: drawnItems, // Gruppo modificabile
+        remove: true, // Abilita la rimozione
+      },
+    });
 
     map.addControl(drawControl);
 
@@ -430,6 +430,32 @@ function SetMapViewEdit(props: any) {
       });
 
       if (event.layerType === 'marker') {
+        // Aggiungi il nuovo marker sulla mappa
+        currentMarker = layer;
+
+        layer.unbindPopup();
+
+        layer.addTo(map);
+        //popup of the coordinates 
+        const popup = new L.Popup({
+          closeButton: false, // Disable the close button
+          autoClose: false,   // Prevent automatic closing
+          closeOnClick: false, // Prevent closing on click
+          offset: [10, -5],   // Adjust the position above the marker
+          className: "custom-popup"
+        })
+          .setLatLng(layer.getLatLng()) // Set popup position to the marker's coordinates
+          .setContent(`<p>Coordinates: ${decimalToDMS(layer.getLatLng().lat)} ${layer.getLatLng().lng >= 0 ? "N" : "S"} , ${decimalToDMS(layer.getLatLng().lng)} ${layer.getLatLng().lng >= 0 ? "E" : "W"}</p>`)
+        
+        layer.on('mouseover', () => {
+            map.openPopup(popup)
+        });
+
+        layer.on('mouseout', () => {
+          map.closePopup(popup);
+        });
+
+        layer.bindPopup(popup); // Associa il popup al marker
         setSelectedPosition([{ lat: layer.getLatLng().lat, lng: layer.getLatLng().lng }]);
       } else if (event.layerType === 'polygon') {
         // Ottenere le coordinate del poligono e verificare il tipo
@@ -448,10 +474,41 @@ function SetMapViewEdit(props: any) {
     map.on(L.Draw.Event.EDITED, (event: any) => {
       const layers = event.layers;
     
+      // Rimuovi tutti i popup esistenti dalla mappa
+      map.eachLayer((layer) => {
+        if (layer instanceof L.Popup) {
+          map.removeLayer(layer); // Elimina il popup dalla mappa
+        }
+      });
+
       layers.eachLayer((layer: any) => {
         if (layer instanceof L.Marker) {
           const newPosition = layer.getLatLng();
+
+          layer.unbindPopup(); // Elimina eventuali popup associati al marker
+
           console.log('Marker spostato a:', newPosition);
+          
+          //popup of the coordinates 
+          const popup = new L.Popup({
+            closeButton: false, // Disable the close button
+            autoClose: false,   // Prevent automatic closing
+            closeOnClick: false, // Prevent closing on click
+            offset: [10, -5],   // Adjust the position above the marker
+            className: "custom-popup"
+          })
+            .setLatLng(newPosition) // Set popup position to the marker's coordinates
+            .setContent(`<p>Coordinates: ${decimalToDMS(newPosition.lat)} ${newPosition.lat >= 0 ? "N" : "S"} , ${decimalToDMS(newPosition.lng)} ${newPosition.lng >= 0 ? "E" : "W"}</p>`)
+
+          layer.on('mouseover', () => {
+              map.openPopup(popup)
+          });
+
+          layer.on('mouseout', () => {
+            map.closePopup(popup);
+          });
+
+          layer.bindPopup(popup); // Associa il nuovo popup
           setSelectedPosition([{ lat: newPosition.lat, lng: newPosition.lng }]);
         } else if (layer instanceof L.Polygon) {
           const latLngs = layer.getLatLngs();
@@ -470,7 +527,7 @@ function SetMapViewEdit(props: any) {
     //event delete
     map.on(L.Draw.Event.DELETED, (event: any) => {
       const layers = event.layers;
-    
+
       layers.eachLayer((layer: any) => {
         if (layer instanceof L.Marker) {
           console.log('Marker eliminato:', layer.getLatLng());
@@ -499,7 +556,7 @@ function SetMapViewEdit(props: any) {
       map.removeLayer(satelliteLayer);
       map.removeControl(drawControl);
     };
-  }, [map, setSelectedPosition]);
+  }, [map, setSelectedPosition, props.selectedButton]);
 
   useEffect(() => {
 
@@ -522,44 +579,6 @@ function SetMapViewEdit(props: any) {
     }
   }, [map, useMunicipalArea]);
 
-  // Gestione dell'evento di creazione del marker
-  map?.on(L.Draw.Event.CREATED, (event: any) => {
-    const layer = event.layer;
-
-    if (event.layerType === 'marker') {
-      const newPosition = layer.getLatLng();
-      
-      // Rimuovere il vecchio marker, se presente
-      if (currentMarker) {
-        map.removeLayer(currentMarker);
-      }
-
-      // Aggiungi il nuovo marker sulla mappa
-      currentMarker = layer;
-      layer.addTo(map);
-      //popup of the coordinates 
-      const popup = L.popup({
-        closeButton: false, // Disable the close button
-        autoClose: false,   // Prevent automatic closing
-        closeOnClick: false, // Prevent closing on click
-        offset: [10, -5],   // Adjust the position above the marker
-        className: "custom-popup"
-      })
-        .setLatLng(newPosition) // Set popup position to the marker's coordinates
-        .setContent(`<p>Coordinates: ${decimalToDMS(newPosition.lat)} ${newPosition.lat >= 0 ? "N" : "S"} , ${decimalToDMS(newPosition.lng)} ${newPosition.lng >= 0 ? "E" : "W"}</p>`)
-
-      layer.on('mouseover', () => {
-          map.openPopup(popup)
-      });
-
-      layer.on('mouseout', () => {
-        map.closePopup(popup);
-      });
-
-      // Aggiorna la posizione selezionata
-      setSelectedPosition([{lat: newPosition.lat, lng: newPosition.lng}]);
-    }
-  });
 
   return null;
 }
