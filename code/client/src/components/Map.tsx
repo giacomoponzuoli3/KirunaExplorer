@@ -364,7 +364,7 @@ function SetMapViewHome(props: any) {
 
 // Componente per la costruzione della mappa nel modal edit
 function SetMapViewEdit(props: any) {
-  const { setSelectedPosition, useMunicipalArea, selectedButton } = props;
+  const { setSelectedPosition, useMunicipalArea, selectedButton, documentCoordinates } = props;
   const map = useMap(); // Ottieni l'istanza della mappa
 
   // Icona personalizzata per il marker
@@ -376,6 +376,12 @@ function SetMapViewEdit(props: any) {
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
     shadowSize: [41, 41], // Dimensioni dell'ombra
   });
+
+  //layer staellitare
+  const satelliteLayer = L.tileLayer(
+    'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+    { attribution: '&copy; ' }
+  );
 
   const drawnItems = new L.FeatureGroup(); // Gruppo di elementi disegnati
   let currentMarker: L.Marker | null = null;
@@ -390,6 +396,53 @@ function SetMapViewEdit(props: any) {
     map.setMaxBounds(kirunaBounds);
 
     map.addLayer(drawnItems); // Aggiungi il gruppo alla mappa
+
+    //add the polygon or point of the current document only if selected "edit"
+    if (selectedButton === "edit" && documentCoordinates) {
+      const latLngs = documentCoordinates.coordinates.map((coord: any) => [coord.latitude, coord.longitude]);
+
+      // Aggiungi poligono o punto dall'attuale documento
+      if (documentCoordinates.coordinates.length === 1) {
+        const marker = L.marker(latLngs[0], { icon: defaultIcon });
+
+        const popup = L.popup({
+          closeButton: false, // Disable the close button
+          autoClose: false,   // Prevent automatic closing
+          closeOnClick: false, // Prevent closing on click
+          offset: [10, -5],   // Adjust the position above the marker
+          className: "custom-popup"
+        })
+          .setLatLng(latLngs[0]) // Set popup position to the marker's coordinates
+          .setContent(`<p>Coordinates: ${decimalToDMS(latLngs[0][0])} ${latLngs[0][0] >= 0 ? "N" : "S"} , ${decimalToDMS(latLngs[0][1])} ${latLngs[0][1] >= 0 ? "E" : "W"}</p>`)
+
+        marker.on('mouseover', () => {
+            map.openPopup(popup)
+        });
+
+        marker.on('mouseout', () => {
+          map.closePopup(popup);
+        });
+
+        marker.bindPopup(popup); // Associa il nuovo popup
+
+        drawnItems.addLayer(marker);
+        setSelectedPosition(); // Imposta la posizione selezionata
+      } else if (documentCoordinates.coordinates.length > 1) {
+        const polygon = L.polygon(latLngs, {
+          color: '#ff0000',
+          weight: 3,
+          opacity: 0.8,
+          fillColor: '#3388ff',
+          fillOpacity: 0.3,
+        });
+        drawnItems.addLayer(polygon);
+        
+         // Converte latLngs in formato compatibile con setSelectedPosition
+        const formattedCoordinates = latLngs.map(([latitude, longitude]: [number, number]) => ({ lat: latitude, lng: longitude }));
+        setSelectedPosition(formattedCoordinates); // Imposta le coordinate del poligono
+      }
+    }
+
 
     const drawControl = new L.Control.Draw({
       position: 'topright',
@@ -411,7 +464,7 @@ function SetMapViewEdit(props: any) {
       },
       edit: {
         featureGroup: drawnItems, // Gruppo modificabile
-        remove: true, // Abilita la rimozione
+        remove: selectedButton != 'edit', // Abilita cancellazione solo se `edit` è selezionato
       },
     });
 
@@ -539,11 +592,6 @@ function SetMapViewEdit(props: any) {
       });
     });
     
-
-    const satelliteLayer = L.tileLayer(
-      'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-      { attribution: '&copy; ' }
-    );
     satelliteLayer.addTo(map);
 
     return () => {
@@ -556,7 +604,7 @@ function SetMapViewEdit(props: any) {
       map.removeLayer(satelliteLayer);
       map.removeControl(drawControl);
     };
-  }, [map, setSelectedPosition, props.selectedButton]);
+  }, [map, setSelectedPosition, props.selectedButton, documentCoordinates]);
 
   useEffect(() => {
 
@@ -587,8 +635,6 @@ function SetMapViewEdit(props: any) {
 
 const SetViewDocumentCoordinates = (props: any) => {
   const map = useMap();
-
-  console.log(props.documentCoordinates.coordinates);
 
   useEffect(() => {
     map.eachLayer((layer) => {
@@ -692,10 +738,8 @@ function MapView(props: any) {
   const getDocument = async () => {
     try{
       if(idDocument){
-        console.log("id: "+ idDocument )
         const doc = props.documentsCoordinates.filter((d: DocCoordinates) => d.id === Number(idDocument))
         setDocumentCoordinates(doc[0]);
-        console.log(doc);
       }
       
     }catch(err: any){

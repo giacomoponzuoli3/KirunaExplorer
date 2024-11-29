@@ -9,6 +9,7 @@ import { DocCoordinates } from "../models/document_coordinate";
 import { EditDocumentModal } from "./EditDocumentModal";
 import ConfirmModal from "./ConfirmModal";
 import { MagnifyingGlassIcon } from '@heroicons/react/24/solid'
+import { ModalEditGeoreference } from "./ModalEditGeoreference";
 
 function DocumentsTable(props: any){
     const navigate = useNavigate();
@@ -29,14 +30,16 @@ function DocumentsTable(props: any){
     const [documentGeoreferenceDelete, setDocumentGeoreferenceDelete] = useState<DocCoordinates | null>(null);
     //view document's georeference 
     const [viewDocumentGeoreference, setViewDocumentGeoreference] = useState<DocCoordinates | null>(null);
+    //document selected for edit/add georeference
+    const [documentSelected, setDocumentSelected] = useState<DocCoordinates | null>(null);
 
     //modal
     const [showAlert, setShowAlert] = useState(false); // alert state
     const [showModalEditDocument, setShowModalEditDocument] = useState<boolean>(false);
     const [showModalConfirmDelete, setShowModalConfirmDelete] = useState<boolean>(false);
     const [showModalConfirmDeleteGeoreference, setShowModalConfirmDeleteGeoreference] = useState<boolean>(false);
+    const [showModalGeoreference, setShowModalGeoreference] = useState<boolean>(false);
 
-    const [showModalViewDocumentCoordinates, setShowModalViewDocumentCoordinates] = useState<boolean>(false);
 
     //pagination controls
     const [currentPage, setCurrentPage] = useState(1);  // Track the current page
@@ -45,6 +48,8 @@ function DocumentsTable(props: any){
 
      // Calcola il numero totale di pagine in base ai documenti filtrati
     const totalPages = Math.ceil(filteredDocuments.length / itemsPerPage);
+
+    const [mode, setMode] = useState<string | null>(null);
 
     // Handle pagination button clicks
     const handleNextPage = () => {
@@ -192,9 +197,23 @@ function DocumentsTable(props: any){
     }
   }
 
-  //---------- VIEW DOCUMENT'S GEOREFERENCE -----------//
+  //---------- ADD DOCUMENT'S GEOREFERENCE -----------//
+  const handleAddGeoreference = (doc: DocCoordinates) => {
+    setDocumentSelected(doc);
+    setMode('insert');
+    setShowModalGeoreference(true);
+  }
 
+  //---------- EDIT DOCUMENT'S GEOREFERENCE -----------//
+  const handleEditGeoreference = (doc: DocCoordinates) => {
+    setDocumentSelected(doc);
+    setMode('edit');
+    setShowModalGeoreference(true);
+  }
 
+  const onBack = () => {
+    setShowModalGeoreference(false);
+  }   
 
   //function for the edit document modal
   function refreshSelectedDocument(doc: DocCoordinates) {
@@ -343,7 +362,7 @@ function DocumentsTable(props: any){
                                   <button
                                     title="Edit georeference"
                                     className="flex items-center justify-center rounded-full border-1 border-yellow-500 hover:border-yellow-600 text-yellow-500 hover:text-yellow-600 w-7 h-7 hover:shadow-lg"
-                                    onClick={() => {}}
+                                    onClick={() => handleEditGeoreference(doc)}
                                   >
                                     <MapIcon className="h-4 w-4" />
                                   </button>
@@ -355,7 +374,7 @@ function DocumentsTable(props: any){
                             <div className="flex items-center justify-center space-x-2">
                               <button
                                 title="Add new georeference"
-                                onClick={() => {}}
+                                onClick={() => handleAddGeoreference(doc)}
                                 className="bg-white text-green-600 hover:text-green-800 rounded-full w-14 h-8 flex items-center justify-center text-xs font-medium border-1 border-green-600 hover:border-green-800 hover:shadow-lg transition-all duration-300 ease-in-out"
                               >
                                 <PlusCircleIcon className="w-4 h-4 mr-1" />
@@ -439,6 +458,24 @@ function DocumentsTable(props: any){
 
           {/* Show the map with the coordinates of a specific document */}
           {viewDocumentGeoreference ? <>{console.log("view")}</> : <></>}
+
+          {showModalGeoreference && mode && documentSelected &&
+                <ModalEditGeoreference
+                    documentCoordinates={documentSelected}
+                    mode={mode}
+                    refreshDocuments={props.refreshDocuments}
+                    refreshDocumentsCoordinates={props.refreshDocumentsCoordinates}
+
+                    onClose={() => {    
+                      getDocuments(); //refresh of documents
+                      setShowModalGeoreference(false)
+                      setMode(null); //reset the mode
+                    }}
+
+                    onBack = {onBack}
+
+                />
+            }
 
         </div>
       );

@@ -163,7 +163,7 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocumentCoordinates, r
             {showModalEditGeoreference && selectedDocumentCoordinates.coordinates.length !== 0 &&
                 <ModalEditGeoreference
                     documentCoordinates={selectedDocumentCoordinates}
-
+                    mode={"edit"}
                     refreshDocuments={refreshDocuments}
                     refreshDocumentsCoordinates={refreshDocumentsCoordinates}
 
