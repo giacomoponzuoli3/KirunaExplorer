@@ -485,7 +485,7 @@ function GeoreferenceNewDocumentModal({
       </Modal.Header>
 
       <Modal.Body 
-        className="bg-white overflow-auto relative h-[calc(100vh-200px)]" // Prevent vertical scrollbar, ensure content fits
+        className="bg-white overflow-auto relative h-full w-full" // Prevent vertical scrollbar, ensure content fits
       >
         <Container>
           {showAlert && (
@@ -499,14 +499,23 @@ function GeoreferenceNewDocumentModal({
             />
           )}
 
-          <p className="text-sm text-gray-600 mt-2">
-            This step is optional. You can skip it if you don't wish to georeference the document at this time.
-          </p>
+          <label className="text-sm text-gray-600 mt-2 p-2"
+          style={{
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: "#A7C7E7"
+          }}>
+            If u need more information on how to select a point, draw an area, pick the whole area or enter coordinates, 
+            click on the <b style={{ marginLeft: '4px' }}> Info Button</b>
+            <i className="bi bi-info-square fs-8" style={{ marginLeft: '4px' }}></i>
+          </label>
 
           {/* Map Container */}
           <MapContainer 
             ref={mapRef} 
-            style={{ height: "calc(100vh - 250px)", width: "100%" }} // Ensure the map takes available height
+            style={{ height: "100%", width: "100%" }} // Ensure the map takes available height
           >
             <SetMapView
               resetForm={resetForm} 
@@ -687,6 +696,7 @@ function GeoreferenceNewDocumentModal({
       </Modal.Body>
 
       <Modal.Footer className="bg-gray-100 flex justify-end space-x-4">
+        <p className="text-sm text-gray-600 mt-2">This step is optional. You can skip it if you don't wish to georeference the document at this time.</p>
           <button
             className="px-4 py-2 bg-blue-950 hover:bg-blue-500 text-white rounded-md"
             onClick={handleSubmit}
