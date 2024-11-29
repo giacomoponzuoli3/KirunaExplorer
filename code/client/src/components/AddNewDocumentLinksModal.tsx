@@ -229,9 +229,6 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoord
         </Modal.Header>
         <Modal.Body className="bg-white">
           <Container>
-          <p className="text-sm text-gray-600 mt-2">
-            This step is optional. You can submit without linking the new document to other documents at this time.
-          </p>
             <Row>
               <Col xs={12} md={4}>
                 <div className=" flex items-center justify-center bg-gray-100">
@@ -423,6 +420,9 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoord
           </Container>
         </Modal.Body>
         <Modal.Footer className="bg-gray-100 flex justify-end space-x-4">
+        <p className="text-sm text-gray-600 mt-2">
+            This step is optional. You can submit without linking the new document to other documents at this time.
+          </p>
           <button 
               className="px-4 py-2 bg-blue-950 hover:bg-blue-500 text-white rounded-md" 
               onClick={handleLink} 
