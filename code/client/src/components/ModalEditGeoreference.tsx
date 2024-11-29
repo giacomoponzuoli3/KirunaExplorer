@@ -20,6 +20,7 @@ interface ModalEditGeoreferenceProps {
   refreshDocuments: () => void;  // Funzione per ricaricare la lista dei documenti dopo la modifica
   refreshDocumentsCoordinates: () => void;  // Funzione per ricaricare la lista dei documenti dopo la modifica
   onBack: () => void;
+  mode: string //Variabile che mi dice se sono in modalità di inserimento o update
 }
 
 const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
@@ -27,7 +28,8 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   onClose,
   refreshDocuments,
   refreshDocumentsCoordinates,
-  onBack
+  onBack,
+  mode
 }) => {
   const [selectedPosition, setSelectedPosition] = useState<LatLng[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -52,8 +54,14 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
       setError(null);
 
       try {
-        // Fai la chiamata API per aggiornare le coordinate del documento
-        await API.updateDocumentCoordinates(documentCoordinates.id, selectedPosition);
+        if(mode == "edit"){
+          // Fai la chiamata API per aggiornare le coordinate del documento
+          await API.updateDocumentCoordinates(documentCoordinates.id, selectedPosition);
+        }
+        if(mode == "insert"){
+          //Fai la chiamata API per inseire le coordinate ad un documento
+          await API.setDocumentCoordinates(documentCoordinates.id, selectedPosition);
+        }
 
         // Dopo aver aggiornato, ricarica i documenti
         refreshDocuments();
@@ -94,7 +102,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
       <div className="bg-white rounded-lg shadow-lg w-full h-[90%] max-w-6xl p-8 flex flex-col">
         <div className="flex justify-between items-center border-b mb-7">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-            Edit the Georeference of <span className="text-blue-600">{documentCoordinates.title}</span>
+            {mode == "edit" ? "Edit" : "Add new"} the Georeference of <span className="text-blue-600">{documentCoordinates.title}</span>
           </h2>
         </div>
 
@@ -112,6 +120,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
         <div className="flex mb-4 space-x-3">
           {/* New point */}
           <button
+            title='Insert new point'
             className={`px-3 py-1 border-1 border-green-500 text-green-500 text-sm rounded-full hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-300 transition ease-in-out duration-200 ${
               selectedButton === 'point' ? 'bg-green-100 text-green-500 border-green-500 border-2' : ''
             }`}
@@ -123,6 +132,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
 
           {/* New polygon */}
           <button
+            title='Draw new plygon'
             className={`px-3 py-1 border-1 border-blue-500 text-blue-500 text-sm rounded-full hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-300 transition ease-in-out duration-200 ${
               selectedButton === 'polygon' ? 'bg-blue-100 text-blue-500 border-blue-500 border-2' : ''
             }`}
@@ -133,15 +143,19 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
           </button>
 
           {/* Edit georeference */}
-          <button
-            className={`px-3 py-1 border-1 border-orange-500 text-orange-500 text-sm rounded-full hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300 transition ease-in-out duration-200 ${
-              selectedButton === 'edit' ? 'bg-orange-100 text-orange-500 border-orange-500 border-2' : ''
-            }`}
-            onClick={() => handleButtonClick('edit')}
-          >
-            <PencilSquareIcon className="w-5 h-5 mr-2 inline" />
-            Edit georeference
-          </button>
+
+          {mode === 'edit' && 
+            <button
+              title='Edit the actual georeference'
+              className={`px-3 py-1 border-1 border-orange-500 text-orange-500 text-sm rounded-full hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300 transition ease-in-out duration-200 ${
+                selectedButton === 'edit' ? 'bg-orange-100 text-orange-500 border-orange-500 border-2' : ''
+              }`}
+              onClick={() => handleButtonClick('edit')}
+            >
+              <PencilSquareIcon className="w-5 h-5 mr-2 inline" />
+              Edit georeference
+            </button>
+          }
 
           <div className="flex items-center mb-0">
             <label htmlFor="municipal-area-checkbox" className="relative inline-flex items-center cursor-pointer">
@@ -169,6 +183,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
                 setSelectedPosition={setSelectedPosition}
                 selectedButton={selectedButton}
                 useMunicipalArea={useMunicipalArea}
+                documentCoordinates={documentCoordinates}
               />
             </MapContainer>
           </div>
