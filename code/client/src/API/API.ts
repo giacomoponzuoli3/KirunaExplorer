@@ -232,6 +232,26 @@ async function getAllDocumentsOfSameType(type: string) {
     }
 }
 
+async function addResourceToDocument(idDoc: number, name: string, data: Uint8Array) {
+    let response = await fetch(baseURL + "doc/res", {
+        method: 'POST',
+        credentials: "include",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ idDoc: idDoc, name: name, data: data })
+    })
+    if (response.ok) {
+        return await response.json()
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
 
 /** ------------------- Link APIs ------------------------ */
 async function addLink(idDoc1: number, idDoc2: number, idLink: number) {
@@ -306,6 +326,25 @@ async function getAllStakeholders() {
     }
 }
 
+async function addStakeholder(name: string, category: string): Promise<number> {
+    const response = await fetch(baseURL + "stakeholders", {
+        method: 'POST',
+        credentials: "include",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, category })
+    });
+
+    if (response.ok) {
+        const data = await response.json(); // Ottieni la risposta del server
+        return data.id; // Restituisci l'ID dello stakeholder
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error) throw errDetail.error;
+        if (errDetail.message) throw errDetail.message;
+        throw new Error("Something went wrong");
+    }
+}
+
 /** ------------------- Coordinates APIs ------------------------ */
 
 async function getAllDocumentsCoordinates() {
@@ -370,10 +409,25 @@ async function deleteDocumentCoordinates(idDoc: number){
     }
 }
 
+async function getMunicipalityArea() {
+    const response = await fetch(baseURL + "coordinates" + "/municipality")
+    if (response.ok) {
+        return await response.json()
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+
 const API = {
     login, logOut, getUserInfo, register,
-    addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType,
-    addLink, deleteLink, editLink, getAllLinks, getAllStakeholders,
-    getAllDocumentsCoordinates, setDocumentCoordinates, updateDocumentCoordinates, deleteDocumentCoordinates
+    addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType, addResourceToDocument,
+    getAllStakeholders, addStakeholder,
+    addLink, deleteLink, editLink, getAllLinks,
+    getAllDocumentsCoordinates, setDocumentCoordinates, updateDocumentCoordinates, deleteDocumentCoordinates, getMunicipalityArea
 }
 export default API

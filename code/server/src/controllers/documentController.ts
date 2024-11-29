@@ -119,6 +119,17 @@ class DocumentController {
         return this.dao.getAllDocumentsOfSameType(type);
     }
 
+
+    /**
+     * Adds a resource to the specified document in the database.
+     * @param documentId The id of the document to add the resource to.
+     * @param name The name of the resource to add.
+     * @param data The data of the resource to add.
+     * @returns A Promise that resolves when the resource has been added.
+     */
+    addResourceToDocument(documentId: number, name: string, data: Uint8Array): Promise<void> {
+        return this.dao.addResourceToDocument(documentId, name, data);
+    }
 }
 
 export default DocumentController
