@@ -218,6 +218,24 @@ class DocumentRoutes {
             }
         );
 
+        this.router.post(
+            "/res",
+            this.authenticator.isLoggedIn, //error 401
+            this.authenticator.isPlanner, //error 401
+            body("idDoc").isNumeric(),
+            body("name").isString().notEmpty(),
+            body("data"),
+            this.errorHandler.validateRequest,
+            async (req: any, res: any, next: any) => {
+                try {
+                    const document = await this.controller.addResourceToDocument(req.body["idDoc"], req.body["name"], req.body["data"]);
+                    res.status(200).json(document);
+                } catch (err) {
+                    next(err);
+                }
+            }
+        );
+
     }
 }
 
