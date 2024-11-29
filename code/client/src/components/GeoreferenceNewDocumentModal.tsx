@@ -396,7 +396,7 @@ function GeoreferenceNewDocumentModal({
             clearOtherLayers();
 
             // Save the coordinates of the whole map polygon
-            setCoordinates(coordinatesCity); // First array in LatLngs represents the outer boundary
+            setCoordinates([]); // First array in LatLngs represents the outer boundary
 
             // Add the new polygon to the map
             newPolygon.addTo(mapRef.current);
