@@ -2,7 +2,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from "react";
 import { useMap, MapContainer } from 'react-leaflet';
-import { LatLngTuple, LatLngBounds, ControlOptions, map, polygon, Polygon, popup } from 'leaflet'; // Import del tipo corretto
+import { LatLngTuple, LatLngBounds, Polygon} from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -12,12 +12,7 @@ import ReactDOMServer from 'react-dom/server';
 import 'leaflet.markercluster';
 import { useParams } from 'react-router-dom';
 import Alert from './Alert';
-import API from '../API/API';
-import { LatLng } from 'leaflet';
-import { InformationCircleIcon } from '@heroicons/react/24/outline';  // Heroicon per l'icona "info"
-
-//coordinates of Kiruna Town Hall
-const kiruna_town_hall: LatLngTuple = [67.8558, 20.2253];
+import geoJson from '../utility/KirunaMunicipality.json'
 
 // Limiti della mappa per Kiruna
 const kirunaBounds = new LatLngBounds(
@@ -27,58 +22,29 @@ const kirunaBounds = new LatLngBounds(
 
 const position: LatLngTuple = [67.8558, 20.2253];
 
-function createCityCoordinates(): L.LatLng[] {
-  return [
-    L.latLng(67.8753332, 20.1841097),
-    L.latLng(67.8749453, 20.1866846),
-    L.latLng(67.8738462, 20.1880579),
-    L.latLng(67.8731996, 20.1878862),
-    L.latLng(67.8710012, 20.193551),
-    L.latLng(67.8689318, 20.1969843),
-    L.latLng(67.8659569, 20.1988725),
-    L.latLng(67.8638871, 20.2023058),
-    L.latLng(67.8620112, 20.204709),
-    L.latLng(67.8603939, 20.205224),
-    L.latLng(67.8586471, 20.2011041),
-    L.latLng(67.8573531, 20.1971559),
-    L.latLng(67.857159, 20.1923494),
-    L.latLng(67.8563826, 20.1921778),
-    L.latLng(67.8561885, 20.1944093),
-    L.latLng(67.8541826, 20.1870279),
-    L.latLng(67.8528883, 20.182908),
-    L.latLng(67.8534707, 20.1793031),
-    L.latLng(67.8552179, 20.1798181),
-    L.latLng(67.8567061, 20.1808481),
-    L.latLng(67.8577414, 20.1823931),
-    L.latLng(67.858259, 20.183938),
-    L.latLng(67.8583236, 20.1868562),
-    L.latLng(67.857159, 20.1873712),
-    L.latLng(67.8577414, 20.1894312),
-    L.latLng(67.8588412, 20.1880579),
-    L.latLng(67.8596176, 20.185483),
-    L.latLng(67.8618171, 20.1880579),
-    L.latLng(67.8623993, 20.1875429),
-    L.latLng(67.8620759, 20.185483),
-    L.latLng(67.8633696, 20.1851396),
-    L.latLng(67.8640811, 20.1823931),
-    L.latLng(67.8634343, 20.1803331),
-    L.latLng(67.8590353, 20.17381),
-    L.latLng(67.8598117, 20.1688318),
-    L.latLng(67.8602645, 20.163167),
-    L.latLng(67.8587765, 20.150464),
-    L.latLng(67.8428555, 20.1463442),
-    L.latLng(67.8337899, 20.2012758),
-    L.latLng(67.8384526, 20.2012758),
-    L.latLng(67.8289966, 20.2541475),
-    L.latLng(67.8229065, 20.2901964),
-    L.latLng(67.8384526, 20.3166323),
-    L.latLng(67.8381936, 20.3561144),
-    L.latLng(67.851141, 20.3619509),
-    L.latLng(67.8604586, 20.3066759),
-    L.latLng(67.8781777, 20.2129488),
-    L.latLng(67.8753332, 20.1841097)
-  ];
+// Funzione per convertire GeoJSON in un array di L.LatLng
+function createCityCoordinates(geoJson: any): L.LatLng[] {
+  const latLngs: L.LatLng[] = [];
+
+  geoJson.features.forEach((feature: any) => {
+    if (feature.geometry.type === 'MultiPolygon') {
+      feature.geometry.coordinates.forEach((polygon: any) => {
+        polygon.forEach((ring: any) => {
+          ring.forEach((coord: [number, number]) => {
+            const latLng = L.latLng(coord[1], coord[0]); // [latitude, longitude]
+            latLngs.push(latLng);
+          });
+        });
+      });
+    }
+  });
+
+  return latLngs;
 }
+
+const cityCoords = createCityCoordinates(geoJson);  // Ottieni le coordinate dell'area della città
+
+
 
 //function that calculates the centre of polygon
 function calculateCentroid(latLngs: [number, number][]): [number, number] {
@@ -108,18 +74,6 @@ function calculateCentroid(latLngs: [number, number][]): [number, number] {
   }
 }
 
-// Funzione che verifica se le coordinate di un documento sono dentro l'area definita
-function isPolygonMunicipal(coordinates: any[]): boolean {
-  const cityCoords = createCityCoordinates();  // Ottieni le coordinate dell'area della città
-
-  // Verifica se tutte le coordinate del documento sono all'interno dell'area
-  return coordinates.every((coord: any) => {
-    // Confronta ogni coordinata con quelle dell'area della città
-    return cityCoords.some((cityCoord: L.LatLng) => 
-      cityCoord.lat === coord.latitude && cityCoord.lng === coord.longitude
-    );
-  });
-}
 
 function decimalToDMS(decimal: number) {
   const degrees = Math.floor(decimal);
@@ -143,21 +97,22 @@ function SetMapViewHome(props: any) {
 
   useEffect(() => {
     if (map.getZoom() === undefined) {
-      map.setView(position, 12);
+      map.setView(position, 9);
     }
 
     map.setMaxZoom(18);
-    map.setMinZoom(12);
-    map.setMaxBounds(kirunaBounds);
+    map.setMinZoom(2);
+    //map.setMaxBounds(kirunaBounds);
     map.options.maxBoundsViscosity = 1.0;
 
     const satelliteLayer = L.tileLayer(
-      'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
+      'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+      { attribution: '&copy;' }
     ).addTo(map);
 
     const classicLayer = L.tileLayer(
       'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }
+      { attribution: '&copy;' }
     ).addTo(map);
 
     L.control.layers({ Classic: classicLayer, Satellite: satelliteLayer }, {}, { position: 'topleft' }).addTo(map);
@@ -240,20 +195,44 @@ function SetMapViewHome(props: any) {
     props.documentsCoordinates
       .filter((d: DocCoordinates) => d.coordinates.length !== 0)
       .forEach((doc: any) => {
-        const latLngs = doc.coordinates.map((coord: any) => [coord.latitude, coord.longitude]);
-  
-        if (latLngs.length > 1) {
-          const relatedLayer: L.Polygon = L.polygon(latLngs, {
-            color: '#B22222',
-            weight: 2,
-            opacity: 0.8,
-            fillColor: '#FFD700',
-            fillOpacity: 0.2,
-            smoothFactor: 2,
-          });
-  
-          const centralCoord = calculateCentroid(latLngs);; // Punto centrale del poligono
-  
+        console.log(doc);
+        const latLngs = doc.coordinates[0].municipality_area == 1 ? cityCoords.map((coord: any) => [coord.lat, coord.lng]) : doc.coordinates.map((coord: any) => [coord.latitude, coord.longitude]);
+
+        console.log(latLngs);
+
+        if (latLngs.length > 1 || (doc.coordinates.length == 1 && doc.coordinates[0].municipality_area == 1) ) {
+          
+          const centralCoord = calculateCentroid(latLngs);
+          //polygon of the document
+          let relatedLayer: any;
+
+          if (doc.coordinates[0].municipality_area == 1) {
+            relatedLayer = L.geoJSON(props.geoJsonData, {
+              style: {
+                color: "#B22222",
+                weight: 2,
+                opacity: 0.8,
+                fillColor: '#FFD700',
+                fillOpacity: 0.2,
+              },
+              onEachFeature: (feature, layer) => {
+                if (feature.properties) {
+                  layer.bindPopup(`Municipality: ${feature.properties.pnm}`);
+                }
+              },
+            });
+            
+          }else {
+            relatedLayer = L.polygon(latLngs, {
+              color: '#B22222',
+              weight: 2,
+              opacity: 0.8,
+              fillColor: '#FFD700',
+              fillOpacity: 0.2,
+              smoothFactor: 2,
+            });
+          }
+        
           const iconHtml = ReactDOMServer.renderToString(props.getDocumentIcon(doc.type, 5) || <></>);
   
           const marker = L.marker(centralCoord, {
@@ -274,7 +253,7 @@ function SetMapViewHome(props: any) {
             
             activePolygons.add(relatedLayer);
 
-            if (isPolygonMunicipal(doc.coordinates)) {
+            if (doc.coordinates[0].municipality_area == 1) {
               setShowPolygonMessage(true);  // Mostra il messaggio
             }
           });
@@ -283,7 +262,7 @@ function SetMapViewHome(props: any) {
             relatedLayer.removeFrom(map);
             activePolygons.delete(relatedLayer);
 
-            if (isPolygonMunicipal(doc.coordinates)) {
+            if (doc.coordinates[0].municipality_area == 1) {
               setShowPolygonMessage(false); //nascondi il messaggio
             }
 
@@ -327,10 +306,14 @@ function SetMapViewHome(props: any) {
 
           marker.on('mouseover', () => {
               map.openPopup(popup)
+              
           });
   
           marker.on('mouseout', () => {
             map.closePopup(popup);
+            if(doc.coordinates[0].municipality_area == 1){
+              setShowPolygonMessage(true);
+            }
           });
   
           marker.on('click', () => {
@@ -388,12 +371,12 @@ function SetMapViewEdit(props: any) {
 
   useEffect(() => {
     if (map.getZoom() === undefined) {
-      map.setView(position, 11);
+      map.setView(position, 10);
     }
 
     map.setMaxZoom(18);
     map.setMinZoom(3);
-    map.setMaxBounds(kirunaBounds);
+    //map.setMaxBounds(kirunaBounds);
 
     map.addLayer(drawnItems); // Aggiungi il gruppo alla mappa
 
@@ -402,7 +385,7 @@ function SetMapViewEdit(props: any) {
       const latLngs = documentCoordinates.coordinates.map((coord: any) => [coord.latitude, coord.longitude]);
 
       // Aggiungi poligono o punto dall'attuale documento
-      if (documentCoordinates.coordinates.length === 1) {
+      if (documentCoordinates.coordinates.length === 1 && documentCoordinates.coordinates[0].municipality_area == 0) {
         const marker = L.marker(latLngs[0], { icon: defaultIcon });
 
         const popup = L.popup({
@@ -643,13 +626,17 @@ const SetViewDocumentCoordinates = (props: any) => {
       }
     });
 
+    //get the coordinates
+    const latLngs = props.documentCoordinates.coordinates[0].municipality_area == 1 ? cityCoords.map((coord: any) => [coord.lat, coord.lng]) : props.documentCoordinates.coordinates.map((coord: any) => [coord.latitude, coord.longitude]);
+    const centralCoord = calculateCentroid(latLngs);
+
     if (map.getZoom() === undefined) {
-      map.setView(position, 12);
+      map.setView(centralCoord, 9);
     }
 
     map.setMaxZoom(18);
     map.setMinZoom(3);
-    map.setMaxBounds(kirunaBounds);
+    //map.setMaxBounds(kirunaBounds);
 
     const satelliteLayer = L.tileLayer(
       'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
@@ -659,16 +646,16 @@ const SetViewDocumentCoordinates = (props: any) => {
     
 
     if(props.documentCoordinates.coordinates.length !== 0){
+      console.log(props.documentCoordinates.coordinates);
       //get the icon of the document
       const iconHtml = ReactDOMServer.renderToString(props.getDocumentIcon(props.documentCoordinates.type, 5) || <></>);
       //get the coordinates
-      const latLngs = props.documentCoordinates.coordinates.map((coord: any) => [coord.latitude, coord.longitude]);
+      const latLngs = props.documentCoordinates.coordinates[0].municipality_area == 1 ? cityCoords.map((coord: any) => [coord.lat, coord.lng]) : props.documentCoordinates.coordinates.map((coord: any) => [coord.latitude, coord.longitude]);
 
-      // centre point of the polygon/point
       const centralCoord = calculateCentroid(latLngs);
 
       //marker of the document
-      const marker = L.marker(centralCoord, {
+      const marker =  L.marker(centralCoord, {
         icon: L.divIcon({
           html: `
             <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95 border-1 border-blue-950">
@@ -680,7 +667,7 @@ const SetViewDocumentCoordinates = (props: any) => {
         }),
       }).addTo(map);
 
-      if(props.documentCoordinates.coordinates.length === 1){ //if it is a point
+      if(props.documentCoordinates.coordinates.length === 1 && props.documentCoordinates.coordinates[0].municipality_area == 0){ //if it is a point
         
         //popup of the coordinates 
         const popup = L.popup({
@@ -692,8 +679,9 @@ const SetViewDocumentCoordinates = (props: any) => {
         })
           .setLatLng(centralCoord) // Set popup position to the marker's coordinates
           .setContent(`<p>Coordinates: ${decimalToDMS(centralCoord[0])} ${centralCoord[0] >= 0 ? "N" : "S"} , ${decimalToDMS(centralCoord[1])} ${centralCoord[1] >= 0 ? "E" : "W"}</p>`)
-
+        
         marker.on('mouseover', () => {
+          console.log("popup");
             map.openPopup(popup)
         });
 
@@ -701,19 +689,46 @@ const SetViewDocumentCoordinates = (props: any) => {
           map.closePopup(popup);
         });
 
+        marker.bindPopup(popup); // Associa il nuovo popup
+
 
       } else { //it is a polygon
-
+        
         //polygon of the document
-        L.polygon(latLngs, {
-          color: '#B22222',
-          weight: 2,
-          opacity: 0.8,
-          fillColor: '#FFD700',
-          fillOpacity: 0.2,
-          smoothFactor: 2,
-          interactive: false
-        }).addTo(map);
+        let polygon: any;
+
+        if (props.documentCoordinates.coordinates[0].municipality_area == 1) {
+          polygon = L.geoJSON(props.geoJsonData, {
+            style: {
+              color: "#B22222",
+              weight: 2,
+              opacity: 0.8,
+              fillColor: '#FFD700',
+              fillOpacity: 0.2,
+            },
+            onEachFeature: (feature, layer) => {
+              if (feature.properties) {
+                layer.bindPopup(`Municipality: ${feature.properties.pnm}`);
+              }
+            },
+          }).addTo(map);
+
+          props.setShowPolygonMessage(true);
+
+          
+        }else {
+          polygon = L.polygon(latLngs, {
+            color: '#B22222',
+            weight: 2,
+            opacity: 0.8,
+            fillColor: '#FFD700',
+            fillOpacity: 0.2,
+            smoothFactor: 2,
+          });
+        }
+
+        polygon.addTo(map);
+        
       }
       
     }
@@ -726,6 +741,9 @@ const SetViewDocumentCoordinates = (props: any) => {
 
 function MapView(props: any) {
   const { idDocument } = useParams(); 
+
+  //set show message of polygon
+  const [showPolygonMessage, setShowPolygonMessage] = useState<boolean>(false)
 
   //modal alert
   const [showAlert, setShowAlert] = useState<boolean>(false);
@@ -769,7 +787,12 @@ function MapView(props: any) {
             <MapContainer
               style={{ height: 'calc(100vh - 65px)', width: '100%' }}
             >
-              <SetViewDocumentCoordinates position={position} documentCoordinates={documentCoordinates} getDocumentIcon={props.getDocumentIcon}/>
+              <SetViewDocumentCoordinates position={position} documentCoordinates={documentCoordinates} getDocumentIcon={props.getDocumentIcon} geoJsonData={props.geoJsonData} setShowPolygonMessage={setShowPolygonMessage}/>
+              {showPolygonMessage && (
+                <div className="fixed top-2/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] bg-gray-200 text-black text-sm px-2 py-1 rounded-md shadow-lg border">
+                  area: <strong>the entire municipality of Kiruna</strong>
+                </div>
+              )}
             </MapContainer>
           </div>
         </div>
@@ -779,5 +802,5 @@ function MapView(props: any) {
 };
 
 
-export {SetMapViewHome, SetMapViewEdit, createCityCoordinates, MapView}
+export {SetMapViewHome, SetMapViewEdit, cityCoords, MapView}
   

@@ -362,7 +362,17 @@ async function getAllDocumentsCoordinates() {
 }
 
 async function setDocumentCoordinates(idDoc: number, coordinates: LatLng|LatLng[]) {
-    const response = await fetch(baseURL + "coordinates", { method: 'POST', credentials: "include", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idDoc: idDoc, coordinates: coordinates },) })
+    console.log("coordinates " + coordinates)
+    const response = await fetch(baseURL + "coordinates", { 
+        method: 'POST', 
+        credentials: "include", 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ 
+            idDoc: idDoc, 
+            coordinates: coordinates,
+        }) 
+    })
+    console.log("fetch");
     if (response.ok) {
         return 
     } else {
@@ -376,7 +386,16 @@ async function setDocumentCoordinates(idDoc: number, coordinates: LatLng|LatLng[
 }
 
 async function updateDocumentCoordinates(idDoc: number, coordinates: LatLng|LatLng[]) {
-    const response = await fetch(baseURL + "coordinates" + "/update", { method: 'POST', credentials: "include", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idDoc: idDoc, coordinates: coordinates },) })
+    const response = await fetch(baseURL + "coordinates" + "/update", { 
+        method: 'POST', 
+        credentials: "include", 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ 
+            idDoc: idDoc, 
+            coordinates: coordinates
+        }) 
+    })
+
     if (response.ok) {
         return 
     } else {

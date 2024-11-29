@@ -199,6 +199,7 @@ function DocumentsTable(props: any){
 
   //---------- ADD DOCUMENT'S GEOREFERENCE -----------//
   const handleAddGeoreference = (doc: DocCoordinates) => {
+    console.log(doc.coordinates);
     setDocumentSelected(doc);
     setMode('insert');
     setShowModalGeoreference(true);
@@ -307,7 +308,7 @@ function DocumentsTable(props: any){
                     </tr>
                   </thead>
                   <tbody>
-                    {paginatedLinks.map((doc, index) => (
+                    {paginatedLinks.map((doc: DocCoordinates, index) => (
                       <tr
                         key={index}
                         className={`border-b transition duration-200 ease-in-out ${
@@ -338,6 +339,7 @@ function DocumentsTable(props: any){
                           </button>
                         </td>
                         <td className="px-2 py-4 text-sm text-gray-600 w-[10%]">
+                          
                           {doc.coordinates.length !== 0 ? (
                             <>
                               <div className="flex items-center justify-center space-x-2">
@@ -465,6 +467,8 @@ function DocumentsTable(props: any){
                     mode={mode}
                     refreshDocuments={props.refreshDocuments}
                     refreshDocumentsCoordinates={props.refreshDocumentsCoordinates}
+
+                    geoJsonData={props.geoJsonData}
 
                     onClose={() => {    
                       getDocuments(); //refresh of documents

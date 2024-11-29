@@ -7,8 +7,7 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet-draw';
 import API from '../API/API';
 import { DocCoordinates } from "../models/document_coordinate";
-import { SetMapViewEdit } from './Map';
-import {createCityCoordinates} from './Map'
+import { SetMapViewEdit, cityCoords } from './Map';
 import { Button } from 'react-bootstrap';
 import {ArrowsPointingOutIcon, InformationCircleIcon, Square2StackIcon, MapPinIcon, PencilSquareIcon} from '@heroicons/react/24/solid'
 import Alert from './Alert';
@@ -21,6 +20,7 @@ interface ModalEditGeoreferenceProps {
   refreshDocumentsCoordinates: () => void;  // Funzione per ricaricare la lista dei documenti dopo la modifica
   onBack: () => void;
   mode: string //Variabile che mi dice se sono in modalità di inserimento o update
+  geoJsonData: any
 }
 
 const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
@@ -29,7 +29,8 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   refreshDocuments,
   refreshDocumentsCoordinates,
   onBack,
-  mode
+  mode,
+  geoJsonData
 }) => {
   const [selectedPosition, setSelectedPosition] = useState<LatLng[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,15 +44,16 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
   // Default coordinate of municipal city
-  const coordinatesCity: L.LatLng[] = createCityCoordinates();
+  const coordinatesCity: L.LatLng[] = cityCoords;
 
   // Determina se le coordinate rappresentano un poligono o un punto
   const isPolygon = documentCoordinates.coordinates && documentCoordinates.coordinates.length > 1;
 
   const handleUpdate = async () => {
-    if (selectedPosition != null && selectedPosition.length !== 0) {
+    if (selectedPosition != null) {
       setIsLoading(true);
       setError(null);
+
 
       try {
         if(mode == "edit"){
@@ -63,15 +65,17 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
           await API.setDocumentCoordinates(documentCoordinates.id, selectedPosition);
         }
 
+        console.log("Entrato1")
         // Dopo aver aggiornato, ricarica i documenti
         refreshDocuments();
         refreshDocumentsCoordinates();
+        console.log("Entrato1")
 
         // Chiudi il modal dopo il salvataggio
         onClose();
       } catch (err) {
         setError('An error occurred while saving the georeference.');
-        console.error(err);
+        console.log(err);
       } finally {
         setIsLoading(false);
       }
@@ -83,7 +87,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   // Funzione per gestire il cambio di stato della checkbox
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUseMunicipalArea(event.target.checked);
-    setSelectedPosition(coordinatesCity);
+    setSelectedPosition([]);
     if (event.target.checked) {
       setSelectedButton('Entire Area'); // Se l'area municipale è selezionata, resettiamo l'input
     }
@@ -181,6 +185,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
             >
               <SetMapViewEdit
                 setSelectedPosition={setSelectedPosition}
+                geoJsonData={geoJsonData}
                 selectedButton={selectedButton}
                 useMunicipalArea={useMunicipalArea}
                 documentCoordinates={documentCoordinates}
