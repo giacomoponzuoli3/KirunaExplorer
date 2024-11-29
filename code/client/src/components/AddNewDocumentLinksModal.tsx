@@ -26,7 +26,7 @@ interface AddNewDocumentLinksModalProps {
     newDocumentCoordinates: LatLng | LatLng[] | null
 }
 
-function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoordinates, docs,newDocumentCoordinates}: AddNewDocumentLinksModalProps) {
+function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoordinates, docs, newDocumentCoordinates}: AddNewDocumentLinksModalProps) {
     const [typesLink, setTypesLink] = useState<Link[]>([]); // vector of types of links
     const [documents, setDocuments] = useState<Document[]>(docs.filter((d: Document) => d.id != document.id)); // vector of all documents except one
 
@@ -163,6 +163,8 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoord
       if(newDocumentCoordinates){
         console.log(doc.id)
         //add the coordinates if they exist
+
+        //TODO: UPDATE WITH THE BOOLEAN 0 OR 1 (NOT FALSE/TRUE)
         await API.setDocumentCoordinates(doc.id, newDocumentCoordinates);
       }
       if (documentLinks.length !== 0) {

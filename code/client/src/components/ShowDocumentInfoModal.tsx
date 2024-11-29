@@ -24,9 +24,10 @@ interface ShowDocumentInfoModalProps {
     refreshDocuments: () => void;
     refreshDocumentsCoordinates: () => void;
     setShow: (arg: boolean) => void;
+    geoJsonData: any
 }
 
-function ShowDocumentInfoModal({ getDocumentIcon, selectedDocumentCoordinates, refreshDocumentsCoordinates, setShow, show, onHide, user, handleEdit, refreshDocuments }: ShowDocumentInfoModalProps) {
+function ShowDocumentInfoModal({ geoJsonData, getDocumentIcon, selectedDocumentCoordinates, refreshDocumentsCoordinates, setShow, show, onHide, user, handleEdit, refreshDocuments }: ShowDocumentInfoModalProps) {
     const navigate = useNavigate();  
   
     const [showModalEditGeoreference, setShowModalEditGeoreference] = useState<boolean>(false);
@@ -164,6 +165,7 @@ function ShowDocumentInfoModal({ getDocumentIcon, selectedDocumentCoordinates, r
                 <ModalEditGeoreference
                     documentCoordinates={selectedDocumentCoordinates}
                     mode={"edit"}
+                    geoJsonData={geoJsonData}
                     refreshDocuments={refreshDocuments}
                     refreshDocumentsCoordinates={refreshDocumentsCoordinates}
 

@@ -13,7 +13,20 @@ class CoordinatesDAO {
      getAllDocumentsCoordinates(): Promise<DocCoordinates[]> {
         return new Promise<DocCoordinates[]>((resolve, reject) => {
             try {
-                const sql = `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude,dc.longitude, dc.point_order FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id ORDER BY dc.point_order`;
+                const sql = `SELECT 
+                                d.*, 
+                                s.id AS stakeholder_id, 
+                                s.name AS stakeholder_name, 
+                                s.category AS stakeholder_category, 
+                                dc.id AS coordinate_id, 
+                                dc.latitude,dc.longitude, 
+                                dc.point_order, 
+                                dc.municipality_area 
+                            FROM documents d 
+                            LEFT JOIN document_coordinates dc ON dc.document_id = d.id 
+                            LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document 
+                            LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id 
+                            ORDER BY dc.point_order`;
     
                 db.all(sql, [], (err: Error | null, rows: any[]) => {
                     if (err) return reject(err);
@@ -49,9 +62,9 @@ class CoordinatesDAO {
                             }
                     
                             // Add coordinate only if it exists and is not already added
-                            if (row.coordinate_id !== null && row.latitude !== null && row.longitude !== null) {
+                            if ((row.coordinate_id !== null && row.latitude !== null && row.longitude !== null) || (row.municipality_area == 1)) {
                                 if (!doc.coordinates.some(coordinate => coordinate.id === row.coordinate_id)) {
-                                    const coordinate = new Coordinate(row.coordinate_id, row.point_order, row.latitude, row.longitude);
+                                    const coordinate = new Coordinate(row.coordinate_id, row.point_order, row.latitude, row.longitude, row.municipality_area);
                                     doc.coordinates.push(coordinate);
                                 }
                             }
@@ -78,24 +91,38 @@ class CoordinatesDAO {
         return new Promise<void>((resolve, reject) => {
             try {
                 const coordinatesArray = Array.isArray(coords) ? coords : [coords];
-                const coordinatesInserts = coordinatesArray.map((point, index) => {
-                    return new Promise<void>((innerResolve, innerReject) => {
-                        const sql = `INSERT INTO document_coordinates (document_id, latitude, longitude, point_order) VALUES (?, ?, ?, ?)`;
-                        const pointOrder = index + 1;
-    
-                        db.run(sql, [id, point.lat, point.lng, pointOrder], (err: Error | null) => {
-                            if (err) {
-                                innerReject(err);
-                            } else {
-                                innerResolve();
-                            }
+                if(coordinatesArray.length > 0){
+                    const coordinatesInserts = coordinatesArray.map((point, index) => {
+                        return new Promise<void>((innerResolve, innerReject) => {
+                            const sql = `INSERT INTO document_coordinates (document_id, latitude, longitude, point_order, municipality_area) VALUES (?, ?, ?, ?, ?)`;
+                            const pointOrder = index + 1;
+        
+                            db.run(sql, [id, point.lat, point.lng, pointOrder, 0], (err: Error | null) => {
+                                if (err) {
+                                    innerReject(err);
+                                } else {
+                                    innerResolve();
+                                }
+                            });
                         });
                     });
-                });
-    
-                Promise.all(coordinatesInserts)
-                    .then(() => resolve())
-                    .catch((error) => reject(error));
+        
+                    Promise.all(coordinatesInserts)
+                        .then(() => resolve())
+                        .catch((error) => reject(error));
+                }else{
+                    
+                    const sql = `INSERT INTO document_coordinates (document_id, municipality_area) VALUES (?, ?)`;
+                
+                    db.run(sql, [id, 1], (err: Error | null) => {
+                        if (err) {
+                            return reject(err);
+                        } else {
+                            console.log("fine dao");
+                            return resolve();
+                        }
+                    });
+                }
             } catch (error) {
                 reject(error);
             }

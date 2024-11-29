@@ -37,6 +37,7 @@ function getDocumentIcon(type: string, size: number = 16): JSX.Element | null {
 }
 
 
+
 function App() {
   const [user, setUser] = useState<any>('');
 
@@ -58,9 +59,19 @@ function App() {
     }
   };
 
+  const [geoJsonData, setGeoJsonData] = useState(null);
+
+  useEffect(() => {
+    // Carica il file GeoJSON da 'public/'
+    fetch('/KirunaMunicipality.geojson')
+      .then(response => response.json())
+      .then(data => setGeoJsonData(data))
+      .catch(error => console.error('Error loading GeoJSON:', error));
+  }, []);
+
   const getAllDocumentsCoordinates = async () => {
     try {
-        const docs = await API.getAllDocumentsCoordinates();
+        const docs: DocCoordinates[] = await API.getAllDocumentsCoordinates();
         setDocumentsCoordinates(docs);
     } catch (err: any) {
         console.log(err);
@@ -122,6 +133,8 @@ function App() {
     setUser('')
   };
 
+
+
   return (
     <>
       <Routes>
@@ -131,14 +144,14 @@ function App() {
             <Outlet/>
           </>
         }>
-          <Route index element={<HomePage documentsCoordinates={documentsCoordinates} documents={documents} user={user} refreshDocuments={getAllDocuments} refreshDocumentsCoordinates={getAllDocumentsCoordinates} stakeholders={stakeholders} getDocumentIcon={getDocumentIcon}/>}/>
+          <Route index element={<HomePage geoJsonData={geoJsonData} documentsCoordinates={documentsCoordinates} documents={documents} user={user} refreshDocuments={getAllDocuments} refreshDocumentsCoordinates={getAllDocumentsCoordinates} stakeholders={stakeholders} getDocumentIcon={getDocumentIcon}/>}/>
           <Route path="/login" element={<Login message={message} isLogged={isLogged} login={handleLogin} handleBack={handleBack}/>} />
           <Route path="*" element={<NotFoundLayout/>} />
           {/* Aggiungi altre route come la dashboard */}
           <Route path="/:idDocument/links" element={<LinksDocument user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} />} />
           <Route path="/documents" element={<DocumentsTable user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} refreshDocuments={getAllDocuments} refreshDocumentsCoordinates={getAllDocumentsCoordinates}/>} />
           <Route path="documents/:idDocument/links" element={<LinksDocument user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} />} />
-          <Route path="documents/:idDocument/map" element={<MapView user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} documentsCoordinates={documentsCoordinates}/>} />
+          <Route path="documents/:idDocument/map" element={<MapView user={user} geoJsonData={geoJsonData} isLogged={isLogged} getDocumentIcon={getDocumentIcon} documentsCoordinates={documentsCoordinates}/>} />
         </Route>
       </Routes>
     </>

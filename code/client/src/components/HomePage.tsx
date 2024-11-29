@@ -48,12 +48,13 @@ interface HomepageProps {
     refreshDocumentsCoordinates: () => void;
     getDocumentIcon: (type: string) => JSX.Element | null;
     stakeholders: Stakeholder[];
+    geoJsonData: any
 }
 
 
 //----------- Components -------------//
 
-function HomePage({documentsCoordinates, documents, user, refreshDocuments, refreshDocumentsCoordinates, getDocumentIcon, stakeholders} : HomepageProps) {
+function HomePage({documentsCoordinates, documents, user, refreshDocuments, refreshDocumentsCoordinates, getDocumentIcon, stakeholders, geoJsonData} : HomepageProps) {
 
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
   const [selectedDocumentCoordinates, setSelectedDocumentCoordinates] = useState<DocCoordinates | null>(null);
@@ -107,7 +108,7 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
       style={{ height: "calc(100vh - 65px)", width: "100%" }}
     >
       {/* Impostiamo il centro, il livello di zoom e i vari documenti tramite SetMapView */}
-      <SetMapViewHome documentsCoordinates={documentsCoordinates} getDocumentIcon={getDocumentIcon} onMarkerClick={handleDocumentClick}/>
+      <SetMapViewHome documentsCoordinates={documentsCoordinates} geoJsonData={geoJsonData} getDocumentIcon={getDocumentIcon} onMarkerClick={handleDocumentClick}/>
 
     </MapContainer>
 
@@ -122,6 +123,7 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
         selectedDocumentCoordinates={selectedDocumentCoordinates}
         onHide={handleCloseDetailsModal} getDocumentIcon={getDocumentIcon} 
         user={user} handleEdit={handleEdit} refreshDocuments={refreshDocuments} 
+        geoJsonData={geoJsonData}
         refreshDocumentsCoordinates={refreshDocumentsCoordinates}
       />
     )}

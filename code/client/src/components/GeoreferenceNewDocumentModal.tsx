@@ -534,7 +534,7 @@ function GeoreferenceNewDocumentModal({
             onClick={() => {
                 setLatitude('');
                 setLongitude('');
-                setCoordinates(null);
+                setCoordinates([]);
                 setIsEnterCoordinatesMode(false);
                 handleSelectWholeMap();
             }}

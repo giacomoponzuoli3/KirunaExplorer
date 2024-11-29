@@ -32,8 +32,9 @@ class CoordinatesRoutes {
             (_req: any, res: any, next: any) => {
                 try {
                     this.controller.getAllDocumentsCoordinates()
-                        .then((docCoordinates: DocCoordinates[]) => res.status(200).json(docCoordinates))
+                        .then((docCoordinates: DocCoordinates[]) =>  res.status(200).json(docCoordinates))
                         .catch((err: Error) => next(err))
+                        
                 } catch (err) {
                     next(err);
                 }
@@ -50,14 +51,16 @@ class CoordinatesRoutes {
         
                 if (!Array.isArray(value) && !isLatLng(value)) throw new CoordinatesTypeError;
                 if (Array.isArray(value) && !value.every(isLatLng)) throw new CoordinatesArrayError;
-
                 return true;
             }),
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
                 try {
+                    console.log("arrivo qui");
                     this.controller.setDocumentCoordinates(req.body.idDoc, req.body.coordinates)
-                        .then(() => res.status(200).json({ message: "Coordinates added successfully" }))
+                        .then(() => {
+                            console.log("pippo");
+                            return res.status(200).json({ message: "Coordinates added successfully" });})
                         .catch((err: Error) => next(err));
                 } catch (err) {
                     next(err);
@@ -81,7 +84,7 @@ class CoordinatesRoutes {
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
                 try {
-                    this.controller.updateDocumentCoordinates(req.body.idDoc, req.body.coordinates)
+                    this.controller.updateDocumentCoordinates(req.body.idDoc, req.body.coordinates, req.body.useMunicipalArea)
                         .then(() => res.status(200).json({ message: "Coordinates updated successfully" }))
                         .catch((err: Error) => next(err))
                 } catch (err) {
