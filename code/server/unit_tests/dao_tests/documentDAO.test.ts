@@ -1319,7 +1319,7 @@ describe('documentDAO', () => {
 
             expect(db.all).toHaveBeenCalledWith(
                 'SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.type = ?',
-                [],
+                ["Material effect"],
                 expect.any(Function)
             );
 
@@ -1336,7 +1336,7 @@ describe('documentDAO', () => {
 
             expect(db.all).toHaveBeenCalledWith(
                 'SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.type = ?',
-                [],
+                ["Material effect"],
                 expect.any(Function)
             );
 
@@ -1352,7 +1352,7 @@ describe('documentDAO', () => {
 
             expect(db.all).toHaveBeenCalledWith(
                 'SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.type = ?',
-                [],
+                ["Material effect"],
                 expect.any(Function)
             );
 
@@ -1367,6 +1367,43 @@ describe('documentDAO', () => {
 
             await expect(dao.getAllDocumentsOfSameType("Material effect")).rejects.toThrow("Unexpected error");
     
+        });
+    });
+
+    describe(' addResourceToDocument', () => {
+        test("It should adds a resource to the specified document in the database", async () => {
+            jest.spyOn(db, 'run').mockImplementationOnce((sql, params, callback) => {
+                callback(null);
+                return {} as Database;
+            })
+    
+            await expect(dao.addResourceToDocument(testId, "title", new Uint8Array([10, 10, 20]))).resolves.toBeUndefined();
+
+            expect(db.run).toHaveBeenCalledWith(
+                'INSERT INTO original_resources (id_doc, name, data) VALUES (?, ?, ?)',
+                [testId, "title", new Uint8Array([10, 10, 20])],
+                expect.any(Function)
+            );
+    
+        });
+
+        test('It should reject if there is a database error', async () => {
+            jest.spyOn(db, 'run')
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(new Error('Database error'));
+                    return {} as Database;
+                })
+
+            await expect(dao.addResourceToDocument).rejects.toThrow(`Database error`);
+        });
+
+        test('It should reject with error if an unexpected error occurs', async () => {
+            const unexpectedError = new Error("Unexpected error");
+            (db.run as jest.Mock).mockImplementation(() => {
+                throw unexpectedError;
+            });
+
+            await expect(dao.addResourceToDocument).rejects.toThrow("Unexpected error");
         });
     });
 });

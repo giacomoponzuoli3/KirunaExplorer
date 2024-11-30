@@ -18,9 +18,9 @@ describe('coordinatesController', () => {
     const controller = new CoordinatesController();
     const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
     const testStakeholder2 = new Stakeholder(2, "Bob", "urban developer");
-    const testCoordinate1 = new Coordinate(1, 5, 100, 200);
-    const testCoordinate2 = new Coordinate(2, 10, 200, 100);
-    const testCoordinate3 = new Coordinate(3, 1, 150, 150);
+    const testCoordinate1 = new Coordinate(1, 5, 100, 200,1);
+    const testCoordinate2 = new Coordinate(2, 10, 200, 100,1);
+    const testCoordinate3 = new Coordinate(3, 1, 150, 150,1);
     const testDocCoordinate = new DocCoordinates(1, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description", [testCoordinate1, testCoordinate2, testCoordinate3]);
 
     describe('getAllDocumentsCoordinates', () => {
@@ -66,6 +66,15 @@ describe('coordinatesController', () => {
             expect(dao.setDocumentCoordinates).toHaveBeenCalledWith(1,coordinate);
         });
 
+        test('It should successfully set the municipality area for a document if no coordinates are provided', async () => {
+
+            jest.spyOn(dao, 'setDocumentCoordinates').mockResolvedValue(undefined);
+
+            await expect(controller.setDocumentCoordinates(1, [])).resolves.toBeUndefined();
+            expect(dao.setDocumentCoordinates).toHaveBeenCalledWith(1,[]);
+
+        });
+
         test('It should successfully set multiple coordinates for a document', async () => {
             const coordinates: LatLng[] = [
                 { lat: 40.7128, lng: -74.0060 },
@@ -76,6 +85,15 @@ describe('coordinatesController', () => {
 
             await expect(controller.setDocumentCoordinates(1,coordinates)).resolves.toEqual(undefined);
             expect(dao.setDocumentCoordinates).toHaveBeenCalledWith(1,coordinates);
+        });
+
+        test('It should reject if there is an error in set the municipality area', async () => {
+
+            jest.spyOn(dao, 'setDocumentCoordinates').mockRejectedValue(new Error ('Set municipality area error'));
+
+            await expect(controller.setDocumentCoordinates(1, [])).rejects.toThrow('Set municipality area error');
+            expect(dao.setDocumentCoordinates).toHaveBeenCalledWith(1,[]);
+
         });
 
         test('It should reject if there is an error in the first coordinate insertion', async () => {
@@ -124,20 +142,20 @@ describe('coordinatesController', () => {
     });
 
 
-        describe('updateDocumentCoordinates', () => {
+    describe('updateDocumentCoordinates', () => {
 
         test('It should successfully update document coordinates with a single coordinate', async () => {
           const documentId = 1;
           const coordinate: LatLng = { lat: 40.7128, lng: -74.0060 };
       
           // Mock `dao.updateDocumentCoordinates` to resolve successfully
-          const updateSpy = jest.spyOn(dao, 'updateDocumentCoordinates').mockResolvedValueOnce(undefined);
+          jest.spyOn(dao, 'updateDocumentCoordinates').mockResolvedValueOnce(undefined);
       
           // Call the function and expect it to resolve without errors
-          await expect(dao.updateDocumentCoordinates(documentId, coordinate)).resolves.toBeUndefined();
+          await expect(controller.updateDocumentCoordinates(documentId, coordinate,1)).resolves.toBeUndefined();
       
           // Ensure `dao.updateDocumentCoordinates` was called with the correct arguments
-          expect(updateSpy).toHaveBeenCalledWith(documentId, coordinate);
+          expect(dao.updateDocumentCoordinates).toHaveBeenCalledWith(documentId, coordinate);
         });
       
         test('It should successfully update document coordinates with multiple coordinates', async () => {
@@ -148,13 +166,13 @@ describe('coordinatesController', () => {
           ];
       
           // Mock `dao.updateDocumentCoordinates` to resolve successfully
-          const updateSpy = jest.spyOn(dao, 'updateDocumentCoordinates').mockResolvedValueOnce(undefined);
+          jest.spyOn(dao, 'updateDocumentCoordinates').mockResolvedValueOnce(undefined);
       
           // Call the function and expect it to resolve without errors
-          await expect(dao.updateDocumentCoordinates(documentId, coordinates)).resolves.toBeUndefined();
+          await expect(controller.updateDocumentCoordinates(documentId, coordinates,1)).resolves.toBeUndefined();
       
           // Ensure `dao.updateDocumentCoordinates` was called with the correct arguments
-          expect(updateSpy).toHaveBeenCalledWith(documentId, coordinates);
+          expect(dao.updateDocumentCoordinates).toHaveBeenCalledWith(documentId, coordinates);
         });
       
         test('It should reject if updating document coordinates fails', async () => {
@@ -165,7 +183,10 @@ describe('coordinatesController', () => {
           jest.spyOn(dao, 'updateDocumentCoordinates').mockRejectedValueOnce(new Error('Update failed'));
       
           // Call the function and expect it to reject with the correct error message
-          await expect(dao.updateDocumentCoordinates(documentId, coordinate)).rejects.toThrow('Update failed');
+          await expect(controller.updateDocumentCoordinates(documentId, coordinate,1 )).rejects.toThrow('Update failed');
+
+           // Ensure `dao.updateDocumentCoordinates` was called with the correct arguments
+           expect(dao.updateDocumentCoordinates).toHaveBeenCalledWith(documentId, coordinate);
         });
 
         test('It should propagate unexpected errors', async () => {
@@ -176,8 +197,43 @@ describe('coordinatesController', () => {
             jest.spyOn(dao, 'updateDocumentCoordinates').mockRejectedValueOnce(new Error('Unexpected error'));
           
             // Call the function and expect it to reject with the correct error message
-            await expect(dao.updateDocumentCoordinates(documentId, coordinate)).rejects.toThrow('Unexpected error');
+            await expect(controller.updateDocumentCoordinates(documentId, coordinate, 1)).rejects.toThrow('Unexpected error');
+
+            // Ensure `dao.updateDocumentCoordinates` was called with the correct arguments
+            expect(dao.updateDocumentCoordinates).toHaveBeenCalledWith(documentId, coordinate);
           });
+    });
+
+    describe('deleteDocumentCoordinates', () => {
+        test('It should successfully delete document coordinates by ID', async () => {
+            const documentId = 1;
+
+            jest.spyOn(dao,'deleteDocumentCoordinatesById').mockResolvedValue(undefined);
+
+            await expect(controller.deleteDocumentCoordinates(documentId)).resolves.toBeUndefined();
+
+            expect(dao.deleteDocumentCoordinatesById).toHaveBeenCalledWith(documentId);
+        });
+
+        test('It should reject if there is an error in deleting document coordinates', async () => {
+            const documentId = 1;
+
+            jest.spyOn(dao,'deleteDocumentCoordinatesById').mockRejectedValue(new Error('Failed to delete'));
+
+            await expect(controller.deleteDocumentCoordinates(documentId)).rejects.toThrow('Failed to delete');
+
+            expect(dao.deleteDocumentCoordinatesById).toHaveBeenCalledWith(documentId);
+        });
+
+        test('It should reject if there is an unexpected error', async () => {
+            const documentId = 1;
+
+            jest.spyOn(dao,'deleteDocumentCoordinatesById').mockRejectedValue(new Error('Unexpected error'));
+
+            await expect(controller.deleteDocumentCoordinates(documentId)).rejects.toThrow('Unexpected error');
+
+            expect(dao.deleteDocumentCoordinatesById).toHaveBeenCalledWith(documentId);
+        });
     });
 
 });

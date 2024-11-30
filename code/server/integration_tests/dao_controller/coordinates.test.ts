@@ -45,9 +45,9 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
     const controller = new CoordinatesController();
     const documentController = new DocumentController();
     const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
-    const testCoordinate1 = new Coordinate(1, 1, 40.7128, -74.0060);
-    const testCoordinate2 = new Coordinate(2, 1, -55.7128, 45.0060);
-    const testCoordinate3 = new Coordinate(3, 2, 40.7128, -74.0060);
+    const testCoordinate1 = new Coordinate(1, 1, 40.7128, -74.0060,1);
+    const testCoordinate2 = new Coordinate(2, 1, -55.7128, 45.0060,1);
+    const testCoordinate3 = new Coordinate(3, 2, 40.7128, -74.0060,2);
     const coordinate: LatLng = { lat: 40.7128, lng: -74.0060 };
     const coordinates: LatLng[] = [
         { lat: 40.7128, lng: -74.0060 },
@@ -150,7 +150,7 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
 
             await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocCoordinate]);
 
-            await expect(controller.updateDocumentCoordinates(1,newCoordinate)).resolves.toBeUndefined();
+            await expect(controller.updateDocumentCoordinates(1,newCoordinate,2)).resolves.toBeUndefined();
 
             await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([newTestDocCoordinate]);
         });
@@ -163,7 +163,7 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
 
             await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocCoordinate]);
 
-            await expect(controller.updateDocumentCoordinates(1,[newCoordinate,coordinate])).resolves.toBeUndefined();
+            await expect(controller.updateDocumentCoordinates(1,[newCoordinate,coordinate],1)).resolves.toBeUndefined();
 
             await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([newTestDocCoordinate2]);
         });
@@ -175,7 +175,7 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
                 return {} as Database;
             });
 
-            await expect(controller.updateDocumentCoordinates(1,[newCoordinate,coordinate])).rejects.toThrow('Database error');
+            await expect(controller.updateDocumentCoordinates(1,[newCoordinate,coordinate],2)).rejects.toThrow('Database error');
 
             dbSpy.mockRestore();
         });
@@ -186,7 +186,7 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
                 return {} as Database;
             });
 
-            await expect(controller.updateDocumentCoordinates(1,[newCoordinate,coordinate])).rejects.toThrow('Unexpected error');
+            await expect(controller.updateDocumentCoordinates(1,[newCoordinate,coordinate],1)).rejects.toThrow('Unexpected error');
 
             dbSpy.mockRestore();
         });
