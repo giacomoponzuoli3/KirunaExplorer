@@ -46,14 +46,6 @@ class CoordinatesController {
         return this.dao.deleteDocumentCoordinatesById(id_document);
     }
 
-     /**
-     * Retrieves the municipality area.
-     * @returns A Promise that resolves to an array of LatLng objects representing the municipality area.
-     */
-     getMunicipalityArea(): Promise<LatLng[]> {
-        return this.dao.getMunicipalityArea();
-    }
-
 }
 
 export { CoordinatesController };

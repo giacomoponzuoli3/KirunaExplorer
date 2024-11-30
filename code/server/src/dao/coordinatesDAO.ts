@@ -13,20 +13,7 @@ class CoordinatesDAO {
      getAllDocumentsCoordinates(): Promise<DocCoordinates[]> {
         return new Promise<DocCoordinates[]>((resolve, reject) => {
             try {
-                const sql = `SELECT 
-                                d.*, 
-                                s.id AS stakeholder_id, 
-                                s.name AS stakeholder_name, 
-                                s.category AS stakeholder_category, 
-                                dc.id AS coordinate_id, 
-                                dc.latitude,dc.longitude, 
-                                dc.point_order, 
-                                dc.municipality_area 
-                            FROM documents d 
-                            LEFT JOIN document_coordinates dc ON dc.document_id = d.id 
-                            LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document 
-                            LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id 
-                            ORDER BY dc.point_order`;
+                const sql = `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude,dc.longitude, dc.point_order, dc.municipality_area FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id ORDER BY dc.point_order`;
     
                 db.all(sql, [], (err: Error | null, rows: any[]) => {
                     if (err) return reject(err);
@@ -118,7 +105,6 @@ class CoordinatesDAO {
                         if (err) {
                             return reject(err);
                         } else {
-                            console.log("fine dao");
                             return resolve();
                         }
                     });
@@ -169,31 +155,6 @@ class CoordinatesDAO {
         }
     }
 
-    /**
-     * Retrieves the municipality area as an array of LatLng objects.
-     * @returns A Promise that resolves to an array of LatLng objects representing the municipality area.
-     */
-    getMunicipalityArea(): Promise<LatLng[]> {
-        return new Promise<LatLng[]>((resolve, reject) => {
-            const filePath = '../server/utility/KirunaMunicipality.geojson';
-            try {
-                const geojsonData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-                const latLngArray: LatLng[] = [];
-                geojsonData.features.forEach((feature: any) => {
-                    feature.geometry.coordinates.forEach((polygon: any) => {
-                        polygon.forEach((ring: any) => {
-                            ring.forEach(([lng, lat]: [number, number]) => {
-                                latLngArray.push({ lat, lng });
-                            });
-                        });
-                    });
-                });
-                resolve(latLngArray);
-            } catch (error) {
-                reject("Error in getMunicipalityArea: " + error);
-            }
-        });
-    }
 }
 
 export {CoordinatesDAO};

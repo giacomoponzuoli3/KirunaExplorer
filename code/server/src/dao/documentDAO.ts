@@ -380,7 +380,7 @@ class DocumentDAO {
         return new Promise<Document[]>((resolve, reject) => {
             try {
                 const sql = `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.type = ?`;
-                db.all(sql, [], (err: Error | null, rows: any[]) => {
+                db.all(sql, [type], (err: Error | null, rows: any[]) => {
                     if (err) return reject(err);
                     if (!rows || rows.length == 0) return resolve([]);
 

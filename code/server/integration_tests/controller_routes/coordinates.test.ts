@@ -24,9 +24,9 @@ describe('coordinatesRoutes/coordinatesController Integration tests', () => {
     const controller = new CoordinatesController();
     const documentController = new DocumentController();
     const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
-    const testCoordinate1 = new Coordinate(1, 1, 40.7128, -74.0060);
-    const testCoordinate2 = new Coordinate(2, 1, -55.7128, 45.0060);
-    const testCoordinate3 = new Coordinate(3, 2, 40.7128, -74.0060);
+    const testCoordinate1 = new Coordinate(1, 1, 40.7128, -74.0060,1);
+    const testCoordinate2 = new Coordinate(2, 1, -55.7128, 45.0060,1);
+    const testCoordinate3 = new Coordinate(3, 2, 40.7128, -74.0060,2);
     const coordinate: LatLng = { lat: 40.7128, lng: -74.0060 };
     const coordinates: LatLng[] = [
         { lat: 40.7128, lng: -74.0060 },
