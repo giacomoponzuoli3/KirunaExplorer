@@ -60,6 +60,7 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
   const [selectedDocumentCoordinates, setSelectedDocumentCoordinates] = useState<DocCoordinates | null>(null);
   const [newDocumentCoordinates,setNewDocumentCoordinates] = useState<LatLng | LatLng[] | null>(null);
   const [newDocument, setNewDocument] = useState<Document | null>(null);
+  const [files, setFiles] = useState<File[]>([]);//Resources of newDocument
 
   //modals
   const [showDetails, setShowDetails] = useState<boolean>(false);
@@ -144,7 +145,9 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
       onHide={() => setShowAddDocumentModal(false)} 
       refreshDocuments={refreshDocuments} 
       stakeholders={stakeholders} 
-      showGeoreferenceNewDocumentModal = {(doc: Document) => {setNewDocument(doc); setShowGeoreferenceDocument(true); }}
+      showGeoreferenceNewDocumentModal = {(doc: Document, filesUploaded: File[]) => {
+        setNewDocument(doc); setShowGeoreferenceDocument(true);
+      if(filesUploaded.length>0){setFiles(filesUploaded)} }}
     />
 
     {selectedDocument && (
@@ -171,7 +174,7 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
         refreshDocumentsCoordinates={()=>{setNewDocument(null); setNewDocumentCoordinates(null); refreshDocumentsCoordinates();}}
         docs={documents}
         newDocumentCoordinates={newDocumentCoordinates}
-
+        filesUploaded={files}
       />
     )}
   </>
