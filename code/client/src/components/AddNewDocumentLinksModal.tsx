@@ -23,7 +23,8 @@ interface AddNewDocumentLinksModalProps {
     onHide: () => void;
     refreshDocumentsCoordinates: () => void;
     docs: Document[];
-    newDocumentCoordinates: LatLng | LatLng[] | null
+    newDocumentCoordinates: LatLng | LatLng[] | null;
+    filesUploaded: File[]
 }
 
 function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoordinates, docs, newDocumentCoordinates}: AddNewDocumentLinksModalProps) {
@@ -177,6 +178,30 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoord
             
         });
       }
+
+        if (filesUploaded.length !== 0) {
+        console.log("new files");
+    
+        filesUploaded.forEach(async (file) => {
+            console.log(file);
+    
+            // Step 1: Read the file content as a Uint8Array
+            const fileData = await file.arrayBuffer(); // Convert to ArrayBuffer
+            const uint8Array = new Uint8Array(fileData); // Convert to Uint8Array
+    
+            // Step 2: Call the API
+            try {
+                const response = await API.addResourceToDocument(
+                    doc.id,        // Replace with the actual document ID
+                    file.name,    // Use the file name
+                    uint8Array    // Pass the file data as Uint8Array
+                );
+                console.log("File uploaded successfully:", response);
+            } catch (error) {
+                console.error("Failed to upload file:", file.name, error);
+            }
+        });
+    }  
     }
     catch(err){
       setShowAlert(true);
