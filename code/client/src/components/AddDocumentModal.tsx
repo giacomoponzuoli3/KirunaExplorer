@@ -37,7 +37,7 @@ interface AddDocumentModalProps {
     onHide: () => void;
     refreshDocuments: () => void;
     stakeholders: Stakeholder[];
-    showGeoreferenceNewDocumentModal: (doc: Document) => void;
+    showGeoreferenceNewDocumentModal: (doc: Document, files: File[]) => void;
 }
 
 
@@ -50,6 +50,8 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
     const [language, setLanguage] = useState<string | null>(null);
     const [pages, setPages] = useState<string | null>(null);
     const [description, setDescription] = useState('');
+
+    const [files, setFiles] = useState<File[]>([]);//resources
 
     const [addingOther, setAddingOther] = useState(false); 
     const [newStakeholderName, setNewStakeholderName] = useState(''); 
@@ -71,6 +73,8 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
         setPages(null);
         setDescription('');
         setShowAlert(false);
+        setFiles([]); // Clear selected files
+        (document.getElementById("formFile") as HTMLInputElement).value = ""; // Reset input field
     };
 
     const handleClose = () => {
@@ -88,6 +92,12 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
           : [...prevSelectedStakeholders, option]; // Aggiungi altrimenti
       });
     };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (event.target.files) {
+          setFiles(Array.from(event.target.files)); // Convert FileList to an array
+      }
+  };
   
     const handleSubmit = async () => {
       // Validation check
@@ -129,7 +139,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
       refreshDocuments();
       handleClose();
       refreshDocuments();
-      showGeoreferenceNewDocumentModal(new Document(0,title,selectedStakeholders,scale,issuanceDate,type, language, pages, description));
+      showGeoreferenceNewDocumentModal(new Document(0,title,selectedStakeholders,scale,issuanceDate,type, language, pages, description), files);
   };
 
     // Ottieni tutte le lingue disponibili da ISO 639-1
@@ -372,7 +382,39 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                 </div>
               </div>
 
-              {/* Section 4: Additional Information */}
+                {/* Section 4: Resources files */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-700">Resources</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* File Upload Field */}
+                  <div className="space-y-2">
+                    <label htmlFor="formFile" className="block text-sm font-medium text-gray-600">
+                      Upload File
+                    </label>
+                    <input
+                      type="file"
+                      id="formFile"
+                      multiple
+                      onChange={handleFileChange}
+                      className="w-full border border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 px-2 py-2"
+                    />
+                    {files.length > 0 && (
+                        <div className="text-sm text-gray-600">
+                            <strong>Selected files:</strong>
+                            <ul>
+                                {files.map((file, index) => (
+                                    <li key={index} className="font-medium">
+                                        {file.name}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+                
+              {/* Section 5: Additional Information */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-700">Classification</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
