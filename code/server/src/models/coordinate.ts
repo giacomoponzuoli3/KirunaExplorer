@@ -6,7 +6,7 @@ class Coordinate {
     longitude: number
     municipality_area: number
 
-    constructor(id: number, point_order: number, latitude: number, longitude: number, municipality_area: number) {
+    constructor(id: number, point_order: number | null, latitude: number | null, longitude: number | null, municipality_area: number) {
         this.id = id
         this.point_order = point_order
         this.latitude = latitude

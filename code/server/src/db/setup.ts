@@ -71,14 +71,26 @@ export async function setup() {
         )`);
 
         await runQuery(`CREATE TABLE IF NOT EXISTS "document_coordinates" (
-            "id" INTEGER,
-            "document_id" INTEGER,
-            "latitude" REAL,
-            "longitude" REAL,
-            "point_order" INTEGER,
+	        "id"	INTEGER,
+	        "document_id"	INTEGER NOT NULL,
+            "latitude"	REAL,
+	        "longitude"	REAL,
+	        "point_order"	INTEGER,
+	        "municipality_area"	INTEGER NOT NULL,
             PRIMARY KEY("id" AUTOINCREMENT),
+	        FOREIGN KEY("document_id") REFERENCES "documents"("id") ON DELETE CASCADE
+        )`);
+
+        await runQuery(`CREATE TABLE IF NOT EXISTS "original_resources" (
+	        "resource_id"	INTEGER,
+	        "document_id"	INTEGER NOT NULL,
+	        "resource_name"	TEXT NOT NULL,
+	        "resource_data"	BLOB NOT NULL,
+	        "uploaded_at"	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	        PRIMARY KEY("resource_id" AUTOINCREMENT),
             FOREIGN KEY("document_id") REFERENCES "documents"("id") ON DELETE CASCADE
         )`);
+
 
         console.log("All tables created successfully.");
     } catch (err) {
