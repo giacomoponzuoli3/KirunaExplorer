@@ -427,13 +427,14 @@ class DocumentDAO {
     addResourceToDocument(documentId: number, name: string, data: Uint8Array): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try {
-                const sql = "INSERT INTO original_resources (id_doc, name, data) VALUES (?, ?, ?)";
+                const sql = "INSERT INTO original_resources (document_id, resource_name, resource_data) VALUES (?, ?, ?)";
                 db.run(sql, [documentId, name, data], (err: Error | null) => {
                     if (err) return reject(err);
                     resolve();
                 });
             } catch (error) {
                 reject(error);
+                console.log(error)
             }
         });
     }
