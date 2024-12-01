@@ -262,15 +262,18 @@ function SetMapView({resetForm, setCoordinates}: SetMapViewInterface) {
   
     useEffect(() => {
       if (map.getZoom() === undefined) {
-        map.setView(position, 12);
+        map.setView(position, 9);
       }
   
-      // Imposta i limiti di zoom
-      map.setMaxZoom(16);
-      map.setMinZoom(12);
-  
-      // Limita l'area visibile della mappa alla bounding box di Kiruna
-      map.setMaxBounds(kirunaBounds);
+      map.setMaxZoom(18);
+      map.setMinZoom(2);
+
+      const worldBounds = L.latLngBounds(
+        [-90, -180], // Southwest corner
+        [90, 180]    // Northeast corner
+      );
+      
+      map.setMaxBounds(worldBounds);
   
       // Aggiungi il layer satellitare alla mappa
       const satelliteLayer = L.tileLayer(
@@ -385,11 +388,11 @@ function GeoreferenceNewDocumentModal({
 
             // Define a polygon that covers the map bounds
             const newPolygon = L.polygon([
-              [KsouthWest.lat, southWest.lng],
-              [KnorthWest.lat, northWest.lng],
-              [KnorthEast.lat, northEast.lng],
-              [KsouthEast.lat, southEast.lng],
-              [KsouthWest.lat, southWest.lng],
+              [-90, -190], // Far southwest corner (wrapping left)
+              [-90, 190],  // Far southeast corner (wrapping right)
+              [90, 190],   // Far northeast corner (wrapping right)
+              [90, -190],  // Far northwest corner (wrapping left)
+              [-90, -190], // Closing the polygon
             ]);
 
             // Clear any existing polygons or markers, if needed
@@ -485,7 +488,7 @@ function GeoreferenceNewDocumentModal({
       </Modal.Header>
 
       <Modal.Body 
-        className="bg-white overflow-auto relative h-full w-full" // Prevent vertical scrollbar, ensure content fits
+        className="bg-white overflow-auto" // Prevent vertical scrollbar, ensure content fits
       >
         <Container>
           {showAlert && (
@@ -513,9 +516,7 @@ function GeoreferenceNewDocumentModal({
           </label>
 
           {/* Map Container */}
-          <MapContainer 
-            ref={mapRef} 
-            style={{ height: "100%", width: "100%" }} // Ensure the map takes available height
+          <MapContainer ref={mapRef} style={{ height: "50vh",width: "100%"}}
           >
             <SetMapView
               resetForm={resetForm} 

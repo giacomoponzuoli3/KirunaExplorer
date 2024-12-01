@@ -27,7 +27,7 @@ interface AddNewDocumentLinksModalProps {
     filesUploaded: File[]
 }
 
-function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoordinates, docs, newDocumentCoordinates}: AddNewDocumentLinksModalProps) {
+function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoordinates, docs, newDocumentCoordinates,filesUploaded}: AddNewDocumentLinksModalProps) {
     const [typesLink, setTypesLink] = useState<Link[]>([]); // vector of types of links
     const [documents, setDocuments] = useState<Document[]>(docs.filter((d: Document) => d.id != document.id)); // vector of all documents except one
 
