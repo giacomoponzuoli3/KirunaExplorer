@@ -97,7 +97,7 @@ function SetMapViewHome(props: any) {
 
   useEffect(() => {
     if (map.getZoom() === undefined) {
-      map.setView(position, 9);
+      map.setView(position, 7);
     }
 
     map.setMaxZoom(18);
@@ -631,7 +631,7 @@ const SetViewDocumentCoordinates = (props: any) => {
     const centralCoord = calculateCentroid(latLngs);
 
     if (map.getZoom() === undefined) {
-      map.setView(centralCoord, 9);
+      map.setView(centralCoord, 7);
     }
 
     map.setMaxZoom(18);
