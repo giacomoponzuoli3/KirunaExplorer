@@ -33,11 +33,8 @@ function ShowDocumentInfoModal({ geoJsonData, getDocumentIcon, selectedDocumentC
     const [showModalEditGeoreference, setShowModalEditGeoreference] = useState<boolean>(false);
     const [showModalConfirmDelete, setShowModalConfirmDelete] = useState<boolean>(false);
 
-    const [showModalEditDocument, setShowModalEditDocument] = useState<boolean>(false);
-
     const handleEditClick = () => {
         handleEdit();
-        setShowModalEditDocument(true);
     };
 
     const handleEditGeoreference = () => {

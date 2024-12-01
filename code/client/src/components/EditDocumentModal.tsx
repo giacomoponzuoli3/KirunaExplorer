@@ -82,6 +82,7 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
         console.log(doc)
         refreshSelectedDocument(doc);
         onHide();
+        refreshSelectedDocument(doc);
     };
 
     // Ottieni tutte le lingue disponibili da ISO 639-1

@@ -71,10 +71,7 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
 
   const [showGeoreferenceDocument, setShowGeoreferenceDocument] = useState<boolean>(false);
 
-  const handleEdit = () => {
-    setShowDetails(false);
-    setShowEditDocumentModal(true);
-  };
+  
 
   const handleCloseDetailsModal = () => {
       setShowDetails(false);
@@ -91,6 +88,8 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
 
   function refreshSelectedDocument(doc: DocCoordinates) {
     setSelectedDocument(doc)
+    setSelectedDocumentCoordinates(doc);
+    console.log(doc)
   }
 
   return (
@@ -123,7 +122,7 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
         setShow={setShowDetails} 
         selectedDocumentCoordinates={selectedDocumentCoordinates}
         onHide={handleCloseDetailsModal} getDocumentIcon={getDocumentIcon} 
-        user={user} handleEdit={handleEdit} refreshDocuments={refreshDocuments} 
+        user={user} handleEdit={() => {setShowDetails(false); setShowEditDocumentModal(true);}} refreshDocuments={refreshDocuments} 
         geoJsonData={geoJsonData}
         refreshDocumentsCoordinates={refreshDocumentsCoordinates}
       />
@@ -153,7 +152,7 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
     {selectedDocument && (
       <EditDocumentModal 
         document={selectedDocument} show={showEditDocumentModal} 
-        onHide={() => setShowEditDocumentModal(false)} 
+        onHide={() => {setShowEditDocumentModal(false); setShowDetails(true);}} 
         refreshSelectedDocument={refreshSelectedDocument}
         
         stakeholders={stakeholders}
