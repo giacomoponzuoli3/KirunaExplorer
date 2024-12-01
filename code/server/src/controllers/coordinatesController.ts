@@ -39,7 +39,7 @@ class CoordinatesController {
 
     /**
      * Delete the coordinates of a document
-     * @param id_document the id of the document to update the coordinates
+     * @param id_document the id of the document to delete the coordinates
      * @return A Promise that resolves when the coordinates have been deleted
      */
     deleteDocumentCoordinates(id_document: number): Promise<void> {

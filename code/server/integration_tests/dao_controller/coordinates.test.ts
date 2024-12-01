@@ -45,17 +45,21 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
     const controller = new CoordinatesController();
     const documentController = new DocumentController();
     const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
-    const testCoordinate1 = new Coordinate(1, 1, 40.7128, -74.0060,1);
-    const testCoordinate2 = new Coordinate(2, 1, -55.7128, 45.0060,1);
-    const testCoordinate3 = new Coordinate(3, 2, 40.7128, -74.0060,2);
+    const testCoordinate1 = new Coordinate(1, 1, 40.7128, -74.0060,0);
+    const testCoordinate2 = new Coordinate(2, 1, -55.7128, 45.0060,0);
+    const testCoordinate3 = new Coordinate(3, 2, 40.7128, -74.0060,0);
+    const testCoordinateMunicipalityArea = new Coordinate (2,null,null,null,1);
     const coordinate: LatLng = { lat: 40.7128, lng: -74.0060 };
     const coordinates: LatLng[] = [
         { lat: 40.7128, lng: -74.0060 },
-        { lat: 34.0522, lng: -118.2437 },
+        { lat: -55.7128, lng: 45.0060 },
       ];
     const newCoordinate: LatLng = { lat: -55.7128, lng: 45.0060 };
     const testDocument = new Document(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
+    const testDocument2 = new Document(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2");
     const testDocCoordinate = new DocCoordinates(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description", [testCoordinate1]);
+    const testDocNoCoordinate = new DocCoordinates(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description", []);
+    const testDocCoordinateMunicipalityArea = new DocCoordinates(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2", [testCoordinateMunicipalityArea]);
     const newTestDocCoordinate = new DocCoordinates(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description", [testCoordinate2]);
     const newTestDocCoordinate2 = new DocCoordinates(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description", [testCoordinate2,testCoordinate3]);
 
@@ -65,6 +69,12 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
             await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
 
             await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
+        });
+
+        test('It should successfully set the municipality area for a document if no coordinates are provided', async () => {
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await expect(controller.setDocumentCoordinates(1,[])).resolves.toBeUndefined();
         });
 
         test("It should successfully It should successfully set multiple coordinate for a document", async () => {
@@ -105,9 +115,14 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
 
             await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toStrictEqual(testDocument);
 
+            await expect(documentController.addDocument("title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2")).resolves.toStrictEqual(testDocument2);
+
             await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
 
-            await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocCoordinate]);
+            await expect(controller.setDocumentCoordinates(2,[])).resolves.toBeUndefined();
+            
+            await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocCoordinateMunicipalityArea,testDocCoordinate]);
+    
 
         });
 
@@ -139,6 +154,48 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
             dbSpy.mockRestore();
         });
     });
+
+    describe('deleteDocumentCoordinatesById', () => {
+
+        test('It should successfully delete document coordinates by ID', async () => {
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toStrictEqual(testDocument);
+
+            await expect(documentController.addDocument("title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2")).resolves.toStrictEqual(testDocument2);
+
+            await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
+
+            await expect(controller.setDocumentCoordinates(2,[])).resolves.toBeUndefined();
+            
+            await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocCoordinateMunicipalityArea,testDocCoordinate]);
+    
+            await expect(controller.deleteDocumentCoordinates(1)).resolves.toBeUndefined();
+
+            await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocNoCoordinate,testDocCoordinateMunicipalityArea]);
+        });
+
+        test('It should reject if there is an error in deleting document coordinates', async () => {
+            const dbSpy = jest.spyOn(db, 'run').mockImplementation(function (sql, params, callback) {
+                callback(new Error('Database error'), null);
+                return {} as Database;
+            });
+
+            await expect(controller.deleteDocumentCoordinates(1)).rejects.toThrow('Database error');
+
+            dbSpy.mockRestore();
+        });
+
+        test('It should reject if there is an unexpected error', async () => {
+            const dbSpy = jest.spyOn(db, 'run').mockImplementation(function (sql, params, callback) {
+                callback(new Error('Unexpected error'), null);
+                return {} as Database;
+            });
+
+            await expect(controller.deleteDocumentCoordinates(1)).rejects.toThrow('Unexpected error');
+
+            dbSpy.mockRestore();
+        });
+    });
+
 
     describe('updateDocumentCoordinates', () => {
 
@@ -191,4 +248,5 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
             dbSpy.mockRestore();
         });
     });
+
 });

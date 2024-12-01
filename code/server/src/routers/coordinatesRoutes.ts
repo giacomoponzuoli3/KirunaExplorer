@@ -56,7 +56,6 @@ class CoordinatesRoutes {
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
                 try {
-                    console.log("arrivo qui");
                     this.controller.setDocumentCoordinates(req.body.idDoc, req.body.coordinates)
                         .then(() => {
                             return res.status(200).json({ message: "Coordinates added successfully" });})

@@ -18,17 +18,19 @@ describe('coordinatesController', () => {
     const controller = new CoordinatesController();
     const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
     const testStakeholder2 = new Stakeholder(2, "Bob", "urban developer");
-    const testCoordinate1 = new Coordinate(1, 5, 100, 200,1);
-    const testCoordinate2 = new Coordinate(2, 10, 200, 100,1);
-    const testCoordinate3 = new Coordinate(3, 1, 150, 150,1);
+    const testCoordinate1 = new Coordinate(1, 5, 100, 200,0);
+    const testCoordinate2 = new Coordinate(2, 10, 200, 100,0);
+    const testCoordinate3 = new Coordinate(3, 1, 150, 150,0);
+    const testCoordinateMunicipalityArea = new Coordinate(4, null, null, null, 1);
     const testDocCoordinate = new DocCoordinates(1, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description", [testCoordinate1, testCoordinate2, testCoordinate3]);
+    const testDocCoordinateMunicipalityArea = new DocCoordinates(2, "title 2", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2", [testCoordinateMunicipalityArea]);
 
     describe('getAllDocumentsCoordinates', () => {
         test('It should successfully retrieves all documents with their coordinates', async () => {
 
-            jest.spyOn(dao, 'getAllDocumentsCoordinates').mockResolvedValue([testDocCoordinate]);
+            jest.spyOn(dao, 'getAllDocumentsCoordinates').mockResolvedValue([testDocCoordinate,testDocCoordinateMunicipalityArea]);
 
-            await expect(controller.getAllDocumentsCoordinates()).resolves.toEqual([testDocCoordinate]);
+            await expect(controller.getAllDocumentsCoordinates()).resolves.toEqual([testDocCoordinate,testDocCoordinateMunicipalityArea]);
             expect(dao.getAllDocumentsCoordinates).toHaveBeenCalledWith();
 
         });

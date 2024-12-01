@@ -19,10 +19,12 @@ describe('coordinatesDAO', () => {
     const dao = new CoordinatesDAO();
     const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
     const testStakeholder2 = new Stakeholder(2, "Bob", "urban developer");
-    const testCoordinate1 = new Coordinate(1, 5, 100, 200, 1);
-    const testCoordinate2 = new Coordinate(2, 10, 200, 100, 1);
-    const testCoordinate3 = new Coordinate(3, 1, 150, 150, 1);
+    const testCoordinate1 = new Coordinate(1, 5, 100, 200, 0);
+    const testCoordinate2 = new Coordinate(2, 10, 200, 100, 0);
+    const testCoordinate3 = new Coordinate(3, 1, 150, 150, 0);
+    const testCoordinateMunicipalityArea = new Coordinate(4, null, null, null, 1);
     const testDocCoordinate = new DocCoordinates(1, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description", [testCoordinate1, testCoordinate2, testCoordinate3]);
+    const testDocCoordinateMunicipalityArea = new DocCoordinates(2, "title 2", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2", [testCoordinateMunicipalityArea]);
 
     describe('getAllDocumentsCoordinates', () => {
         test('It should successfully retrieves all documents with their coordinates', async () => {
@@ -45,7 +47,7 @@ describe('coordinatesDAO', () => {
                     point_order: 5,
                     latitude: 100,
                     longitude: 200,
-                    municipality_area: 1
+                    municipality_area: 0
                 },
                 // First stakeholder with the second coordinate
                 {
@@ -64,7 +66,7 @@ describe('coordinatesDAO', () => {
                     point_order: 10,
                     latitude: 200,
                     longitude: 100,
-                    municipality_area: 1
+                    municipality_area: 0
                 },
                 // First stakeholder with the third coordinate
                 {
@@ -83,7 +85,7 @@ describe('coordinatesDAO', () => {
                     point_order: 1,
                     latitude: 150,
                     longitude: 150,
-                    municipality_area: 1
+                    municipality_area: 0
                 },
                 // Second stakeholder with the first coordinate
                 {
@@ -102,7 +104,7 @@ describe('coordinatesDAO', () => {
                     point_order: 5,
                     latitude: 100,
                     longitude: 200,
-                    municipality_area: 1
+                    municipality_area: 0
                 },
                 // Second stakeholder with the second coordinate
                 {
@@ -121,7 +123,7 @@ describe('coordinatesDAO', () => {
                     point_order: 10,
                     latitude: 200,
                     longitude: 100,
-                    municipality_area: 1
+                    municipality_area: 0
                 },
                 // Second stakeholder with the third coordinate
                 {
@@ -140,7 +142,46 @@ describe('coordinatesDAO', () => {
                     point_order: 1,
                     latitude: 150,
                     longitude: 150,
-                    municipality_area: 1
+                    municipality_area: 0
+                },
+                 // First stakeholder with the municipality area
+                {
+                    id: 2,
+                    title: 'title 2',
+                    scale: '1:1',
+                    issuance_date: '2020-10-10',
+                    type: 'Informative document',
+                    language: 'English',
+                    pages: '300',
+                    description: 'description 2',
+                    stakeholder_id: 1,
+                    stakeholder_name: 'John',
+                    stakeholder_category: 'urban developer',
+                    coordinate_id: 4,
+                    latitude: null,
+                    longitude: null,
+                    municipality_area: 1,
+                    point_order: null
+                },
+
+                // Second stakeholder with the municipality area
+                {
+                    id: 2,
+                    title: 'title 2',
+                    scale: '1:1',
+                    issuance_date: '2020-10-10',
+                    type: 'Informative document',
+                    language: 'English',
+                    pages: '300',
+                    description: 'description 2',
+                    stakeholder_id: 2,
+                    stakeholder_name: 'Bob',
+                    stakeholder_category: 'urban developer',
+                    coordinate_id: 4,
+                    latitude: null,
+                    longitude: null,
+                    municipality_area: 1,
+                    point_order: null
                 }
             ];
 
@@ -150,7 +191,7 @@ describe('coordinatesDAO', () => {
                     return {} as Database;
                 })
 
-            await expect(dao.getAllDocumentsCoordinates()).resolves.toEqual([testDocCoordinate]);
+            await expect(dao.getAllDocumentsCoordinates()).resolves.toEqual([testDocCoordinate,testDocCoordinateMunicipalityArea]);
 
             expect(db.all).toHaveBeenCalledWith(
                 `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude,dc.longitude, dc.point_order, dc.municipality_area FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id ORDER BY dc.point_order`,
@@ -223,7 +264,7 @@ describe('coordinatesDAO', () => {
         });
 
         test('It should successfully set the municipality area for a document if no coordinates are provided', async () => {
-    
+
             jest.spyOn(db, 'run')
                 .mockImplementationOnce((sql, params, callback) => {
                     callback(null);
@@ -368,7 +409,6 @@ describe('coordinatesDAO', () => {
         });
 
     });
-
 
     describe('deleteDocumentCoordinatesById', () => {
 
