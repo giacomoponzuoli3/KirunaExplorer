@@ -195,10 +195,7 @@ function SetMapViewHome(props: any) {
     props.documentsCoordinates
       .filter((d: DocCoordinates) => d.coordinates.length !== 0)
       .forEach((doc: any) => {
-        console.log(doc);
         const latLngs = doc.coordinates[0].municipality_area == 1 ? cityCoords.map((coord: any) => [coord.lat, coord.lng]) : doc.coordinates.map((coord: any) => [coord.latitude, coord.longitude]);
-
-        console.log(latLngs);
 
         if (latLngs.length > 1 || (doc.coordinates.length == 1 && doc.coordinates[0].municipality_area == 1) ) {
           
@@ -666,7 +663,6 @@ const SetViewDocumentCoordinates = (props: any) => {
     
 
     if(props.documentCoordinates.coordinates.length !== 0){
-      console.log(props.documentCoordinates.coordinates);
       //get the icon of the document
       const iconHtml = ReactDOMServer.renderToString(props.getDocumentIcon(props.documentCoordinates.type, 5) || <></>);
       //get the coordinates
@@ -701,8 +697,7 @@ const SetViewDocumentCoordinates = (props: any) => {
           .setContent(`<p>Coordinates: ${decimalToDMS(centralCoord[0])} ${centralCoord[0] >= 0 ? "N" : "S"} , ${decimalToDMS(centralCoord[1])} ${centralCoord[1] >= 0 ? "E" : "W"}</p>`)
         
         marker.on('mouseover', () => {
-          console.log("popup");
-            map.openPopup(popup)
+          map.openPopup(popup)
         });
 
         marker.on('mouseout', () => {
