@@ -1,20 +1,14 @@
-import React, { useState,useEffect } from 'react';
-import { Container, Modal, Row, Col, Form, Button, Dropdown, ListGroup } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Modal, Dropdown } from 'react-bootstrap';
 import { Document } from '../models/document';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { User } from '../models/user';
 import API from '../API/API';
 import { Stakeholder } from '../models/stakeholder';
-import { DocLink } from '../models/document_link';
 import '../modal.css'
-import { TrashIcon, PencilIcon,ChevronLeftIcon,ChevronRightIcon, DocumentIcon } from "@heroicons/react/24/outline";
-import Link from '../models/link'; 
+import { TrashIcon, DocumentIcon } from "@heroicons/react/24/outline";
 import Alert from "./Alert";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import Select from 'react-select';
 import ISO6391 from 'iso-639-1';  // Utilizziamo ISO 639-1 per ottenere le lingue
-import { DocCoordinates } from '../models/document_coordinate';
 import CreatableSelect from 'react-select/creatable';
 import { SingleValue } from 'react-select';
 

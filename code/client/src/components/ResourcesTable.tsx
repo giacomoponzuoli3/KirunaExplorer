@@ -1,13 +1,10 @@
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import { Document } from "../models/document";
 import API from "../API/API";
-import { TrashIcon, PlusIcon, FaceFrownIcon, PencilIcon,ChevronRightIcon, ChevronLeftIcon, ArrowDownIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, PlusIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import Alert from "./Alert";
 import ConfirmModal from './ConfirmModal';
-import { AddLinkModal } from "./AddLinkModal";
 import { DocLink } from "../models/document_link";
-import { EditLinkModal } from "./EditLinkModal";
 import { DocCoordinates } from "../models/document_coordinate";
 import Resources from "../models/original_resources";
 
@@ -94,7 +91,7 @@ function ResourcesTable(props: any) {
             try{
                 const documentId = Number(idDocument);
                 //const documentResources = await API.getResourceData(documentId);
-                const documentResources: Resources[] = [new Resources(1, 2, "prova", null, "12/11/2024")]
+                const documentResources: Resources[] = [new Resources(1, 2, "prova", null, new Date("12/11/2024"))]
                 setResources(documentResources);
             }catch (err){
                 setShowAlert(true);

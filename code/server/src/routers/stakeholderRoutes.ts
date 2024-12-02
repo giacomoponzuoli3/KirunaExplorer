@@ -2,7 +2,7 @@ import express, {Router} from "express"
 import ErrorHandler from "../helper"
 import StakeholderController from "../controllers/stakeholderController"
 import {Stakeholder} from "../models/stakeholder";
-import {body, param} from "express-validator"
+import {body} from "express-validator"
 
 class StakeholderRoutes {
     private controller: StakeholderController

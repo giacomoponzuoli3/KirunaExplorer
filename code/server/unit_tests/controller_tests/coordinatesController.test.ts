@@ -154,7 +154,7 @@ describe('coordinatesController', () => {
           jest.spyOn(dao, 'updateDocumentCoordinates').mockResolvedValueOnce(undefined);
       
           // Call the function and expect it to resolve without errors
-          await expect(controller.updateDocumentCoordinates(documentId, coordinate,1)).resolves.toBeUndefined();
+          await expect(controller.updateDocumentCoordinates(documentId, coordinate)).resolves.toBeUndefined();
       
           // Ensure `dao.updateDocumentCoordinates` was called with the correct arguments
           expect(dao.updateDocumentCoordinates).toHaveBeenCalledWith(documentId, coordinate);
@@ -171,7 +171,7 @@ describe('coordinatesController', () => {
           jest.spyOn(dao, 'updateDocumentCoordinates').mockResolvedValueOnce(undefined);
       
           // Call the function and expect it to resolve without errors
-          await expect(controller.updateDocumentCoordinates(documentId, coordinates,1)).resolves.toBeUndefined();
+          await expect(controller.updateDocumentCoordinates(documentId, coordinates)).resolves.toBeUndefined();
       
           // Ensure `dao.updateDocumentCoordinates` was called with the correct arguments
           expect(dao.updateDocumentCoordinates).toHaveBeenCalledWith(documentId, coordinates);
@@ -185,7 +185,7 @@ describe('coordinatesController', () => {
           jest.spyOn(dao, 'updateDocumentCoordinates').mockRejectedValueOnce(new Error('Update failed'));
       
           // Call the function and expect it to reject with the correct error message
-          await expect(controller.updateDocumentCoordinates(documentId, coordinate,1 )).rejects.toThrow('Update failed');
+          await expect(controller.updateDocumentCoordinates(documentId, coordinate )).rejects.toThrow('Update failed');
 
            // Ensure `dao.updateDocumentCoordinates` was called with the correct arguments
            expect(dao.updateDocumentCoordinates).toHaveBeenCalledWith(documentId, coordinate);
@@ -199,7 +199,7 @@ describe('coordinatesController', () => {
             jest.spyOn(dao, 'updateDocumentCoordinates').mockRejectedValueOnce(new Error('Unexpected error'));
           
             // Call the function and expect it to reject with the correct error message
-            await expect(controller.updateDocumentCoordinates(documentId, coordinate, 1)).rejects.toThrow('Unexpected error');
+            await expect(controller.updateDocumentCoordinates(documentId, coordinate)).rejects.toThrow('Unexpected error');
 
             // Ensure `dao.updateDocumentCoordinates` was called with the correct arguments
             expect(dao.updateDocumentCoordinates).toHaveBeenCalledWith(documentId, coordinate);

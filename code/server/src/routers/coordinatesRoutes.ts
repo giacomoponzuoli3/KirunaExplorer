@@ -5,7 +5,6 @@ import ErrorHandler from "../helper"
 import Authenticator from "./auth"
 import {DocCoordinates} from "../models/document_coordinate";
 import {CoordinatesArrayError, CoordinatesTypeError} from "../errors/coordinates";
-import { LatLng } from "../interfaces"
 
 class CoordinatesRoutes {
     private controller: CoordinatesController
@@ -82,7 +81,7 @@ class CoordinatesRoutes {
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
                 try {
-                    this.controller.updateDocumentCoordinates(req.body.idDoc, req.body.coordinates, req.body.useMunicipalArea)
+                    this.controller.updateDocumentCoordinates(req.body.idDoc, req.body.coordinates)
                         .then(() => res.status(200).json({ message: "Coordinates updated successfully" }))
                         .catch((err: Error) => next(err))
                 } catch (err) {

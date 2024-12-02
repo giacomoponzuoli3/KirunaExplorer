@@ -14,6 +14,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 initRoutes(app)
+// noinspection JSDeprecatedSymbols
 if (!module.parent) {
     app.listen(port, () => {
         console.log(`Server listening at http://localhost:${port}`);
