@@ -18,9 +18,10 @@ function ResourcesTable(props: any) {
     const { idDocument } = useParams();
     const [document, setDocument] = useState<DocCoordinates | null>(null);
     const [documentLinks, setDocumentLinks] = useState<DocLink[]>([]);
+    
     const [showModal, setShowModal] = useState(false);
 
-    const [resources, setResources] = useState<Resources[] | null>(null);
+    const [resources, setResources] = useState<Resources[]>([]);
 
     //delete
     const [documentToDelete, setDocumentToDelete] = useState<number | null>(null);
@@ -38,17 +39,17 @@ function ResourcesTable(props: any) {
     const [loading, setLoading] = useState(true);  // stato di caricamento
 
     const [currentPage, setCurrentPage] = useState(1);  // Track the current page
-    const [paginatedLinks, setPaginatedLinks] = useState<DocLink[]>([]);
+    const [paginatedResources, setPaginatedResources] = useState<Resources[]>([]);
     const itemsPerPage = 4; // Number of items to show per page
 
     // Calculate total pages
-    const totalPages = Math.ceil(documentLinks.length / itemsPerPage);
+    const totalPages = Math.ceil(resources.length / itemsPerPage);
 
     // Handle pagination button clicks
     const handleNextPage = () => {
      if (currentPage < totalPages) {
-       console.log(paginatedLinks)
-       setPaginatedLinks(documentLinks.slice(
+       console.log(paginatedResources)
+       setPaginatedResources(resources.slice(
         (currentPage) * itemsPerPage, 
         (currentPage + 1) * itemsPerPage
       ))
@@ -58,7 +59,7 @@ function ResourcesTable(props: any) {
 
     const handlePrevPage = () => {
      if (currentPage > 1) {
-      setPaginatedLinks(documentLinks.slice(
+      setPaginatedResources(resources.slice(
         (currentPage - 2) * itemsPerPage, 
         (currentPage - 1) * itemsPerPage
       ))
@@ -104,17 +105,17 @@ function ResourcesTable(props: any) {
     }, [idDocument])
 
     useEffect(() => {
-        const getDocuments = async () => {
+        const getResources = async () => {
             try{
                 const documentId = Number(idDocument);
-                const documentsConnections = await API.getDocumentLinksById(documentId);
-        
-                setDocumentLinks(documentsConnections);
+                const documentResources = await API.getResourceData(documentId);
+
+                setResources(documentResources);
             }catch (err){
                 setShowAlert(true);
             }
         };
-        getDocuments().then();
+        getResources().then();
     }, [idDocument]);
 
     useEffect(() => {
@@ -123,13 +124,13 @@ function ResourcesTable(props: any) {
   
       // If the current page is the last page and we're deleting the last link on it, go to the previous page
       if (isLastPage && currentPage > 1) {
-        setPaginatedLinks(documentLinks.slice(
+        setPaginatedResources(resources.slice(
           (currentPage - 2) * itemsPerPage, 
           (currentPage - 1) * itemsPerPage
         ))
         setCurrentPage(prevPage => prevPage - 1); // Decrement the page
       }else{
-        setPaginatedLinks(documentLinks.slice(
+        setPaginatedResources(resources.slice(
           (currentPage - 1) * itemsPerPage, 
           currentPage * itemsPerPage
         ))
@@ -170,7 +171,7 @@ function ResourcesTable(props: any) {
 
               <div className="relative mb-2">
                 <div className="flex justify-between items-center mt-0">
-                  {/* Add Link Button */}
+                  {/* Add Resource Button */}
                   {props.isLogged && props.user.role === "Urban Planner" && documentLinks.length !== 0 ? (
                     <button
                       className="flex items-center justify-center bg-green-600 text-white rounded px-4 py-2 hover:bg-green-700 transition duration-200"
@@ -180,7 +181,7 @@ function ResourcesTable(props: any) {
                       <span>Add Resource</span>
                     </button>
                   ) : (
-                    <div></div> /* Empty div to maintain spacing when Add Link is not present */
+                    <div></div> /* Empty div to maintain spacing when Add Resource is not present */
                   )}
 
                   {/* Pagination Controls */}
@@ -207,7 +208,7 @@ function ResourcesTable(props: any) {
               </div>
 
               
-              {documentLinks.length === 0 ? (
+              {resources.length === 0 ? (
                 <div className="flex flex-col items-center mt-6">
                   <FaceFrownIcon className="h-10 w-10 text-gray-400" />
                   <p className="text-lg text-gray-500 mt-2">No resources available</p>
@@ -227,7 +228,7 @@ function ResourcesTable(props: any) {
                   <table className="min-w-full bg-white border border-gray-200 shadow-lg rounded-lg table-auto">
                     <thead>
                       <tr className="bg-gray-100 border-b">
-                        <th className="p-4 text-left text-sm font-semibold w-[15%]">Name Resource</th>
+                        <th className="p-4 text-left text-sm font-semibold w-[15%]">Name</th>
                         <th className="p-4 text-left text-sm font-semibold w-[15%]">Date uploaded</th>
                         <th className="p-4 text-left text-sm font-semibold w-[10%]">Size</th>
                         {props.isLogged && props.user.role == "Urban Planner" && (
@@ -236,12 +237,12 @@ function ResourcesTable(props: any) {
                       </tr>
                     </thead>
                     <tbody>
-                      {paginatedLinks.map((doc, index) => (
+                      {paginatedResources.map((resource, index) => (
                         <tr key={index} className={`border-b transition duration-200 ease-in-out 
                           ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
                         `}>
-                          <td className="p-4 text-sm text-gray-600 w-[15%]"></td>
-                          <td className="p-4 text-sm text-gray-600 w-[15%]"></td>
+                          <td className="p-4 text-sm text-gray-600 w-[15%]">{resource.name}</td>
+                          <td className="p-4 text-sm text-gray-600 w-[15%]">{String(resource.uploadTime)}</td>
                           <td className="p-4 text-sm text-gray-600 w-[10%]"></td>
                           {props.isLogged && props.user.role == "Urban Planner" && (
                             <td className="p-3 items-center justify-center space-x-4 w-[5%]">

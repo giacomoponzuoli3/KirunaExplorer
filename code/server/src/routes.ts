@@ -22,8 +22,8 @@ const prefix = "/kiruna"
  */
 function initRoutes(app: express.Application) {
     app.use(morgan("dev")) // Log requests to the console
-    app.use(express.json({ limit: "25mb" }))
-    app.use(express.urlencoded({ limit: '25mb', extended: true }))
+    app.use(express.json({ limit: "50mb" }))
+    app.use(express.urlencoded({ limit: '50mb', extended: true }))
 
     /**
      * The authenticator object is used to authenticate users.
