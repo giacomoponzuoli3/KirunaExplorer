@@ -95,21 +95,21 @@ function ShowDocumentInfoModal({ geoJsonData, getDocumentIcon, selectedDocumentC
                                     {getDocumentIcon(selectedDocumentCoordinates.type, 16)}
     
                                     {user.role === "Urban Planner" && (
-                                        <div className="flex space-x-2 mt-4">
+                                        <div className="flex flex-wrap space-x-2 mt-4">
                                             <button title="Delete document"
-                                                className="p-2 rounded-full border-2 bg-red-400 text-white hover:bg-red-700 transition-colors duration-200"
+                                                className="p-2 m-1 rounded-full border-2 bg-red-400 text-white hover:bg-red-700 transition-colors duration-200"
                                                 onClick={confirmDelete}
                                             >
                                                 <TrashIcon className="h-5 w-5" />
                                             </button>
                                             <button title="Edit document"
-                                                className="p-2 rounded-full border-2 bg-blue-400 text-white hover:bg-blue-700 transition-colors duration-200"
+                                                className="p-2 m-1 rounded-full border-2 bg-blue-400 text-white hover:bg-blue-700 transition-colors duration-200"
                                                 onClick={handleEditClick}
                                             >
                                                 <PencilIcon className="h-5 w-5" />
                                             </button>
                                             <button title="Edit document's georeference"
-                                                className="p-2 rounded-full border-2 bg-yellow-500 text-white hover:bg-yellow-600 transition-colors duration-200"
+                                                className="p-2 m-1 rounded-full border-2 bg-yellow-500 text-white hover:bg-yellow-600 transition-colors duration-200"
                                                 onClick={handleEditGeoreference}
                                             >
                                                 <MapIcon className="h-5 w-5 text-white" />

@@ -384,8 +384,8 @@ function SetMapViewEdit(props: any) {
     if (selectedButton === "edit" && documentCoordinates) {
       const latLngs = documentCoordinates.coordinates.map((coord: any) => [coord.latitude, coord.longitude]);
 
-      // Aggiungi poligono o punto dall'attuale documento
-      if (documentCoordinates.coordinates.length === 1 && documentCoordinates.coordinates[0].municipality_area == 0) {
+      // Aggiungi poligono o punto dall'attuale documento 
+      if (documentCoordinates.coordinates.length === 1 && documentCoordinates.coordinates[0].municipality_area == 0) { //if it is a point
         const marker = L.marker(latLngs[0], { icon: defaultIcon });
 
         const popup = L.popup({
@@ -410,16 +410,36 @@ function SetMapViewEdit(props: any) {
 
         drawnItems.addLayer(marker);
         setSelectedPosition(); // Imposta la posizione selezionata
-      } else if (documentCoordinates.coordinates.length > 1) {
-        const polygon = L.polygon(latLngs, {
-          color: '#ff0000',
-          weight: 3,
-          opacity: 0.8,
-          fillColor: '#3388ff',
-          fillOpacity: 0.3,
-        });
-        drawnItems.addLayer(polygon);
+      } else {
+        let polygon;
         
+        if (documentCoordinates.coordinates.length > 1){
+          polygon = L.polygon(latLngs, {
+            color: '#ff0000',
+            weight: 3,
+            opacity: 0.8,
+            fillColor: '#3388ff',
+            fillOpacity: 0.3,
+          });
+          drawnItems.addLayer(polygon);
+        }
+        if(documentCoordinates.coordinates.length == 1 && documentCoordinates.coordinates[0].municipality_area == 1){
+          polygon = L.geoJSON(props.geoJsonData, {
+            style: {
+              color: "#B22222",
+              weight: 2,
+              opacity: 0.8,
+              fillColor: '#FFD700',
+              fillOpacity: 0.2,
+            },
+            onEachFeature: (feature, layer) => {
+              if (feature.properties) {
+                layer.bindPopup(`Municipality: ${feature.properties.pnm}`);
+              }
+            },
+          });
+          drawnItems.addLayer(polygon);
+        }
          // Converte latLngs in formato compatibile con setSelectedPosition
         const formattedCoordinates = latLngs.map(([latitude, longitude]: [number, number]) => ({ lat: latitude, lng: longitude }));
         setSelectedPosition(formattedCoordinates); // Imposta le coordinate del poligono
