@@ -232,7 +232,7 @@ async function getAllDocumentsOfSameType(type: string) {
     }
 }
 
-async function addResourceToDocument(idDoc: number, name: string, data: Uint8Array) {
+async function addResourceToDocument(idDoc: number, name: string, data: string) {
     let response = await fetch(baseURL + "doc/res", {
         method: 'POST',
         credentials: "include",
@@ -240,7 +240,32 @@ async function addResourceToDocument(idDoc: number, name: string, data: Uint8Arr
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({ idDoc: idDoc, name: name, data: data })
-    })
+    });
+
+    if (response.ok) {
+        // Verifica se la risposta ha un corpo
+        const responseText = await response.text();  // Usa .text() prima di tentare di fare .json()
+        if (responseText) {
+            try {
+                // Prova a convertire la risposta in JSON
+                const responseBody = JSON.parse(responseText);
+                return responseBody;
+            } catch (error) {
+                console.error('Failed to parse JSON:', error);
+                throw new Error('Server returned an invalid JSON response.');
+            }
+        } else {
+            return {};  // Restituisci un oggetto vuoto o un altro valore di successo
+        }
+    } else {
+        const errDetail = await response.text();
+        throw new Error(`Error: ${errDetail}`);
+    }
+}
+
+
+async function getResourceData(idDoc: number) {
+    const response = await fetch(baseURL + "doc/res/" + idDoc, { credentials: "include" })
     if (response.ok) {
         return await response.json()
     } else {
@@ -253,10 +278,10 @@ async function addResourceToDocument(idDoc: number, name: string, data: Uint8Arr
     }
 }
 
-async function getResourceData(idDoc: number) {
-    const response = await fetch(baseURL + "doc/res/" + idDoc, { credentials: "include" })
+async function deleteResource(idDoc: number, name: string) {
+    const response = await fetch(baseURL + "doc/res/" + idDoc + "/" + name, { method: 'DELETE', credentials: "include" })
     if (response.ok) {
-        return await response.json()
+        return
     } else {
         const errDetail = await response.json();
         if (errDetail.error)
@@ -458,7 +483,7 @@ async function getMunicipalityArea() {
 
 const API = {
     login, logOut, getUserInfo, register,
-    addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType, addResourceToDocument, getResourceData,
+    addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType, addResourceToDocument, getResourceData, deleteResource,
     getAllStakeholders, addStakeholder,
     addLink, deleteLink, editLink, getAllLinks,
     getAllDocumentsCoordinates, setDocumentCoordinates, updateDocumentCoordinates, deleteDocumentCoordinates, getMunicipalityArea

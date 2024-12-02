@@ -8,7 +8,7 @@ import API from '../API/API';
 import { Stakeholder } from '../models/stakeholder';
 import { DocLink } from '../models/document_link';
 import '../modal.css'
-import { TrashIcon, PencilIcon,ChevronLeftIcon,ChevronRightIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, PencilIcon,ChevronLeftIcon,ChevronRightIcon, DocumentIcon } from "@heroicons/react/24/outline";
 import Link from '../models/link'; 
 import Alert from "./Alert";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
@@ -94,10 +94,19 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
     };
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (event.target.files) {
-          setFiles(Array.from(event.target.files)); // Convert FileList to an array
-      }
-  };
+      const fileList = event.target.files; // HTMLInputElement.files can be FileList or null
+      if (fileList) {
+        setFiles((prevFiles) =>  [...prevFiles, ...Array.from(fileList)]);
+      
+    }
+      event.target.value = '';
+    };
+
+    const handleDeleteFile = (index: number) => {
+      setFiles((prevFiles) => 
+        prevFiles.filter((_, i) => i !== index)
+      );
+    };
   
     const handleSubmit = async () => {
       // Validation check
@@ -180,7 +189,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
             <form className="space-y-6">
               {/* Section 1: Basic Information */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-700">Basic Information</h3>
+                <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Basic Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Title Field */}
                   <div className="flex items-center">
@@ -214,7 +223,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
 
               {/* Section 2: Classification */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-700">Classification</h3>
+                <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Classification</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Scale Field */}
                   <div className="flex items-center">
@@ -383,40 +392,65 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
               </div>
 
                 {/* Section 4: Resources files */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-700">Resources</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-6">
+                  <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Resources</h3>
+
                   {/* File Upload Field */}
-                  <div className="space-y-2">
-                    <label htmlFor="formFile" className="block text-sm font-medium text-gray-600">
-                      Upload File
-                    </label>
-                    <input
-                      type="file"
-                      id="formFile"
-                      multiple
-                      onChange={handleFileChange}
-                      className="w-full border border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 px-2 py-2"
-                    />
-                    {files.length > 0 && (
-                        <div className="text-sm text-gray-600">
-                            <strong>Selected files:</strong>
-                            <ul>
-                                {files.map((file, index) => (
-                                    <li key={index} className="font-medium">
-                                        {file.name}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    )}
+                  <div className="p-4 border border-gray-200 rounded-md shadow-sm bg-gray-50">
+                      <div className="space-y-2">
+                          <label htmlFor="formFile" className="block text-sm font-medium text-gray-600">
+                              Upload File
+                          </label>
+                          <input
+                              type="file"
+                              id="formFile"
+                              multiple
+                              onChange={handleFileChange}
+                              className="w-full border border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 px-2 py-2"
+                          />
+                      </div>
+
+                      {/* Selected Files Section */}
+                      {files.length > 0 && (
+                          <div className="mt-4">
+                              <h4 className="text-sm font-semibold text-gray-700 mb-2">Selected Files</h4>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                  {files.map((file, index) => (
+                                      <div
+                                          key={index}
+                                          className="flex items-center justify-between border border-gray-300 p-2 rounded-md shadow-sm bg-white hover:shadow-md transition-shadow duration-300"
+                                      >
+                                          {/* File Info */}
+                                          <div className="flex items-center space-x-2">
+                                              <DocumentIcon className="h-6 w-6 text-blue-500" />
+                                              <span className="font-medium text-gray-800 truncate">
+                                                  {file.name} ({(file.size / 1024).toFixed(2)} KB)
+                                              </span>
+                                          </div>
+
+                                          {/* Delete Button */}
+                                          <button
+                                              type="button"
+                                              className="text-red-500 hover:text-red-700 focus:outline-none"
+                                              onClick={(e) => {
+                                                  e.preventDefault();
+                                                  e.stopPropagation();
+                                                  handleDeleteFile(index);
+                                              }}
+                                          >
+                                              <TrashIcon className="h-5 w-5" />
+                                          </button>
+                                      </div>
+                                  ))}
+                              </div>
+                          </div>
+                      )}
                   </div>
-                </div>
               </div>
                 
               {/* Section 5: Additional Information */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-700">Classification</h3>
+                <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Classification</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Description Field */}
                   <div className="space-y-2">

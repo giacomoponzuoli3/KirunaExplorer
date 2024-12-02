@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2015", // Può essere anche 'es6' o 'esnext'
+    "downlevelIteration": true, // Abilita iterazioni compatibili con spread operator"target": "es5",
     "lib": [
       "dom",
       "dom.iterable",
