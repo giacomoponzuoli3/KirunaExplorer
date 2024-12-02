@@ -474,19 +474,20 @@ class DocumentDAO {
     getAllResourcesData(documentId: number): Promise<Resources[]> {
         return new Promise<Resources[]>((resolve, reject) => {
             try {
-                const sql = "SELECT resource_id, resource_name, uploaded_at FROM original_resources WHERE document_id = ?";
+                const sql = "SELECT resource_id, resource_name, uploaded_at,document_id FROM original_resources WHERE document_id = ?";
                 db.all(sql, [documentId], (err: Error | null, rows: any[]) => {
                     if (err) return reject(err);
                     if (!rows || rows.length == 0) return resolve([]);
 
-                    const resources: Resources[] = [];
+                    let resources: Resources[] = [];
                     rows.forEach((row: any) => {
+                        // const idDoc = row.document_id;
                         const idDoc = row.document_id;
-                        const id = row.id;
+                        const id = row.resource_id;
                         const data:null = null;
                         const name = row.resource_name;
                         const uploadTime = row.uploaded_at;
-                        resources.push({ idDoc, id, data, name, uploadTime });
+                        resources.push({ id, idDoc, data, name, uploadTime });
                     });
 
                     resolve(resources);
