@@ -156,7 +156,7 @@ function ResourcesTable(props: any) {
               <div className="relative mb-2">
                 <div className="flex justify-between items-center mt-0">
                   {/* Add Resource Button */}
-                  {props.isLogged && props.user.role === "Urban Planner" && documentLinks.length !== 0 ? (
+                  {props.isLogged && props.user.role === "Urban Planner" && resources.length !== 0 ? (
                     <button
                       className="flex items-center justify-center bg-green-600 text-white rounded px-4 py-2 hover:bg-green-700 transition duration-200"
                       onClick={() => {}}
@@ -244,12 +244,6 @@ function ResourcesTable(props: any) {
                                     onClick={() => {}}
                                   >
                                     <TrashIcon className="h-5 w-5" />
-                                  </button>
-                                  <button
-                                    className="text-blue-500 hover:text-blue-700 ml-2"
-                                    onClick={() => {}}
-                                  >
-                                    <PencilIcon className="h-5 w-5" />
                                   </button>
                                 </>
                               )}
