@@ -1,7 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
+import { Modal } from 'react-bootstrap';
 import API from "../API/API";
-import { TrashIcon, PlusIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, PlusIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon, ArrowDownTrayIcon, DocumentIcon } from "@heroicons/react/24/outline";
 import Alert from "./Alert";
 import ConfirmModal from './ConfirmModal';
 import { DocLink } from "../models/document_link";
@@ -15,8 +16,10 @@ function ResourcesTable(props: any) {
     const { idDocument } = useParams();
     const [document, setDocument] = useState<DocCoordinates | null>(null);
     const [documentLinks, setDocumentLinks] = useState<DocLink[]>([]);
+    const [files, setFiles] = useState<File[]>([]);//resources
     
     const [showModal, setShowModal] = useState(false);
+    const [refreshPage, setRefreshPage] = useState(false);
 
     const [resources, setResources] = useState<Resources[]>([]);
 
@@ -27,7 +30,7 @@ function ResourcesTable(props: any) {
 
     //modal
     const [showAlert, setShowAlert] = useState(false); // alert state
-    const [showModalAddLink, setShowModalAddLink] = useState(false);
+    const [showModalAddResource, setShowModalAddResource] = useState(false);
 
     //loading
     const [loading, setLoading] = useState(true);  // stato di caricamento
@@ -81,6 +84,65 @@ function ResourcesTable(props: any) {
       setResourceIdToDelete(res.id)
       console.log('hi delete')
     } 
+
+    const handleSubmitResource = async () => {
+      if (files.length !== 0 && document!=null) {
+        console.log("new files");
+
+        files.forEach(async (file) => {
+            console.log(file);
+
+            // Step 1: Read the file content as a Uint8Array
+            const fileData = await file.arrayBuffer(); // Convert to ArrayBuffer
+            const uint8Array = new Uint8Array(fileData); // Convert to Uint8Array
+
+            // Step 2: Convert Uint8Array to binary string using a loop
+            let binaryString = '';
+            for (let i = 0; i < uint8Array.length; i++) {
+                binaryString += String.fromCharCode(uint8Array[i]);
+            }
+            const base64Data = btoa(binaryString); // Convert to base64
+
+            // Step 3: Call the API to upload the resource
+            try {
+                const response = await API.addResourceToDocument(
+                    document.id,        // Replace with the actual document ID
+                    file.name,     // Use the file name
+                    base64Data     // Pass the file data as base64 string
+                );
+                console.log("File uploaded successfully:", response);
+            } catch (error) {
+                console.error("Failed to upload file:", file.name, error);
+            }
+        });
+    }
+      setShowModalAddResource(false);
+      setFiles([])
+  };
+
+  const handleAddResource = () => {
+    setShowModalAddResource(true)
+  }
+
+  const handleCloseModal = () => {
+    setShowModalAddResource(false)
+    setFiles([])
+  }
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const fileList = event.target.files; // HTMLInputElement.files can be FileList or null
+    if (fileList) {
+      setFiles((prevFiles) =>  [...prevFiles, ...Array.from(fileList)]);
+    
+  }
+    event.target.value = '';
+  };
+
+  const handleDeleteFile = (index: number) => {
+    setFiles((prevFiles) => 
+      prevFiles.filter((_, i) => i !== index)
+    );
+  };
 
     useEffect(() => {
         const getDocument = async () => {
@@ -173,7 +235,7 @@ function ResourcesTable(props: any) {
                   {props.isLogged && props.user.role === "Urban Planner" && resources.length !== 0 ? (
                     <button
                       className="flex items-center justify-center bg-green-600 text-white rounded px-4 py-2 hover:bg-green-700 transition duration-200"
-                      onClick={() => {}}
+                      onClick={handleAddResource}
                     >
                       <PlusIcon className="h-5 w-5 mr-2" />
                       <span>Add Resource</span>
@@ -213,7 +275,7 @@ function ResourcesTable(props: any) {
                   {props.isLogged && props.user.role == "Urban Planner" && (
                     <button
                       className="flex items-center justify-center bg-green-600 text-white rounded px-4 py-2 hover:bg-green-600 transition duration-200 mt-4"
-                      onClick={() => {}}
+                      onClick={handleAddResource}
                     >
                       <PlusIcon className="h-5 w-5 mr-2" />
                       <span>Add Resource</span>
@@ -284,6 +346,103 @@ function ResourcesTable(props: any) {
                  
                 </>
               )}
+
+              {showModalAddResource && (
+                          // <Modal size="xl" show={show} onHide={handleClose} aria-labelledby="example-modal-sizes-title-lg">
+                          <Modal size="xl" show={true} onHide={handleCloseModal} aria-labelledby="example-modal-sizes-title-lg">
+                          <Modal.Header closeButton className="bg-gray-100">
+                            <Modal.Title id="example-modal-sizes-title-lg" className="text-2xl font-bold text-gray-800">
+                              Add New Resource
+                            </Modal.Title>
+                          </Modal.Header>
+                          <Modal.Body className="bg-white">
+                            <div className="px-6 py-4 space-y-6">
+                              {/* Alerts */}
+                              {/* {showAlert && (
+                                <Alert
+                                  message={alertMessage}
+                                  onClose={() => {setShowAlert(false); setAlertMessage('')}}
+                                />
+                              )} */}
+                  
+                              <form className="space-y-12">
+                  
+                                  {/* Section 4: Resources files */}
+                                  <div className="space-y-12">
+                                    <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Resources</h3>
+                  
+                                    {/* File Upload Field */}
+                                    <div className="p-4 border border-gray-200 rounded-md shadow-sm bg-gray-50">
+                                        <div className="space-y-2">
+                                            <label htmlFor="formFile" className="block text-sm font-medium text-gray-600">
+                                                Upload File
+                                            </label>
+                                            <input
+                                                type="file"
+                                                id="formFile"
+                                                multiple
+                                                onChange={handleFileChange}
+                                                className="w-full border border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500 px-2 py-2"
+                                            />
+                                        </div>
+                  
+                                        {/* Selected Files Section */}
+                                        {files.length > 0 && (
+                                            <div className="mt-4">
+                                                <h4 className="text-sm font-semibold text-gray-700 mb-2">Selected Files</h4>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                    {files.map((file, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className="flex items-center justify-between border border-gray-300 p-2 rounded-md shadow-sm bg-white hover:shadow-md transition-shadow duration-300"
+                                                        >
+                                                            {/* File Info */}
+                                                            <div className="flex items-center space-x-2">
+                                                                <DocumentIcon className="h-6 w-6 text-blue-500" />
+                                                                <span className="font-medium text-gray-800 truncate">
+                                                                    {file.name} ({(file.size / 1024).toFixed(2)} KB)
+                                                                </span>
+                                                            </div>
+                  
+                                                            {/* Delete Button */}
+                                                            <button
+                                                                type="button"
+                                                                className="text-red-500 hover:text-red-700 focus:outline-none"
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    e.stopPropagation();
+                                                                    handleDeleteFile(index);
+                                                                }}
+                                                            >
+                                                                <TrashIcon className="h-5 w-5" />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                  
+                              </form>
+                            </div>
+                          </Modal.Body>
+                          <Modal.Footer className="bg-gray-100 flex justify-end space-x-4">
+                            <button
+                              className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md"
+                              onClick={handleCloseModal}
+                            >
+                              Close
+                            </button>
+                            <button
+                              className="px-4 py-2 bg-blue-950 hover:bg-blue-500 text-white rounded-md"
+                              onClick={handleSubmitResource}
+                            >
+                              Add
+                            </button>
+                          </Modal.Footer>
+                        </Modal>
+                        )}
             </div>
           );
           
