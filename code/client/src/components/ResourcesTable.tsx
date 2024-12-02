@@ -162,7 +162,7 @@ function ResourcesTable(props: any) {
         return (
             <div className="p-4" style={{ height: "calc(100vh - 65px)", overflowY: "auto" }}>
               <h2 className="text-xl font-normal text-gray-600 mb-1 text-center">
-                Connections of
+                Resources of
               </h2>
               <h2 className="text-3xl font-bold text-black-600 text-center mb-6">
                 {document.title}
@@ -210,7 +210,7 @@ function ResourcesTable(props: any) {
               {documentLinks.length === 0 ? (
                 <div className="flex flex-col items-center mt-6">
                   <FaceFrownIcon className="h-10 w-10 text-gray-400" />
-                  <p className="text-lg text-gray-500 mt-2">No links available</p>
+                  <p className="text-lg text-gray-500 mt-2">No resources available</p>
                   {props.isLogged && props.user.role == "Urban Planner" && (
                     <button
                       className="flex items-center justify-center bg-green-600 text-white rounded px-4 py-2 hover:bg-green-600 transition duration-200 mt-4"
