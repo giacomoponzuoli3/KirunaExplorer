@@ -1,4 +1,3 @@
-import {Button} from "react-bootstrap"
 import { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import API from '../API/API';
@@ -6,21 +5,18 @@ import { Document } from "../models/document";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { User } from "../models/user";
-import { useEffect } from "react";
 import { AddDocumentModal } from "./AddDocumentModal";
 import { Stakeholder } from "../models/stakeholder";
 import {DocumentLegend} from "./DocumentLegend"
 import Alert from "./Alert"
 import { DocumentPlusIcon } from "@heroicons/react/24/outline";
-import { MapContainer, useMap } from 'react-leaflet';
-import { LatLngTuple, LatLngBounds, ControlOptions, LatLng } from 'leaflet'; // Import del tipo corretto
+import { MapContainer } from 'react-leaflet';
+import {LatLng, LatLngTuple} from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
 import { GeoreferenceNewDocumentModal } from "./GeoreferenceNewDocumentModal";
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet-draw';
 import { DocCoordinates } from "../models/document_coordinate";
-import ReactDOMServer from 'react-dom/server';
 import { ShowDocumentInfoModal } from "./ShowDocumentInfoModal";
 import { EditDocumentModal } from "./EditDocumentModal";
 import { AddNewDocumentLinksModal } from "./AddNewDocumentLinksModal";
@@ -33,7 +29,12 @@ function getPolygonKey(latLngs: LatLngTuple[]): string {
   // Ordina le coordinate del poligono per latitudine e longitudine
   const sortedCoords = latLngs
     .map(coord => `${coord[0]},${coord[1]}`)  // Converti le coordinate in stringhe
-    .sort();  // Ordina le coordinate in ordine crescente
+    .sort((a: string, b: string) => {
+        if (a < b) return -1
+        if (a > b) return 1
+
+        return 0
+    });  // Ordina le coordinate in ordine crescente
   return sortedCoords.join(";");
 }
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {Navbar} from "./Navbar"
 import API from '../API/API';
-import { Routes, Route, Outlet, BrowserRouter } from 'react-router-dom';
+import { Routes, Route, Outlet } from 'react-router-dom';
 import {Login} from './Login';
 import { HomePage } from './HomePage';
 import { NotFoundLayout } from './NotFoundLayout';

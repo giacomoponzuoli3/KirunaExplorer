@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import API from "../API/API";
-import { TrashIcon, MapPinIcon, MapIcon, PencilIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon, PlusCircleIcon, ClipboardIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, MapPinIcon, MapIcon, PencilIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import { TruncatedText } from "./LinksDocument";
 import { useNavigate } from "react-router-dom";
 import Alert from "./Alert";
-import { ShowDocumentInfoModal } from "./ShowDocumentInfoModal";
 import { DocCoordinates } from "../models/document_coordinate";
 import { EditDocumentModal } from "./EditDocumentModal";
 import ConfirmModal from "./ConfirmModal";
@@ -29,7 +28,7 @@ function DocumentsTable(props: any){
     //document's georeference delete
     const [documentGeoreferenceDelete, setDocumentGeoreferenceDelete] = useState<DocCoordinates | null>(null);
     //view document's georeference 
-    const [viewDocumentGeoreference, setViewDocumentGeoreference] = useState<DocCoordinates | null>(null);
+    const [viewDocumentGeoreference] = useState<DocCoordinates | null>(null);
     //document selected for edit/add georeference
     const [documentSelected, setDocumentSelected] = useState<DocCoordinates | null>(null);
 
@@ -120,7 +119,7 @@ function DocumentsTable(props: any){
   useEffect(() => {
     const fetchLinksCount = async () => {
         const linksCountMap = new Map<number, number>();
-        
+
         for (const doc of documentsCoordinates) {
             const count = await getDocumentLinksCount(doc.id); // Assicurati che ogni documento abbia un campo "id"
             linksCountMap.set(doc.id, count); // Memorizza il conteggio dei link
@@ -130,7 +129,7 @@ function DocumentsTable(props: any){
     };
 
     if (documentsCoordinates.length > 0) {
-        fetchLinksCount(); // Chiamata quando i documenti sono disponibili
+        fetchLinksCount().then(); // Chiamata quando i documenti sono disponibili
     }
 }, [documentsCoordinates]);
 
@@ -170,8 +169,8 @@ function DocumentsTable(props: any){
   const handleDeleteClick = async () => {
     try{
         if(documentDelete){
-          await API.deleteDocument(documentDelete.id).then();
-          getDocuments();
+          await API.deleteDocument(documentDelete.id);
+          await getDocuments();
         }
         setDocumentDelete(null);
     }catch(err){
@@ -189,7 +188,7 @@ function DocumentsTable(props: any){
     try{
       if(documentGeoreferenceDelete){
         await API.deleteDocumentCoordinates(documentGeoreferenceDelete.id);
-        getDocuments();
+        await getDocuments();
       }
       setDocumentGeoreferenceDelete(null);
     }catch(err){
@@ -431,7 +430,7 @@ function DocumentsTable(props: any){
               onHide={() => {
                 setShowModalEditDocument(false)
                 setDocumentEdit(null);
-                getDocuments(); //refresh of documents
+                getDocuments().then(); //refresh of documents
                 
               }} 
               refreshSelectedDocument={refreshSelectedDocument}
@@ -470,8 +469,8 @@ function DocumentsTable(props: any){
 
                     geoJsonData={props.geoJsonData}
 
-                    onClose={() => {    
-                      getDocuments(); //refresh of documents
+                    onClose={async () => {
+                      await getDocuments(); //refresh of documents
                       setShowModalGeoreference(false)
                       setMode(null); //reset the mode
                     }}

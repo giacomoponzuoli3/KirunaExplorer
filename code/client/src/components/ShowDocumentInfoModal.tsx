@@ -1,7 +1,6 @@
 
 import { useState } from 'react';
 import { Container, Modal, Row, Col } from 'react-bootstrap';
-import { Document } from '../models/document';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { User } from '../models/user';
 import API from '../API/API';
@@ -11,9 +10,8 @@ import { DocCoordinates } from '../models/document_coordinate';
 import { useNavigate } from 'react-router-dom';
 import { ModalEditGeoreference } from './ModalEditGeoreference';
 import ConfirmModal from './ConfirmModal';
-import { EditDocumentModal } from './EditDocumentModal';
 
-  
+
 interface ShowDocumentInfoModalProps {
     selectedDocumentCoordinates: DocCoordinates;
     show: boolean;

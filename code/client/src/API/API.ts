@@ -248,8 +248,7 @@ async function addResourceToDocument(idDoc: number, name: string, data: string) 
         if (responseText) {
             try {
                 // Prova a convertire la risposta in JSON
-                const responseBody = JSON.parse(responseText);
-                return responseBody;
+                return JSON.parse(responseText);
             } catch (error) {
                 console.error('Failed to parse JSON:', error);
                 throw new Error('Server returned an invalid JSON response.');

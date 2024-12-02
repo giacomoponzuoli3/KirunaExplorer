@@ -2,7 +2,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from "react";
 import { useMap, MapContainer } from 'react-leaflet';
-import { LatLngTuple, LatLngBounds, Polygon} from 'leaflet'; // Import del tipo corretto
+import { LatLngTuple, LatLngBounds} from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -814,7 +814,7 @@ function MapView(props: any) {
       }
     </>
   );
-};
+}
 
 
 export {SetMapViewHome, SetMapViewEdit, cityCoords, MapView}
