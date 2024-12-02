@@ -461,6 +461,26 @@ class DocumentDAO {
         });
     }
 
+    /**
+     * Deletes a resource associated with a document from the database.
+     * @param documentId The id of the document whose resource is to be deleted.
+     * @param name The name of the resource to delete.
+     * @returns A Promise that resolves when the resource has been deleted.
+     */
+    deleteResource(documentId: number, name: string): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            try {
+                const sql = "DELETE FROM original_resources WHERE document_id = ? AND resource_name = ?";
+                db.run(sql, [documentId, name], (err: Error | null) => {
+                    if (err) return reject(err);
+                    resolve();
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
 }
 
 export { DocumentDAO }
