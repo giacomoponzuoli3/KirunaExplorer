@@ -266,6 +266,7 @@ async function addResourceToDocument(idDoc: number, name: string, data: string) 
 
 async function getResourceData(idDoc: number) {
     const response = await fetch(baseURL + "doc/res/" + idDoc, { credentials: "include" })
+    console.log(response.json());
     if (response.ok) {
         return await response.json()
     } else {

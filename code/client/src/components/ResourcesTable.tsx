@@ -2,7 +2,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { Document } from "../models/document";
 import API from "../API/API";
-import { TrashIcon, PlusIcon, FaceFrownIcon, PencilIcon,ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, PlusIcon, FaceFrownIcon, PencilIcon,ChevronRightIcon, ChevronLeftIcon, ArrowDownIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import Alert from "./Alert";
 import ConfirmModal from './ConfirmModal';
 import { AddLinkModal } from "./AddLinkModal";
@@ -27,13 +27,9 @@ function ResourcesTable(props: any) {
     const [documentToDelete, setDocumentToDelete] = useState<number | null>(null);
     const [linkToDelete, setLinkToDelete] = useState<number | null>(null);
 
-    //update    
-    const [documentToUpdate, setDocumentToUpdate] = useState<DocLink | null>(null);
-
     //modal
     const [showAlert, setShowAlert] = useState(false); // alert state
     const [showModalAddLink, setShowModalAddLink] = useState(false);
-    const [showModalEditLink, setShowModalEditLink] = useState(false);
 
     //loading
     const [loading, setLoading] = useState(true);  // stato di caricamento
@@ -76,17 +72,6 @@ function ResourcesTable(props: any) {
         }
     };
 
-    const refreshLinks = async () => {
-        try {
-            const documentId = Number(idDocument);
-            const updatedLinks = await API.getDocumentLinksById(documentId);
-            setDocumentLinks(updatedLinks);
-        } catch (err) {
-            setShowAlert(true);
-        }
-    };
-
-
     useEffect(() => {
         const getDocument = async () => {
             try{
@@ -108,14 +93,17 @@ function ResourcesTable(props: any) {
         const getResources = async () => {
             try{
                 const documentId = Number(idDocument);
-                const documentResources = await API.getResourceData(documentId);
-
+                //const documentResources = await API.getResourceData(documentId);
+                const documentResources: Resources[] = [new Resources(1, 2, "prova", null, "12/11/2024")]
                 setResources(documentResources);
             }catch (err){
                 setShowAlert(true);
             }
         };
+        console.log(idDocument);
         getResources().then();
+        console.log(resources);
+        setLoading(false);
     }, [idDocument]);
 
     useEffect(() => {
@@ -136,11 +124,7 @@ function ResourcesTable(props: any) {
         ))
       }
       
-    }, [documentLinks]);
-
-    const handleAddLink = () => {
-        setShowModalAddLink(true);
-    }
+    }, [resources]);
 
     if (loading) {
       return <div>Loading...</div>; 
@@ -208,7 +192,7 @@ function ResourcesTable(props: any) {
               </div>
 
               
-              {resources.length === 0 ? (
+              {(resources.length === 0 && !loading) ? (
                 <div className="flex flex-col items-center mt-6">
                   <FaceFrownIcon className="h-10 w-10 text-gray-400" />
                   <p className="text-lg text-gray-500 mt-2">No resources available</p>
@@ -231,9 +215,8 @@ function ResourcesTable(props: any) {
                         <th className="p-4 text-left text-sm font-semibold w-[15%]">Name</th>
                         <th className="p-4 text-left text-sm font-semibold w-[15%]">Date uploaded</th>
                         <th className="p-4 text-left text-sm font-semibold w-[10%]">Size</th>
-                        {props.isLogged && props.user.role == "Urban Planner" && (
-                          <th className="p-4 text-left text-sm font-semibold w-[5%]">Actions</th>
-                        )}
+                        <th className="p-4 text-left text-sm font-semibold w-[5%]">Actions</th>
+
                       </tr>
                     </thead>
                     <tbody>
@@ -244,22 +227,34 @@ function ResourcesTable(props: any) {
                           <td className="p-4 text-sm text-gray-600 w-[15%]">{resource.name}</td>
                           <td className="p-4 text-sm text-gray-600 w-[15%]">{String(resource.uploadTime)}</td>
                           <td className="p-4 text-sm text-gray-600 w-[10%]"></td>
-                          {props.isLogged && props.user.role == "Urban Planner" && (
+                          
                             <td className="p-3 items-center justify-center space-x-4 w-[5%]">
                               <button
-                                className="text-red-500 hover:text-red-700"
-                                onClick={() => {}}
+                              title="Download"
+                                className="text-green-600 hover:text-green-700"
+                                onClick={() => {}} 
                               >
-                                <TrashIcon className="h-5 w-5" />
+                                <ArrowDownTrayIcon className="h-5 w-5" />
                               </button>
-                              <button
-                                className="text-blue-500 hover:text-blue-700 ml-2"
-                                onClick={() => {}}
-                              >
-                                <PencilIcon className="h-5 w-5" />
-                              </button>
+                              {props.isLogged && props.user.role == "Urban Planner" && (
+                                <>
+                                  <button
+                                  
+                                    className="text-red-500 hover:text-red-700"
+                                    onClick={() => {}}
+                                  >
+                                    <TrashIcon className="h-5 w-5" />
+                                  </button>
+                                  <button
+                                    className="text-blue-500 hover:text-blue-700 ml-2"
+                                    onClick={() => {}}
+                                  >
+                                    <PencilIcon className="h-5 w-5" />
+                                  </button>
+                                </>
+                              )}
                             </td>
-                          )}
+                          
                         </tr>
                       ))}
                     </tbody>
@@ -278,17 +273,6 @@ function ResourcesTable(props: any) {
                     text={`Are you sure you want to delete this link of the document?
                     This action cannot be undone.`}
                   />
-
-
-                  {document !== null && documentToUpdate !== null && showModalEditLink &&<EditLinkModal
-                    show={showModalEditLink}
-                    onHide={() => setShowModalEditLink(false)}
-
-                    firstDocument={document}
-                    secondDocument={documentToUpdate}
-
-                    refreshLinks={refreshLinks}
-                  />}
                  
                 </>
               )}
