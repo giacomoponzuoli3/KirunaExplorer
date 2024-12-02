@@ -264,9 +264,22 @@ async function addResourceToDocument(idDoc: number, name: string, data: string) 
 }
 
 
-async function getResourceData(idDoc: number) {
-    const response = await fetch(baseURL + "doc/res/" + idDoc, { credentials: "include" })
-    console.log(response.json());
+async function getResourceData(idDoc: number, idRes: number) {
+    const response = await fetch(baseURL + "doc/res/" + idDoc + "/" + idRes, { credentials: "include" })
+    if (response.ok) {
+        return await response.json()
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+
+async function getAllResourcesData(idDoc: number) {
+    const response = await fetch(baseURL + "doc/res/" + idDoc + "/all", { credentials: "include" })
     if (response.ok) {
         return await response.json()
     } else {
@@ -484,7 +497,7 @@ async function getMunicipalityArea() {
 
 const API = {
     login, logOut, getUserInfo, register,
-    addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType, addResourceToDocument, getResourceData, deleteResource,
+    addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType, addResourceToDocument, getResourceData, deleteResource, getAllResourcesData,
     getAllStakeholders, addStakeholder,
     addLink, deleteLink, editLink, getAllLinks,
     getAllDocumentsCoordinates, setDocumentCoordinates, updateDocumentCoordinates, deleteDocumentCoordinates, getMunicipalityArea
