@@ -278,7 +278,7 @@ async function getResourceData(idDoc: number, idRes: number) {
 }
 
 async function getAllResourcesData(idDoc: number) {
-    const response = await fetch(baseURL + "doc/res/" + idDoc + "/all", { credentials: "include" })
+    const response = await fetch(baseURL + "doc/res-all/" + idDoc , { credentials: "include" })
     if (response.ok) {
         return await response.json()
     } else {
