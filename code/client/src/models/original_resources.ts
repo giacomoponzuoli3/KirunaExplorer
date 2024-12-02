@@ -2,9 +2,9 @@ class Resources {
     id: number;
     idDoc: number;
     name: string;
-    data: Uint8Array; // Per rappresentare dati binari (es. PDF, immagini)
+    data:  Uint8Array | null; // Per rappresentare dati binari (es. PDF, immagini)
     uploadTime: Date; // Per rappresentare il timestamp
-    constructor(id: number, idDoc: number, name: string, data: Uint8Array, uploadTime: Date) {
+    constructor(id: number, idDoc: number, name: string, data:  Uint8Array | null = null, uploadTime: Date) {
         this.id = id;
         this.idDoc = idDoc;
         this.name = name;
