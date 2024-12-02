@@ -237,14 +237,31 @@ class DocumentRoutes {
         );
 
         this.router.get(
-            "/res/:idDoc",
+            "/res/:idDoc/:idRes",
+            this.authenticator.isLoggedIn, //error 401
+            this.authenticator.isPlanner, //error 403
+            param("idDoc").isNumeric(),
+            param("idRes").isNumeric(),
+            this.errorHandler.validateRequest,
+            async (req: any, res: any, next: any) => {
+                try {
+                    const resources = await this.controller.getResourceData(req.params["idDoc"], req.params["idRes"]);
+                    res.status(200).json(resources);
+                } catch (err) {
+                    next(err);
+                }
+            }
+        );
+
+        this.router.get(
+            "/res/:idDoc/all",
             this.authenticator.isLoggedIn, //error 401
             this.authenticator.isPlanner, //error 403
             param("idDoc").isNumeric(),
             this.errorHandler.validateRequest,
             async (req: any, res: any, next: any) => {
                 try {
-                    const resources = await this.controller.getResourceData(req.params["idDoc"]);
+                    const resources = await this.controller.getAllResourcesData(req.params["idDoc"]);
                     res.status(200).json(resources);
                 } catch (err) {
                     next(err);
