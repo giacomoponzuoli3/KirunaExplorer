@@ -4,6 +4,7 @@ import { Document } from "../models/document"
 import { Stakeholder } from "../models/stakeholder"
 import Link from "../models/link";
 import {DocumentNotFoundError} from "../errors/document";
+import Resources from "../models/original_resources";
 
 class DocumentDAO {
     /**
@@ -445,18 +446,50 @@ class DocumentDAO {
     /**
      * Retrieves the resource data associated with the specified document from the database.
      * @param documentId The id of the document whose resource data is to be retrieved.
+     * @param resourceId The id of the resource to retrieve.
      * @returns A Promise that resolves to the resource data associated with the document.
      */
-    getResourceData(documentId: number): Promise<Uint8Array> {
+    getResourceData(documentId: number, resourceId: number): Promise<Uint8Array> {
         return new Promise<Uint8Array>((resolve, reject) => {
             try {
-                const sql = "SELECT resource_data FROM original_resources WHERE document_id = ?";
-                db.get(sql, [documentId], (err: Error | null, row: any) => {
+                const sql = "SELECT resource_data FROM original_resources WHERE document_id = ? AND resource_id = ?";
+                db.get(sql, [documentId, resourceId], (err: Error | null, row: any) => {
                     if (err) return reject(err);
                     if (!row) return reject(new DocumentNotFoundError);
 
                     // Return the resource data associated with the document
                     resolve(row.resource_data);
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    /**
+     * Retrieves all resources associated with a document from the database.
+     * @param documentId The id of the document whose resources are to be retrieved.
+     * @returns A Promise that resolves to an array of Resources objects.
+     */
+    getAllResourcesData(documentId: number): Promise<Resources[]> {
+        return new Promise<Resources[]>((resolve, reject) => {
+            try {
+                const sql = "SELECT resource_id, resource_name, uploaded_at FROM original_resources WHERE document_id = ?";
+                db.all(sql, [documentId], (err: Error | null, rows: any[]) => {
+                    if (err) return reject(err);
+                    if (!rows || rows.length == 0) return resolve([]);
+
+                    const resources: Resources[] = [];
+                    rows.forEach((row: any) => {
+                        const idDoc = row.document_id;
+                        const id = row.id;
+                        const data:null = null;
+                        const name = row.resource_name;
+                        const uploadTime = row.uploaded_at;
+                        resources.push({ idDoc, id, data, name, uploadTime });
+                    });
+
+                    resolve(resources);
                 });
             } catch (error) {
                 reject(error);
