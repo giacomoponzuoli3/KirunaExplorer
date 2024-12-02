@@ -1377,11 +1377,11 @@ describe('documentDAO', () => {
                 return {} as Database;
             })
     
-            await expect(dao.addResourceToDocument(testId, "title", new Uint8Array([10, 10, 20]))).resolves.toBeUndefined();
+            await expect(dao.addResourceToDocument(testId, "title", "2020-10-10")).resolves.toBeUndefined();
 
             expect(db.run).toHaveBeenCalledWith(
-                'INSERT INTO original_resources (id_doc, name, data) VALUES (?, ?, ?)',
-                [testId, "title", new Uint8Array([10, 10, 20])],
+                'INSERT INTO original_resources (document_id, resource_name, resource_data) VALUES (?, ?, ?)',
+                [testId, "title",  Buffer.from("2020-10-10", 'base64')],
                 expect.any(Function)
             );
     
@@ -1394,16 +1394,19 @@ describe('documentDAO', () => {
                     return {} as Database;
                 })
 
-            await expect(dao.addResourceToDocument).rejects.toThrow(`Database error`);
+             await expect(dao.addResourceToDocument(testId, "title", "2020-10-10")).rejects.toThrow('Database error');
         });
 
-        test('It should reject with error if an unexpected error occurs', async () => {
-            const unexpectedError = new Error("Unexpected error");
-            (db.run as jest.Mock).mockImplementation(() => {
-                throw unexpectedError;
-            });
+        test('should reject when the database returns an error', async () => {
+    
+            jest.spyOn(db, 'run')
+            .mockImplementationOnce((sql, params, callback) => {
+                callback(new Error('Unexpected error'));
+                return {} as Database;
+            })
 
-            await expect(dao.addResourceToDocument).rejects.toThrow("Unexpected error");
+            await expect(dao.addResourceToDocument(testId, "title", "2020-10-10")).rejects.toThrow('Unexpected error');
+    
         });
     });
 });
