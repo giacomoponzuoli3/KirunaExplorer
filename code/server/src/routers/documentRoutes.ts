@@ -236,6 +236,19 @@ class DocumentRoutes {
             }
         );
 
+        this.router.get(
+            "/res/:idDoc",
+            param("idDoc").isNumeric(),
+            this.errorHandler.validateRequest,
+            async (req: any, res: any, next: any) => {
+                try {
+                    const resources = await this.controller.getResourceData(req.params["idDoc"]);
+                    res.status(200).json(resources);
+                } catch (err) {
+                    next(err);
+                }
+            }
+        );
     }
 }
 
