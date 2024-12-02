@@ -139,6 +139,17 @@ class DocumentController {
     getResourceData(documentId: number): Promise<Uint8Array> {
         return this.dao.getResourceData(documentId);
     }
+
+    /**
+     * Deletes a resource associated with a document from the database.
+     * @param documentId The id of the document whose resource is to be deleted.
+     * @param name The name of the resource to delete.
+     * @returns A Promise that resolves when the resource has been deleted.
+     */
+    deleteResource(documentId: number, name: string): Promise<void> {
+        return this.dao.deleteResource(documentId, name);
+    }
+
 }
 
 export default DocumentController

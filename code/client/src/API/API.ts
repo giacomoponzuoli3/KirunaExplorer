@@ -267,6 +267,20 @@ async function getResourceData(idDoc: number) {
     }
 }
 
+async function deleteResource(idDoc: number, name: string) {
+    const response = await fetch(baseURL + "doc/res/" + idDoc + "/" + name, { method: 'DELETE', credentials: "include" })
+    if (response.ok) {
+        return
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+
 /** ------------------- Link APIs ------------------------ */
 async function addLink(idDoc1: number, idDoc2: number, idLink: number) {
     const response = await fetch(baseURL + "link", { method: 'POST', credentials: "include", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idDoc1: idDoc1, idDoc2: idDoc2, idLink: idLink },) })
@@ -458,7 +472,7 @@ async function getMunicipalityArea() {
 
 const API = {
     login, logOut, getUserInfo, register,
-    addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType, addResourceToDocument, getResourceData,
+    addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType, addResourceToDocument, getResourceData, deleteResource,
     getAllStakeholders, addStakeholder,
     addLink, deleteLink, editLink, getAllLinks,
     getAllDocumentsCoordinates, setDocumentCoordinates, updateDocumentCoordinates, deleteDocumentCoordinates, getMunicipalityArea
