@@ -30,7 +30,7 @@ class DocumentRoutes {
         this.router.post(
             "/",
             this.authenticator.isLoggedIn, //error 401
-            this.authenticator.isPlanner, //error 401
+            this.authenticator.isPlanner, //error 403
             body("title").isString(),
             body("stakeHolders").isArray(),
             body("scale").isString(),
@@ -95,7 +95,7 @@ class DocumentRoutes {
         this.router.delete(
             "/:id",
             this.authenticator.isLoggedIn, //error 401
-            this.authenticator.isPlanner, //error 401
+            this.authenticator.isPlanner, //error 403
             param("id").isNumeric(),
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
@@ -112,7 +112,7 @@ class DocumentRoutes {
         this.router.patch(
             "/:id",
             this.authenticator.isLoggedIn, //error 401
-            this.authenticator.isPlanner, //error 401
+            this.authenticator.isPlanner, //error 403
             param("id").isNumeric(),
             body("title").isString(),
             body("stakeHolders").isArray(),
@@ -221,7 +221,7 @@ class DocumentRoutes {
         this.router.post(
             "/res",
             this.authenticator.isLoggedIn, //error 401
-            this.authenticator.isPlanner, //error 401
+            this.authenticator.isPlanner, //error 403
             body("idDoc").isNumeric(),
             body("name").isString().notEmpty(),
             body("data"),
@@ -236,6 +236,19 @@ class DocumentRoutes {
             }
         );
 
+        this.router.get(
+            "/res/:idDoc",
+            param("idDoc").isNumeric(),
+            this.errorHandler.validateRequest,
+            async (req: any, res: any, next: any) => {
+                try {
+                    const resources = await this.controller.getResourceData(req.params["idDoc"]);
+                    res.status(200).json(resources);
+                } catch (err) {
+                    next(err);
+                }
+            }
+        );
     }
 }
 
