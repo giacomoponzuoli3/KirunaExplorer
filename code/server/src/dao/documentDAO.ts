@@ -438,7 +438,6 @@ class DocumentDAO {
                 });
             } catch (error) {
                 reject(error);
-                console.error(error);
             }
         });
     }
