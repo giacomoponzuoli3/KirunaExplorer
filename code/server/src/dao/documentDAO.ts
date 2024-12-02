@@ -424,21 +424,25 @@ class DocumentDAO {
      * @param data The data of the resource to add.
      * @returns A Promise that resolves when the resource has been added.
      */
-    addResourceToDocument(documentId: number, name: string, data: Uint8Array): Promise<void> {
+    addResourceToDocument(documentId: number, name: string, data: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try {
+                // Decodifica la stringa Base64 in binario
+                const decodedData = Buffer.from(data, 'base64');
+    
+                // Query SQL per inserire i dati
                 const sql = "INSERT INTO original_resources (document_id, resource_name, resource_data) VALUES (?, ?, ?)";
-                db.run(sql, [documentId, name, data], (err: Error | null) => {
+                db.run(sql, [documentId, name, decodedData], (err: Error | null) => {
                     if (err) return reject(err);
                     resolve();
                 });
             } catch (error) {
                 reject(error);
-                console.log(error)
+                console.error(error);
             }
         });
     }
-
+    
     /**
      * Retrieves the resource data associated with the specified document from the database.
      * @param documentId The id of the document whose resource data is to be retrieved.

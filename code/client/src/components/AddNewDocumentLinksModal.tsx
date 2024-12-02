@@ -158,66 +158,82 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoord
   };
 
   const handleLink = async () => {
-    //First add the document
-    try{
-      const doc = await API.addDocument(document.title, document.stakeHolders, document.scale, document.issuanceDate, document.type, document.language, document.pages, document.description).then();
-      if(newDocumentCoordinates){
-        console.log(doc.id)
-        //add the coordinates if they exist
+    // First add the document
+    try {
+        const doc = await API.addDocument(
+            document.title, 
+            document.stakeHolders, 
+            document.scale, 
+            document.issuanceDate, 
+            document.type, 
+            document.language, 
+            document.pages, 
+            document.description
+        );
 
-        //TODO: UPDATE WITH THE BOOLEAN 0 OR 1 (NOT FALSE/TRUE)
-        await API.setDocumentCoordinates(doc.id, newDocumentCoordinates);
-      }
-      if (documentLinks.length !== 0) {
-        console.log(doc.id)
-        // Implement API call to add link
-        documentLinks.forEach(async link => {
-          if(link.documentId && link.linkId){
-            await API.addLink(doc.id, link.documentId, link.linkId);
-          }
-            
-        });
-      }
+        if (newDocumentCoordinates) {
+            console.log(doc.id);
+            // Add the coordinates if they exist
+            await API.setDocumentCoordinates(doc.id, newDocumentCoordinates);
+        }
+
+        if (documentLinks.length !== 0) {
+            console.log(doc.id);
+            // Implement API call to add link
+            documentLinks.forEach(async (link) => {
+                if (link.documentId && link.linkId) {
+                    await API.addLink(doc.id, link.documentId, link.linkId);
+                }
+            });
+        }
 
         if (filesUploaded.length !== 0) {
-        console.log("new files");
-    
-        filesUploaded.forEach(async (file) => {
-            console.log(file);
-    
-            // Step 1: Read the file content as a Uint8Array
-            const fileData = await file.arrayBuffer(); // Convert to ArrayBuffer
-            const uint8Array = new Uint8Array(fileData); // Convert to Uint8Array
-    
-            // Step 2: Call the API
-            try {
-                const response = await API.addResourceToDocument(
-                    doc.id,        // Replace with the actual document ID
-                    file.name,    // Use the file name
-                    uint8Array    // Pass the file data as Uint8Array
-                );
-                console.log("File uploaded successfully:", response);
-            } catch (error) {
-                console.error("Failed to upload file:", file.name, error);
-            }
-        });
-    }  
+            console.log("new files");
+
+            filesUploaded.forEach(async (file) => {
+                console.log(file);
+
+                // Step 1: Read the file content as a Uint8Array
+                const fileData = await file.arrayBuffer(); // Convert to ArrayBuffer
+                const uint8Array = new Uint8Array(fileData); // Convert to Uint8Array
+
+                // Step 2: Convert Uint8Array to binary string using a loop
+                let binaryString = '';
+                for (let i = 0; i < uint8Array.length; i++) {
+                    binaryString += String.fromCharCode(uint8Array[i]);
+                }
+                const base64Data = btoa(binaryString); // Convert to base64
+
+                // Step 3: Call the API to upload the resource
+                try {
+                    const response = await API.addResourceToDocument(
+                        doc.id,        // Replace with the actual document ID
+                        file.name,     // Use the file name
+                        base64Data     // Pass the file data as base64 string
+                    );
+                    console.log("File uploaded successfully:", response);
+                } catch (error) {
+                    console.error("Failed to upload file:", file.name, error);
+                }
+            });
+        }
+    } catch (err) {
+        setShowAlert(true);
+        setAlertMessage('Something went wrong...');
     }
-    catch(err){
-      setShowAlert(true);
-      setAlertMessage('Something went wrong...')
-    }
-      refreshDocumentsCoordinates();
-      onHide();
-      //refresh of documents
-      refreshDocumentsCoordinates();    
-      //reset values 
-      setSelectedDocument(null)
-      setSelectedTypeLink(null)
-      setSelectedDocumentName('')
-      setSelectedTypeLinkName('')
-      setDocumentLinks([])
+
+    // Refresh of documents
+    refreshDocumentsCoordinates();
+    onHide();
+
+    // Reset values
+    setSelectedDocument(null);
+    setSelectedTypeLink(null);
+    setSelectedDocumentName('');
+    setSelectedTypeLinkName('');
+    setDocumentLinks([]);
 };
+
 
  const confirmDelete = (documentId:number | null, linkId: number | null) => {
   setDocumentLinks(prevLinks => 
