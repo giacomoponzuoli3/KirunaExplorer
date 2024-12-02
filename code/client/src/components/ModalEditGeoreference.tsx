@@ -11,6 +11,7 @@ import { SetMapViewEdit, cityCoords } from './Map';
 import { Button } from 'react-bootstrap';
 import {ArrowsPointingOutIcon, InformationCircleIcon, Square2StackIcon, MapPinIcon, PencilSquareIcon} from '@heroicons/react/24/solid'
 import Alert from './Alert';
+import { ClipboardDocumentListIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 
 
 interface ModalEditGeoreferenceProps {
@@ -35,7 +36,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   const [selectedPosition, setSelectedPosition] = useState<LatLng[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [useMunicipalArea, setUseMunicipalArea] = useState(false);  // Stato per la checkbox
+  const [useMunicipalArea, setUseMunicipalArea] = useState(documentCoordinates.coordinates[0].municipality_area == 1 ? true : false);  // Stato per la checkbox
 
   //state for the selection
   const [selectedButton, setSelectedButton] = useState<string | null>(null); // Stato per il pulsante selezionato
@@ -86,11 +87,13 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
 
   // Funzione per gestire il cambio di stato della checkbox
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUseMunicipalArea(event.target.checked);
-    setSelectedPosition([]);
-    if (event.target.checked) {
-      setSelectedButton('Entire Area'); // Se l'area municipale è selezionata, resettiamo l'input
-    }
+
+      setUseMunicipalArea(event.target.checked);
+      setSelectedPosition([]);
+      if (event.target.checked) {
+        setSelectedButton('Entire Area'); // Se l'area municipale è selezionata, resettiamo l'input
+      }
+
   };
 
   const handleButtonClick = (buttonType: string) => {
@@ -104,7 +107,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   return (
     <div className="size-xl fixed inset-0 z-[1000] bg-gray-500 bg-opacity-75 flex items-center justify-center pt-6 pb-6">
       <div className="bg-white rounded-lg shadow-lg w-full h-[90%] max-w-6xl p-8 flex flex-col">
-        <div className="flex justify-between items-center border-b mb-7">
+        <div className="flex justify-between items-center border-b mb-2">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
             {mode == "edit" ? "Edit" : "Add new"} the Georeference of <span className="text-blue-600">{documentCoordinates.title}</span>
           </h2>
@@ -120,8 +123,15 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
           }}
         />
         }
-
-        <div className="flex mb-4 space-x-3">
+        {documentCoordinates.coordinates[0].municipality_area == 1 && 
+        
+          <span className='text-sm text-gray-600 mt-1 mb-3 flex items-center'>
+            <InformationCircleIcon className="w-5 h-5 mr-2 text-blue-500 t" />
+            The "Edit Georeference" and checkbox for "The Entire Municipal Area" are disabled because the document is already associated with the entire municipality.
+          </span>
+        }
+        
+        <div className="flex mb-2 space-x-3">
           {/* New point */}
           <button
             title='Insert new point'
@@ -150,37 +160,79 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
 
           {mode === 'edit' && 
             <button
-              title='Edit the actual georeference'
+              title={documentCoordinates.coordinates[0].municipality_area == 1 ? 'Disabled because the document is already associated with the entire municipality area' : 'Edit the actual georeference'}
               className={`px-3 py-1 border-1 border-orange-500 text-orange-500 text-sm rounded-full hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300 transition ease-in-out duration-200 ${
                 selectedButton === 'edit' ? 'bg-orange-100 text-orange-500 border-orange-500 border-2' : ''
-              }`}
+                }
+                ${
+                  documentCoordinates.coordinates[0].municipality_area == 1
+                    ? 'opacity-50 cursor-not-allowed'
+                    : ''
+                }
+                `}
               onClick={() => handleButtonClick('edit')}
+              disabled={documentCoordinates.coordinates[0].municipality_area == 1}
             >
               <PencilSquareIcon className="w-5 h-5 mr-2 inline" />
               Edit georeference
             </button>
           }
 
-          <div className="flex items-center mb-0">
-            <label htmlFor="municipal-area-checkbox" className="relative inline-flex items-center cursor-pointer">
+          <div className="flex items-center">
+            <label
+              htmlFor="municipal-area-checkbox"
+              className={`relative inline-flex items-center ${
+                documentCoordinates.coordinates[0].municipality_area == 1
+                  ? "cursor-not-allowed"
+                  : "cursor-pointer"
+              }`}
+              title={
+                documentCoordinates.coordinates[0].municipality_area == 1
+                  ? "Disabled because the document is already associated with the entire municipality area"
+                  : ""
+              }
+            >
               <input
                 type="checkbox"
+                disabled={documentCoordinates.coordinates[0].municipality_area == 1}
                 id="municipal-area-checkbox"
                 checked={useMunicipalArea}
                 onChange={handleCheckboxChange}
                 className="sr-only peer"
               />
-              <span className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-500 transition"></span>
-              <span className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-5 transition"></span>
+              <span
+                className={`w-11 h-6 rounded-full transition ${
+                  documentCoordinates.coordinates[0].municipality_area == 1
+                    ? "bg-blue-500 opacity-50"
+                    : "bg-gray-300 peer-checked:bg-blue-500"
+                }`}
+              ></span>
+              <span
+                className={`absolute left-1 top-1 w-4 h-4 rounded-full transition ${
+                  documentCoordinates.coordinates[0].municipality_area == 1
+                    ? "bg-white opacity-50 translate-x-5"  // Mantenere la posizione del cerchio
+                    : "bg-white peer-checked:translate-x-5"
+                }`}
+              ></span>
             </label>
+
             <span className="ml-3 text-sm text-gray-600">The entire municipal area</span>
           </div>
         </div>
+        <span className='text-sm text-gray-600 mt-1 mb-3 flex items-center'>
+          {selectedButton && <ClipboardDocumentListIcon className="w-5 h-5 mr-2 text-blue-500" />}
+          {
+            selectedButton === 'point' ? 'Click the "Draw a Marker" icon in the top-right corner to place a point on the map' :
+            selectedButton === 'polygon' ? 'Click the "Draw a polygon" icon in the top-right corner to draw a polygon by selecting multiple points' :
+            selectedButton === 'edit' ? 'Click the "Edit Georeference" icon in the top-right corner to modify the existing georeference' :
+            ''
+          } 
+        </span>
         <form className="flex flex-col flex-grow">
           {/* Mappa Leaflet */}
-          <div  className={`relative w-full h-full mb-4 ${useMunicipalArea || selectedButton === null ? 'pointer-events-none opacity-50' : ''}`}>
+          <div  className={`relative w-full h-full mb-2 ${useMunicipalArea || selectedButton === null ? 'pointer-events-none opacity-50' : ''}`}>
             <MapContainer
-              className={`relative w-full ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}
+              className={`relative w-full `}
               style={{ height: '100%' }}
             >
               <SetMapViewEdit
@@ -194,7 +246,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
           </div>
 
           {/* Bottoni Back e Update */}
-          <div className="mt-auto flex justify-between">
+          <div className="mt-1 flex justify-between">
             <button
               type="button"
               onClick={onBack}
