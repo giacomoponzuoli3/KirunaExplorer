@@ -103,7 +103,7 @@ class AuthRoutes {
             this.authService.isLoggedIn,
             (req, res, next) => {
                 try {
-                    this.authService.logout(req, res, next)
+                    this.authService.logout(req)
                         .then(() => res.status(200).end())
                         .catch((err: any) => next(err))
                 } catch (e) {

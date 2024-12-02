@@ -257,7 +257,7 @@ class DocumentDAO {
                         // Query per ottenere i dati del documento
 
                         const sqlDoc = `SELECT * FROM documents WHERE id = ?`;
-                        const documentRow = await new Promise<any>((resolve, reject) => {
+                        const documentRow = await new Promise<any>((resolve) => {
                             db.get(sqlDoc, [docId], (err: Error | null, documentRow: any) => {
                                 if (err) return rejectDoc(err);
                                 if (!documentRow) return rejectDoc(new DocumentNotFoundError);
@@ -268,7 +268,7 @@ class DocumentDAO {
 
                         // Query per ottenere gli stakeholder associati
                         const sqlStakeholders = `SELECT sd.id_stakeholder, s.name, s.category FROM stakeholders_documents sd JOIN stakeholders s ON s.id = sd.id_stakeholder WHERE id_document = ?`;
-                        const stakeholderRows: any[] = await new Promise<any[]>((resolve, reject) => {
+                        const stakeholderRows: any[] = await new Promise<any[]>((resolve) => {
                             db.all(sqlStakeholders, [docId], (err: Error | null, stakeholderRows: any[]) => {
                                 if (err) return rejectDoc(err);
 

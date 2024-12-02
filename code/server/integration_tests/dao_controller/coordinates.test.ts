@@ -207,7 +207,7 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
 
             await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocCoordinate]);
 
-            await expect(controller.updateDocumentCoordinates(1,newCoordinate,2)).resolves.toBeUndefined();
+            await expect(controller.updateDocumentCoordinates(1,newCoordinate)).resolves.toBeUndefined();
 
             await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([newTestDocCoordinate]);
         });
@@ -220,7 +220,7 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
 
             await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocCoordinate]);
 
-            await expect(controller.updateDocumentCoordinates(1,[newCoordinate,coordinate],1)).resolves.toBeUndefined();
+            await expect(controller.updateDocumentCoordinates(1,[newCoordinate,coordinate])).resolves.toBeUndefined();
 
             await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([newTestDocCoordinate2]);
         });
@@ -232,7 +232,7 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
                 return {} as Database;
             });
 
-            await expect(controller.updateDocumentCoordinates(1,[newCoordinate,coordinate],2)).rejects.toThrow('Database error');
+            await expect(controller.updateDocumentCoordinates(1,[newCoordinate,coordinate])).rejects.toThrow('Database error');
 
             dbSpy.mockRestore();
         });
@@ -243,7 +243,7 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
                 return {} as Database;
             });
 
-            await expect(controller.updateDocumentCoordinates(1,[newCoordinate,coordinate],1)).rejects.toThrow('Unexpected error');
+            await expect(controller.updateDocumentCoordinates(1,[newCoordinate,coordinate])).rejects.toThrow('Unexpected error');
 
             dbSpy.mockRestore();
         });

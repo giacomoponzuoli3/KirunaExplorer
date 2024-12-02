@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
 import { MapContainer } from 'react-leaflet';
-import { LatLng } from 'leaflet'; // Import del tipo corretto
+import L, { LatLng } from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet-draw';
 import API from '../API/API';
 import { DocCoordinates } from "../models/document_coordinate";
-import { SetMapViewEdit, cityCoords } from './Map';
-import { Button } from 'react-bootstrap';
-import {ArrowsPointingOutIcon, InformationCircleIcon, Square2StackIcon, MapPinIcon, PencilSquareIcon} from '@heroicons/react/24/solid'
+import {cityCoords, SetMapViewEdit} from './Map';
+import {InformationCircleIcon, Square2StackIcon, MapPinIcon, PencilSquareIcon} from '@heroicons/react/24/solid'
 import Alert from './Alert';
-import { ClipboardDocumentListIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
+import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
 
 
 interface ModalEditGeoreferenceProps {

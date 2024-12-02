@@ -2,7 +2,6 @@ import Coordinate from '../models/coordinate';
 import db from '../db/db'
 import { DocCoordinates } from '../models/document_coordinate'
 import { Stakeholder } from "../models/stakeholder"
-import fs from 'fs'
 import { LatLng } from "../interfaces"
 
 class CoordinatesDAO {

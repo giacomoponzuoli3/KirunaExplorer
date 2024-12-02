@@ -4,8 +4,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { LogoutButton, LoginButton } from './Login';
 // import logo from '../img/logoKiruna.png';
 import logo from '../img/iconKiruna.png';
-import { ButtonHomePage } from './HomePage';
-import { Button } from 'react-bootstrap';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 
 

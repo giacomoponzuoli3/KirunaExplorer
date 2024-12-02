@@ -1,20 +1,14 @@
 import React, { useState,useEffect } from 'react';
-import { Container, Modal, Row, Col, Form, Button, Dropdown, ListGroup } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { Container, Modal, Row, Col } from 'react-bootstrap';
 import { Document } from '../models/document';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { User } from '../models/user';
 import API from '../API/API';
-import { Stakeholder } from '../models/stakeholder';
-import { DocLink } from '../models/document_link';
 import '../modal.css'
-import { TrashIcon, PencilIcon,ChevronLeftIcon,ChevronRightIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, ChevronLeftIcon,ChevronRightIcon } from "@heroicons/react/24/outline";
 import Link from '../models/link'; 
 import Alert from "./Alert";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import Select from 'react-select';
-import ISO6391 from 'iso-639-1';  // Utilizziamo ISO 639-1 per ottenere le lingue
-import { DocCoordinates } from '../models/document_coordinate';
+// Utilizziamo ISO 639-1 per ottenere le lingue
 import { LatLng } from 'leaflet';
 
 interface AddNewDocumentLinksModalProps {
@@ -29,7 +23,7 @@ interface AddNewDocumentLinksModalProps {
 
 function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoordinates, docs, newDocumentCoordinates,filesUploaded}: AddNewDocumentLinksModalProps) {
     const [typesLink, setTypesLink] = useState<Link[]>([]); // vector of types of links
-    const [documents, setDocuments] = useState<Document[]>(docs.filter((d: Document) => d.id != document.id)); // vector of all documents except one
+    const [documents] = useState<Document[]>(docs.filter((d: Document) => d.id != document.id)); // vector of all documents except one
 
     const [selectedDocument, setSelectedDocument] = useState<number | null>(null); // Selected document
     const [selectedTypeLink, setSelectedTypeLink] = useState<number | null>(null); // Selected type of link
@@ -180,17 +174,18 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoord
         if (documentLinks.length !== 0) {
             console.log(doc.id);
             // Implement API call to add link
-            documentLinks.forEach(async (link) => {
+
+            for (const link of documentLinks) {
                 if (link.documentId && link.linkId) {
                     await API.addLink(doc.id, link.documentId, link.linkId);
                 }
-            });
+            }
         }
 
         if (filesUploaded.length !== 0) {
             console.log("new files");
 
-            filesUploaded.forEach(async (file) => {
+            for (const file of filesUploaded) {
                 console.log(file);
 
                 // Step 1: Read the file content as a Uint8Array
@@ -215,7 +210,7 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoord
                 } catch (error) {
                     console.error("Failed to upload file:", file.name, error);
                 }
-            });
+            }
         }
     } catch (err) {
         setShowAlert(true);
