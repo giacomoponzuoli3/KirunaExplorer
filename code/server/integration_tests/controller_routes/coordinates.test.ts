@@ -19,14 +19,16 @@ const baseURL = "/kiruna/coordinates"
 
 describe('coordinatesRoutes/coordinatesController Integration tests', () => {
 
+    const testId = 1;
     const testUrbanPlanner = { username: "urban_planner", name: "urban", surname: "planner", password: "admin", role: Role.PLANNER };
     const testResident = { username: "resident", name: "resident", surname: "resident", password: "admin", role: Role.PLANNER };
     const controller = new CoordinatesController();
     const documentController = new DocumentController();
     const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
-    const testCoordinate1 = new Coordinate(1, 1, 40.7128, -74.0060);
-    const testCoordinate2 = new Coordinate(2, 1, -55.7128, 45.0060);
-    const testCoordinate3 = new Coordinate(3, 2, 40.7128, -74.0060);
+    const testCoordinate1 = new Coordinate(1, 1, 40.7128, -74.0060,0);
+    const testCoordinate2 = new Coordinate(2, 1, -55.7128, 45.0060,0);
+    const testCoordinate3 = new Coordinate(3, 2, 40.7128, -74.0060,0);
+    const testCoordinateMunicipalityArea = new Coordinate (2,null,null,null,1);
     const coordinate: LatLng = { lat: 40.7128, lng: -74.0060 };
     const coordinates: LatLng[] = [
         { lat: 40.7128, lng: -74.0060 },
@@ -37,10 +39,11 @@ describe('coordinatesRoutes/coordinatesController Integration tests', () => {
         { lat: -50.7128, lng: -88.0060 },
         { lat: 94.0522, lng: -18.2437 },
       ];
+
+    const testDocCoordinateMunicipalityArea = new DocCoordinates(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2", [testCoordinateMunicipalityArea]);
     const testDocument = new Document(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
+    const testDocument2 = new Document(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2");
     const testDocCoordinate = new DocCoordinates(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description", [testCoordinate1]);
-    const newTestDocCoordinate = new DocCoordinates(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description", [testCoordinate2]);
-    const newTestDocCoordinate2 = new DocCoordinates(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description", [testCoordinate2,testCoordinate3]);
 
     // Helper function that logs in a user and returns the cookie
     // Can be used to log in a user before the tests or in the tests
@@ -263,8 +266,6 @@ describe('coordinatesRoutes/coordinatesController Integration tests', () => {
 
             expect(response.body.error).toBe('Internal Server Error');
 
-            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
-
             dbSpy.mockRestore();
         });
     });
@@ -274,12 +275,16 @@ describe('coordinatesRoutes/coordinatesController Integration tests', () => {
 
             await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toStrictEqual(testDocument);
 
+            await expect(documentController.addDocument("title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2")).resolves.toStrictEqual(testDocument2);
+
             await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
+
+            await expect(controller.setDocumentCoordinates(2,[])).resolves.toBeUndefined();
 
             const response = await request(app).get(baseURL + "/");
 
             expect(response.status).toBe(200);
-            expect(response.body).toEqual([testDocCoordinate]);
+            expect(response.body).toEqual([testDocCoordinateMunicipalityArea,testDocCoordinate]);
 
         });
 
@@ -308,6 +313,62 @@ describe('coordinatesRoutes/coordinatesController Integration tests', () => {
         });
     });
 
+    describe('DELETE /:id', () => {
+        test('It should delete the coordinates of a document with the specified id and return 200 status', async () => {
+            const cookie = await login(testUrbanPlanner);
+
+            const response = await request(app).delete(baseURL + `/${testId}`).set("Cookie", cookie).expect(200);
+
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual({ message: "Document's coordinates deleted successfully" });
+
+        });
+
+
+        test('It should return 422 status if the param is not numeric', async () => {
+            const cookie = await login(testUrbanPlanner);
+
+            await request(app).delete(baseURL + `/abc`).set("Cookie", cookie).expect(422);
+        });
+
+        test('It should return 422 status if the param is null', async () => {
+            const cookie = await login(testUrbanPlanner);
+
+            await request(app).delete(baseURL + `/` + null).set("Cookie", cookie).expect(422);
+        });
+
+        test('It should return 401 status if the user is not logged in', async () => {
+
+            const response = await request(app).delete(baseURL + `/${testId}`);
+
+            expect(response.status).toBe(401);
+            expect(response.body.error).toBe('Unauthenticated user');
+        });
+
+        test('It should return 403 status if the user is not an urban planner', async () => {
+            const cookie = await login(testResident);
+
+            const response = await request(app).delete(baseURL + `/${testId}`).set("Cookie", cookie).expect(403);
+
+            expect(response.body.error).toBe('User is not an urban planner');
+        });
+
+        test('It should return 503 if there is an error', async () => {
+            const cookie = await login(testUrbanPlanner);
+
+            const dbSpy = jest.spyOn(db, 'run').mockImplementation(function (sql, params, callback) {
+                callback(new Error('Database error'), null);
+                return {} as Database;
+            })
+
+            const response = await request(app).delete(baseURL + `/${testId}`).set("Cookie", cookie).expect(503);
+
+            expect(response.status).toBe(503);
+            expect(response.body.error).toBe('Internal Server Error');
+
+            dbSpy.mockRestore();
+        });
+    });
     
     describe('POST /update', () => {
         test('It should modify the coordinates of a document and return 200 status', async () => {

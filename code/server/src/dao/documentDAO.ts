@@ -380,7 +380,7 @@ class DocumentDAO {
         return new Promise<Document[]>((resolve, reject) => {
             try {
                 const sql = `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.type = ?`;
-                db.all(sql, [], (err: Error | null, rows: any[]) => {
+                db.all(sql, [type], (err: Error | null, rows: any[]) => {
                     if (err) return reject(err);
                     if (!rows || rows.length == 0) return resolve([]);
 
@@ -438,6 +438,29 @@ class DocumentDAO {
             }
         });
     }
+
+    /**
+     * Retrieves the resource data associated with the specified document from the database.
+     * @param documentId The id of the document whose resource data is to be retrieved.
+     * @returns A Promise that resolves to the resource data associated with the document.
+     */
+    getResourceData(documentId: number): Promise<Uint8Array> {
+        return new Promise<Uint8Array>((resolve, reject) => {
+            try {
+                const sql = "SELECT resource_data FROM original_resources WHERE document_id = ?";
+                db.get(sql, [documentId], (err: Error | null, row: any) => {
+                    if (err) return reject(err);
+                    if (!row) return reject(new DocumentNotFoundError);
+
+                    // Return the resource data associated with the document
+                    resolve(row.resource_data);
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
 }
 
 export { DocumentDAO }

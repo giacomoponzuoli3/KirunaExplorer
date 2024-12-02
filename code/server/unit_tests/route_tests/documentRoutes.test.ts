@@ -36,7 +36,6 @@ describe('documentRoutes', () => {
 
     describe('POST /', () => {
 
-
         test('It should register a document and return 200 status', async () => {
 
             jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
@@ -49,7 +48,7 @@ describe('documentRoutes', () => {
                 return next();
             });
             jest.spyOn(controller, "addDocument").mockResolvedValueOnce(testDocument);
-            console.log("pocnav")
+    
             const response = await request(app).post(baseURL + '/')
             .send({
                 title: "title",
@@ -60,8 +59,8 @@ describe('documentRoutes', () => {
                 language: "English",
                 pages: "300",
                 description: "description"
-            }).timeout({ deadline: 5000 });
-            console.log("wooo")
+            });
+  
             expect(response.status).toBe(200);
             expect(response.body).toEqual(testDocument);
             expect(controller.addDocument).toHaveBeenCalledWith(
@@ -417,6 +416,65 @@ describe('documentRoutes', () => {
             expect(controller.addDocument).not.toHaveBeenCalled(); 
         });
 
+        test('It should return 401 status if the user is not logged in', async () => {
+
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                return res.status(401).json({ error: "Unauthenticated user" });
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+
+            jest.spyOn(controller, "addDocument").mockResolvedValueOnce(testDocument);
+    
+            const response = await request(app).post(baseURL + '/')
+            .send({
+                title: "title",
+                stakeHolders: [testStakeholder1, testStakeholder2],
+                scale: "1:1",
+                issuanceDate: "2020-10-10",
+                type: "Informative document",
+                language: "English",
+                pages: "300",
+                description: "description"
+            });
+ 
+            expect(response.status).toBe(401);
+            expect(response.body.error).toBe('Unauthenticated user');
+        });
+
+        test('It should return 403 status if the user is not an urban planner', async () => {
+            
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                return res.status(403).json({ error: "User is not an urban planner" });
+            });
+
+            jest.spyOn(controller, "addDocument").mockResolvedValueOnce(testDocument);
+    
+            const response = await request(app).post(baseURL + '/')
+            .send({
+                title: "title",
+                stakeHolders: [testStakeholder1, testStakeholder2],
+                scale: "1:1",
+                issuanceDate: "2020-10-10",
+                type: "Informative document",
+                language: "English",
+                pages: "300",
+                description: "description"
+            });
+ 
+            expect(response.status).toBe(403);
+
+            expect(response.body.error).toBe('User is not an urban planner');
+        });
+
         test('It should return 503 if there is an error', async () => {
             jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
                 req.user=u;
@@ -444,6 +502,7 @@ describe('documentRoutes', () => {
             expect(response.status).toBe(503);
             expect(response.body.error).toBe('Internal Server Error');
         });
+
     });
 
     describe('GET /', () => {
@@ -566,6 +625,45 @@ describe('documentRoutes', () => {
 
             expect(response.status).toBe(422);
             expect(controller.deleteDocument).not.toHaveBeenCalled(); 
+        });
+
+        test('It should return 401 status if the user is not logged in', async () => {
+
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                return res.status(401).json({ error: "Unauthenticated user" });
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+
+            jest.spyOn(controller, "deleteDocument").mockResolvedValueOnce(undefined);
+
+            const response = await request(app).delete(baseURL+`/${testId}`);
+ 
+            expect(response.status).toBe(401);
+            expect(response.body.error).toBe('Unauthenticated user');
+        });
+
+        test('It should return 403 status if the user is not an urban planner', async () => {
+            
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                return res.status(403).json({ error: "User is not an urban planner" });
+            });
+
+            jest.spyOn(controller, "deleteDocument").mockResolvedValueOnce(undefined);
+
+            const response = await request(app).delete(baseURL+`/${testId}`);
+
+            expect(response.status).toBe(403);
+
+            expect(response.body.error).toBe('User is not an urban planner');
         });
 
         test('It should return 503 if there is an error', async () => {
@@ -1020,6 +1118,83 @@ describe('documentRoutes', () => {
             expect(controller.editDocument).not.toHaveBeenCalled(); 
         });
 
+        test('It should return 401 status if the user is not logged in', async () => {
+
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                return res.status(401).json({ error: "Unauthenticated user" });
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+
+            jest.spyOn(controller, "editDocument").mockResolvedValueOnce({
+                id: testId,
+                title: "title",
+                stakeHolders: [testStakeholder1, testStakeholder2],
+                scale: "1:1",
+                issuanceDate: "2020-10-10",
+                type: "Informative document",
+                language: "English",
+                pages: "300",
+                description: "description"
+            });
+
+            const response = await request(app).patch(baseURL+`/${testId}`)
+            .send({
+                title: "title",
+                stakeHolders: [testStakeholder1, testStakeholder2],
+                scale: "1:1",
+                issuanceDate: "2020-10-10",
+                type: "Informative document",
+                language: "English",
+                pages: "300",
+                description: "description"
+            });
+            expect(response.status).toBe(401);
+            expect(response.body.error).toBe('Unauthenticated user');
+        });
+
+        test('It should return 403 status if the user is not an urban planner', async () => {
+            
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                return res.status(403).json({ error: "User is not an urban planner" });
+            });
+
+            jest.spyOn(controller, "editDocument").mockResolvedValueOnce({
+                id: testId,
+                title: "title",
+                stakeHolders: [testStakeholder1, testStakeholder2],
+                scale: "1:1",
+                issuanceDate: "2020-10-10",
+                type: "Informative document",
+                language: "English",
+                pages: "300",
+                description: "description"
+            });
+
+            const response = await request(app).patch(baseURL+`/${testId}`)
+            .send({
+                title: "title",
+                stakeHolders: [testStakeholder1, testStakeholder2],
+                scale: "1:1",
+                issuanceDate: "2020-10-10",
+                type: "Informative document",
+                language: "English",
+                pages: "300",
+                description: "description"
+            });
+            expect(response.status).toBe(403);
+
+            expect(response.body.error).toBe('User is not an urban planner');
+        });
+
         test('It should return 503 if there is an error', async () => {
             jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
                 req.user=u;
@@ -1241,6 +1416,222 @@ describe('documentRoutes', () => {
 
             const response = await request(app).post(baseURL+"/type")
             .send({ type : "Material effect"});
+
+            expect(response.status).toBe(503);
+            expect(response.body.error).toBe('Internal Server Error');
+        });
+    });
+
+    describe('POST /res', () => {
+
+        const date = new Uint8Array ([10,10,20]);
+
+        test('It should add a resource to a document and return 200 status', async () => {
+
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+            jest.spyOn(controller, "addResourceToDocument").mockResolvedValueOnce(undefined);
+
+            const response = await request(app).post(baseURL + '/res')
+            .send({
+                idDoc : 1,
+                name: "title",
+                data: date
+            });
+ 
+            expect(response.status).toBe(200);
+
+        });
+
+        test('It should return 422 status if the body is missing', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+            const response = await request(app).post(baseURL+"/res")
+                .send({});
+            expect(response.status).toBe(422); 
+            expect(controller.addResourceToDocument).not.toHaveBeenCalled(); 
+        });
+
+        test('It should return 422 status if docId is not numeric', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+            const response = await request(app).post(baseURL+"/res")
+                .send({  
+                    idDoc : "abc",
+                    name: "title",
+                    data: date
+                });
+            expect(response.status).toBe(422); 
+            expect(controller.addResourceToDocument).not.toHaveBeenCalled(); 
+        });
+
+        test('It should return 422 status if docId is missing', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+            const response = await request(app).post(baseURL+"/res")
+                .send({  
+                    name: "title",
+                    data: date
+                });
+            expect(response.status).toBe(422); 
+            expect(controller.addResourceToDocument).not.toHaveBeenCalled(); 
+        });
+
+        test('It should return 422 status if name is not a string', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+            const response = await request(app).post(baseURL+"/res")
+                .send({  
+                    idDoc : 1,
+                    name: 1,
+                    data: date
+                });
+            expect(response.status).toBe(422); 
+            expect(controller.addResourceToDocument).not.toHaveBeenCalled(); 
+        });
+        
+        test('It should return 422 status if name is an empty string', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+            const response = await request(app).post(baseURL+"/res")
+                .send({  
+                    idDoc : 1,
+                    name: "",
+                    data: date
+                });
+            expect(response.status).toBe(422); 
+            expect(controller.addResourceToDocument).not.toHaveBeenCalled(); 
+        });
+
+        test('It should return 422 status if name is missing', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+            const response = await request(app).post(baseURL+"/res")
+                .send({  
+                    idDoc : 1,
+                    data: date
+                });
+            expect(response.status).toBe(422); 
+            expect(controller.addResourceToDocument).not.toHaveBeenCalled(); 
+        });
+
+        test('It should return 401 status if the user is not logged in', async () => {
+
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                return res.status(401).json({ error: "Unauthenticated user" });
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+
+            jest.spyOn(controller, "addResourceToDocument").mockResolvedValueOnce(undefined);
+
+            const response = await request(app).post(baseURL + '/res')
+            .send({
+                idDoc : 1,
+                name: "title",
+                data: date
+            });
+ 
+            expect(response.status).toBe(401);
+            expect(response.body.error).toBe('Unauthenticated user');
+        });
+
+        
+        test('It should return 403 status if the user is not an urban planner', async () => {
+            
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                return res.status(403).json({ error: "User is not an urban planner" });
+            });
+
+            jest.spyOn(controller, "addResourceToDocument").mockResolvedValueOnce(undefined);
+
+            const response = await request(app).post(baseURL + '/res')
+            .send({
+                idDoc : 1,
+                name: "title",
+                data: date
+            });
+ 
+            expect(response.status).toBe(403);
+
+            expect(response.body.error).toBe('User is not an urban planner');
+        });
+
+        test('It should return 503 if there is an error', async () => {
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+    
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user=u;
+                return next();
+            });
+            jest.spyOn(controller, 'addResourceToDocument').mockRejectedValueOnce(new Error('Internal Server Error'));
+           
+            const response = await request(app).post(baseURL+"/res")
+            .send({  
+                idDoc : 1,
+                name: "title",
+                data: date
+            });
 
             expect(response.status).toBe(503);
             expect(response.body.error).toBe('Internal Server Error');

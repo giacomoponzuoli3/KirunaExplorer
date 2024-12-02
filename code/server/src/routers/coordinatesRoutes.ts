@@ -56,10 +56,8 @@ class CoordinatesRoutes {
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
                 try {
-                    console.log("arrivo qui");
                     this.controller.setDocumentCoordinates(req.body.idDoc, req.body.coordinates)
                         .then(() => {
-                            console.log("pippo");
                             return res.status(200).json({ message: "Coordinates added successfully" });})
                         .catch((err: Error) => next(err));
                 } catch (err) {
@@ -115,22 +113,6 @@ class CoordinatesRoutes {
             
         )
 
-        this.router.get(
-            "/municipality",
-            (_req: any, res: any, next: any) => {
-                try {
-                    this.controller.getMunicipalityArea()
-                        .then((municipalityArea: LatLng[]) => res.status(200).json(municipalityArea))
-                        .catch((err: Error) => {
-                            console.error("Error in controller.getMunicipalityArea:", err);
-                            next(err);
-                        });
-                } catch (err) {
-                    console.error("Unhandled error in /municipality route:", err);
-                    next(err);
-                }
-            }
-        );        
     }
 }
 

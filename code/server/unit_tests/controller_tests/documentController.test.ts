@@ -437,4 +437,27 @@ describe('documentController', () => {
           
         });
     });
+
+    describe(' addResourceToDocument', () => {
+        test("It should adds a resource to the specified document in the database", async () => {
+            jest.spyOn(dao, 'addResourceToDocument').mockResolvedValue(undefined);
+
+            await expect(controller.addResourceToDocument(1,"title",new Uint8Array([10,10,20]))).resolves.toBeUndefined();
+            expect(dao.addResourceToDocument).toBeCalledWith(1,"title",new Uint8Array([10,10,20]));
+        });
+
+        test('It should reject if there is a database error', async () => {
+            jest.spyOn(dao, 'addResourceToDocument').mockRejectedValue("Database error");
+
+            await expect(controller.addResourceToDocument(1,"title",new Uint8Array([10,10,20]))).rejects.toEqual("Database error");
+            expect(dao.addResourceToDocument).toBeCalledWith(1,"title",new Uint8Array([10,10,20]));
+        });
+
+        test('It should reject with error if an unexpected error occurs', async () => {
+            jest.spyOn(dao, 'addResourceToDocument').mockRejectedValue("Unexpected error");
+
+            await expect(controller.addResourceToDocument(1,"title",new Uint8Array([10,10,20]))).rejects.toEqual("Unexpected error");
+            expect(dao.addResourceToDocument).toBeCalledWith(1,"title",new Uint8Array([10,10,20]));
+        });
+    });
 });
