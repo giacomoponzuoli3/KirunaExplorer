@@ -22,7 +22,8 @@ function ResourcesTable(props: any) {
 
     //delete
     const [documentToDelete, setDocumentToDelete] = useState<number | null>(null);
-    const [linkToDelete, setLinkToDelete] = useState<number | null>(null);
+    const [resourceToDelete, setResourceToDelete] = useState<string | null>(null);
+    const [resourceIdToDelete, setResourceIdToDelete] = useState<number | null>(null);
 
     //modal
     const [showAlert, setShowAlert] = useState(false); // alert state
@@ -61,13 +62,25 @@ function ResourcesTable(props: any) {
     };
 
     const handleDelete = async () => {
-        if (document && documentToDelete && linkToDelete) {
-            await API.deleteLink(document.id , documentToDelete, linkToDelete);
-            // Recharge the list of documents
-            setDocumentLinks(documentLinks.filter(doc => (doc.id !== documentToDelete || doc.relatedLink.id !== linkToDelete)));
+        if (documentToDelete && resourceToDelete) {
+            await API.deleteResource(documentToDelete, resourceToDelete)
+
+            setResources(resources.filter(res => (res.id !== resourceIdToDelete)));
             setShowModal(false);
+            setDocumentToDelete(null)
+            setResourceToDelete(null)
+            setResourceIdToDelete(null)
         }
+        console.log('real deleted')
     };
+
+    const handleDeleteResource = (res: Resources) => {
+      setShowModal(true);
+      setDocumentToDelete(res.idDoc);
+      setResourceToDelete(res.name);
+      setResourceIdToDelete(res.id)
+      console.log('hi delete')
+    } 
 
     useEffect(() => {
         const getDocument = async () => {
@@ -90,9 +103,12 @@ function ResourcesTable(props: any) {
         const getResources = async () => {
             try{
                 const documentId = Number(idDocument);
-                //const documentResources = await API.getResourceData(documentId);
-                const documentResources: Resources[] = [new Resources(1, 2, "prova", null, new Date("12/11/2024"))]
+                // const documentResources = await API.getResourceData(documentId);
+                const documentResources = await API.getAllResourcesData(documentId);
+                // const documentResources: Resources[] = [new Resources(1, 2, "prova", null, "12/11/2024")]
                 setResources(documentResources);
+                console.log('lengthResources');
+                console.log(resources)
             }catch (err){
                 setShowAlert(true);
             }
@@ -122,6 +138,7 @@ function ResourcesTable(props: any) {
       }
       
     }, [resources]);
+
 
     if (loading) {
       return <div>Loading...</div>; 
@@ -211,7 +228,7 @@ function ResourcesTable(props: any) {
                       <tr className="bg-gray-100 border-b">
                         <th className="p-4 text-left text-sm font-semibold w-[15%]">Name</th>
                         <th className="p-4 text-left text-sm font-semibold w-[15%]">Date uploaded</th>
-                        <th className="p-4 text-left text-sm font-semibold w-[10%]">Size</th>
+                        {/* <th className="p-4 text-left text-sm font-semibold w-[10%]">Size</th> */}
                         <th className="p-4 text-left text-sm font-semibold w-[5%]">Actions</th>
 
                       </tr>
@@ -223,7 +240,7 @@ function ResourcesTable(props: any) {
                         `}>
                           <td className="p-4 text-sm text-gray-600 w-[15%]">{resource.name}</td>
                           <td className="p-4 text-sm text-gray-600 w-[15%]">{String(resource.uploadTime)}</td>
-                          <td className="p-4 text-sm text-gray-600 w-[10%]"></td>
+                          {/* <td className="p-4 text-sm text-gray-600 w-[10%]"></td> */}
                           
                             <td className="p-3 items-center justify-center space-x-4 w-[5%]">
                               <button
@@ -238,7 +255,7 @@ function ResourcesTable(props: any) {
                                   <button
                                   
                                     className="text-red-500 hover:text-red-700"
-                                    onClick={() => {}}
+                                    onClick={() => {handleDeleteResource(resource)}}
                                   >
                                     <TrashIcon className="h-5 w-5" />
                                   </button>
@@ -261,7 +278,7 @@ function ResourcesTable(props: any) {
                     show={showModal}
                     onHide={() => setShowModal(false)}
                     onConfirm={handleDelete}
-                    text={`Are you sure you want to delete this link of the document?
+                    text={`Are you sure you want to delete this Resources of the document?
                     This action cannot be undone.`}
                   />
                  
