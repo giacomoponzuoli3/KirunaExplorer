@@ -438,6 +438,29 @@ class DocumentDAO {
             }
         });
     }
+
+    /**
+     * Retrieves the resource data associated with the specified document from the database.
+     * @param documentId The id of the document whose resource data is to be retrieved.
+     * @returns A Promise that resolves to the resource data associated with the document.
+     */
+    getResourceData(documentId: number): Promise<Uint8Array> {
+        return new Promise<Uint8Array>((resolve, reject) => {
+            try {
+                const sql = "SELECT resource_data FROM original_resources WHERE document_id = ?";
+                db.get(sql, [documentId], (err: Error | null, row: any) => {
+                    if (err) return reject(err);
+                    if (!row) return reject(new DocumentNotFoundError);
+
+                    // Return the resource data associated with the document
+                    resolve(row.resource_data);
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
 }
 
 export { DocumentDAO }
