@@ -496,17 +496,28 @@ async function getScales() {
         throw new Error("Error. Please reload the page")
     }
 }
-/** 
+
 async function addScale(scale: string) {
     const response = await fetch(baseURL + "scale", {
         method:  'POST',
         credentials: "include",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            scale: scale
+            name: scale
         })
-    })
-}*/
+    });
+
+    if (response.ok) {
+        return 
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error occured when adding a scale");
+    }
+}
 
 
 const API = {
@@ -515,6 +526,6 @@ const API = {
     getAllStakeholders, addStakeholder,
     addLink, deleteLink, editLink, getAllLinks,
     getAllDocumentsCoordinates, setDocumentCoordinates, updateDocumentCoordinates, deleteDocumentCoordinates, getMunicipalityArea,
-    getScales
+    getScales, addScale
 }
 export default API

@@ -21,23 +21,19 @@ class ScaleDAO {
         });
     }
 
-    /**
-     * getAllLinks(): Promise<Link[]> {
-        return new Promise<Link[]>((resolve, reject) => {
-            try {
-                const sql = "SELECT * FROM links";
-                db.all(sql, [], (err: Error | null, rows: any[]) => {
+    addScale(name: string): Promise<number> {
+        return new Promise<number>((resolve, reject) => {
+            try{
+                const sql = "INSERT INTO scales (name) VALUES (?)";
+                db.run(sql, [name], function (err: Error | null) {
                     if (err) return reject(err);
-                    if (!rows || rows.length === 0) return reject(new LinkNotFoundError);
-
-                    const links: Link[] = rows.map((row: any) => new Link(row.id, row.name));
-                    resolve(links);
+                    resolve(this.lastID);
                 });
-            } catch (error) {
+            } catch(error) {
                 reject(error);
             }
         });
     }
-     */
+     
 }
 export { ScaleDAO }

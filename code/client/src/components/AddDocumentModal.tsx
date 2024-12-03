@@ -69,7 +69,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
         setTitle('');
         setSelectedStakeholders([]);
         setScale('');
-        setScaleOptions([]);
+        //setScaleOptions([]);
         setIssuanceDate('');
         setType('');
         setLanguage(null);
@@ -168,14 +168,6 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
       { value: '1:10000', label: '1:10000' },
     ];*/
 
-    /**
-     * try {
-        const docs = await API.getAllDocuments();
-        setDocuments(docs);
-    } catch (err: any) {
-        console.log(err);
-    }
-     */
 
     useEffect(() => {
       const fetchScaleOptions = async () => {
@@ -194,6 +186,16 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
       setScale(selectedOption ? selectedOption.value : '');
     };
 
+    const handleCreateScale = async (inputValue: string) => {
+      try {
+        await API.addScale(inputValue);
+        const newOption = { value: inputValue, label: inputValue };
+        setScaleOptions((prevOptions) => [...prevOptions, newOption]);
+        setScale(inputValue);
+      } catch (error) {
+        console.error("Error adding new Scale: ", error);
+      }
+    }
 
 
     return (
@@ -262,8 +264,9 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                       options={scaleOptions}
                       value={scale ? { value: scale, label: scale } : null}
                       onChange={handleScale}
+                      onCreateOption={handleCreateScale}
                       placeholder="Select or type a scale..."
-                      formatCreateLabel={(inputValue) => `Use custom scale: "${inputValue}"`}
+                      formatCreateLabel={(inputValue) => `Add a new scale: "${inputValue}"`}
                       styles={{
                         control: (base) => ({
                           ...base,

@@ -25,7 +25,22 @@ class ScaleRoutes {
 
     initRoutes() {
 
-        /**his.router.post( 
+
+        this.router.get(
+            "/",
+            (_req: any, res: any, next: any) => {
+                try {
+                    this.controller.getScales()
+                        .then((scales: Scale[]) => res.status(200).json(scales))
+                        .catch((err: Error) => next(err))
+                } catch (err) {
+                    next(err)
+                }
+            }
+        )
+        
+        /** 
+         * his.router.post( 
             "/",
             this.authenticator.isLoggedIn, //error 401
             this.authenticator.isPlanner, //error 401
@@ -40,55 +55,25 @@ class ScaleRoutes {
                 }
             }
         )
+         */
 
-        this.router.delete(
+        this.router.post(
             "/",
-            this.authenticator.isLoggedIn, //error 401
-            this.authenticator.isPlanner, //error 401
-            body("idDoc1").isNumeric(),
-            body("idDoc2").isNumeric(),
-            body("idLink").isNumeric(),
+            this.authenticator.isLoggedIn,
+            this.authenticator.isPlanner,
             this.errorHandler.validateRequest,
-            (req: any, res: any, next: any) => {
+            async (req: any, res: any, next: any) => {
                 try {
-                    this.controller.deleteLink(req.body.idDoc1, req.body.idDoc2, req.body.idLink)
-                        .then(() => res.status(200).json({ message: "Link deleted successfully" }))
-                        .catch((err: Error) => next(err))
-                } catch (err) {
-                    next(err)
-                }
-            }
-        )
+                    const {name} = req.body
+                    if (!name || typeof name !== 'string') {
+                        return res.status(400).json({ error: "Invalid scale name provided" });
+                    }
 
-        this.router.patch(
-            "/",
-            this.authenticator.isLoggedIn, //error 401
-            this.authenticator.isPlanner, //error 401
-            body("idDoc1").isNumeric(),
-            body("idDoc2").isNumeric(),
-            body("oldLinkId").isNumeric(),
-            body("newLinkId").isNumeric(),
-            this.errorHandler.validateRequest,
-            (req: any, res: any, next: any) => {
-                try {
-                    this.controller.updateLink(req.body.idDoc1, req.body.idDoc2, req.body.oldLinkId, req.body.newLinkId)
-                        .then(() => res.status(200).json({ message: "Link updated successfully" }))
-                        .catch((err: Error) => next(err))
+                    await this.controller.addScale(name);
+                    res.status(200).json({ message: "Scale added successfully" });
                 } catch (err) {
-                    next(err)
-                }
-        })
-        **/
-
-        this.router.get(
-            "/",
-            (_req: any, res: any, next: any) => {
-                try {
-                    this.controller.getScales()
-                        .then((scales: Scale[]) => res.status(200).json(scales))
-                        .catch((err: Error) => next(err))
-                } catch (err) {
-                    next(err)
+                    console.error("Error in POST /scales:", err);
+                    next(err);
                 }
             }
         )
