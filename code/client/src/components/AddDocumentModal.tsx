@@ -101,6 +101,13 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
         prevFiles.filter((_, i) => i !== index)
       );
     };
+
+    const truncateFileName = (fileName: string, maxLength = 35) => {
+      if (fileName.length > maxLength) {
+        return fileName.substring(0, maxLength) + '...';
+      }
+      return fileName;
+    };
   
     const handleSubmit = async () => {
       // Validation check
@@ -137,6 +144,28 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
           setShowAlert(true);
           return; // Exit the function early if the range is invalid
         }
+      }
+
+     //validation for uploadedfile
+      const oversizedFiles = files.filter(file => file.size > 50 * 1024 * 1024); // 50 MB //validation for size
+      if (oversizedFiles.length > 0) {
+        setAlertMessage(
+          `The following files exceed 50 MB: ${oversizedFiles
+            .map(file => file.name)
+            .join(', ')}`
+        );
+        setShowAlert(true);
+        return; // Exit early
+      }
+
+      const fileNames = files.map(file => file.name);//validation for duplication file name
+      const duplicates = fileNames.filter((name, index) => fileNames.indexOf(name) !== index);
+      if (duplicates.length > 0) {
+        setAlertMessage(
+          `Duplicate file names detected: ${[...new Set(duplicates)].join(', ')}. Please remove duplicates.`
+        );
+        setShowAlert(true);
+        return; // Exit early
       }
 
       refreshDocuments();
@@ -418,7 +447,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                                           <div className="flex items-center space-x-2">
                                               <DocumentIcon className="h-6 w-6 text-blue-500" />
                                               <span className="font-medium text-gray-800 truncate">
-                                                  {file.name} ({(file.size / 1024).toFixed(2)} KB)
+                                                  {truncateFileName(file.name,30)} ({(file.size / 1024).toFixed(2)} KB)
                                               </span>
                                           </div>
 
