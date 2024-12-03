@@ -96,12 +96,41 @@ function ResourcesTable(props: any) {
         setAlertMessage('Please upload your file')
         setShowAlertMessage(true)
       }
+
+      const oversizedFiles = files.filter(file => file.size > 50 * 1024 * 1024); // 50 MB
+      if (oversizedFiles.length > 0) {
+        setAlertMessage(
+          `The following files exceed 50 MB: ${oversizedFiles
+            .map(file => file.name)
+            .join(', ')}`
+        );
+        setShowAlertMessage(true);
+        return; // Exit early
+      }
+
+      const fileNames = files.map(file => file.name);
+      const duplicates = fileNames.filter((name, index) => fileNames.indexOf(name) !== index);
+      if (duplicates.length > 0) {
+        setAlertMessage(
+          `Duplicate file names detected: ${[...new Set(duplicates)].join(', ')}. Please remove duplicates.`
+        );
+        setShowAlertMessage(true);
+        return; // Exit early
+      }
+
+      const existingResourceNames = resources.map(resource => resource.name);
+      const alreadyExisting = fileNames.filter(name => existingResourceNames.includes(name));
+      if (alreadyExisting.length > 0) {
+        setAlertMessage(
+          `The following file names already exist in resources: ${alreadyExisting.join(', ')}. Please rename or remove them.`
+        );
+        setShowAlertMessage(true);
+        return; // Exit early
+      }
+      
       if (files.length !== 0 && document!=null) {
-        console.log("new files");
 
-        for (const file of files) {
-            console.log(file);
-
+        files.forEach(async (file) => {
             // Step 1: Read the file content as a Uint8Array
             const fileData = await file.arrayBuffer(); // Convert to ArrayBuffer
             const uint8Array = new Uint8Array(fileData); // Convert to Uint8Array
@@ -120,20 +149,18 @@ function ResourcesTable(props: any) {
                     file.name,     // Use the file name
                     base64Data     // Pass the file data as base64 string
                 );
-                console.log("File uploaded successfully:", response);
                 setMessageSucessful('File uploaded successfully!');
-
+    
                 // Clear the message after 3 seconds
                 setTimeout(() => {
                   setMessageSucessful('');
                 }, 3000);
-                await getResources()
+                getResources()
             } catch (error) {
                 console.error("Failed to upload file:", file.name, error);
             }
-        }
-
-          setShowModalAddResource(false);
+        });
+        setShowModalAddResource(false);
         setFiles([])
     }
       
@@ -169,6 +196,13 @@ function ResourcesTable(props: any) {
     );
   };
 
+  const truncateFileName = (fileName: string, maxLength = 35) => {
+    if (fileName.length > maxLength) {
+      return fileName.substring(0, maxLength) + '...';
+    }
+    return fileName;
+  };
+    
   const getResources = async () => {
     const documentId = Number(idDocument);
     const documentResources = await API.getAllResourcesData(documentId);
@@ -431,7 +465,7 @@ function ResourcesTable(props: any) {
                                                             <div className="flex items-center space-x-2">
                                                                 <DocumentIcon className="h-6 w-6 text-blue-500" />
                                                                 <span className="font-medium text-gray-800 truncate">
-                                                                    {file.name} ({(file.size / 1024).toFixed(2)} KB)
+                                                                    {truncateFileName(file.name,35)} ({(file.size / 1024).toFixed(2)} KB)
                                                                 </span>
                                                             </div>
                   
