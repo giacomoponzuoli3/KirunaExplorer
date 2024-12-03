@@ -383,7 +383,7 @@ function DocumentsTable(props: any){
                                     className="flex items-center justify-center rounded-full border-1 border-yellow-500 hover:border-yellow-600 text-yellow-500 hover:text-yellow-600 w-7 h-7 hover:shadow-lg"
                                     onClick={() => handleEditGeoreference(doc)}
                                   >
-                                    <MapIcon className="h-4 w-4" />
+                                    <img src="/img/editMap-icon-yellow.png" alt="Informative Document" className="h-4 w-4"/>
                                   </button>
                                 </div>
                               )}
