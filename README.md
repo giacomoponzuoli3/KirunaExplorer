@@ -117,17 +117,17 @@ Contains the navbar and an error message
   - id_document INTEGER NOT NULL (foreign key `documents.id` ON DELETE CASCADE)
   - the combination of both attributes serves as primary key
 -  Table `documents_coordinates`: contains a row for each set of coordinates and information on the order of the points in the list of coordinates associated with a document
-  - id INTEGER (primary key with autoincrement)
-  - document_id INTEGER (foreign key `documents.id`)
-  - latitude REAL
-  - longitude REAL
-  - point_order INTEGER
+   - id INTEGER (primary key with autoincrement)
+   - document_id INTEGER (foreign key `documents.id`)
+   - latitude REAL
+   - longitude REAL
+   - point_order INTEGER
 - Table `original_resources`: contains a row for each resource that attach to document, with attributes:
-  - resource_id INTEGER (primary key with autoincrement)
-  - document_id INTEGER NOT NULL (foreign key `documents.id` ON DELETE CASCADE)
-  - resource_name TEXT NOT NULL
-  - resource_data BLOB NOT NULL
-  - uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   - resource_id INTEGER (primary key with autoincrement)
+   - document_id INTEGER NOT NULL (foreign key `documents.id` ON DELETE CASCADE)
+   - resource_name TEXT NOT NULL
+   - resource_data BLOB NOT NULL
+   - uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 ## Main React Components
 
