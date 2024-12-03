@@ -39,13 +39,16 @@ interface AddDocumentModalProps {
     refreshDocuments: () => void;
     stakeholders: Stakeholder[];
     showGeoreferenceNewDocumentModal: (doc: Document, files: File[]) => void;
+    scaleOptions: { value: string; label: string }[];
+    //setScaleOptions: React.Dispatch<React.SetStateAction<{ value: string; label: string }[]>>;
+    onCreateScale: (inputValue: string) => Promise<void>;
 }
 
 
-function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeoreferenceNewDocumentModal}: AddDocumentModalProps) {
+function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeoreferenceNewDocumentModal, scaleOptions, onCreateScale}: AddDocumentModalProps) {
     const [title, setTitle] = useState('');
     const [selectedStakeholders, setSelectedStakeholders] = useState<Stakeholder[]>([]);
-    const [scaleOptions, setScaleOptions] = useState<{ value: string; label: string }[]>([]);
+    //const [scaleOptions, setScaleOptions] = useState<{ value: string; label: string }[]>([]);
     const [scale, setScale] = useState('');
     const [issuanceDate, setIssuanceDate] = useState('');
     const [type, setType] = useState('');
@@ -169,33 +172,12 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
     ];*/
 
 
-    useEffect(() => {
-      const fetchScaleOptions = async () => {
-        try {
-          const response = await API.getScales();
-          const options = response.map((scale: {name: string}) => ({value: scale.name, label: scale.name}));
-          setScaleOptions(options);
-        } catch (err: any) {
-          console.error("Failed to fetch scales", err);
-        }
-      };
-      fetchScaleOptions();
-    }, [])
+    
 
     const handleScale = (selectedOption: SingleValue<{ value: string; label: string }>) => {
       setScale(selectedOption ? selectedOption.value : '');
     };
 
-    const handleCreateScale = async (inputValue: string) => {
-      try {
-        await API.addScale(inputValue);
-        const newOption = { value: inputValue, label: inputValue };
-        setScaleOptions((prevOptions) => [...prevOptions, newOption]);
-        setScale(inputValue);
-      } catch (error) {
-        console.error("Error adding new Scale: ", error);
-      }
-    }
 
 
     return (
@@ -264,7 +246,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                       options={scaleOptions}
                       value={scale ? { value: scale, label: scale } : null}
                       onChange={handleScale}
-                      onCreateOption={handleCreateScale}
+                      onCreateOption={onCreateScale}
                       placeholder="Select or type a scale..."
                       formatCreateLabel={(inputValue) => `Add a new scale: "${inputValue}"`}
                       styles={{

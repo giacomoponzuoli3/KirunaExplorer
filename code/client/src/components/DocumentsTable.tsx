@@ -437,6 +437,9 @@ function DocumentsTable(props: any){
               refreshSelectedDocument={refreshSelectedDocument}
               
               stakeholders={documentEdit.stakeHolders}
+              scaleOptions={props.scaleOptions}
+              //setScaleOptions={setScaleOptions}
+              onCreateScale={props.onCreateScale}
             />
           )}
 
