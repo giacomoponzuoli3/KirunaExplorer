@@ -481,11 +481,40 @@ async function getMunicipalityArea() {
     }
 }
 
+/** ------------------- Scale APIs ------------------------ */ 
+  
+async function getScales() {
+    const response = await fetch(baseURL + "scale", {credentials: "include"})
+    if(response.ok) {
+        return await response.json()
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.message
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+/** 
+async function addScale(scale: string) {
+    const response = await fetch(baseURL + "scale", {
+        method:  'POST',
+        credentials: "include",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            scale: scale
+        })
+    })
+}*/
+
+
 const API = {
     login, logOut, getUserInfo, register,
     addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType, addResourceToDocument, getResourceData, deleteResource,
     getAllStakeholders, addStakeholder,
     addLink, deleteLink, editLink, getAllLinks,
-    getAllDocumentsCoordinates, setDocumentCoordinates, updateDocumentCoordinates, deleteDocumentCoordinates, getMunicipalityArea
+    getAllDocumentsCoordinates, setDocumentCoordinates, updateDocumentCoordinates, deleteDocumentCoordinates, getMunicipalityArea,
+    getScales
 }
 export default API
