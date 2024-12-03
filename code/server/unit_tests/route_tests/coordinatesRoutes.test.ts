@@ -434,13 +434,12 @@ describe('coordinateRoutes', () => {
             const response = await request(app).post(baseURL + "/update").send({
                 idDoc: 1,            // Valid document ID
                 coordinates: coordinate, // Valid coordinate
-                useMunicipalArea: 1 // Valid useMunicipalArea
             });
 
             // Assertions
             expect(response.status).toBe(200); // Should return 200 OK
             expect(response.body).toEqual({ message: "Coordinates updated successfully" }); // Verify response message
-            expect(controller.updateDocumentCoordinates).toHaveBeenCalledWith(1, coordinate, 1); // Ensure correct arguments passed
+            expect(controller.updateDocumentCoordinates).toHaveBeenCalledWith(1, coordinate); // Ensure correct arguments passed
         });
 
         test('It should return 422 status if the body is missing', async () => {
