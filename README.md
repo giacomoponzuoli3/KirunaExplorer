@@ -122,6 +122,7 @@ Contains the navbar and an error message
    - latitude REAL
    - longitude REAL
    - point_order INTEGER
+   - municipality_area INTEGER NOT NULL
 - Table `original_resources`: contains a row for each resource that attach to document, with attributes:
    - resource_id INTEGER (primary key with autoincrement)
    - document_id INTEGER NOT NULL (foreign key `documents.id` ON DELETE CASCADE)
