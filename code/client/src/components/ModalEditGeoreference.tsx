@@ -34,7 +34,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   const [selectedPosition, setSelectedPosition] = useState<LatLng[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [useMunicipalArea, setUseMunicipalArea] = useState(documentCoordinates.coordinates[0].municipality_area == 1 ? true : false);  // Stato per la checkbox
+  const [useMunicipalArea, setUseMunicipalArea] = useState(documentCoordinates.coordinates[0].municipality_area == 1);  // Stato per la checkbox
 
   //state for the selection
   const [selectedButton, setSelectedButton] = useState<string | null>(null); // Stato per il pulsante selezionato

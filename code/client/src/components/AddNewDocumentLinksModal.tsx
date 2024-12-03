@@ -171,45 +171,42 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoord
             await API.setDocumentCoordinates(doc.id, newDocumentCoordinates);
         }
 
-        if (documentLinks.length !== 0) {
-            console.log(doc.id);
-            // Implement API call to add link
+        if (documentLinks.length !== 0) console.log(doc.id);
 
-            for (const link of documentLinks) {
-                if (link.documentId && link.linkId) {
-                    await API.addLink(doc.id, link.documentId, link.linkId);
-                }
+        // Implement API call to add link
+
+        for (const link of documentLinks) {
+            if (link.documentId && link.linkId) {
+                await API.addLink(doc.id, link.documentId, link.linkId);
             }
         }
 
-        if (filesUploaded.length !== 0) {
-            console.log("new files");
+        if (filesUploaded.length !== 0) console.log("new files");
 
-            for (const file of filesUploaded) {
-                console.log(file);
+        for (const file of filesUploaded) {
+            console.log(file);
 
-                // Step 1: Read the file content as a Uint8Array
-                const fileData = await file.arrayBuffer(); // Convert to ArrayBuffer
-                const uint8Array = new Uint8Array(fileData); // Convert to Uint8Array
+            // Step 1: Read the file content as a Uint8Array
+            const fileData = await file.arrayBuffer(); // Convert to ArrayBuffer
+            const uint8Array = new Uint8Array(fileData); // Convert to Uint8Array
 
-                // Step 2: Convert Uint8Array to binary string using a loop
-                let binaryString = '';
-                for (let i = 0; i < uint8Array.length; i++) {
-                    binaryString += String.fromCharCode(uint8Array[i]);
-                }
-                const base64Data = btoa(binaryString); // Convert to base64
+            // Step 2: Convert Uint8Array to binary string using a loop
+            let binaryString = '';
+            for (let i = 0; i < uint8Array.length; i++) {
+                binaryString += String.fromCharCode(uint8Array[i]);
+            }
+            const base64Data = btoa(binaryString); // Convert to base64
 
-                // Step 3: Call the API to upload the resource
-                try {
-                    const response = await API.addResourceToDocument(
-                        doc.id,        // Replace with the actual document ID
-                        file.name,     // Use the file name
-                        base64Data     // Pass the file data as base64 string
-                    );
-                    console.log("File uploaded successfully:", response);
-                } catch (error) {
-                    console.error("Failed to upload file:", file.name, error);
-                }
+            // Step 3: Call the API to upload the resource
+            try {
+                const response = await API.addResourceToDocument(
+                    doc.id,        // Replace with the actual document ID
+                    file.name,     // Use the file name
+                    base64Data     // Pass the file data as base64 string
+                );
+                console.log("File uploaded successfully:", response);
+            } catch (error) {
+                console.error("Failed to upload file:", file.name, error);
             }
         }
     } catch (err) {

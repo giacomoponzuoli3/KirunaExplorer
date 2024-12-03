@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { Modal } from 'react-bootstrap';
 import API from "../API/API";
-import { TrashIcon, PlusIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon, ArrowDownTrayIcon, DocumentIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, PlusIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon, DocumentIcon } from "@heroicons/react/24/outline";
 import Alert from "./Alert";
 import ConfirmModal from './ConfirmModal';
 import { DocLink } from "../models/document_link";
@@ -99,7 +99,7 @@ function ResourcesTable(props: any) {
       if (files.length !== 0 && document!=null) {
         console.log("new files");
 
-        files.forEach(async (file) => {
+        for (const file of files) {
             console.log(file);
 
             // Step 1: Read the file content as a Uint8Array
@@ -122,17 +122,18 @@ function ResourcesTable(props: any) {
                 );
                 console.log("File uploaded successfully:", response);
                 setMessageSucessful('File uploaded successfully!');
-    
+
                 // Clear the message after 3 seconds
                 setTimeout(() => {
                   setMessageSucessful('');
                 }, 3000);
-                getResources()
+                await getResources()
             } catch (error) {
                 console.error("Failed to upload file:", file.name, error);
             }
-        });
-        setShowModalAddResource(false);
+        }
+
+          setShowModalAddResource(false);
         setFiles([])
     }
       

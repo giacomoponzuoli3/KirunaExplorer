@@ -26,18 +26,18 @@ const position: LatLngTuple = [67.8558, 20.2253];
 function createCityCoordinates(geoJson: any): L.LatLng[] {
   const latLngs: L.LatLng[] = [];
 
-  geoJson.features.forEach((feature: any) => {
-    if (feature.geometry.type === 'MultiPolygon') {
-      feature.geometry.coordinates.forEach((polygon: any) => {
-        polygon.forEach((ring: any) => {
-          ring.forEach((coord: [number, number]) => {
-            const latLng = L.latLng(coord[1], coord[0]); // [latitude, longitude]
-            latLngs.push(latLng);
-          });
-        });
-      });
+  for (const feature of geoJson.features) {
+    if (feature.geometry.type !== 'MultiPolygon') {
+      continue;
     }
-  });
+
+    feature.geometry.coordinates.forEach((polygon: any) =>
+        polygon.forEach((ring: any) =>
+            ring.forEach((coord: [number, number]) => {
+              const latLng = L.latLng(coord[1], coord[0]); // [latitude, longitude]
+              latLngs.push(latLng);
+            })));
+  }
 
   return latLngs;
 }
@@ -378,69 +378,76 @@ function SetMapViewEdit(props: any) {
     map.addLayer(drawnItems); // Aggiungi il gruppo alla mappa
 
     //add the polygon or point of the current document only if selected "edit"
-    if (selectedButton === "edit" && documentCoordinates) {
-      const latLngs = documentCoordinates.coordinates.map((coord: any) => [coord.latitude, coord.longitude]);
+    if (!(selectedButton === "edit" && documentCoordinates)) return;
 
-      // Aggiungi poligono o punto dall'attuale documento 
-      if (documentCoordinates.coordinates.length === 1 && documentCoordinates.coordinates[0].municipality_area == 0) { //if it is a point
-        const marker = L.marker(latLngs[0], { icon: defaultIcon });
+    const latLngs = documentCoordinates.coordinates.map((coord: any) => [coord.latitude, coord.longitude]);
 
-        const popup = L.popup({
-          closeButton: false, // Disable the close button
-          autoClose: false,   // Prevent automatic closing
-          closeOnClick: false, // Prevent closing on click
-          offset: [10, -5],   // Adjust the position above the marker
-          className: "custom-popup"
-        })
+    // Aggiungi poligono o punto dall'attuale documento
+    if (documentCoordinates.coordinates.length === 1 && documentCoordinates.coordinates[0].municipality_area == 0) { //if it is a point
+      const marker = L.marker(latLngs[0], {icon: defaultIcon});
+
+      const popup = L.popup({
+        closeButton: false, // Disable the close button
+        autoClose: false,   // Prevent automatic closing
+        closeOnClick: false, // Prevent closing on click
+        offset: [10, -5],   // Adjust the position above the marker
+        className: "custom-popup"
+      })
           .setLatLng(latLngs[0]) // Set popup position to the marker's coordinates
-          .setContent(`<p>Coordinates: ${decimalToDMS(latLngs[0][0])} ${latLngs[0][0] >= 0 ? "N" : "S"} , ${decimalToDMS(latLngs[0][1])} ${latLngs[0][1] >= 0 ? "E" : "W"}</p>`)
+          .setContent(`
+            <p>
+                Coordinates: ${decimalToDMS(latLngs[0][0])} ${latLngs[0][0] >= 0 ? "N" : "S"} , ${decimalToDMS(latLngs[0][1])} ${latLngs[0][1] >= 0 ? "E" : "W"}
+            </p>
+          `)
 
-        marker.on('mouseover', () => {
-            map.openPopup(popup)
+      marker.on('mouseover', () => {
+        map.openPopup(popup)
+      });
+
+      marker.on('mouseout', () => {
+        map.closePopup(popup);
+      });
+
+      marker.bindPopup(popup); // Associa il nuovo popup
+
+      drawnItems.addLayer(marker);
+      setSelectedPosition(); // Imposta la posizione selezionata
+    } else {
+      let polygon;
+
+      if (documentCoordinates.coordinates.length > 1) {
+        polygon = L.polygon(latLngs, {
+          color: '#ff0000',
+          weight: 3,
+          opacity: 0.8,
+          fillColor: '#3388ff',
+          fillOpacity: 0.3,
         });
-
-        marker.on('mouseout', () => {
-          map.closePopup(popup);
-        });
-
-        marker.bindPopup(popup); // Associa il nuovo popup
-
-        drawnItems.addLayer(marker);
-        setSelectedPosition(); // Imposta la posizione selezionata
-      } else {
-        let polygon;
-        
-        if (documentCoordinates.coordinates.length > 1){
-          polygon = L.polygon(latLngs, {
-            color: '#ff0000',
-            weight: 3,
-            opacity: 0.8,
-            fillColor: '#3388ff',
-            fillOpacity: 0.3,
-          });
-          drawnItems.addLayer(polygon);
-        }
-        if(documentCoordinates.coordinates.length == 1 && documentCoordinates.coordinates[0].municipality_area == 1){
-          polygon = L.geoJSON(props.geoJsonData, {
-            style: {
-              color: "#B22222",
-              weight: 2,
-              opacity: 0.8,
-              fillColor: '#FFD700',
-              fillOpacity: 0.2,
-            },
-            onEachFeature: (feature, layer) => {
-              if (feature.properties) {
-                layer.bindPopup(`Municipality: ${feature.properties.pnm}`);
-              }
-            },
-          });
-          drawnItems.addLayer(polygon);
-        }
-         // Converte latLngs in formato compatibile con setSelectedPosition
-        const formattedCoordinates = latLngs.map(([latitude, longitude]: [number, number]) => ({ lat: latitude, lng: longitude }));
-        setSelectedPosition(formattedCoordinates); // Imposta le coordinate del poligono
+        drawnItems.addLayer(polygon);
       }
+      if (documentCoordinates.coordinates.length == 1 && documentCoordinates.coordinates[0].municipality_area == 1) {
+        polygon = L.geoJSON(props.geoJsonData, {
+          style: {
+            color: "#B22222",
+            weight: 2,
+            opacity: 0.8,
+            fillColor: '#FFD700',
+            fillOpacity: 0.2,
+          },
+          onEachFeature(feature, layer) {
+            if (feature.properties) {
+              layer.bindPopup(`Municipality: ${feature.properties.pnm}`);
+            }
+          },
+        });
+        drawnItems.addLayer(polygon);
+      }
+      // Converte latLngs in formato compatibile con setSelectedPosition
+      const formattedCoordinates = latLngs.map(([latitude, longitude]: [number, number]) => ({
+        lat: latitude,
+        lng: longitude
+      }));
+      setSelectedPosition(formattedCoordinates); // Imposta le coordinate del poligono
     }
 
 
@@ -627,7 +634,6 @@ function SetMapViewEdit(props: any) {
     }
   }, [map, useMunicipalArea]);
 
-
   return null;
 }
 
@@ -660,7 +666,7 @@ const SetViewDocumentCoordinates = (props: any) => {
       { attribution: '&copy; <a href="https://www.opentopomap.org">OpenTopoMap</a>' }
     );
     satelliteLayer.addTo(map);
-    
+
 
     if(props.documentCoordinates.coordinates.length !== 0){
       //get the icon of the document
@@ -684,8 +690,8 @@ const SetViewDocumentCoordinates = (props: any) => {
       }).addTo(map);
 
       if(props.documentCoordinates.coordinates.length === 1 && props.documentCoordinates.coordinates[0].municipality_area == 0){ //if it is a point
-        
-        //popup of the coordinates 
+
+        //popup of the coordinates
         const popup = L.popup({
           closeButton: false, // Disable the close button
           autoClose: false,   // Prevent automatic closing
@@ -695,7 +701,7 @@ const SetViewDocumentCoordinates = (props: any) => {
         })
           .setLatLng(centralCoord) // Set popup position to the marker's coordinates
           .setContent(`<p>Coordinates: ${decimalToDMS(centralCoord[0])} ${centralCoord[0] >= 0 ? "N" : "S"} , ${decimalToDMS(centralCoord[1])} ${centralCoord[1] >= 0 ? "E" : "W"}</p>`)
-        
+
         marker.on('mouseover', () => {
           map.openPopup(popup)
         });
@@ -708,7 +714,7 @@ const SetViewDocumentCoordinates = (props: any) => {
 
 
       } else { //it is a polygon
-        
+
         //polygon of the document
         let polygon: any;
 
@@ -730,7 +736,7 @@ const SetViewDocumentCoordinates = (props: any) => {
 
           props.setShowPolygonMessage(true);
 
-          
+
         }else {
           polygon = L.polygon(latLngs, {
             color: '#B22222',
@@ -743,12 +749,10 @@ const SetViewDocumentCoordinates = (props: any) => {
         }
 
         polygon.addTo(map);
-        
+
       }
-      
+
     }
-
-
   }, [map, position, kirunaBounds]);
 
   return null;
