@@ -414,7 +414,6 @@ async function getAllDocumentsCoordinates() {
 }
 
 async function setDocumentCoordinates(idDoc: number, coordinates: LatLng|LatLng[]) {
-    console.log("coordinates " + coordinates)
     const response = await fetch(baseURL + "coordinates", { 
         method: 'POST', 
         credentials: "include", 
@@ -424,7 +423,6 @@ async function setDocumentCoordinates(idDoc: number, coordinates: LatLng|LatLng[
             coordinates: coordinates,
         }) 
     })
-    console.log("fetch");
     if (response.ok) {
         return 
     } else {
