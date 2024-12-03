@@ -97,17 +97,6 @@ function ResourcesTable(props: any) {
         setShowAlertMessage(true)
       }
 
-      const oversizedFiles = files.filter(file => file.size > 50 * 1024 * 1024); // 50 MB
-      if (oversizedFiles.length > 0) {
-        setAlertMessage(
-          `The following files exceed 50 MB: ${oversizedFiles
-            .map(file => file.name)
-            .join(', ')}`
-        );
-        setShowAlertMessage(true);
-        return; // Exit early
-      }
-
       const fileNames = files.map(file => file.name);
       const duplicates = fileNames.filter((name, index) => fileNames.indexOf(name) !== index);
       if (duplicates.length > 0) {
@@ -183,9 +172,19 @@ function ResourcesTable(props: any) {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = event.target.files; // HTMLInputElement.files can be FileList or null
     if (fileList) {
-      setFiles((prevFiles) =>  [...prevFiles, ...Array.from(fileList)]);
+      const oversizedFiles = Array.from(fileList).filter(file => file.size > 50 * 1024 * 1024); // 50 MB
+      const notOversizedFiles = Array.from(fileList).filter(file => file.size < 50 * 1024 * 1024);
+      if (oversizedFiles.length > 0) {
+        setAlertMessage(
+          `The following files exceed 50 MB: ${oversizedFiles
+            .map(file => file.name)
+            .join(', ')}.`
+        );
+        setShowAlertMessage(true);
+      }
+      setFiles((prevFiles) =>  [...prevFiles, ...notOversizedFiles]);
     
-  }
+    }
     event.target.value = '';
   };
 
@@ -404,7 +403,7 @@ function ResourcesTable(props: any) {
                     show={showModal}
                     onHide={() => setShowModal(false)}
                     onConfirm={handleDelete}
-                    text={`Are you sure you want to delete this Resources of the document?
+                    text={`Are you sure you want to delete ${resourceToDelete}?
                     This action cannot be undone.`}
                   />
                  

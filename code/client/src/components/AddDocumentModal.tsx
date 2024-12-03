@@ -89,10 +89,21 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const fileList = event.target.files; // HTMLInputElement.files can be FileList or null
+      //validation for uploadedfile
       if (fileList) {
-        setFiles((prevFiles) =>  [...prevFiles, ...Array.from(fileList)]);
+       const oversizedFiles = Array.from(fileList).filter(file => file.size > 50 * 1024 * 1024); // 50 MB //validation for size
+       const notOversizedFiles = Array.from(fileList).filter(file => file.size < 50 * 1024 * 1024);
+       if (oversizedFiles.length > 0) {
+        setAlertMessage(
+          `The following files exceed 50 MB: ${oversizedFiles
+            .map(file => file.name)
+            .join(', ')}`
+        );
+        setShowAlert(true);
+       }
+        setFiles((prevFiles) =>  [...prevFiles, ...notOversizedFiles]);
+      }
       
-    }
       event.target.value = '';
     };
 
@@ -146,18 +157,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
         }
       }
 
-     //validation for uploadedfile
-      const oversizedFiles = files.filter(file => file.size > 50 * 1024 * 1024); // 50 MB //validation for size
-      if (oversizedFiles.length > 0) {
-        setAlertMessage(
-          `The following files exceed 50 MB: ${oversizedFiles
-            .map(file => file.name)
-            .join(', ')}`
-        );
-        setShowAlert(true);
-        return; // Exit early
-      }
-
+     
       const fileNames = files.map(file => file.name);//validation for duplication file name
       const duplicates = fileNames.filter((name, index) => fileNames.indexOf(name) !== index);
       if (duplicates.length > 0) {
