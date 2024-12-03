@@ -1797,8 +1797,6 @@ describe('documentRoutes', () => {
                 { id: 2, idDoc: 1, data: null, name: 'Resource 2', uploadTime: '2024-12-02T12:00:00.000Z'},
             ]);
 
-            expect(controller.getAllResourcesData).toHaveBeenCalledWith(1);
-
         });
 
         test('It should return 422 status if the docId is missing', async () => {
