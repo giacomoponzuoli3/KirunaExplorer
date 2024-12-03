@@ -17,6 +17,7 @@ import ISO6391 from 'iso-639-1';  // Utilizziamo ISO 639-1 per ottenere le lingu
 import { DocCoordinates } from '../models/document_coordinate';
 import CreatableSelect from 'react-select/creatable';
 import { SingleValue } from 'react-select';
+import Scale from "../models/scale"
 
 interface RequiredLabelProps {
     text: string; // Explicitly define the type of 'text' as string
@@ -44,6 +45,7 @@ interface AddDocumentModalProps {
 function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeoreferenceNewDocumentModal}: AddDocumentModalProps) {
     const [title, setTitle] = useState('');
     const [selectedStakeholders, setSelectedStakeholders] = useState<Stakeholder[]>([]);
+    const [scaleOptions, setScaleOptions] = useState<{ value: string; label: string }[]>([]);
     const [scale, setScale] = useState('');
     const [issuanceDate, setIssuanceDate] = useState('');
     const [type, setType] = useState('');
@@ -67,6 +69,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
         setTitle('');
         setSelectedStakeholders([]);
         setScale('');
+        setScaleOptions([]);
         setIssuanceDate('');
         setType('');
         setLanguage(null);
@@ -156,18 +159,42 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
       value: code,
       label: ISO6391.getName(code),
     }));
-
+    /** 
     const scaleOptions = [
       { value: '1:1000', label: '1:1000' },
       { value: '1:2000', label: '1:2000' },
       { value: '1:5000', label: '1:5000' },
       { value: '1:7500', label: '1:7500' },
       { value: '1:10000', label: '1:10000' },
-    ];
+    ];*/
+
+    /**
+     * try {
+        const docs = await API.getAllDocuments();
+        setDocuments(docs);
+    } catch (err: any) {
+        console.log(err);
+    }
+     */
+
+    useEffect(() => {
+      const fetchScaleOptions = async () => {
+        try {
+          const response = await API.getScales();
+          const options = response.map((scale: {name: string}) => ({value: scale.name, label: scale.name}));
+          setScaleOptions(options);
+        } catch (err: any) {
+          console.error("Failed to fetch scales", err);
+        }
+      };
+      fetchScaleOptions();
+    }, [])
 
     const handleScale = (selectedOption: SingleValue<{ value: string; label: string }>) => {
       setScale(selectedOption ? selectedOption.value : '');
     };
+
+
 
     return (
       <Modal size="xl" show={show} onHide={handleClose} aria-labelledby="example-modal-sizes-title-lg">
