@@ -255,8 +255,6 @@ class DocumentRoutes {
 
         this.router.get(
             "/res-all/:idDoc",
-            this.authenticator.isLoggedIn, //error 401
-            this.authenticator.isPlanner, //error 403
             param("idDoc").isNumeric(),
             this.errorHandler.validateRequest,
             async (req: any, res: any, next: any) => {

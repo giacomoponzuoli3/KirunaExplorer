@@ -10,6 +10,22 @@ import { EditDocumentModal } from "./EditDocumentModal";
 import ConfirmModal from "./ConfirmModal";
 import { MagnifyingGlassIcon } from '@heroicons/react/24/solid'
 import { ModalEditGeoreference } from "./ModalEditGeoreference";
+import dayjs from 'dayjs';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+
+
+
+const documentTypes = [
+  "Informative document",
+  "Prescriptive document",
+  "Design document",
+  "Technical document",
+  "Material effect",
+  "Agreement",
+  "Conflict",
+  "Consultation",
+];
 
 function DocumentsTable(props: any){
     const navigate = useNavigate();
@@ -41,6 +57,11 @@ function DocumentsTable(props: any){
     const [showModalConfirmDeleteGeoreference, setShowModalConfirmDeleteGeoreference] = useState<boolean>(false);
     const [showModalGeoreference, setShowModalGeoreference] = useState<boolean>(false);
 
+    //section filter
+    const [sortOrder, setSortOrder] = useState("asc"); // Per ordinamento alfabetico
+    const [selectedType, setSelectedType] = useState(""); // Per tipo documento
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
 
     //pagination controls
     const [currentPage, setCurrentPage] = useState(1);  // Track the current page
@@ -84,30 +105,114 @@ function DocumentsTable(props: any){
       setPaginatedLinks(filtered.slice(0, itemsPerPage)); // Aggiorna i documenti visualizzati
     };
 
+    // Funzione per il cambio dell'ordinamento
+    const handleSortOrderChange = (value: any) => {
+      setSortOrder(value);
+      // Aggiorna documenti ordinati
 
-  // Funzione per ottenere il numero di link per un documento
-  const getDocumentLinksCount = async (docId: number) => {
-    try {
-        const response = await API.getDocumentLinksById(docId);
-        return response.length; //the response is the array of links
-    } catch (error) {
-        console.error("Error fetching document links count", error);
-        return 0; // 0 if there is an error
-    }
-  };
+      setFilteredDocuments((prevDocs) => {
+        const sortedDocs = [...prevDocs].sort((a, b) =>
+          value === "asc" ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)
+        );
+        return sortedDocs;
+      });
+      setCurrentPage(1); // Resetta la paginazione alla prima pagina
+      setPaginatedLinks(filteredDocuments.slice(0, itemsPerPage)); // Aggiorna i documenti visualizzati
+    };
+
+    // Funzione per normalizzare le date
+    const normalizeDate = (dateStr: any) => {
+      const formats = ['YYYY', 'DD/MM/YYYY', 'MM/YYYY'];
+      const parsedDate = dayjs(dateStr, formats, true); // Parsing rigoroso con formati
+      return parsedDate.isValid() ? parsedDate : null; // Restituisce null se la data non è valida
+    };
+
+    const handleFilterByDateRange = () => {
+      const normalizeDate = (dateStr: string) => {
+        // Aggiungi i formati che vuoi supportare
+        const formats = ['YYYY-MM-DD', 'DD/MM/YYYY', 'MM/YYYY', 'YYYY']; // Formati da gestire
+        let formattedDate = dateStr;
+    
+        // Se la data è MM/YYYY, aggiungi '01/' (es. 'MM/YYYY' diventa '01/MM/YYYY')
+        if (/^\d{2}\/\d{4}$/.test(dateStr)) {
+          formattedDate = `01/${dateStr}`; // Trasforma 'MM/YYYY' in '01/MM/YYYY'
+        }
+    
+        // Se la data è solo YYYY, aggiungi '01/01' (es. 'YYYY' diventa '01/01/YYYY')
+        if (/^\d{4}$/.test(dateStr)) {
+          formattedDate = `01/01/${dateStr}`; // Trasforma 'YYYY' in '01/01/YYYY'
+        }
+    
+        console.log("Formatted Date: ", formattedDate);
+    
+        // Usa formattedDate per il parsing con dayjs
+        const parsedDate = dayjs(formattedDate, formats, true); // 'true' per il parsing rigoroso
+    
+        console.log("Parsed Date: ", parsedDate);
+    
+        return parsedDate.isValid() ? parsedDate : null; // Se la data è valida, restituisci dayjs, altrimenti null
+      };
+    
+      // Normalizzazione delle date di inizio e fine
+      const normalizedStart = normalizeDate(startDate);
+      const normalizedEnd = normalizeDate(endDate);
+    
+      if (!normalizedStart || !normalizedEnd) {
+        setFilteredDocuments(documentsCoordinates); // Ripristina i documenti originali se il range non è valido
+        return;
+      }
+    
+      const filtered = documentsCoordinates.filter((doc) => {
+        // Normalizzazione e parsing della data del documento
+        const docDate = normalizeDate(doc.issuanceDate); // Usa la funzione di normalizzazione per la data del documento
+    
+        // Se docDate è null o non valido, escludi il documento
+        if (!docDate || !docDate.isValid()) {
+          console.log(`Invalid docDate for ${doc.title}`);
+          return false;
+        }
+    
+        // Filtro per il range di date
+        return docDate.isSameOrAfter(normalizedStart) && docDate.isSameOrBefore(normalizedEnd);
+      });
+    
+      // Aggiorna lo stato dei documenti filtrati
+      setFilteredDocuments(filtered);
+    };
+    
+
+    // Funzione per il filtro per tipo documento
+    const handleTypeFilterChange = (type: any) => {
+      setSelectedType(type);
+      setFilteredDocuments(() =>
+        type ? documentsCoordinates.filter((doc) => doc.type === type) : documentsCoordinates
+      );
+      setCurrentPage(1); // Resetta la paginazione alla prima pagina
+      setPaginatedLinks(filteredDocuments.slice(0, itemsPerPage)); // Aggiorna i documenti visualizzati
+    };
+
+
+    // Funzione per ottenere il numero di link per un documento
+    const getDocumentLinksCount = async (docId: number) => {
+      try {
+          const response = await API.getDocumentLinksById(docId);
+          return response.length; //the response is the array of links
+      } catch (error) {
+          console.error("Error fetching document links count", error);
+          return 0; // 0 if there is an error
+      }
+    };
 
  
-  const getDocumentResourcesCount = async (docId: number) => {
-    try {
-        const response = await API.getAllResourcesData(docId);
-        console.log('response')
-        console.log(response)
-        return response.length;
-    } catch (error) {
-        console.log(error)
-        return 0; // 0 if there is an error
-    }
-  };
+    const getDocumentResourcesCount = async (docId: number) => {
+      try {
+          const response = await API.getAllResourcesData(docId);
+          return response.length;
+      } catch (error) {
+          console.log(error)
+          return 0; // 0 if there is an error
+      }
+    };
 
   //get all DocCoordinates
   const getDocuments = async () => {
@@ -182,7 +287,6 @@ function DocumentsTable(props: any){
   const handleDeleteDocument = (doc: DocCoordinates) => {
     setShowModalConfirmDelete(true);
     setDocumentDelete(doc);
-    console.log(documentDelete)
   } 
 
   const handleDeleteClick = async () => {
@@ -217,7 +321,6 @@ function DocumentsTable(props: any){
 
   //---------- ADD DOCUMENT'S GEOREFERENCE -----------//
   const handleAddGeoreference = (doc: DocCoordinates) => {
-    console.log(doc.coordinates);
     setDocumentSelected(doc);
     setMode('insert');
     setShowModalGeoreference(true);
@@ -300,7 +403,63 @@ function DocumentsTable(props: any){
               </div>
             )}
           </div>
-      
+          <div className="flex justify-between items-center mb-4">
+      {/* Ordinamento */}
+      <div className="flex items-center space-x-4">
+        <label className="text-sm text-gray-600 font-medium">Sort by:</label>
+        <select
+          value={sortOrder}
+          onChange={(e) => handleSortOrderChange(e.target.value)}
+          className="border border-gray-300 rounded-md px-3 py-1 text-sm"
+        >
+          <option value="asc">Title (A-Z)</option>
+          <option value="desc">Title (Z-A)</option>
+        </select>
+      </div>
+
+      {/* Filtro per range di date */}
+
+    <div className="flex space-x-4 mb-4">
+      <input
+        type="text"
+        placeholder="Start Date (e.g. YYYY, MM/YYYY, DD/MM/YYYY)"
+        value={startDate}
+        onChange={(e) => setStartDate(e.target.value)}
+        className="border px-2 py-1"
+      />
+      <input
+        type="text"
+        placeholder="End Date (e.g. YYYY, MM/YYYY, DD/MM/YYYY)"
+        value={endDate}
+        onChange={(e) => setEndDate(e.target.value)}
+        className="border px-2 py-1"
+      />
+      <button
+        onClick={handleFilterByDateRange}
+        className="px-4 py-1 bg-blue-500 text-white rounded"
+      >
+        Filter
+      </button>
+    </div>
+
+      {/* Filtro per tipo documento */}
+      <div className="flex items-center space-x-4">
+        <label className="text-sm text-gray-600 font-medium">Filter by Type:</label>
+        <select
+          value={selectedType}
+          onChange={(e) => handleTypeFilterChange(e.target.value)}
+          className="border border-gray-300 rounded-md px-3 py-1 text-sm"
+        >
+          <option value="">All Types</option>
+          {documentTypes.map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+
           {filteredDocuments.length == 0 ? (
             <div className="flex flex-col items-center mt-6">
               <FaceFrownIcon className="h-10 w-10 text-gray-400" />
