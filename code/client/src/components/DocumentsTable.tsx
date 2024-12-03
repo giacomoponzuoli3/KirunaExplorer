@@ -4,7 +4,6 @@ import { TrashIcon, MapPinIcon, MapIcon, PencilIcon, FaceFrownIcon, ChevronRight
 import { TruncatedText } from "./LinksDocument";
 import { useNavigate } from "react-router-dom";
 import Alert from "./Alert";
-import { ShowDocumentInfoModal } from "./ShowDocumentInfoModal";
 import { DocCoordinates } from "../models/document_coordinate";
 import { EditDocumentModal } from "./EditDocumentModal";
 import ConfirmModal from "./ConfirmModal";
@@ -296,7 +295,7 @@ function DocumentsTable(props: any){
     };
 
     if (documentsCoordinates.length > 0) {
-        fetchLinksCount(); // Chiamata quando i documenti sono disponibili
+        fetchLinksCount().then(); // Chiamata quando i documenti sono disponibili
     }
 }, [documentsCoordinates]);
 
@@ -336,7 +335,7 @@ function DocumentsTable(props: any){
     try{
         if(documentDelete){
           await API.deleteDocument(documentDelete.id).then();
-          getDocuments();
+          getDocuments().then();
         }
         setDocumentDelete(null);
     }catch(err){
@@ -354,7 +353,7 @@ function DocumentsTable(props: any){
     try{
       if(documentGeoreferenceDelete){
         await API.deleteDocumentCoordinates(documentGeoreferenceDelete.id);
-        getDocuments();
+        getDocuments().then();
       }
       setDocumentGeoreferenceDelete(null);
     }catch(err){
@@ -641,7 +640,7 @@ function DocumentsTable(props: any){
                                     className="flex items-center justify-center rounded-full border-1 border-yellow-500 hover:border-yellow-600 text-yellow-500 hover:text-yellow-600 w-7 h-7 hover:shadow-lg"
                                     onClick={() => handleEditGeoreference(doc)}
                                   >
-                                    <MapIcon className="h-4 w-4" />
+                                    <img src="/img/editMap-icon-yellow.png" alt="Informative Document" className="h-4 w-4"/>
                                   </button>
                                 </div>
                               )}
@@ -724,7 +723,7 @@ function DocumentsTable(props: any){
               onHide={() => {
                 setShowModalEditDocument(false)
                 setDocumentEdit(null);
-                getDocuments(); //refresh of documents
+                getDocuments().then(); //refresh of documents
                 
               }} 
               refreshSelectedDocument={refreshSelectedDocument}
@@ -752,7 +751,7 @@ function DocumentsTable(props: any){
           />}
 
           {/* Show the map with the coordinates of a specific document */}
-          {viewDocumentGeoreference ? <>{console.log("view")}</> : <></>}
+          {/*viewDocumentGeoreference ? <>{console.log("view")}</> : <></>*/}
 
           {showModalGeoreference && mode && documentSelected &&
                 <ModalEditGeoreference
@@ -764,7 +763,7 @@ function DocumentsTable(props: any){
                     geoJsonData={props.geoJsonData}
 
                     onClose={() => {    
-                      getDocuments(); //refresh of documents
+                      getDocuments().then(); //refresh of documents
                       setShowModalGeoreference(false)
                       setMode(null); //reset the mode
                     }}
