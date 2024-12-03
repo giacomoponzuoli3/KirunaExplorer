@@ -110,7 +110,7 @@ function ShowDocumentInfoModal({ geoJsonData, getDocumentIcon, selectedDocumentC
                                                 className="p-2 m-1 rounded-full border-2 bg-yellow-500 text-white hover:bg-yellow-600 transition-colors duration-200"
                                                 onClick={handleEditGeoreference}
                                             >
-                                                <MapIcon className="h-5 w-5 text-white" />
+                                                <img src="/img/editMap-icon-white.png" alt="Informative Document" className="h-5 w-5"/>
                                           </button>
                                         </div>
                                     )}
