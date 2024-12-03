@@ -28,13 +28,17 @@ interface EditDocumentModalProps {
     show: boolean;
     onHide: () => void;
     refreshSelectedDocument: (doc: DocCoordinates) => void;
-    stakeholders: Stakeholder[]
+    stakeholders: Stakeholder[];
+    scaleOptions: { value: string; label: string }[];
+    //setScaleOptions: React.Dispatch<React.SetStateAction<{ value: string; label: string }[]>>;
+    onCreateScale: (inputValue: string) => Promise<void>;
 }
 
-function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, stakeholders }: EditDocumentModalProps) {
+function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, stakeholders, scaleOptions, onCreateScale }: EditDocumentModalProps) {
     const [title, setTitle] = useState(document.title);
     const [selectedStakeholders, setSelectedStakeholders] = useState<Stakeholder[]>(document.stakeHolders);
-    const [scale, setScale] = useState(document.scale);
+    //const [scaleOptions, setScaleOptions] = useState<{ value: string; label: string }[]>([]);
+    const [scale, setScale] = useState('');
     const [issuanceDate, setIssuanceDate] = useState(document.issuanceDate);
     const [type, setType] = useState(document.type);
     const [language, setLanguage] = useState<string | null>(document.language);
@@ -91,17 +95,20 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
       label: ISO6391.getName(code),
     }));
 
-    const scaleOptions = [
+    /**const scaleOptions = [
         { value: '1:1000', label: '1:1000' },
         { value: '1:2000', label: '1:2000' },
         { value: '1:5000', label: '1:5000' },
         { value: '1:7500', label: '1:7500' },
         { value: '1:10000', label: '1:10000' },
       ];
-  
+    */
+
+
     const handleScale = (selectedOption: SingleValue<{ value: string; label: string }>) => {
     setScale(selectedOption ? selectedOption.value : '');
     };
+
     
     return (
         <Modal size="xl" show={show} onHide={onHide} aria-labelledby="example-modal-sizes-title-lg">
@@ -181,8 +188,9 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                                     options={scaleOptions}
                                     value={scale ? { value: scale, label: scale } : null}
                                     onChange={handleScale}
+                                    onCreateOption={onCreateScale}
                                     placeholder="Select or type a scale..."
-                                    formatCreateLabel={(inputValue) => `Use custom scale: "${inputValue}"`}
+                                    formatCreateLabel={(inputValue) => `Add a new scale: "${inputValue}"`}
                                     styles={{
                                         control: (base) => ({
                                         ...base,
