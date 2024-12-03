@@ -110,7 +110,7 @@ function ShowDocumentInfoModal({ geoJsonData, getDocumentIcon, selectedDocumentC
                                                 className="p-2 m-1 rounded-full border-2 bg-yellow-500 text-white hover:bg-yellow-600 transition-colors duration-200"
                                                 onClick={handleEditGeoreference}
                                             >
-                                                <MapIcon className="h-5 w-5 text-white" />
+                                                <img src="/img/editMap-icon-white.png" alt="Informative Document" className="h-5 w-5"/>
                                           </button>
                                         </div>
                                     )}
@@ -152,6 +152,12 @@ function ShowDocumentInfoModal({ geoJsonData, getDocumentIcon, selectedDocumentC
                         className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium"
                     >
                         View connections
+                    </button>
+                    <button 
+                        onClick={() => navigate(`documents/${selectedDocumentCoordinates.id}/resources`, { state: { from: "/documents" } })}
+                        className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium"
+                    >
+                        View resources
                     </button>
                 </Modal.Footer>
             </Modal>

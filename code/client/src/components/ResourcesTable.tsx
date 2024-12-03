@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { Modal } from 'react-bootstrap';
 import API from "../API/API";
-import { TrashIcon, PlusIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon, ArrowDownTrayIcon, DocumentIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, PlusIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon, DocumentIcon } from "@heroicons/react/24/outline";
 import Alert from "./Alert";
 import ConfirmModal from './ConfirmModal';
 import { DocLink } from "../models/document_link";
@@ -30,7 +30,10 @@ function ResourcesTable(props: any) {
 
     //modal
     const [showAlert, setShowAlert] = useState(false); // alert state
+    const [messageSucessful, setMessageSucessful] = useState('');
     const [showModalAddResource, setShowModalAddResource] = useState(false);
+    const [showAlertMessage, setShowAlertMessage] = useState(false);//error in modal add resource
+    const [alertMessage, setAlertMessage] = useState('');//error message in modal add resources
 
     //loading
     const [loading, setLoading] = useState(true);  // stato di caricamento
@@ -64,6 +67,7 @@ function ResourcesTable(props: any) {
      }
     };
 
+    //delete resource
     const handleDelete = async () => {
         if (documentToDelete && resourceToDelete) {
             await API.deleteResource(documentToDelete, resourceToDelete)
@@ -77,6 +81,7 @@ function ResourcesTable(props: any) {
         console.log('real deleted')
     };
 
+    //open delete modal
     const handleDeleteResource = (res: Resources) => {
       setShowModal(true);
       setDocumentToDelete(res.idDoc);
@@ -85,13 +90,36 @@ function ResourcesTable(props: any) {
       console.log('hi delete')
     } 
 
+    //add new resource
     const handleSubmitResource = async () => {
+      if(files.length == 0){
+        setAlertMessage('Please upload your file')
+        setShowAlertMessage(true)
+      }
+
+      const fileNames = files.map(file => file.name);
+      const duplicates = fileNames.filter((name, index) => fileNames.indexOf(name) !== index);
+      if (duplicates.length > 0) {
+        setAlertMessage(
+          `Duplicate file names detected: ${[...new Set(duplicates)].join(', ')}. Please remove duplicates.`
+        );
+        setShowAlertMessage(true);
+        return; // Exit early
+      }
+
+      const existingResourceNames = resources.map(resource => resource.name);
+      const alreadyExisting = fileNames.filter(name => existingResourceNames.includes(name));
+      if (alreadyExisting.length > 0) {
+        setAlertMessage(
+          `The following file names already exist in resources: ${alreadyExisting.join(', ')}. Please rename or remove them.`
+        );
+        setShowAlertMessage(true);
+        return; // Exit early
+      }
+      
       if (files.length !== 0 && document!=null) {
-        console.log("new files");
 
         files.forEach(async (file) => {
-            console.log(file);
-
             // Step 1: Read the file content as a Uint8Array
             const fileData = await file.arrayBuffer(); // Convert to ArrayBuffer
             const uint8Array = new Uint8Array(fileData); // Convert to Uint8Array
@@ -110,39 +138,75 @@ function ResourcesTable(props: any) {
                     file.name,     // Use the file name
                     base64Data     // Pass the file data as base64 string
                 );
-                console.log("File uploaded successfully:", response);
+                setMessageSucessful('File uploaded successfully!');
+    
+                // Clear the message after 3 seconds
+                setTimeout(() => {
+                  setMessageSucessful('');
+                }, 3000);
+                getResources()
             } catch (error) {
                 console.error("Failed to upload file:", file.name, error);
             }
         });
+        setShowModalAddResource(false);
+        setFiles([])
     }
-      setShowModalAddResource(false);
-      setFiles([])
+      
   };
 
+  //open add resource modal
   const handleAddResource = () => {
     setShowModalAddResource(true)
+    setShowAlertMessage(false)
+    setAlertMessage('')
   }
 
+  //close add resource modal
   const handleCloseModal = () => {
     setShowModalAddResource(false)
     setFiles([])
   }
 
+  //upload new resource (inside modal not db)
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = event.target.files; // HTMLInputElement.files can be FileList or null
     if (fileList) {
-      setFiles((prevFiles) =>  [...prevFiles, ...Array.from(fileList)]);
+      const oversizedFiles = Array.from(fileList).filter(file => file.size > 50 * 1024 * 1024); // 50 MB
+      const notOversizedFiles = Array.from(fileList).filter(file => file.size < 50 * 1024 * 1024);
+      if (oversizedFiles.length > 0) {
+        setAlertMessage(
+          `The following files exceed 50 MB: ${oversizedFiles
+            .map(file => file.name)
+            .join(', ')}.`
+        );
+        setShowAlertMessage(true);
+      }
+      setFiles((prevFiles) =>  [...prevFiles, ...notOversizedFiles]);
     
-  }
+    }
     event.target.value = '';
   };
 
+  //delete uploaded file (inside modal)
   const handleDeleteFile = (index: number) => {
     setFiles((prevFiles) => 
       prevFiles.filter((_, i) => i !== index)
     );
   };
+
+  const truncateFileName = (fileName: string, maxLength = 35) => {
+    if (fileName.length > maxLength) {
+      return fileName.substring(0, maxLength) + '...';
+    }
+    return fileName;
+  };
+    
+  const getResources = async () => {
+    const documentId = Number(idDocument);
+    const documentResources = await API.getAllResourcesData(documentId);
+    setResources(documentResources);
+  }
 
     useEffect(() => {
         const getDocument = async () => {
@@ -162,22 +226,11 @@ function ResourcesTable(props: any) {
     }, [idDocument])
 
     useEffect(() => {
-        const getResources = async () => {
-            try{
-                const documentId = Number(idDocument);
-                // const documentResources = await API.getResourceData(documentId);
-                const documentResources = await API.getAllResourcesData(documentId);
-                // const documentResources: Resources[] = [new Resources(1, 2, "prova", null, "12/11/2024")]
-                setResources(documentResources);
-                console.log('lengthResources');
-                console.log(resources)
-            }catch (err){
-                setShowAlert(true);
-            }
-        };
-        console.log(idDocument);
+      try{
         getResources().then();
-        console.log(resources);
+      }catch(err){
+        setShowAlert(true);
+      }
         setLoading(false);
     }, [idDocument]);
 
@@ -222,6 +275,23 @@ function ResourcesTable(props: any) {
     }else{
         return (
             <div className="p-4" style={{ height: "calc(100vh - 65px)", overflowY: "auto" }}>
+               {/* Show the message if it's not empty */}
+               <div className="p-4">
+                  {messageSucessful && (
+                    <div
+                      style={{
+                        marginTop: '20px',
+                        padding: '10px',
+                        backgroundColor: '#DFF2BF',
+                        color: '#4F8A10',
+                        borderRadius: '5px',
+                        transition: 'opacity 0.5s ease-in-out',
+                      }}
+                    >
+                      {messageSucessful}
+                    </div>
+                  )}
+                </div>
               <h2 className="text-xl font-normal text-gray-600 mb-1 text-center">
                 Resources of
               </h2>
@@ -305,13 +375,6 @@ function ResourcesTable(props: any) {
                           {/* <td className="p-4 text-sm text-gray-600 w-[10%]"></td> */}
                           
                             <td className="p-3 items-center justify-center space-x-4 w-[5%]">
-                              <button
-                              title="Download"
-                                className="text-green-600 hover:text-green-700"
-                                onClick={() => {}} 
-                              >
-                                <ArrowDownTrayIcon className="h-5 w-5" />
-                              </button>
                               {props.isLogged && props.user.role == "Urban Planner" && (
                                 <>
                                   <button
@@ -340,7 +403,7 @@ function ResourcesTable(props: any) {
                     show={showModal}
                     onHide={() => setShowModal(false)}
                     onConfirm={handleDelete}
-                    text={`Are you sure you want to delete this Resources of the document?
+                    text={`Are you sure you want to delete ${resourceToDelete}?
                     This action cannot be undone.`}
                   />
                  
@@ -348,7 +411,6 @@ function ResourcesTable(props: any) {
               )}
 
               {showModalAddResource && (
-                          // <Modal size="xl" show={show} onHide={handleClose} aria-labelledby="example-modal-sizes-title-lg">
                           <Modal size="xl" show={true} onHide={handleCloseModal} aria-labelledby="example-modal-sizes-title-lg">
                           <Modal.Header closeButton className="bg-gray-100">
                             <Modal.Title id="example-modal-sizes-title-lg" className="text-2xl font-bold text-gray-800">
@@ -358,24 +420,26 @@ function ResourcesTable(props: any) {
                           <Modal.Body className="bg-white">
                             <div className="px-6 py-4 space-y-6">
                               {/* Alerts */}
-                              {/* {showAlert && (
+                              {showAlertMessage && (
                                 <Alert
                                   message={alertMessage}
-                                  onClose={() => {setShowAlert(false); setAlertMessage('')}}
+                                  onClose={() => {setShowAlertMessage(false); setAlertMessage('')}}
                                 />
-                              )} */}
+                              )}
                   
                               <form className="space-y-12">
                   
                                   {/* Section 4: Resources files */}
                                   <div className="space-y-12">
-                                    <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Resources</h3>
+                                    <h3 className="text-lg font-semibold text-gray-700">
+                                      You can add resource 
+                                    </h3>
                   
                                     {/* File Upload Field */}
                                     <div className="p-4 border border-gray-200 rounded-md shadow-sm bg-gray-50">
                                         <div className="space-y-2">
                                             <label htmlFor="formFile" className="block text-sm font-medium text-gray-600">
-                                                Upload File
+                                                Upload File (<span style={{ color: 'red' }}>*</span>)
                                             </label>
                                             <input
                                                 type="file"
@@ -400,7 +464,7 @@ function ResourcesTable(props: any) {
                                                             <div className="flex items-center space-x-2">
                                                                 <DocumentIcon className="h-6 w-6 text-blue-500" />
                                                                 <span className="font-medium text-gray-800 truncate">
-                                                                    {file.name} ({(file.size / 1024).toFixed(2)} KB)
+                                                                    {truncateFileName(file.name,35)} ({(file.size / 1024).toFixed(2)} KB)
                                                                 </span>
                                                             </div>
                   
