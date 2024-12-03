@@ -26,7 +26,7 @@ Contains the navbar and an error message
 - POST `/doc`: adds a new document to the database:
   - has no parameters
   - body contains the new document's information (title, stakeholders, scale, issue date, type, language, pages, description)
-  - returns a 200 code if the document is successfully added to the database, a 503 code in case of errors
+  - returns a 200 code if the document is successfully added to the database, a 401 code if user is not logged in, a 403 if user is not urban planner, a 503 code in case of errors
 - GET `/doc`: retrieves all the documents in the database:
   - has no parameters nor body
   - returns a 200 code and a list with all the documents' information when successful, a 503 code in case of errors
@@ -37,7 +37,7 @@ Contains the navbar and an error message
 - DELETE `/doc/:id`: removes a given document from the database:
   - has, as the only parameter, the ID of the document to delete
   - has no body
-  - returns a 200 code in case of success, a 503 code in case of errors
+  - returns a 200 code in case of success, a 401 code if user is not logged in, a 403 if user is not urban planner, a 503 code in case of errors
 - PATCH `/doc/:id`: modifies the information about a given document:
   - has, as the only parameter, the ID of the document to edit
   - body contains the new information (title, stakeholders, scale, issue date, type, language, pages, description)
@@ -46,28 +46,65 @@ Contains the navbar and an error message
   - has, as the only parameter, the ID of the document to search the links for
   - has no body
   - returns a 200 code and a list with all the relative links' information when successful, a 503 code in case of errors
+- GET `/doc/:id/title`: retrieves the title of a document by its id
+  - has, as the only parameter, the ID of the document
+  - has no body
+  - returns a 200 code and a title of this document when successful, a 503 code in case of errors
+- GET `/doc/:id/title`: retrieves the title of a document by its id
+  - has, as the only parameter, the ID of the document
+  - has no body
+  - returns a 200 code and a title of this document when successful, a 503 code in case of errors
+- GET `/doc/:id/description`: retrieves the description of a document by its id
+  - has, as the only parameter, the ID of the document
+  - has no body
+  - returns a 200 code and a description of this document when successful, a 503 code in case of errors
+- GET `/doc/:id/issuanceDate`: retrieves the issuanceDate of a document by its id
+  - has, as the only parameter, the ID of the document
+  - has no body
+  - returns a 200 code and a issuanceDate of this document when successful, a 503 code in case of errors
+- GET `/doc/type`: retrieves all documents that have this type
+  - has no parameters
+  - body contains the type of Document
+  - returns a 200 code and a issuanceDate of this document when successful, a 503 code in case of errors
+- DELETE `/res/:idDoc/:name`: removes a resource from the database:
+  - has two parameters, the ID of the documents, and name of resource
+  - has no body
+  - returns a 200 code in case of success, a 401 code if user is not logged in, a 403 if user is not urban planner, a 503 code in case of error
+- GET `/res/:idDoc/:idRes`: retrieves a resource:
+  - has two parameters, the ID of the documents, and ID of resource
+  - has no body
+  - returns a 200 code and a resource when successful, a 401 code if user is not logged in, a 403 if user is not urban planner, a 503 code in case of error
+- GET `/res-all/:idDoc`: retrieves all of resources by this ID of document:
+  - has, as the only parameter, the ID of the documente
+  - has no body
+  - returns a 200 code and a resource when successful, a 401 code if user is not logged in, a 403 if user is not urban planner, a 503 code in case of error
+
 
 
 - POST `/link`: adds a new link between two documents:
   - has no parameters
   - body contains the IDs of the documents to link, and the ID of the link itself
-  - returns a 200 code in case of success, a 409 code if the link is already present in the database, a 503 code in case of errors
+  - returns a 200 code in case of success, a 409 code if the link is already present in the database, a 401 code if user is not logged in, a 403 if user is not urban planner, a 503 code in case of errors
 - GET `/link`: retrieves a list of all the links in the database:
   - has no parameters nor body
   - returns a 200 code and a list with the retrieved links' info when successful, a 404 code if no links are present in the database, a 503 code in case of errors
 - DELETE `/link`: removes a link from the database:
   - has no parameters
   - body contains the IDs of the documents to link, and the ID of the link itself
-  - returns a 200 code in case of success, a 503 code in case of errors
+  - returns a 200 code in case of success, a 401 code if user is not logged in, a 403 if user is not urban planner, a 503 code in case of errors
 - PATCH `/link`: modifies a link's information
   - has no parameters
   - body contains the IDs of the documents to link, and the ID of the link itself
-  - returns a 200 code in case of success, a 404 code if the link is not present in the database, a 409 code if the updated link is already present in the database, a 503 code in case of errors
+  - returns a 200 code in case of success, a 404 code if the link is not present in the database, a 409 code if the updated link is already present in the database,  a 401 code if user is not logged in, a 403 if user is not urban planner, a 503 code in case of errors
 
 
 - GET `/stakeholders`: retrieves a list of all the stakeholders in the database:
   - has no parameters nor body
   - returns a 200 code and a list with the retrieved stakeholders' info when successful,a 404 code if no stakeholder information is on the database, a 503 code in case of errors
+- POST `/stakeholders`: adds new stakeholder to the database:
+  - has no parameters
+  - body contains the name of new stakeholder, and its category
+  - returns a 201 code and ID of added stakeholder' when successful, a 503 code in case of errors
 
 
 - GET `/coordinates`: retrieves all the geo-referenced documents in the database:
@@ -81,6 +118,10 @@ Contains the navbar and an error message
   - has no parameters
   - body contains the id of the document to update and the new coordinates (or list of coordinates)
   - returns a 200 code when successful, a 503 code in case of errors
+- DELETE `/coordinates/:id`: deletes the geo-referencing information of a document:
+  - has one parameter for id of the document
+  - has no parameters
+  - returns a 200 code when successful, return a 401 code if user is not logged in, return a 403 if user is not urban planner, and a 503 code in case of errors
 
 ## Database Tables
 
