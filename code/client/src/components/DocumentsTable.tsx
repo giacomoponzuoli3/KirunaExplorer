@@ -312,11 +312,11 @@ function DocumentsTable(props: any){
                 <table className="min-w-full bg-white border border-gray-200 shadow-lg rounded-lg table-auto">
                   <thead>
                     <tr className="bg-gray-200 text-gray-600">
-                      <th className="px-2 py-4 text-left text-sm font-semibold w-[5%]">Icon</th>
+                      <th className="px-2 py-4 text-left text-sm font-semibold w-[3%]">Icon</th>
                       <th className="px-2 py-4 text-center text-sm font-semibold w-[15%]">Title</th>
                       <th className="px-2 py-4 text-center text-sm font-semibold w-[15%]">Stakeholder(s)</th>
                       <th className="px-2 py-4 text-center text-sm font-semibold w-[5%]">Scale</th>
-                      <th className="px-2 py-4 text-center text-sm font-semibold w-[5%]">Pages</th>
+                      <th className="px-2 py-4 text-center text-sm font-semibold w-[7%]">Date</th>
                       <th className="px-2 py-4 text-center text-sm font-semibold w-[5%]">Language</th>
                       <th className="px-2 py-4 text-center text-sm font-semibold w-[25%]">Description</th>
                       <th className="px-2 py-4 text-center text-sm font-semibold w-[5%]">Links</th>
@@ -333,13 +333,13 @@ function DocumentsTable(props: any){
                           index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
                         }`}
                       >
-                        <td className="px-2 py-4 relative justify-center items-center w-[5%]">{props.getDocumentIcon(doc.type, 8)}</td>
+                        <td className="px-2 py-4 relative justify-center items-center w-[3%]">{props.getDocumentIcon(doc.type, 8)}</td>
                         <td className="px-2 py-4 text-sm text-gray-600 w-[15%] text-center">{doc.title}</td>
                         <td className="px-2 py-4 text-sm text-gray-600 w-[15%] text-center">
                           {doc.stakeHolders.map((sh) => sh.name).join(' / ')}
                         </td>
                         <td className="px-2 py-4 text-sm text-gray-600 w-[5%] text-center">{doc.scale}</td>
-                        <td className="px-2 py-4 text-sm text-gray-600 w-[5%] text-center">{doc.pages != null ? doc.pages : "-"}</td>
+                        <td className="px-2 py-4 text-sm text-gray-600 w-[7%] text-center">{doc.issuanceDate}</td>
                         <td className="px-2 py-4 text-sm text-gray-600 w-[5%] text-center">{doc.language != null ? doc.language : "-"}</td>
                         <td className="px-2 py-4 text-sm text-gray-600 w-[25%] text-center">
                           <TruncatedText
