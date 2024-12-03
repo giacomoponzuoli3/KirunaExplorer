@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1733237478155" clover="3.2.0">
-  <project timestamp="1733237478155" name="All files">
+<coverage generated="1733265370227" clover="3.2.0">
+  <project timestamp="1733265370227" name="All files">
     <metrics statements="861" coveredstatements="741" conditionals="177" coveredconditionals="134" methods="311" coveredmethods="264" elements="1349" coveredelements="1139" complexity="0" loc="861" ncloc="861" packages="8" files="34" classes="34"/>
     <package name="server">
       <metrics statements="14" coveredstatements="12" conditionals="1" coveredconditionals="0" methods="1" coveredmethods="0"/>
@@ -912,18 +912,18 @@
         <line num="249" count="1" type="stmt"/>
         <line num="251" count="1" type="stmt"/>
         <line num="256" count="4" type="stmt"/>
+        <line num="260" count="2" type="stmt"/>
+        <line num="261" count="2" type="stmt"/>
         <line num="262" count="2" type="stmt"/>
-        <line num="263" count="2" type="stmt"/>
-        <line num="264" count="2" type="stmt"/>
+        <line num="263" count="1" type="stmt"/>
         <line num="265" count="1" type="stmt"/>
-        <line num="267" count="1" type="stmt"/>
-        <line num="272" count="4" type="stmt"/>
-        <line num="280" count="2" type="stmt"/>
-        <line num="281" count="2" type="stmt"/>
-        <line num="282" count="1" type="stmt"/>
-        <line num="283" count="1" type="stmt"/>
-        <line num="285" count="0" type="stmt"/>
-        <line num="292" count="4" type="stmt"/>
+        <line num="270" count="4" type="stmt"/>
+        <line num="278" count="2" type="stmt"/>
+        <line num="279" count="2" type="stmt"/>
+        <line num="280" count="1" type="stmt"/>
+        <line num="281" count="1" type="stmt"/>
+        <line num="283" count="0" type="stmt"/>
+        <line num="290" count="4" type="stmt"/>
       </file>
       <file name="linkRoutes.ts" path="C:\Users\Korisnik\Desktop\SE2\KirunaExplorer\code\server\src\routers\linkRoutes.ts">
         <metrics statements="35" coveredstatements="15" conditionals="0" coveredconditionals="0" methods="15" coveredmethods="3"/>
