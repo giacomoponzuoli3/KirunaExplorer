@@ -378,7 +378,7 @@ function SetMapViewEdit(props: any) {
     map.addLayer(drawnItems); // Aggiungi il gruppo alla mappa
 
     //add the polygon or point of the current document only if selected "edit"
-    if (!(selectedButton === "edit" && documentCoordinates)) return;
+    if (!documentCoordinates) return;
 
     const latLngs = documentCoordinates.coordinates.map((coord: any) => [coord.latitude, coord.longitude]);
 
