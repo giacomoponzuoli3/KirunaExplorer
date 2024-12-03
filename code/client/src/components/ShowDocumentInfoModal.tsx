@@ -153,6 +153,12 @@ function ShowDocumentInfoModal({ geoJsonData, getDocumentIcon, selectedDocumentC
                     >
                         View connections
                     </button>
+                    <button 
+                        onClick={() => navigate(`documents/${selectedDocumentCoordinates.id}/resources`, { state: { from: "/documents" } })}
+                        className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium"
+                    >
+                        View resources
+                    </button>
                 </Modal.Footer>
             </Modal>
 
