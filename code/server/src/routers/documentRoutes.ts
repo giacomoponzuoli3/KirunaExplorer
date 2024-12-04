@@ -126,7 +126,7 @@ class DocumentRoutes {
             (req: any, res: any, next: any) => {
                 try {
                     this.controller.editDocument(
-                        req.params["id"],
+                        parseInt(req.params["id"], 10),
                         req.body["title"],
                         req.body["stakeHolders"],
                         req.body["scale"],
