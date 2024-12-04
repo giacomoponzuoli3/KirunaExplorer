@@ -2,10 +2,10 @@
 import { useState } from 'react';
 import { Container, Modal, Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { User } from '../models/user';
+import { User } from '../../../common_models/user';
 import API from '../API/API';
 import '../modal.css'
-import { TrashIcon, PencilIcon, MapIcon} from "@heroicons/react/24/outline";
+import { TrashIcon, PencilIcon} from "@heroicons/react/24/outline";
 import { DocCoordinates } from '../models/document_coordinate';
 import { useNavigate } from 'react-router-dom';
 import { ModalEditGeoreference } from './ModalEditGeoreference';

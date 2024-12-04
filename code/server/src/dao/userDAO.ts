@@ -1,5 +1,5 @@
 import db from "../db/db"
-import { User } from "../models/user"
+import { User } from "../../../common_models/user";
 import crypto from "crypto"
 import {UserAlreadyExistsError, UserNotFoundError} from "../errors/user";
 

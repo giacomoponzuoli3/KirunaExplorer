@@ -1,6 +1,5 @@
 import { ScaleController } from "../controllers/scaleController"
 import express, {Router} from "express"
-import {body} from "express-validator"
 import ErrorHandler from "../helper"
 import Scale from "../models/scale";
 import Authenticator from "./auth";

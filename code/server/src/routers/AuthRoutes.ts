@@ -1,7 +1,7 @@
 import express, { Router } from "express"
 import Authenticator from "./auth"
 import { body } from "express-validator"
-import {User } from "../models/user"
+import { User } from "../../../common_models/user";
 import UserController from "../controllers/userController"
 import ErrorHandler from "../helper"
 

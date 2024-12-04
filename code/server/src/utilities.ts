@@ -1,4 +1,5 @@
-import { User, Role } from "./models/user"
+import {User, Role} from "../../common_models/user";
+
 /**
  * Represents a utility class.
  */

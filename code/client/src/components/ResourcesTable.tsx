@@ -5,9 +5,8 @@ import API from "../API/API";
 import { TrashIcon, PlusIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon, DocumentIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import Alert from "./Alert";
 import ConfirmModal from './ConfirmModal';
-import { DocLink } from "../models/document_link";
 import { DocCoordinates } from "../models/document_coordinate";
-import Resources from "../models/original_resources";
+import Resources from "../../../common_models/original_resources";
 
 
 function ResourcesTable(props: any) {
@@ -119,7 +118,7 @@ function ResourcesTable(props: any) {
       
       if (files.length !== 0 && selectedDoc!=null) {
 
-        files.forEach(async (file) => {
+        for (const file of files) {
             // Step 1: Read the file content as a Uint8Array
             const fileData = await file.arrayBuffer(); // Convert to ArrayBuffer
             const uint8Array = new Uint8Array(fileData); // Convert to Uint8Array
@@ -139,17 +138,17 @@ function ResourcesTable(props: any) {
                     base64Data     // Pass the file data as base64 string
                 );
                 setMessageSucessful('File uploaded successfully!');
-    
+
                 // Clear the message after 3 seconds
                 setTimeout(() => {
                   setMessageSucessful('');
                 }, 3000);
-                getResources()
+                await getResources()
             } catch (error) {
                 console.error("Failed to upload file:", file.name, error);
             }
-        });
-        setShowModalAddResource(false);
+        }
+          setShowModalAddResource(false);
         setFiles([])
     }
       
@@ -405,7 +404,7 @@ function ResourcesTable(props: any) {
                                 <button
                                    onClick={(e) => {
                                       e.preventDefault();
-                                      handleDownload(resource.idDoc, resource.id, resource.name);
+                                      handleDownload(resource.idDoc, resource.id, resource.name).then();
                                     }}
                                    className="text-blue-500 cursor-pointer hover:text-blue-700"
                                   >
