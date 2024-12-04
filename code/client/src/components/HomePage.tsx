@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate} from 'react-router-dom';
 import API from '../API/API';
 import { Document } from "../models/document";
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -21,6 +21,7 @@ import { ShowDocumentInfoModal } from "./ShowDocumentInfoModal";
 import { EditDocumentModal } from "./EditDocumentModal";
 import { AddNewDocumentLinksModal } from "./AddNewDocumentLinksModal";
 import { SetMapViewHome } from "./Map";
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 //----------- Functions -------------//
 
@@ -65,6 +66,7 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
   const [newDocumentCoordinates,setNewDocumentCoordinates] = useState<LatLng | LatLng[] | null>(null);
   const [newDocument, setNewDocument] = useState<Document | null>(null);
   const [files, setFiles] = useState<File[]>([]);//Resources of newDocument
+  const navigate = useNavigate();
 
   //modals
   const [showDetails, setShowDetails] = useState<boolean>(false);
@@ -134,6 +136,17 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
         refreshDocumentsCoordinates={refreshDocumentsCoordinates}
       />
     )}
+
+    {/* Search Document Button */}
+    <button
+      className="fixed bottom-20 left-4 z-[999] bg-blue-950 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg"
+      onClick={() =>{
+        navigate(`/documents/-1`)
+      }}
+      title="Search on documents referred to the whole municipality"
+    >
+      <MagnifyingGlassIcon className="h-5 w-5" />
+    </button>   
                         
     {/* Add Document Button */}
     {user.role==="Urban Planner" ? (
