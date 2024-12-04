@@ -253,7 +253,7 @@ Update connection modal:
 Documents Page:
 ![Documents](./screenshots/DocumentUser.png "Documents")
 Documents Page: (urban planner)
-![Documents logged in](./screenshots/Document1.png "Documents logged in")
+![Documents logged in](./screenshots/Documents1.png "Documents logged in")
 
 Resources Page:
 ![Resources](./screenshots/Resources.png "Resources")
