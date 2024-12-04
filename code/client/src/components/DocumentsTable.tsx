@@ -223,6 +223,9 @@ function DocumentsTable(props: any){
     
       setFilteredDocuments(filtered); // Aggiorna lo stato dei documenti filtrati
 
+      setCurrentPage(1); // Resetta la paginazione alla prima pagina
+      setPaginatedLinks(filteredDocuments.slice(0, itemsPerPage)); // Aggiorna i documenti visualizzati
+
       // Reset dei filtri di ordine e tipo documento
       setSelectedOrder("none"); // Reset del filtro di ordine
       setSelectedValueTypeDocument("All Types"); // Reset del filtro di tipo documento
