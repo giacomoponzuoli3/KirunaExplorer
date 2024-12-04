@@ -250,6 +250,17 @@ New connection modal:
 Update connection modal:
 ![Update connection](./screenshots/UpdateConnection.png "Update connection")
 
+Documents Page:
+![Documents](./screenshots/DocumentUser.png "Documents")
+Documents Page: (urban planner)
+![Documents logged in](./screenshots/Document1.png "Documents logged in")
+
+Resources Page:
+![Resources](./screenshots/Resources.png "Resources")
+
+Add resources:
+![Add resources](./screenshots/AddResources.png "Add resources")
+
 ## Users credentials
 
 - Generic urban planner:
