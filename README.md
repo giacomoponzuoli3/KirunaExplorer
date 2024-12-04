@@ -215,6 +215,7 @@ Editing and submitting the form will call the API to update a link.
 
 Homepage:
 ![Homepage](./screenshots/Homepage.png "Homepage")
+![Homepage](./screenshots/HomePage1.png "Homepage")
 
 Document info:
 ![Document info](./screenshots/DocumentModal.png "Document info")
