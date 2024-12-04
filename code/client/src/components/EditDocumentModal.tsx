@@ -27,10 +27,13 @@ interface EditDocumentModalProps {
     show: boolean;
     onHide: () => void;
     refreshSelectedDocument: (doc: DocCoordinates) => void;
-    stakeholders: Stakeholder[]
+    stakeholders: Stakeholder[];
+    scaleOptions: { value: string; label: string }[];
+    //setScaleOptions: React.Dispatch<React.SetStateAction<{ value: string; label: string }[]>>;
+    onCreateScale: (inputValue: string) => Promise<void>;
 }
 
-function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, stakeholders }: EditDocumentModalProps) {
+function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, stakeholders, scaleOptions, onCreateScale }: EditDocumentModalProps) {
     const [title, setTitle] = useState(document.title);
     const [selectedStakeholders, setSelectedStakeholders] = useState<Stakeholder[]>(document.stakeHolders);
     const [scale, setScale] = useState(document.scale);
@@ -90,17 +93,35 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
       label: ISO6391.getName(code),
     }));
 
-    const scaleOptions = [
+    /**const scaleOptions = [
         { value: '1:1000', label: '1:1000' },
         { value: '1:2000', label: '1:2000' },
         { value: '1:5000', label: '1:5000' },
         { value: '1:7500', label: '1:7500' },
         { value: '1:10000', label: '1:10000' },
       ];
-  
+    */
+
+
     const handleScale = (selectedOption: SingleValue<{ value: string; label: string }>) => {
     setScale(selectedOption ? selectedOption.value : '');
     };
+
+    const typeOptions = [
+        { value: 'Informative document', label: 'Informative document' },
+        { value: 'Prescriptive document', label: 'Prescriptive document' },
+        { value: 'Design document', label: 'Design document' },
+        { value: 'Technical document', label: 'Technical document' },
+        { value: 'Material effect', label: 'Material effect' },
+        { value: 'Agreement', label: 'Agreement' },
+        { value: 'Conflict', label: 'Conflict' },
+        { value: 'Consultation', label: 'Consultation' },
+      ];
+    
+    const handleType = (selectedOption: SingleValue<{ value: string; label: string }>) => {
+    setType(selectedOption ? selectedOption.value : '');
+    };
+
     
     return (
         <Modal size="xl" show={show} onHide={onHide} aria-labelledby="example-modal-sizes-title-lg">
@@ -180,8 +201,9 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                                     options={scaleOptions}
                                     value={scale ? { value: scale, label: scale } : null}
                                     onChange={handleScale}
+                                    onCreateOption={onCreateScale}
                                     placeholder="Select or type a scale..."
-                                    formatCreateLabel={(inputValue) => `Use custom scale: "${inputValue}"`}
+                                    formatCreateLabel={(inputValue) => `Add a new scale: "${inputValue}"`}
                                     styles={{
                                         control: (base) => ({
                                         ...base,
@@ -197,33 +219,21 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                                         <label htmlFor="formIssuanceDate" className="w-1/3 font-medium">
                                             <RequiredLabel text="Type of document" />
                                         </label>
-                                        <Dropdown className='w-2/3'>
-                                            <Dropdown.Toggle
-                                                id="dropdown-button-dark-example1"
-                                                className="custom-dropdown-toggle"
-                                            >
-                                                {type ? type : <RequiredLabel text="Choose a type" />}
-                                            </Dropdown.Toggle>
-                                            <Dropdown.Menu className="w-full">
-                                                {[
-                                                'Informative document',
-                                                'Prescriptive document',
-                                                'Design document',
-                                                'Technical document',
-                                                'Material effect',
-                                                'Agreement',
-                                                'Conflict',
-                                                'Consultation',
-                                                ].map((option, index) => (
-                                                <Dropdown.Item
-                                                    key={index}
-                                                    onClick={() => setType(option)}
-                                                >
-                                                    {option}
-                                                </Dropdown.Item>
-                                                ))}
-                                            </Dropdown.Menu>
-                                        </Dropdown>
+                                        <CreatableSelect
+                                            isClearable
+                                            options={typeOptions}
+                                            value={type ? { value: type, label: type } : null}
+                                            onChange={handleType}
+                                            placeholder="Select or type a type..."
+                                            formatCreateLabel={(inputValue) => `Use custom type: "${inputValue}"`}
+                                            styles={{
+                                                control: (base) => ({
+                                                ...base,
+                                                minWidth: '300px',
+                                                borderColor: 'rgba(0, 0, 0, 0.2)',
+                                                }),
+                                            }}
+                                        />
                                     </div>
                                 </div>
                             </div>
