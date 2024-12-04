@@ -226,6 +226,7 @@ function DocumentsTable(props: any){
       // Reset dei filtri di ordine e tipo documento
       setSelectedOrder("none"); // Reset del filtro di ordine
       setSelectedValueTypeDocument("All Types"); // Reset del filtro di tipo documento
+      setSearchTerm('');
       setSortOrder("asc"); // Imposta l'ordine di default (A-Z)
       setIsDropdownOpen(false); // Chiude il dropdown di ordinamento
       setIsOpenTypeDocument(false); // Chiude il dropdown del tipo documento
@@ -238,6 +239,7 @@ function DocumentsTable(props: any){
       setIsOpenTypeDocument(false); // Chiude il dropdown dopo la selezione
       setStartDate('');
       setEndDate('');
+      setSearchTerm('');
     };
 
     // Funzione per il filtro per tipo documento
