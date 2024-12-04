@@ -1,4 +1,4 @@
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { Document } from "../models/document";
 import API from "../API/API";
@@ -346,7 +346,7 @@ function LinksDocument(props: any) {
                     refreshLinks={refreshLinks}
                   />
 
-                  {document !== null && documentToUpdate !== null && showModalEditLink &&<EditLinkModal
+                  {documentToUpdate !== null && showModalEditLink &&<EditLinkModal
                     show={showModalEditLink}
                     onHide={() => setShowModalEditLink(false)}
 

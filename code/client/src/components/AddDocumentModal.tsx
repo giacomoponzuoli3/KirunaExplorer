@@ -1,20 +1,14 @@
-import React, { useState,useEffect } from 'react';
-import { Container, Modal, Row, Col, Form, Button, Dropdown, ListGroup } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Modal, Dropdown } from 'react-bootstrap';
 import { Document } from '../models/document';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { User } from '../models/user';
 import API from '../API/API';
 import { Stakeholder } from '../models/stakeholder';
-import { DocLink } from '../models/document_link';
 import '../modal.css'
-import { TrashIcon, PencilIcon,ChevronLeftIcon,ChevronRightIcon, DocumentIcon } from "@heroicons/react/24/outline";
-import Link from '../models/link'; 
+import { TrashIcon, DocumentIcon } from "@heroicons/react/24/outline";
 import Alert from "./Alert";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import Select from 'react-select';
 import ISO6391 from 'iso-639-1';  // Utilizziamo ISO 639-1 per ottenere le lingue
-import { DocCoordinates } from '../models/document_coordinate';
 import CreatableSelect from 'react-select/creatable';
 import { SingleValue } from 'react-select';
 import Scale from "../models/scale"
@@ -101,10 +95,21 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const fileList = event.target.files; // HTMLInputElement.files can be FileList or null
+      //validation for uploadedfile
       if (fileList) {
-        setFiles((prevFiles) =>  [...prevFiles, ...Array.from(fileList)]);
+       const oversizedFiles = Array.from(fileList).filter(file => file.size > 50 * 1024 * 1024); // 50 MB //validation for size
+       const notOversizedFiles = Array.from(fileList).filter(file => file.size < 50 * 1024 * 1024);
+       if (oversizedFiles.length > 0) {
+        setAlertMessage(
+          `The following files exceed 50 MB: ${oversizedFiles
+            .map(file => file.name)
+            .join(', ')}`
+        );
+        setShowAlert(true);
+       }
+        setFiles((prevFiles) =>  [...prevFiles, ...notOversizedFiles]);
+      }
       
-    }
       event.target.value = '';
     };
 
@@ -112,6 +117,13 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
       setFiles((prevFiles) => 
         prevFiles.filter((_, i) => i !== index)
       );
+    };
+
+    const truncateFileName = (fileName: string, maxLength = 35) => {
+      if (fileName.length > maxLength) {
+        return fileName.substring(0, maxLength) + '...';
+      }
+      return fileName;
     };
   
     const handleSubmit = async () => {
@@ -149,6 +161,17 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
           setShowAlert(true);
           return; // Exit the function early if the range is invalid
         }
+      }
+
+     
+      const fileNames = files.map(file => file.name);//validation for duplication file name
+      const duplicates = fileNames.filter((name, index) => fileNames.indexOf(name) !== index);
+      if (duplicates.length > 0) {
+        setAlertMessage(
+          `Duplicate file names detected: ${[...new Set(duplicates)].join(', ')}. Please remove duplicates.`
+        );
+        setShowAlert(true);
+        return; // Exit early
       }
 
       refreshDocuments();
@@ -436,7 +459,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                                           <div className="flex items-center space-x-2">
                                               <DocumentIcon className="h-6 w-6 text-blue-500" />
                                               <span className="font-medium text-gray-800 truncate">
-                                                  {file.name} ({(file.size / 1024).toFixed(2)} KB)
+                                                  {truncateFileName(file.name,30)} ({(file.size / 1024).toFixed(2)} KB)
                                               </span>
                                           </div>
 

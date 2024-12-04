@@ -248,8 +248,7 @@ async function addResourceToDocument(idDoc: number, name: string, data: string) 
         if (responseText) {
             try {
                 // Prova a convertire la risposta in JSON
-                const responseBody = JSON.parse(responseText);
-                return responseBody;
+                return JSON.parse(responseText);
             } catch (error) {
                 console.error('Failed to parse JSON:', error);
                 throw new Error('Server returned an invalid JSON response.');
@@ -264,8 +263,22 @@ async function addResourceToDocument(idDoc: number, name: string, data: string) 
 }
 
 
-async function getResourceData(idDoc: number) {
-    const response = await fetch(baseURL + "doc/res/" + idDoc, { credentials: "include" })
+async function getResourceData(idDoc: number, idRes: number) {
+    const response = await fetch(baseURL + "doc/res/" + idDoc + "/" + idRes, { credentials: "include" })
+    if (response.ok) {
+        return await response.json()
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+
+async function getAllResourcesData(idDoc: number) {
+    const response = await fetch(baseURL + "doc/res-all/" + idDoc , { credentials: "include" })
     if (response.ok) {
         return await response.json()
     } else {
@@ -401,7 +414,6 @@ async function getAllDocumentsCoordinates() {
 }
 
 async function setDocumentCoordinates(idDoc: number, coordinates: LatLng|LatLng[]) {
-    console.log("coordinates " + coordinates)
     const response = await fetch(baseURL + "coordinates", { 
         method: 'POST', 
         credentials: "include", 
@@ -411,7 +423,6 @@ async function setDocumentCoordinates(idDoc: number, coordinates: LatLng|LatLng[
             coordinates: coordinates,
         }) 
     })
-    console.log("fetch");
     if (response.ok) {
         return 
     } else {
@@ -522,7 +533,7 @@ async function addScale(scale: string) {
 
 const API = {
     login, logOut, getUserInfo, register,
-    addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType, addResourceToDocument, getResourceData, deleteResource,
+    addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType, addResourceToDocument, getResourceData, deleteResource, getAllResourcesData,
     getAllStakeholders, addStakeholder,
     addLink, deleteLink, editLink, getAllLinks,
     getAllDocumentsCoordinates, setDocumentCoordinates, updateDocumentCoordinates, deleteDocumentCoordinates, getMunicipalityArea,

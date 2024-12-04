@@ -2,6 +2,7 @@ import { Document } from "../models/document";
 import { DocumentDAO } from "../dao/documentDAO";
 import { DocLink } from "../models/document_link";
 import { Stakeholder } from "../models/stakeholder";
+import Resources from "../models/original_resources";
 
 class DocumentController {
     private dao: DocumentDAO;
@@ -134,10 +135,20 @@ class DocumentController {
     /**
      * Retrieves the resource data associated with the specified document from the database.
      * @param documentId The id of the document whose resource data is to be retrieved.
+     * @param resourceId The id of the resource to retrieve.
      * @returns A Promise that resolves to the resource data associated with the document.
      */
-    getResourceData(documentId: number): Promise<Uint8Array> {
-        return this.dao.getResourceData(documentId);
+    getResourceData(documentId: number, resourceId: number): Promise<Uint8Array> {
+        return this.dao.getResourceData(documentId, resourceId);
+    }
+
+    /**
+     * Retrieves all resources associated with a document from the database.
+     * @param documentId The id of the document whose resources are to be retrieved.
+     * @returns A Promise that resolves to an array of Resources objects.
+     */
+    getAllResourcesData(documentId: number): Promise<Resources[]> {
+        return this.dao.getAllResourcesData(documentId);
     }
 
     /**

@@ -5,6 +5,8 @@ import { Document } from "../../src/models/document"
 import { Stakeholder } from "../../src/models/stakeholder"
 import { DocLink } from "../../src/models/document_link"
 import Link from "../../src/models/link"
+import { DocumentNotFoundError } from "../../src/errors/document"
+import Resources from "../../src/models/original_resources"
 
 jest.mock("../../src/dao/documentDAO");
 
@@ -17,11 +19,17 @@ describe('documentController', () => {
     const dao = DocumentDAO.prototype;
     const controller = new DocumentController();
     const testId = 1;
+    const resourceId = 2;
     const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
     const testStakeholder2 = new Stakeholder(2, "Bob", "urban developer");
     const testDocument = new Document(testId, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
     const testDocument2 = new Document(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2");
     const testDocument3 = new Document(3, "title 3", [testStakeholder2], "1:1", "2020-10-10", "Material effect", "English", "300", "description 3");
+    const mockResourceData = new Uint8Array([1, 2, 3, 4]);
+    const mockResources: Resources[] = [
+        { id: 1, idDoc: 1, data: null, name: 'Resource 1', uploadTime: new Date('2024-12-01T12:00:00Z') },
+        { id: 2, idDoc: 1, data: null, name: 'Resource 2', uploadTime: new Date('2024-12-02T12:00:00Z') },
+    ];
 
     describe('addDocument', () => {
         test('It should successfully add a document', async () => {
@@ -117,9 +125,9 @@ describe('documentController', () => {
 
         });
 
-        test('It should reject if there is no documents', async () => {
-            jest.spyOn(dao, 'getAllDocuments').mockRejectedValue(`No documents found.`)
-            await expect(controller.getAllDocuments()).rejects.toEqual(`No documents found.`);
+        test('It should return an empty array if there is no documents', async () => {
+            jest.spyOn(dao, 'getAllDocuments').mockResolvedValue([])
+            await expect(controller.getAllDocuments()).resolves.toEqual([]);
 
             expect(dao.getAllDocuments).toBeCalledWith();
         });
@@ -265,10 +273,10 @@ describe('documentController', () => {
             
         });
 
-        test("It should reject if there is a no document", async () => {
-            jest.spyOn(dao, 'getDocumentLinksById').mockRejectedValue("Document not found.");
+        test("It should return an empty array if there is a no document", async () => {
+            jest.spyOn(dao, 'getDocumentLinksById').mockResolvedValue([]);
 
-            await expect(controller.getDocumentLinksById(testId)).rejects.toEqual("Document not found.");
+            await expect(controller.getDocumentLinksById(testId)).resolves.toEqual([]);
             expect(dao.getDocumentLinksById).toBeCalledWith(testId);
 
         });
@@ -442,22 +450,113 @@ describe('documentController', () => {
         test("It should adds a resource to the specified document in the database", async () => {
             jest.spyOn(dao, 'addResourceToDocument').mockResolvedValue(undefined);
 
-            await expect(controller.addResourceToDocument(1,"title",new Uint8Array([10,10,20]))).resolves.toBeUndefined();
-            expect(dao.addResourceToDocument).toBeCalledWith(1,"title",new Uint8Array([10,10,20]));
+            await expect(controller.addResourceToDocument(1,"title","2020-10-10")).resolves.toBeUndefined();
+            expect(dao.addResourceToDocument).toBeCalledWith(1,"title","2020-10-10");
         });
 
         test('It should reject if there is a database error', async () => {
             jest.spyOn(dao, 'addResourceToDocument').mockRejectedValue("Database error");
 
-            await expect(controller.addResourceToDocument(1,"title",new Uint8Array([10,10,20]))).rejects.toEqual("Database error");
-            expect(dao.addResourceToDocument).toBeCalledWith(1,"title",new Uint8Array([10,10,20]));
+            await expect(controller.addResourceToDocument(1,"title","2020-10-10")).rejects.toEqual("Database error");
+            expect(dao.addResourceToDocument).toBeCalledWith(1,"title","2020-10-10");
         });
 
         test('It should reject with error if an unexpected error occurs', async () => {
             jest.spyOn(dao, 'addResourceToDocument').mockRejectedValue("Unexpected error");
 
-            await expect(controller.addResourceToDocument(1,"title",new Uint8Array([10,10,20]))).rejects.toEqual("Unexpected error");
-            expect(dao.addResourceToDocument).toBeCalledWith(1,"title",new Uint8Array([10,10,20]));
+            await expect(controller.addResourceToDocument(1,"title","2020-10-10")).rejects.toEqual("Unexpected error");
+            expect(dao.addResourceToDocument).toBeCalledWith(1,"title","2020-10-10");
+        });
+    });
+
+    describe('getResourceData', () => {
+        test('should return resource data when the DAO resolves successfully', async () => {
+            jest.spyOn(dao, 'getResourceData').mockResolvedValue(mockResourceData);
+
+            const result = await controller.getResourceData(testId, resourceId);
+
+            expect(result).toEqual(mockResourceData);
+            expect(dao.getResourceData).toHaveBeenCalledWith(testId, resourceId);
+        });
+
+        test('should throw an error when the Document is not found', async () => {
+            const mockError = new DocumentNotFoundError();
+            jest.spyOn(dao, 'getResourceData').mockRejectedValue(mockError);
+
+            await expect(controller.getResourceData(testId, resourceId)).rejects.toThrow(DocumentNotFoundError);
+            expect(dao.getResourceData).toHaveBeenCalledWith(testId, resourceId);
+        });
+
+        test('should throw an Database error', async () => {
+            const mockError = new Error('Database error');
+            jest.spyOn(dao, 'getResourceData').mockRejectedValue(mockError);
+
+            await expect(controller.getResourceData(testId, resourceId)).rejects.toThrow('Database error');
+            expect(dao.getResourceData).toHaveBeenCalledWith(testId, resourceId);
+        });
+
+        test('should throw an Unexpected error', async () => {
+            const mockError = new Error('Unexpected error');
+            jest.spyOn(dao, 'getResourceData').mockRejectedValue(mockError);
+
+            await expect(controller.getResourceData(testId, resourceId)).rejects.toThrow('Unexpected error');
+            expect(dao.getResourceData).toHaveBeenCalledWith(testId, resourceId);
+        });
+    });
+
+    describe('getAllResourcesData', () => {
+        test('should return all resources when the DAO resolves successfully', async () => {
+            jest.spyOn(dao, 'getAllResourcesData').mockResolvedValue(mockResources);
+
+            const result = await controller.getAllResourcesData(testId);
+
+            expect(result).toEqual(mockResources);
+            expect(dao.getAllResourcesData).toHaveBeenCalledWith(testId);
+        });
+
+        test('should return an empty array when no resources are found', async () => {
+            jest.spyOn(dao, 'getAllResourcesData').mockResolvedValue([]);
+
+            const result = await controller.getAllResourcesData(testId);
+
+            expect(result).toEqual([]);
+            expect(dao.getAllResourcesData).toHaveBeenCalledWith(testId);
+        });
+
+        test('should throw an error when the DAO rejects', async () => {
+            const mockError = new Error('Database error');
+            jest.spyOn(dao, 'getAllResourcesData').mockRejectedValue(mockError);
+
+            await expect(controller.getAllResourcesData(testId)).rejects.toThrow('Database error');
+            expect(dao.getAllResourcesData).toHaveBeenCalledWith(testId);
+        });
+
+        test('should throw an Unexpected error', async () => {
+            const mockError = new Error('Unexpected error');
+            jest.spyOn(dao, 'getAllResourcesData').mockRejectedValue(mockError);
+
+            await expect(controller.getAllResourcesData(testId)).rejects.toThrow('Unexpected error');
+            expect(dao.getAllResourcesData).toHaveBeenCalledWith(testId);
+        });
+
+    });
+
+    describe('deleteResource', () => {
+        test('should resolve when the DAO successfully deletes the resource', async () => {
+            jest.spyOn(dao, 'deleteResource').mockResolvedValue();
+
+            await expect(controller.deleteResource(testId, "Resource 1")).resolves.not.toThrow();
+
+            expect(dao.deleteResource).toHaveBeenCalledWith(testId, "Resource 1");
+        });
+
+        test('should throw an error when the DAO rejects', async () => {
+            const mockError = new Error('Database error');
+            jest.spyOn(dao, 'deleteResource').mockRejectedValue(mockError);
+
+            await expect(controller.deleteResource(testId, "Resource 1")).rejects.toThrow('Database error');
+
+            expect(dao.deleteResource).toHaveBeenCalledWith(testId, "Resource 1");
         });
     });
 });

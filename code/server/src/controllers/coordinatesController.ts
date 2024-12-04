@@ -33,7 +33,7 @@ class CoordinatesController {
      * @param coords the array of the new coordinates
      * @return A Promise that resolves when the coordinates have been updated
      */
-    updateDocumentCoordinates(id_document: number, coords: LatLng|LatLng[], useMunicipalArea: number): Promise<void> {
+    updateDocumentCoordinates(id_document: number, coords: LatLng|LatLng[]): Promise<void> {
         return this.dao.updateDocumentCoordinates(id_document, coords);
     }
 
