@@ -11,6 +11,7 @@ import { Database } from "sqlite3";
 import { cleanup } from "../../src/db/cleanup";
 import { setup } from "../../src/db/setup";
 import { DocumentNotFoundError } from "../../src/errors/document";
+import Resources from "../../src/models/original_resources";
 
 describe('documentController/documentDAO Integration tests', () => {
 
@@ -66,6 +67,11 @@ describe('documentController/documentDAO Integration tests', () => {
     const testNewDocument = new Document(testId, "new title", [testStakeholder2], "1:1", "2020-10-10", "Informative document", "Italian", "300", "new description");
     const testDocument2 = new Document(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2");
     const testDocLink = new DocLink(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2", testLink);
+    const mockResourceData =  Buffer.from("data", 'base64')
+    const mockResources: Resources[] = [
+        { id: 1, idDoc: 1, data: null, name: 'Resource 1', uploadTime: new Date() },
+        { id: 2, idDoc: 1, data: null, name: 'Resource 2', uploadTime: new Date() },
+    ];
 
     describe('addDocument', () => {
         test('It should successfully add a document', async () => {
@@ -367,7 +373,7 @@ describe('documentController/documentDAO Integration tests', () => {
         test("It should adds a resource to the specified document in the database", async () => {
             await expect(controller.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
 
-            await expect(controller.addResourceToDocument(1, "title", "2020-10-10")).resolves.toBeUndefined();
+            await expect(controller.addResourceToDocument(1, "title", "data")).resolves.toBeUndefined();
 
         });
 
@@ -377,12 +383,98 @@ describe('documentController/documentDAO Integration tests', () => {
                 return {} as Database;
             });
 
-            await expect(controller.addResourceToDocument(1, "title", "2020-10-10")).rejects.toThrow(`Database error`);
+            await expect(controller.addResourceToDocument(1, "title", "data")).rejects.toThrow(`Database error`);
 
             dbSpy.mockRestore();
         });
 
 
+    });
+
+    describe('getResourceData', () => {
+        test('should return resource data when the DAO resolves successfully', async () => {
+
+            await expect(controller.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await expect(controller.addResourceToDocument(1, "title", "data")).resolves.toBeUndefined();
+
+            await expect(controller.getResourceData(testId,1)).resolves.toEqual(mockResourceData);
+        
+        });
+
+        test('should throw an error when the Document is not found', async () => {
+            
+            await expect(controller.getResourceData(testId, 1)).rejects.toThrow(DocumentNotFoundError);
+           
+        });
+
+        test('should throw an Database error', async () => {
+            const dbSpy = jest.spyOn(db, 'get').mockImplementation(function (sql, params, callback) {
+                callback(new Error('Database error'), null);
+                return {} as Database;
+            });
+
+            await expect(controller.getResourceData(testId,1)).rejects.toThrow(`Database error`);
+
+            dbSpy.mockRestore();
+        });
+
+    });
+
+    describe('getAllResourcesData', () => {
+        test('should return all resources when the DAO resolves successfully', async () => {
+         
+            await expect(controller.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await expect(controller.addResourceToDocument(1, "Resource 1", "data")).resolves.toBeUndefined();
+
+            await expect(controller.addResourceToDocument(1, "Resource 2", "data")).resolves.toBeUndefined();
+
+            await expect(controller.getAllResourcesData(testId)).resolves.toEqual(mockResources);
+
+        });
+
+        test('should return an empty array when no resources are found', async () => {
+           
+            await expect(controller.getAllResourcesData(testId)).resolves.toEqual([]);
+
+        });
+
+        test("It should reject if there is a database error", async () => {
+            const dbSpy = jest.spyOn(db, 'all').mockImplementation(function (sql, params, callback) {
+                callback(new Error('Database error'), null);
+                return {} as Database;
+            });
+
+            await expect(controller.getAllResourcesData(testId)).rejects.toThrow(`Database error`);
+
+            dbSpy.mockRestore();
+        });
+
+    });
+
+    describe('deleteResource', () => {
+        test('should resolve when the DAO successfully deletes the resource', async () => {
+            await expect(controller.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await expect(controller.addResourceToDocument(1, "Resource 1", "data")).resolves.toBeUndefined();
+
+            await expect(controller.deleteResource(1, "Resource 1")).resolves.toBeUndefined();
+
+            await expect(controller.getAllResourcesData(testId)).resolves.toEqual([]);
+        });
+
+       
+        test("It should reject if there is a database error", async () => {
+            const dbSpy = jest.spyOn(db, 'run').mockImplementation(function (sql, params, callback) {
+                callback(new Error('Database error'), null);
+                return {} as Database;
+            });
+
+            await expect(controller.deleteResource(testId,"Resource 1")).rejects.toThrow(`Database error`);
+
+            dbSpy.mockRestore();
+        });
     });
 
 });

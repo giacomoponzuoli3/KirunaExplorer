@@ -12,6 +12,7 @@ import { setup } from "../../src/db/setup";
 import { app } from "../../index";
 import request from 'supertest';
 import { Role } from "../../src/models/user"
+import Resources from "../../src/models/original_resources";
 
 const baseURL = "/kiruna/doc"
 
@@ -29,6 +30,11 @@ describe('documentRoutes/documentController Integration tests', () => {
     const testNewDocument = new Document(testId, "new title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "new description");
     const testDocument2 = new Document(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2");
     const testDocLink = new DocLink(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2", testLink);
+    const mockResourceData =  Buffer.from("data", 'base64')
+    const mockResources: Resources[] = [
+        { id: 1, idDoc: 1, data: null, name: 'Resource 1', uploadTime: new Date() },
+        { id: 2, idDoc: 1, data: null, name: 'Resource 2', uploadTime: new Date() },
+    ];
 
     // Helper function that logs in a user and returns the cookie
     // Can be used to log in a user before the tests or in the tests
@@ -892,7 +898,6 @@ describe('documentRoutes/documentController Integration tests', () => {
 
             const cookie = await login(testResident);
 
-
             const response = await request(app).patch(baseURL + `/${testId}`)
                 .send({
                     title: "new title",
@@ -1304,6 +1309,176 @@ describe('documentRoutes/documentController Integration tests', () => {
                     name: "title",
                     data: date
                 }).set("Cookie", cookie).expect(503);
+
+            expect(response.body.error).toBe('Internal Server Error');
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+
+            dbSpy.mockRestore();
+        });
+    });
+
+    describe('GET /res/:idDoc/:idRes', () => {
+
+        test('It should get a specific resource to a document and return 200 status', async () => {
+
+            await expect(controller.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await expect(controller.addResourceToDocument(1, "Resource 1", "data")).resolves.toBeUndefined();
+
+            const response = await request(app).get(baseURL + '/res/1/1')
+ 
+            expect(response.status).toBe(200);
+
+            expect(Buffer.from(response.body.data)).toEqual(Buffer.from(mockResourceData));
+        });
+
+        test('It should return 422 status if the parms are missing', async () => {
+            const response = await request(app).get(baseURL+"/res")
+            expect(response.status).toBe(422); 
+
+        });
+
+        test('It should return 422 status if docId is not numeric', async () => {
+            const response = await request(app).get(baseURL+"/res/test/2")
+            expect(response.status).toBe(422); 
+  
+        });
+
+        test('It should return 422 status if resId is not a number', async () => {
+            const response = await request(app).get(baseURL+"/res/1/test")
+            expect(response.status).toBe(422); 
+
+        });
+
+        test('It should return 503 if there is an error', async () => {
+
+            const dbSpy = jest.spyOn(db, 'get').mockImplementation(function (sql, params, callback) {
+                callback(new Error('Database error'), null);
+                return {} as Database;
+            });
+
+            const response = await request(app).get(baseURL + '/res/1/2')
+
+            expect(response.status).toBe(503);
+            expect(response.body.error).toBe('Internal Server Error');
+
+            dbSpy.mockRestore();
+        });
+    });
+
+    describe('GET /res-all/:idDoc', () => {
+
+        test('It should get a all resources related to a document and return 200 status', async () => {
+
+            await expect(controller.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await expect(controller.addResourceToDocument(1, "Resource 1", "data")).resolves.toBeUndefined();
+
+            await expect(controller.addResourceToDocument(1, "Resource 2", "data")).resolves.toBeUndefined();
+
+            const response = await request(app).get(baseURL + '/res-all/1');
+ 
+            expect(response.status).toBe(200);
+
+            expect(response.body).toEqual(mockResources);
+
+        });
+
+        test('It should return 422 status if the docId is missing', async () => {
+            const response = await request(app).get(baseURL+"/res-all/")
+            expect(response.status).toBe(422); 
+ 
+        });
+
+        test('It should return 422 status if docId is not numeric', async () => {
+            const response = await request(app).get(baseURL+"/res-all/test")
+            expect(response.status).toBe(422); 
+    
+        });
+
+        test('It should return 503 if there is an error', async () => {
+
+            const dbSpy = jest.spyOn(db, 'all').mockImplementation(function (sql, params, callback) {
+                callback(new Error('Database error'), null);
+                return {} as Database;
+            });
+
+            const response = await request(app).get(baseURL + '/res-all/1')
+
+            expect(response.status).toBe(503);
+            expect(response.body.error).toBe('Internal Server Error');
+
+            dbSpy.mockRestore();
+        });
+    });
+
+    describe('DELETE /res/:idDoc/:name', () => {
+
+        test('It should delete a resources and return 200 status', async () => {
+            const cookie = await login(testUrbanPlanner);
+
+            jest.spyOn(controller, "deleteResource").mockResolvedValueOnce();
+
+            const response = await request(app).delete(baseURL + '/res/1/testName').set("Cookie", cookie).expect(200);
+
+            expect(response.body).toEqual({ message: 'Document deleted successfully' });
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+        });
+
+        test('It should return 422 status if docId is not numeric', async () => {
+            const cookie = await login(testUrbanPlanner);
+
+            await request(app).delete(baseURL + '/res/test/testName').set("Cookie", cookie).expect(422);
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+
+        });
+        
+
+        test('It should return 422 status if both of the parms are missing', async () => {
+            const cookie = await login(testUrbanPlanner);
+
+            await request(app).delete(baseURL + '/res').set("Cookie", cookie).expect(422);
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+
+        });
+
+        test('It should return 401 status if the user is not logged in', async () => {
+
+            const response = await request(app).delete(baseURL + '/res/1/testName')
+ 
+            expect(response.status).toBe(401);
+            expect(response.body.error).toBe('Unauthenticated user');
+        });
+
+        
+        test('It should return 403 status if the user is not an urban planner', async () => {
+            
+            const cookie = await login(testResident);
+
+            jest.spyOn(controller, "deleteResource").mockResolvedValueOnce();
+
+            const response = await request(app).delete(baseURL + '/res/1/testName').set("Cookie", cookie).expect(403);
+
+            expect(response.body.error).toBe('User is not an urban planner');
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+
+        });
+
+        test('It should return 503 if there is an error', async () => {
+
+            const cookie = await login(testUrbanPlanner);
+
+            const dbSpy = jest.spyOn(db, 'run').mockImplementation(function (sql, params, callback) {
+                callback(new Error('Database error'), null);
+                return {} as Database;
+            });
+
+            const response = await request(app).delete(baseURL + '/res/1/testName').set("Cookie", cookie).expect(503);
 
             expect(response.body.error).toBe('Internal Server Error');
 
