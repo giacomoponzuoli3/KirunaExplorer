@@ -242,7 +242,7 @@ Edit document modal:
 ![Edit document](./screenshots/EditDocumentModal.png "Edit document")
 
 Edit document geo-referencing modal:
-![Edit document geo-referencing](./screenshots/UpdateGeoreferencing.png "Edit document geo-referencing")
+![Edit document geo-referencing](./screenshots/EditGeorefrenceModal1.png "Edit document geo-referencing")
 
 New connection modal:
 ![New connection](./screenshots/NewConnectionModal.png "New connection")
