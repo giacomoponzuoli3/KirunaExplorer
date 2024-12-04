@@ -11,7 +11,7 @@ import { Database } from "sqlite3";
 import { cleanup } from "../../src/db/cleanup";
 import { setup } from "../../src/db/setup";
 import { DocumentNotFoundError } from "../../src/errors/document";
-import Resources from "../../src/models/original_resources";
+import Resources from "../../../common_models/original_resources";
 
 describe('documentController/documentDAO Integration tests', () => {
 
