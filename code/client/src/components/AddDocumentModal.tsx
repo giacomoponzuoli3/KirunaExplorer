@@ -194,6 +194,17 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
       { value: '1:10000', label: '1:10000' },
     ];*/
 
+    const typeOptions = [
+      { value: 'Informative document', label: 'Informative document' },
+      { value: 'Prescriptive document', label: 'Prescriptive document' },
+      { value: 'Design document', label: 'Design document' },
+      { value: 'Technical document', label: 'Technical document' },
+      { value: 'Material effect', label: 'Material effect' },
+      { value: 'Agreement', label: 'Agreement' },
+      { value: 'Conflict', label: 'Conflict' },
+      { value: 'Consultation', label: 'Consultation' },
+    ];
+
 
     
 
@@ -201,7 +212,9 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
       setScale(selectedOption ? selectedOption.value : '');
     };
 
-
+    const handleType = (selectedOption: SingleValue<{ value: string; label: string }>) => {
+      setType(selectedOption ? selectedOption.value : '');
+    };
 
     return (
       <Modal size="xl" show={show} onHide={handleClose} aria-labelledby="example-modal-sizes-title-lg">
@@ -286,33 +299,21 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                     <label htmlFor="formIssuanceDate" className="w-1/3 font-medium">
                         <RequiredLabel text="Type of document" />
                     </label>
-                    <Dropdown className='w-2/3'>
-                    <Dropdown.Toggle
-                      id="dropdown-button-dark-example1"
-                      className="custom-dropdown-toggle"
-                    >
-                      {type ? type : <RequiredLabel text="Choose a type" />}
-                    </Dropdown.Toggle>
-                        <Dropdown.Menu className="w-full">
-                            {[
-                            'Informative document',
-                            'Prescriptive document',
-                            'Design document',
-                            'Technical document',
-                            'Material effect',
-                            'Agreement',
-                            'Conflict',
-                            'Consultation',
-                            ].map((option, index) => (
-                            <Dropdown.Item
-                                key={index}
-                                onClick={() => setType(option)}
-                            >
-                                {option}
-                            </Dropdown.Item>
-                            ))}
-                        </Dropdown.Menu>
-                    </Dropdown>
+                    <CreatableSelect
+                      isClearable
+                      options={typeOptions}
+                      value={type ? { value: type, label: type } : null}
+                      onChange={handleType}
+                      placeholder="Select or type a type..."
+                      formatCreateLabel={(inputValue) => `Use custom type: "${inputValue}"`}
+                      styles={{
+                        control: (base) => ({
+                          ...base,
+                          minWidth: '300px',
+                          borderColor: 'rgba(0, 0, 0, 0.2)',
+                        }),
+                      }}
+                    />
                   </div>
                 </div>
               </div>
