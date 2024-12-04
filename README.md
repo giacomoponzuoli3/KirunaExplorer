@@ -223,6 +223,8 @@ Document info: (urban planner)
 
 Connections:
 ![Connections](./screenshots/Connections.png "Connections")
+Connections: (urban planner)
+![Connections](./screenshots/ConnectionIsLogged.png "Connections logged in")
 
 Login page:
 ![Login page](./screenshots/Login.png "Login page")
