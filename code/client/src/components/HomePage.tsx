@@ -49,13 +49,16 @@ interface HomepageProps {
     refreshDocumentsCoordinates: () => void;
     getDocumentIcon: (type: string) => JSX.Element | null;
     stakeholders: Stakeholder[];
-    geoJsonData: any
+    geoJsonData: any;
+    scaleOptions: { value: string; label: string }[];
+    //setScaleOptions: React.Dispatch<React.SetStateAction<{ value: string; label: string }[]>>;
+    onCreateScale: (inputValue: string) => Promise<void>;
 }
 
 
 //----------- Components -------------//
 
-function HomePage({documentsCoordinates, documents, user, refreshDocuments, refreshDocumentsCoordinates, getDocumentIcon, stakeholders, geoJsonData} : HomepageProps) {
+function HomePage({documentsCoordinates, documents, user, refreshDocuments, refreshDocumentsCoordinates, getDocumentIcon, stakeholders, geoJsonData, scaleOptions, onCreateScale} : HomepageProps) {
 
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
   const [selectedDocumentCoordinates, setSelectedDocumentCoordinates] = useState<DocCoordinates | null>(null);
@@ -72,6 +75,7 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
 
   const [showGeoreferenceDocument, setShowGeoreferenceDocument] = useState<boolean>(false);
 
+  
   
 
   const handleCloseDetailsModal = () => {
@@ -92,6 +96,8 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
     setSelectedDocumentCoordinates(doc);
     console.log(doc)
   }
+
+  
 
   return (
   <>
@@ -148,6 +154,9 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
       showGeoreferenceNewDocumentModal = {(doc: Document, filesUploaded: File[]) => {
         setNewDocument(doc); setShowGeoreferenceDocument(true);
       if(filesUploaded.length>0){setFiles(filesUploaded)} }}
+      scaleOptions={scaleOptions}
+      //setScaleOptions={setScaleOptions}
+      onCreateScale={onCreateScale}
     />
 
     {selectedDocument && (
@@ -157,6 +166,9 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
         refreshSelectedDocument={refreshSelectedDocument}
         
         stakeholders={stakeholders}
+        scaleOptions={scaleOptions}
+        //setScaleOptions={setScaleOptions}
+        onCreateScale={onCreateScale}
       />
     )}
 

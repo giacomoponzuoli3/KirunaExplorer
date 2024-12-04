@@ -50,6 +50,10 @@ function App() {
 
   const [stakeholders, setStakeholders] = useState<Stakeholder[]>([]);
 
+  const [scaleOptions, setScaleOptions] = useState<{ value: string; label: string }[]>([]);
+
+  
+
   //API call to get all the documents so we can display them
   const getAllDocuments = async () => {
     try {
@@ -134,6 +138,29 @@ function App() {
     setUser('')
   };
 
+  useEffect(() => {
+    const fetchScaleOptions = async () => {
+      try {
+        const response = await API.getScales();
+        const options = response.map((scale: {name: string}) => ({value: scale.name, label: scale.name}));
+        setScaleOptions(options);
+      } catch (err: any) {
+        console.error("Failed to fetch scales", err);
+      }
+    };
+    fetchScaleOptions();
+  }, [])
+
+  const handleCreateScale = async (inputValue: string) => {
+    try {
+      await API.addScale(inputValue);
+      const newOption = { value: inputValue, label: inputValue };
+      setScaleOptions((prevOptions) => [...prevOptions, newOption]);
+    } catch (error) {
+      console.error("Error adding new Scale: ", error);
+    }
+  }
+  
 
 
   return (
@@ -145,12 +172,12 @@ function App() {
             <Outlet/>
           </>
         }>
-          <Route index element={<HomePage geoJsonData={geoJsonData} documentsCoordinates={documentsCoordinates} documents={documents} user={user} refreshDocuments={getAllDocuments} refreshDocumentsCoordinates={getAllDocumentsCoordinates} stakeholders={stakeholders} getDocumentIcon={getDocumentIcon}/>}/>
+          <Route index element={<HomePage geoJsonData={geoJsonData} documentsCoordinates={documentsCoordinates} documents={documents} user={user} refreshDocuments={getAllDocuments} refreshDocumentsCoordinates={getAllDocumentsCoordinates} stakeholders={stakeholders} getDocumentIcon={getDocumentIcon} scaleOptions={scaleOptions} onCreateScale={handleCreateScale}/>}/>
           <Route path="/login" element={<Login message={message} isLogged={isLogged} login={handleLogin} handleBack={handleBack}/>} />
           <Route path="*" element={<NotFoundLayout/>} />
           {/* Aggiungi altre route come la dashboard */}
           <Route path="/:idDocument/links" element={<LinksDocument user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} />} />
-          <Route path="/documents" element={<DocumentsTable user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} refreshDocuments={getAllDocuments} refreshDocumentsCoordinates={getAllDocumentsCoordinates}/>} />
+          <Route path="/documents" element={<DocumentsTable user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} refreshDocuments={getAllDocuments} refreshDocumentsCoordinates={getAllDocumentsCoordinates} scaleOptions={scaleOptions} onCreateScale={handleCreateScale}/>} />
           <Route path="documents/:idDocument/links" element={<LinksDocument user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} />} />
           <Route path="documents/:idDocument/map" element={<MapView user={user} geoJsonData={geoJsonData} isLogged={isLogged} getDocumentIcon={getDocumentIcon} documentsCoordinates={documentsCoordinates}/>} />
           <Route path="documents/:idDocument/resources" element={<ResourcesTable user={user} isLogged={isLogged} />} />

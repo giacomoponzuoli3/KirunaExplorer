@@ -11,6 +11,7 @@ import Select from 'react-select';
 import ISO6391 from 'iso-639-1';  // Utilizziamo ISO 639-1 per ottenere le lingue
 import CreatableSelect from 'react-select/creatable';
 import { SingleValue } from 'react-select';
+import Scale from "../models/scale"
 
 interface RequiredLabelProps {
     text: string; // Explicitly define the type of 'text' as string
@@ -32,12 +33,16 @@ interface AddDocumentModalProps {
     refreshDocuments: () => void;
     stakeholders: Stakeholder[];
     showGeoreferenceNewDocumentModal: (doc: Document, files: File[]) => void;
+    scaleOptions: { value: string; label: string }[];
+    //setScaleOptions: React.Dispatch<React.SetStateAction<{ value: string; label: string }[]>>;
+    onCreateScale: (inputValue: string) => Promise<void>;
 }
 
 
-function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeoreferenceNewDocumentModal}: AddDocumentModalProps) {
+function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeoreferenceNewDocumentModal, scaleOptions, onCreateScale}: AddDocumentModalProps) {
     const [title, setTitle] = useState('');
     const [selectedStakeholders, setSelectedStakeholders] = useState<Stakeholder[]>([]);
+    //const [scaleOptions, setScaleOptions] = useState<{ value: string; label: string }[]>([]);
     const [scale, setScale] = useState('');
     const [issuanceDate, setIssuanceDate] = useState('');
     const [type, setType] = useState('');
@@ -61,6 +66,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
         setTitle('');
         setSelectedStakeholders([]);
         setScale('');
+        //setScaleOptions([]);
         setIssuanceDate('');
         setType('');
         setLanguage(null);
@@ -179,17 +185,35 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
       value: code,
       label: ISO6391.getName(code),
     }));
-
+    /** 
     const scaleOptions = [
       { value: '1:1000', label: '1:1000' },
       { value: '1:2000', label: '1:2000' },
       { value: '1:5000', label: '1:5000' },
       { value: '1:7500', label: '1:7500' },
       { value: '1:10000', label: '1:10000' },
+    ];*/
+
+    const typeOptions = [
+      { value: 'Informative document', label: 'Informative document' },
+      { value: 'Prescriptive document', label: 'Prescriptive document' },
+      { value: 'Design document', label: 'Design document' },
+      { value: 'Technical document', label: 'Technical document' },
+      { value: 'Material effect', label: 'Material effect' },
+      { value: 'Agreement', label: 'Agreement' },
+      { value: 'Conflict', label: 'Conflict' },
+      { value: 'Consultation', label: 'Consultation' },
     ];
+
+
+    
 
     const handleScale = (selectedOption: SingleValue<{ value: string; label: string }>) => {
       setScale(selectedOption ? selectedOption.value : '');
+    };
+
+    const handleType = (selectedOption: SingleValue<{ value: string; label: string }>) => {
+      setType(selectedOption ? selectedOption.value : '');
     };
 
     return (
@@ -258,8 +282,9 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                       options={scaleOptions}
                       value={scale ? { value: scale, label: scale } : null}
                       onChange={handleScale}
+                      onCreateOption={onCreateScale}
                       placeholder="Select or type a scale..."
-                      formatCreateLabel={(inputValue) => `Use custom scale: "${inputValue}"`}
+                      formatCreateLabel={(inputValue) => `Add a new scale: "${inputValue}"`}
                       styles={{
                         control: (base) => ({
                           ...base,
@@ -274,33 +299,21 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
                     <label htmlFor="formIssuanceDate" className="w-1/3 font-medium">
                         <RequiredLabel text="Type of document" />
                     </label>
-                    <Dropdown className='w-2/3'>
-                    <Dropdown.Toggle
-                      id="dropdown-button-dark-example1"
-                      className="custom-dropdown-toggle"
-                    >
-                      {type ? type : <RequiredLabel text="Choose a type" />}
-                    </Dropdown.Toggle>
-                        <Dropdown.Menu className="w-full">
-                            {[
-                            'Informative document',
-                            'Prescriptive document',
-                            'Design document',
-                            'Technical document',
-                            'Material effect',
-                            'Agreement',
-                            'Conflict',
-                            'Consultation',
-                            ].map((option, index) => (
-                            <Dropdown.Item
-                                key={index}
-                                onClick={() => setType(option)}
-                            >
-                                {option}
-                            </Dropdown.Item>
-                            ))}
-                        </Dropdown.Menu>
-                    </Dropdown>
+                    <CreatableSelect
+                      isClearable
+                      options={typeOptions}
+                      value={type ? { value: type, label: type } : null}
+                      onChange={handleType}
+                      placeholder="Select or type a type..."
+                      formatCreateLabel={(inputValue) => `Use custom type: "${inputValue}"`}
+                      styles={{
+                        control: (base) => ({
+                          ...base,
+                          minWidth: '300px',
+                          borderColor: 'rgba(0, 0, 0, 0.2)',
+                        }),
+                      }}
+                    />
                   </div>
                 </div>
               </div>
