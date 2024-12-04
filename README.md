@@ -214,11 +214,12 @@ Editing and submitting the form will call the API to update a link.
 ## Screenshots
 
 Homepage:
-![Homepage](./screenshots/Homepage.png "Homepage")
 ![Homepage](./screenshots/HomePage1.png "Homepage")
 
-Document info:
+Document info: 
 ![Document info](./screenshots/DocumentModal.png "Document info")
+Document info: (urban planner)
+![Document info](./screenshots/DocumentInfoIsLogged1.png "Document info logged in")
 
 Connections:
 ![Connections](./screenshots/Connections.png "Connections")
