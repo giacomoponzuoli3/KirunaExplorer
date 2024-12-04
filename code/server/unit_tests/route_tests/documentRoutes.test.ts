@@ -734,7 +734,7 @@ describe('documentRoutes', () => {
                 description: "description"
             });
             expect(controller.editDocument).toHaveBeenCalledWith(
-                `${testId}`,
+                testId,
                 "title",
                 [testStakeholder1, testStakeholder2],
                 "1:1",
