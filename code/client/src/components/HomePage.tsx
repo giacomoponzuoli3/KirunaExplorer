@@ -143,7 +143,7 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
       onClick={() =>{
         navigate(`/documents/-1`)
       }}
-      title="Search on documents referred to the whole municipality"
+      title="View documents related to the entire municipality of Kiruna"
     >
       <MagnifyingGlassIcon className="h-5 w-5" />
     </button>   
