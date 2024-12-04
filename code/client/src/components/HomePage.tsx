@@ -94,7 +94,7 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
   function refreshSelectedDocument(doc: DocCoordinates) {
     setSelectedDocument(doc)
     setSelectedDocumentCoordinates(doc);
-    console.log(doc)
+    refreshDocumentsCoordinates();
   }
 
   
