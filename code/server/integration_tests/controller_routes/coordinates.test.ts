@@ -12,7 +12,7 @@ import { cleanup } from "../../src/db/cleanup";
 import { setup } from "../../src/db/setup";
 import { app } from "../../index";
 import request from 'supertest';
-import { Role } from "../../src/models/user"
+import { Role } from "../../../common_models/user"
 import { CoordinatesArrayError, CoordinatesTypeError } from "../../src/errors/coordinates";
 
 const baseURL = "/kiruna/coordinates"
