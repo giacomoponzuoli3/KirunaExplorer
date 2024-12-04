@@ -4,7 +4,7 @@ import API from '../API/API';
 import { Document } from "../models/document";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { User } from "../models/user";
+import { User } from "../../../common_models/user";
 import { AddDocumentModal } from "./AddDocumentModal";
 import { Stakeholder } from "../models/stakeholder";
 import {DocumentLegend} from "./DocumentLegend"

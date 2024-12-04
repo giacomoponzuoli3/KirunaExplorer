@@ -1,7 +1,7 @@
 //import { resolve } from "path"
 import db from "../db/db"
 import Scale from "../models/scale"
-import {ScaleAlreadyExistsError, ScaleNotFoundError} from "../errors/scale";
+import {ScaleNotFoundError} from "../errors/scale";
 
 class ScaleDAO {
     getScales(): Promise<Scale[]> {

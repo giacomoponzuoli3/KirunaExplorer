@@ -148,7 +148,7 @@ function App() {
         console.error("Failed to fetch scales", err);
       }
     };
-    fetchScaleOptions();
+    fetchScaleOptions().then();
   }, [])
 
   const handleCreateScale = async (inputValue: string) => {

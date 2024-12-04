@@ -10,6 +10,7 @@ import L from 'leaflet';
 import Alert from "./Alert";
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
+import { decimalToDMS } from '../utility/utilities'
 
 // Extend the L.MarkerOptions type to include isStandalone
 declare module 'leaflet' {
@@ -89,20 +90,6 @@ const kirunaBounds = new LatLngBounds(
   [67.7758, 20.1003],  // Sud-ovest
   [67.9358, 20.3503]   // Nord-est
 );
-
-function decimalToDMS(decimal: number) {
-  const degrees = Math.floor(decimal);
-  const minutesDecimal = Math.abs((decimal - degrees) * 60);
-  const minutes = Math.floor(minutesDecimal);
-  const seconds = Math.round((minutesDecimal - minutes) * 60);
-
-  // Handle edge case for rounding up seconds
-  if (seconds === 60) {
-      return `${degrees + Math.sign(degrees)}° ${minutes + 1}' 0"`;
-  }
-
-  return `${degrees}° ${minutes}' ${seconds}"`;
-}
 
 const DMSStringToDecimal = (dmsString: string, regex : RegExp) => {
   // Regular expression to match DMS format: "57° 24' 4''"

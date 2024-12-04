@@ -53,7 +53,6 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoord
     // Calculate total pages
     const totalPages = Math.ceil(documentLinks.length / itemsPerPage);
 
-
     // Handle pagination button clicks
     const handleNextPage = () => {
      if (currentPage < totalPages) {

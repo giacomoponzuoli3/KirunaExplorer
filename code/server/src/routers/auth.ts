@@ -1,5 +1,5 @@
 import express from "express"
-import { User } from "../models/user"
+import { User } from "../../../common_models/user";
 import {UserDAO} from "../dao/userDAO"
 import Utility from "../utilities"
 const session = require('express-session')

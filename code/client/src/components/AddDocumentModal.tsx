@@ -11,7 +11,6 @@ import Select from 'react-select';
 import ISO6391 from 'iso-639-1';  // Utilizziamo ISO 639-1 per ottenere le lingue
 import CreatableSelect from 'react-select/creatable';
 import { SingleValue } from 'react-select';
-import Scale from "../models/scale"
 
 interface RequiredLabelProps {
     text: string; // Explicitly define the type of 'text' as string

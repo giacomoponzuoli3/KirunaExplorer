@@ -1,14 +1,23 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import API from "../API/API";
-import { TrashIcon, MapPinIcon, MapIcon, PencilIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon, PlusCircleIcon, ClipboardIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
-import { TruncatedText } from "./LinksDocument";
-import { useNavigate } from "react-router-dom";
+import {
+    ChevronDownIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    FaceFrownIcon,
+    MapPinIcon,
+    PencilIcon,
+    PlusCircleIcon,
+    TrashIcon
+} from "@heroicons/react/24/outline";
+import {TruncatedText} from "./LinksDocument";
+import {useNavigate} from "react-router-dom";
 import Alert from "./Alert";
-import { DocCoordinates } from "../models/document_coordinate";
-import { EditDocumentModal } from "./EditDocumentModal";
+import {DocCoordinates} from "../models/document_coordinate";
+import {EditDocumentModal} from "./EditDocumentModal";
 import ConfirmModal from "./ConfirmModal";
-import { MagnifyingGlassIcon } from '@heroicons/react/24/solid'
-import { ModalEditGeoreference } from "./ModalEditGeoreference";
+import {MagnifyingGlassIcon} from '@heroicons/react/24/solid'
+import {ModalEditGeoreference} from "./ModalEditGeoreference";
 import dayjs from 'dayjs';
 import 'dayjs/locale/it'; // Importa la localizzazione italiana
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -146,10 +155,9 @@ function DocumentsTable(props: any){
       }
 
       setFilteredDocuments((prevDocs) => {
-        const sortedDocs = [...prevDocs].sort((a, b) =>
-          value === "asc" ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)
+          return [...prevDocs].sort((a, b) =>
+            value === "asc" ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)
         );
-        return sortedDocs;
       });
       setCurrentPage(1); // Resetta la paginazione alla prima pagina
       setPaginatedLinks(filteredDocuments.slice(0, itemsPerPage)); // Aggiorna i documenti visualizzati
@@ -199,11 +207,8 @@ function DocumentsTable(props: any){
         }
     
         // Filtro per il range di date
-        const isInRange =
-          docDate.isSameOrAfter(normalizedStart) &&
-          docDate.isSameOrBefore(normalizedEnd);
-    
-        return isInRange;
+          return docDate.isSameOrAfter(normalizedStart) &&
+            docDate.isSameOrBefore(normalizedEnd);
       });
     
       setFilteredDocuments(filtered); // Aggiorna lo stato dei documenti filtrati
