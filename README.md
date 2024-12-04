@@ -66,19 +66,22 @@ Contains the navbar and an error message
   - has no parameters
   - body contains the type of Document
   - returns a 200 code and a issuanceDate of this document when successful, a 503 code in case of errors
-- DELETE `/res/:idDoc/:name`: removes a resource from the database:
+- DELETE `doc/res/:idDoc/:name`: removes a resource from the database:
   - has two parameters, the ID of the documents, and name of resource
   - has no body
   - returns a 200 code in case of success, a 401 code if user is not logged in, a 403 if user is not urban planner, a 503 code in case of error
-- GET `/res/:idDoc/:idRes`: retrieves a resource:
+- GET `doc/res/:idDoc/:idRes`: retrieves a resource:
   - has two parameters, the ID of the documents, and ID of resource
   - has no body
   - returns a 200 code and a resource when successful, a 401 code if user is not logged in, a 403 if user is not urban planner, a 503 code in case of error
-- GET `/res-all/:idDoc`: retrieves all of resources by this ID of document:
+- GET `doc/res-all/:idDoc`: retrieves all of resources by this ID of document:
   - has, as the only parameter, the ID of the documente
   - has no body
   - returns a 200 code and a resource when successful, a 401 code if user is not logged in, a 403 if user is not urban planner, a 503 code in case of error
-
+- POST `/doc/res`: adds a new resource to document:
+  - has no parameters
+  - body contains the new resource's information (ID of document, name of resource, data of resource)
+  - returns a 200 code if the resource is successfully added to the database, a 401 code if user is not logged in, a 403 if user is not urban planner, a 503 code in case of errors
 
 
 - POST `/link`: adds a new link between two documents:
@@ -183,7 +186,7 @@ user is logged in.
 indicating the type. Clicking on the icon opens a modal showing the document's information.
 - `ButtonHomePage` (in `Homepage.tsx`): a button used to return to the home page. It's shown in the navbar of the login
 page, to return to the homepage without logging in.
-- `AddDocumentModal` (in `DocumentModals.tsx`): shows a form to fill in the information for a document to add.
+- `AddDocumentModal` (in `DocumentModals.tsx`): shows a form to fill in the information for a document to add, and attaches files, as a resource, to document.
 Filling and submitting the form will call the API to add a new document to the database, with the filled-in info.
 - `AddNewDocumentLinksModal` (in `AddNewDocumentLinksModal.tsx`): shows a form to add links to a newly created document.
 Filling and submitting the form will call the API to add the specified connections.
@@ -197,18 +200,16 @@ Editing the information and then submitting the form will call the API to edit t
 relative document, with options to specify new geo-referencing information. Submitting the form will call the API to update
 the geo-referencing information of the document.
 - `LinksDocument` (in `LinksDocument.tsx`): shows a paged table, containing the title, stakeholders and an icon indicating the
-document type of every document connected to a given one, together with the connection type. If the user is logged in as
-an urban planner, additionally shows, for each connection, a button to delete it. At the end of the page, if the user
-is logged in as an urban planner, shows a button which, when clicked, opens a modal to add a new connection.
+document type of every document connected to a given one, together with the connection type. two additional buttons are displayed for each connection: one to delete it and another to edit it. At the end of the page, if the user is logged in as an urban planner, shows a button which, when clicked, opens a modal to add a new connection.
 - `AddLinkModal` (in `AddLinkModal.tsx`): shows a form to select a document, with which to add a new connection, and the
 connection type. When the form is filled in and submitted, an API call to add the connection is performed.
 - `EditLinkModal` (in `EditLinkModal.tsx`): shows a form, prefilled with the relative link's information.
 Editing and submitting the form will call the API to update a link.
 - `Map` (in `Map.tsx`): the component used to display the map, on top of which the icons for the documents will be displayed, in the homepage.
-- `Alert` (in `Alert.tsx`): shows an alert that notifies the user that a given connection already exists. It's used in
-AddLinkModal component, and shown when an urban planner tries to add an already existing connection.
-- `ConfirmModal` (in `ConfirmModal.tsx`): shows a simple confirmation modal to delete a connection. It's used in the LinksDocument
-component, and shown when an urban planner clicks on the button to delete a connection.
+- `Alert` (in `Alert.tsx`): is displayed as a alert in most components, such as AddDocument, AddLink, and EditDocument, to notify the urban planner of an existing mistake or that something is wrong.
+- `ConfirmModal` (in `ConfirmModal.tsx`): is displayed to delete a connection or resource. It is used in the LinksDocument component and appears when an urban planner clicks the button to delete a connection. Additionally, it is used in the ResourcesTable component and appears when an urban planner clicks the button to delete a resource.
+- `DocumentsTable` (in `DocumentsTable.tsx`): displays a list of all documents along with their information and the number of links. Clicking on the number of links redirects to a page that lists all the links associated with the document. Similarly, clicking on the number of resources redirects to a page that lists all the resources of the document. If the user is logged in as an urban planner, additional buttons are shown to edit or delete the document and to edit, add, or delete the georeference of the document.
+- `ResourcesDocument` (in `ResourcesDocument.tsx`): shows a paged table, containing the list of resources of document. Additionally, is displayed for each resource: one button to delete. At the end of the page, if the user is logged in as an urban planner, shows a button which, when clicked, opens a modal to add a new resource.
 
 ## Screenshots
 
