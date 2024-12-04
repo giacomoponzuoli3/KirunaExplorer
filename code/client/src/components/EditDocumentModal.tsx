@@ -36,8 +36,7 @@ interface EditDocumentModalProps {
 function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, stakeholders, scaleOptions, onCreateScale }: EditDocumentModalProps) {
     const [title, setTitle] = useState(document.title);
     const [selectedStakeholders, setSelectedStakeholders] = useState<Stakeholder[]>(document.stakeHolders);
-    //const [scaleOptions, setScaleOptions] = useState<{ value: string; label: string }[]>([]);
-    const [scale, setScale] = useState('');
+    const [scale, setScale] = useState(document.scale);
     const [issuanceDate, setIssuanceDate] = useState(document.issuanceDate);
     const [type, setType] = useState(document.type);
     const [language, setLanguage] = useState<string | null>(document.language);
