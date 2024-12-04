@@ -11,7 +11,7 @@ import {
     TrashIcon
 } from "@heroicons/react/24/outline";
 import {TruncatedText} from "./LinksDocument";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useLocation} from "react-router-dom";
 import Alert from "./Alert";
 import {DocCoordinates} from "../models/document_coordinate";
 import {EditDocumentModal} from "./EditDocumentModal";
@@ -47,6 +47,8 @@ const documentTypes = [
 
 function DocumentsTable(props: any){
     const navigate = useNavigate();
+    const location = useLocation()
+    const [isMunicipality, setIsMunicipality] = useState(false); // filter
 
     const [documentsCoordinates, setDocumentsCoordinates] = useState<DocCoordinates[]>([]);
 
@@ -278,20 +280,47 @@ function DocumentsTable(props: any){
       }
     };
 
-  //get all DocCoordinates
-  const getDocuments = async () => {
-    const allDocuments = await API.getAllDocumentsCoordinates();
-    setDocumentsCoordinates(allDocuments);
-    setFilteredDocuments(allDocuments); // Inizializza i documenti filtrati
+ const filterByMunicipality = ( data: DocCoordinates[]): DocCoordinates[] => {
+    return data.filter((item) =>
+      item.coordinates.some((coord) => coord.municipality_area === 1)
+    );
+  };
+//get all DocCoordinates
+const getDocuments = async () => {
+  let temp = 0;
+  if(location.pathname.includes("-1") || location.pathname.endsWith("/documents/")){
+    setIsMunicipality(true)
+    temp = 1;
+  }
+  const allDocuments = await API.getAllDocumentsCoordinates();
+  
+  let allDoc = allDocuments;
+  
+  if (isMunicipality || temp===1) {
+    allDoc = filterByMunicipality(allDocuments);
   }
 
-  useEffect(() => {
-      try{
-        getDocuments().then();
-      }catch(err){
-        setShowAlert(true);
-      }
-  }, [])
+  // Update state with filtered or original documents
+  setDocumentsCoordinates(allDoc);
+  setFilteredDocuments(allDoc); // Inizializza i documenti filtrati
+}
+
+
+useEffect(() => {
+    try{
+      getDocuments().then();
+    }catch(err){
+      setShowAlert(true);
+    }
+}, [])
+useEffect(() => {
+  // Check if the URL contains `-1`
+  if (location.pathname.endsWith("-1")) {
+    setIsMunicipality(true)
+    const newPath = location.pathname.replace(/-1$/, "");
+    navigate(newPath, { replace: true });
+  }
+}, [location, navigate]);
 
   // Aggiorna la paginazione ogni volta che filteredDocuments o currentPage cambiano
   useEffect(() => {
