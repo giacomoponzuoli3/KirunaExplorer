@@ -233,7 +233,7 @@ New document modal:
 ![New document](./screenshots/NewDocumentModal1.png "New document")
 
 New document geo-referencing modal:
-![New document geo-referencing](./screenshots/NewDocumentGeoreferencing.png "New document geo-referencing")
+![New document geo-referencing](./screenshots/GeorefrenceModal1.png "New document geo-referencing")
 
 New document connections modal:
 ![New document connections](./screenshots/NewDocumentLinks.png "New document connections")
