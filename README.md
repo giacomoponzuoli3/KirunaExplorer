@@ -230,7 +230,7 @@ Login page:
 ![Login page](./screenshots/Login.png "Login page")
 
 New document modal:
-![New document](./screenshots/NewDocumentModal.png "New document")
+![New document](./screenshots/NewDocumentModal1.png "New document")
 
 New document geo-referencing modal:
 ![New document geo-referencing](./screenshots/NewDocumentGeoreferencing.png "New document geo-referencing")
