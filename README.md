@@ -214,22 +214,26 @@ Editing and submitting the form will call the API to update a link.
 ## Screenshots
 
 Homepage:
-![Homepage](./screenshots/Homepage.png "Homepage")
+![Homepage](./screenshots/HomePage1.png "Homepage")
 
-Document info:
+Document info: 
 ![Document info](./screenshots/DocumentModal.png "Document info")
+Document info: (urban planner)
+![Document info](./screenshots/DocumentInfoIsLogged1.png "Document info logged in")
 
 Connections:
 ![Connections](./screenshots/Connections.png "Connections")
+Connections: (urban planner)
+![Connections](./screenshots/ConnectionIsLogged.png "Connections logged in")
 
 Login page:
 ![Login page](./screenshots/Login.png "Login page")
 
 New document modal:
-![New document](./screenshots/NewDocumentModal.png "New document")
+![New document](./screenshots/NewDocumentModal1.png "New document")
 
 New document geo-referencing modal:
-![New document geo-referencing](./screenshots/NewDocumentGeoreferencing.png "New document geo-referencing")
+![New document geo-referencing](./screenshots/GeorefrenceModal1.png "New document geo-referencing")
 
 New document connections modal:
 ![New document connections](./screenshots/NewDocumentLinks.png "New document connections")
@@ -238,7 +242,7 @@ Edit document modal:
 ![Edit document](./screenshots/EditDocumentModal.png "Edit document")
 
 Edit document geo-referencing modal:
-![Edit document geo-referencing](./screenshots/UpdateGeoreferencing.png "Edit document geo-referencing")
+![Edit document geo-referencing](./screenshots/EditGeorefrenceModal1.png "Edit document geo-referencing")
 
 New connection modal:
 ![New connection](./screenshots/NewConnectionModal.png "New connection")
