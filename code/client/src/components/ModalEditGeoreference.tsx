@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapContainer } from 'react-leaflet';
 import L, { LatLng } from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
@@ -79,19 +79,20 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
         setIsLoading(false);
       }
     }else{
+      console.log(selectedPosition)
       setShowAlert(true);
     }
   };
 
   // Funzione per gestire il cambio di stato della checkbox
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-
-      setUseMunicipalArea(event.target.checked);
-      setSelectedPosition([]);
-      if (event.target.checked) {
-        setSelectedButton('Entire Area'); // Se l'area municipale è selezionata, resettiamo l'input
-      }
-
+    event.stopPropagation(); // Blocca l'evento per impedire interferenze
+    console.log("Checkbox changed", event.target.checked);
+    setUseMunicipalArea(event.target.checked);
+    if (event.target.checked) {
+        setSelectedPosition([]);
+        setSelectedButton('Entire Area');
+    }
   };
 
   const handleButtonClick = (buttonType: string) => {
@@ -99,6 +100,10 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
     setSelectedPosition(null); //reset the position
     setUseMunicipalArea(false);
   };
+
+  useEffect(() => {
+    console.log(selectedPosition)
+  }, [selectedPosition])
 
 
   // Impostiamo il map component all'interno del modal
