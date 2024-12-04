@@ -1,8 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Modal } from 'react-bootstrap';
 import API from "../API/API";
-import { TrashIcon, PlusIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon, DocumentIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, PlusIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon, DocumentIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import Alert from "./Alert";
 import ConfirmModal from './ConfirmModal';
 import { DocLink } from "../models/document_link";
@@ -14,9 +14,9 @@ function ResourcesTable(props: any) {
     const navigate = useNavigate();
 
     const { idDocument } = useParams();
-    const [document, setDocument] = useState<DocCoordinates | null>(null);
-    const [documentLinks, setDocumentLinks] = useState<DocLink[]>([]);
+    const [selectedDoc, setSelectedDoc] = useState<DocCoordinates | null>(null);
     const [files, setFiles] = useState<File[]>([]);//resources
+    const linkRef = useRef<HTMLAnchorElement>(null);
     
     const [showModal, setShowModal] = useState(false);
     const [refreshPage, setRefreshPage] = useState(false);
@@ -117,7 +117,7 @@ function ResourcesTable(props: any) {
         return; // Exit early
       }
       
-      if (files.length !== 0 && document!=null) {
+      if (files.length !== 0 && selectedDoc!=null) {
 
         files.forEach(async (file) => {
             // Step 1: Read the file content as a Uint8Array
@@ -134,7 +134,7 @@ function ResourcesTable(props: any) {
             // Step 3: Call the API to upload the resource
             try {
                 const response = await API.addResourceToDocument(
-                    document.id,        // Replace with the actual document ID
+                    selectedDoc.id,        // Replace with the actual document ID
                     file.name,     // Use the file name
                     base64Data     // Pass the file data as base64 string
                 );
@@ -208,13 +208,40 @@ function ResourcesTable(props: any) {
     setResources(documentResources);
   }
 
+  const handleDownload = useCallback(async (idDoc: number, idRes: number, fileName: string) => {
+    try {
+
+      // Assuming the backend sends the file data as JSON with a `unit8Array` property
+      const response = await API.getResourceData(idDoc,idRes);
+      // Log the entire response to inspect it
+      console.log("API Response:", response);
+
+      console.log(response)
+
+      // Step 2: Convert Uint8Array to Blob
+      const blob = new Blob([new Uint8Array(response.data)], { type: "application/octet-stream" });
+
+      // Set the href and download attributes of the static link
+      const url = URL.createObjectURL(blob);
+      // Create a temporary link for downloading the file
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName; // Set the file name for the download
+      a.click(); // Trigger the download
+      URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error("Error downloading file:", error);
+    }
+  },[]);
+
     useEffect(() => {
         const getDocument = async () => {
             try{
                 setLoading(true);  // Imposta lo stato di caricamento a true
                 const documentId = Number(idDocument);
                 const document = await API.getDocumentById(documentId);
-                setDocument(document);
+                setSelectedDoc(document);
             }catch(err){
                 setShowAlert(true);
             } finally {
@@ -259,7 +286,7 @@ function ResourcesTable(props: any) {
       return <div>Loading...</div>; 
     }
 
-    if (document == null){
+    if (selectedDoc == null){
         return (
           
             <div className="p-4">
@@ -296,7 +323,7 @@ function ResourcesTable(props: any) {
                 Resources of
               </h2>
               <h2 className="text-3xl font-bold text-black-600 text-center mb-6">
-                {document.title}
+                {selectedDoc.title}
               </h2>
 
               <div className="relative mb-2">
@@ -370,13 +397,22 @@ function ResourcesTable(props: any) {
                         <tr key={index} className={`border-b transition duration-200 ease-in-out 
                           ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
                         `}>
-                          <td className="p-4 text-sm text-gray-600 w-[15%]">{resource.name}</td>
+                          <td className="p-4 text-sm text-gray-600 w-[15%]" >{resource.name}</td>
                           <td className="p-4 text-sm text-gray-600 w-[15%]">{String(resource.uploadTime)}</td>
                           {/* <td className="p-4 text-sm text-gray-600 w-[10%]"></td> */}
                           
                             <td className="p-3 items-center justify-center space-x-4 w-[5%]">
                               {props.isLogged && props.user.role == "Urban Planner" && (
                                 <>
+                                  <button
+                                   onClick={(e) => {
+                                      e.preventDefault();
+                                      handleDownload(resource.idDoc, resource.id, resource.name);
+                                    }}
+                                   className="text-blue-500 cursor-pointer hover:text-blue-700"
+                                  >
+                                    <ArrowDownTrayIcon className="h-5 w-5"/>
+                                  </button>
                                   <button
                                   
                                     className="text-red-500 hover:text-red-700"
