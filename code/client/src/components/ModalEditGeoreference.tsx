@@ -34,7 +34,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   const [selectedPosition, setSelectedPosition] = useState<LatLng[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [useMunicipalArea, setUseMunicipalArea] = useState(documentCoordinates.coordinates[0].municipality_area == 1);  // Stato per la checkbox
+  const [useMunicipalArea, setUseMunicipalArea] = useState(documentCoordinates.coordinates.length == 0 ? false : documentCoordinates.coordinates[0].municipality_area == 1 ? true : false);  // Stato per la checkbox
 
   //state for the selection
   const [selectedButton, setSelectedButton] = useState<string | null>(null); // Stato per il pulsante selezionato
@@ -126,7 +126,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
           }}
         />
         }
-        {documentCoordinates.coordinates[0].municipality_area == 1 && 
+        {documentCoordinates.coordinates.length == 1 && documentCoordinates.coordinates[0].municipality_area == 1 && 
         
           <span className='text-sm text-gray-600 mt-1 mb-3 flex items-center'>
             <InformationCircleIcon className="w-5 h-5 mr-2 text-blue-500 t" />
@@ -163,12 +163,12 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
 
           {mode === 'edit' && 
             <button
-              title={documentCoordinates.coordinates[0].municipality_area == 1 ? 'Disabled because the document is already associated with the entire municipality area' : 'Edit the actual georeference'}
+              title={documentCoordinates.coordinates.length == 1 && documentCoordinates.coordinates[0].municipality_area == 1 ? 'Disabled because the document is already associated with the entire municipality area' : 'Edit the actual georeference'}
               className={`px-3 py-1 border-1 border-orange-500 text-orange-500 text-sm rounded-full hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-300 transition ease-in-out duration-200 ${
                 selectedButton === 'edit' ? 'bg-orange-100 text-orange-500 border-orange-500 border-2' : ''
                 }
                 ${
-                  documentCoordinates.coordinates[0].municipality_area == 1
+                  documentCoordinates.coordinates.length == 1 &&documentCoordinates.coordinates[0].municipality_area == 1
                     ? 'opacity-50 cursor-not-allowed'
                     : ''
                 }
@@ -185,26 +185,26 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
             <label
               htmlFor="municipal-area-checkbox"
               className={`relative inline-flex items-center ${
-                documentCoordinates.coordinates[0].municipality_area == 1
+                documentCoordinates.coordinates.length == 1 && documentCoordinates.coordinates[0].municipality_area == 1
                   ? "cursor-not-allowed"
                   : "cursor-pointer"
               }`}
               title={
-                documentCoordinates.coordinates[0].municipality_area == 1
+                documentCoordinates.coordinates.length == 1 && documentCoordinates.coordinates[0].municipality_area == 1
                   ? "Disabled because the document is already associated with the entire municipality area"
                   : ""
               }
             >
               <input
                 type="checkbox"
-                disabled={documentCoordinates.coordinates[0].municipality_area == 1}
+                disabled={documentCoordinates.coordinates.length == 1 && documentCoordinates.coordinates[0].municipality_area == 1}
                 id="municipal-area-checkbox"
                 checked={useMunicipalArea}
                 onChange={handleCheckboxChange}
                 className="sr-only peer"
               />
               <span
-                className={`w-11 h-6 rounded-full transition ${
+                className={`w-11 h-6 rounded-full transition ${ documentCoordinates.coordinates.length == 1 &&
                   documentCoordinates.coordinates[0].municipality_area == 1
                     ? "bg-blue-500 opacity-50"
                     : "bg-gray-300 peer-checked:bg-blue-500"
@@ -212,7 +212,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
               ></span>
               <span
                 className={`absolute left-1 top-1 w-4 h-4 rounded-full transition ${
-                  documentCoordinates.coordinates[0].municipality_area == 1
+                  documentCoordinates.coordinates.length == 1 && documentCoordinates.coordinates[0].municipality_area == 1
                     ? "bg-white opacity-50 translate-x-5"  // Mantenere la posizione del cerchio
                     : "bg-white peer-checked:translate-x-5"
                 }`}
@@ -263,7 +263,8 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
               disabled={isLoading}
               className="px-4 py-2 bg-blue-950 text-white rounded-lg hover:bg-blue-700 focus:outline-none"
             >
-              {isLoading ? 'Updating...' : 'Update'}
+              {mode == "edit" ? isLoading ? 'Updating...' : 'Update' : ''}
+              {mode == "insert" ? isLoading ? 'Inserting...' : 'Insert' : ''}
             </button>
           </div>
         </form>

@@ -380,7 +380,7 @@ function SetMapViewEdit(props: any) {
     //add the polygon or point of the current document only if selected "edit"
     if (!documentCoordinates) return;
 
-    if(documentCoordinates.coordinates.length === 0) return;
+    //if(documentCoordinates.coordinates.length == 0) return;
 
     const latLngs = documentCoordinates.coordinates.map((coord: any) => [coord.latitude, coord.longitude]);
 
