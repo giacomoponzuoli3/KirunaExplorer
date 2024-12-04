@@ -402,9 +402,7 @@ function ResourcesTable(props: any) {
                           {/* <td className="p-4 text-sm text-gray-600 w-[10%]"></td> */}
                           
                             <td className="p-3 items-center justify-center space-x-4 w-[5%]">
-                              {props.isLogged && props.user.role == "Urban Planner" && (
-                                <>
-                                  <button
+                                <button
                                    onClick={(e) => {
                                       e.preventDefault();
                                       handleDownload(resource.idDoc, resource.id, resource.name);
@@ -412,7 +410,9 @@ function ResourcesTable(props: any) {
                                    className="text-blue-500 cursor-pointer hover:text-blue-700"
                                   >
                                     <ArrowDownTrayIcon className="h-5 w-5"/>
-                                  </button>
+                                </button>
+                              {props.isLogged && props.user.role == "Urban Planner" && (
+                                <>
                                   <button
                                   
                                     className="text-red-500 hover:text-red-700"
