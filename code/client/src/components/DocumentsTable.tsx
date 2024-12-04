@@ -382,6 +382,7 @@ function DocumentsTable(props: any){
   //function for the edit document modal
   function refreshSelectedDocument(doc: DocCoordinates) {
     setDocumentEdit(doc)
+    props.refreshDocumentsCoordinates();
   }
 
     if(showAlert){
