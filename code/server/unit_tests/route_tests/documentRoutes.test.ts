@@ -1645,15 +1645,6 @@ describe('documentRoutes', () => {
 
         test('It should get a specific resource to a document and return 200 status', async () => {
 
-            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-    
-            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
             jest.spyOn(controller, "getResourceData").mockResolvedValueOnce(mockResourceData);
 
             const response = await request(app).get(baseURL + '/res/1/2')
@@ -1665,100 +1656,24 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 422 status if the parms are missing', async () => {
-            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-    
-            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
             const response = await request(app).get(baseURL+"/res")
             expect(response.status).toBe(422); 
             expect(controller.getResourceData).not.toHaveBeenCalled(); 
         });
 
         test('It should return 422 status if docId is not numeric', async () => {
-            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-    
-            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
             const response = await request(app).get(baseURL+"/res/test/2")
             expect(response.status).toBe(422); 
             expect(controller.getResourceData).not.toHaveBeenCalled(); 
         });
 
         test('It should return 422 status if resId is not a number', async () => {
-            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-    
-            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
             const response = await request(app).get(baseURL+"/res/1/test")
             expect(response.status).toBe(422); 
             expect(controller.getResourceData).not.toHaveBeenCalled(); 
         });
 
-        test('It should return 401 status if the user is not logged in', async () => {
-
-            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
-                return res.status(401).json({ error: "Unauthenticated user" });
-            });
-    
-            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-
-            jest.spyOn(controller, "getResourceData").mockResolvedValueOnce(mockResourceData);
-
-            const response = await request(app).get(baseURL + '/res/1/2')
- 
-            expect(response.status).toBe(401);
-            expect(response.body.error).toBe('Unauthenticated user');
-        });
-
-        
-        test('It should return 403 status if the user is not an urban planner', async () => {
-            
-            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-    
-            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
-                return res.status(403).json({ error: "User is not an urban planner" });
-            });
-
-            jest.spyOn(controller, "getResourceData").mockResolvedValueOnce(mockResourceData);
-
-            const response = await request(app).get(baseURL + '/res/1/2')
- 
-            expect(response.status).toBe(403);
-
-            expect(response.body.error).toBe('User is not an urban planner');
-        });
-
         test('It should return 503 if there is an error', async () => {
-            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
-    
-            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
-                req.user=u;
-                return next();
-            });
             jest.spyOn(controller, 'getResourceData').mockRejectedValueOnce(new Error('Internal Server Error'));
 
             const response = await request(app).get(baseURL + '/res/1/2')
