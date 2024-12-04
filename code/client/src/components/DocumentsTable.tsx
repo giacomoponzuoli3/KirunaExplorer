@@ -42,6 +42,7 @@ const documentTypes = [
   "Agreement",
   "Conflict",
   "Consultation",
+  "Others"
 ];
 
 function DocumentsTable(props: any){
@@ -126,6 +127,15 @@ function DocumentsTable(props: any){
 
     // function to filter documents
     const handleSearch = (term: string) => {
+      if(selectedOrder != 'none'){
+        handleSelectOrder('none');
+      }
+      if(selectedType != 'All Types'){
+        handleSelect('All Types');
+      }
+      setStartDate('');
+      setEndDate('');
+
       setSearchTerm(term);
       const filtered = documentsCoordinates.filter((doc) =>
         doc.title.toLowerCase().includes(term.toLowerCase())
@@ -150,7 +160,7 @@ function DocumentsTable(props: any){
       // Aggiorna documenti ordinati
       // Se l'ordinamento è "None", non fare nulla
       if (value === "none") {
-        setFilteredDocuments(documentsCoordinates); // Ripristina i documenti originali senza ordinamento
+        setFilteredDocuments(filteredDocuments); // Ripristina i documenti originali senza ordinamento
         return;
       }
 
@@ -226,13 +236,15 @@ function DocumentsTable(props: any){
       setSelectedValueTypeDocument(type);
       handleTypeFilterChange(type);
       setIsOpenTypeDocument(false); // Chiude il dropdown dopo la selezione
+      setStartDate('');
+      setEndDate('');
     };
 
     // Funzione per il filtro per tipo documento
     const handleTypeFilterChange = (type: any) => {
       setSelectedType(type);
       setFilteredDocuments(() =>
-        type && type != "All Types" ? documentsCoordinates.filter((doc) => doc.type === type) : documentsCoordinates
+        type && type != "All Types" && type != "Others" ? documentsCoordinates.filter((doc) => doc.type === type) : type == "All Types" ? documentsCoordinates : documentsCoordinates.filter((doc) => !documentTypes.includes(doc.type) || doc.type == "Others")
       );
       setCurrentPage(1); // Resetta la paginazione alla prima pagina
       setPaginatedLinks(filteredDocuments.slice(0, itemsPerPage)); // Aggiorna i documenti visualizzati
@@ -388,6 +400,12 @@ function DocumentsTable(props: any){
   function refreshSelectedDocument(doc: DocCoordinates) {
     setDocumentEdit(doc)
     props.refreshDocumentsCoordinates();
+    handleSelectOrder('none');
+    handleSelect('All Types');
+    setStartDate('');
+    setEndDate('');
+    setSortOrder('none');
+    setSelectedType('');
   }
 
     if(showAlert){
@@ -495,41 +513,6 @@ function DocumentsTable(props: any){
               </div>
             </div>
 
-            {/* Filtro per range di date */}
-            <div className="flex items-center space-x-4">
-              {/* Filtro per range di date */}
-              <div className="flex flex-col items-start">
-                <label className="text-xs font-medium text-gray-700">Start Date</label>
-                <input
-                  type="text"
-                  placeholder="dd/mm/yyyy, mm/yyyy, yyyy"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-48 border border-gray-300 rounded px-2 py-1 text-xs shadow-sm focus:outline-none focus:ring focus:ring-blue-200"
-                />
-              </div>
-
-              <div className="flex flex-col items-start">
-                <label className="text-xs font-medium text-gray-700">End Date</label>
-                <input
-                  type="text"
-                  placeholder="dd/mm/yyyy, mm/yyyy, yyyy"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-48 border border-gray-300 rounded px-2 py-1 text-xs shadow-sm focus:outline-none focus:ring focus:ring-blue-200"
-                />
-              </div>
-              
-              <div className="flex flex-col items-start">
-                <label className="text-xs font-medium text-white">-</label>
-                <button
-                  onClick={handleFilterByDateRange}
-                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded shadow-sm focus:outline-none focus:ring focus:ring-blue-300 transition"
-                >
-                  Filter
-                </button>
-              </div>
-            </div>
 
             {/* Filtro per tipo documento */}
             <div className="flex items-center space-x-2">
@@ -558,6 +541,55 @@ function DocumentsTable(props: any){
                     ))}
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Filtro per range di date */}
+            <div className="flex items-center space-x-4">
+              {/* Filtro per range di date */}
+              <div className="flex flex-col items-start">
+                <label className="text-xs font-medium text-gray-700">Start Date</label>
+                <input
+                  type="text"
+                  placeholder="dd/mm/yyyy, mm/yyyy, yyyy"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-48 border border-gray-300 rounded px-2 py-1 text-xs shadow-sm focus:outline-none focus:ring focus:ring-blue-200"
+                />
+              </div>
+
+              <div className="flex flex-col items-start">
+                <label className="text-xs font-medium text-gray-700">End Date</label>
+                <input
+                  type="text"
+                  placeholder="dd/mm/yyyy, mm/yyyy, yyyy"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-48 border border-gray-300 rounded px-2 py-1 text-xs shadow-sm focus:outline-none focus:ring focus:ring-blue-200"
+                />
+              </div>
+              
+              <div className="flex flex-col items-start">
+                <label className="text-xs font-medium text-white">-</label>
+                <div className="flex items-center space-x-2">
+                <button
+                  onClick={handleFilterByDateRange}
+                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded shadow-sm focus:outline-none focus:ring focus:ring-blue-300 transition"
+                >
+                  Filter
+                </button>
+                <button
+                  onClick={() =>{
+                    setStartDate('');
+                    setEndDate('');
+                    handleSelectOrder('none');
+                    handleSelect('All Types');
+                  }}
+                  className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded shadow-sm focus:outline-none focus:ring focus:ring-blue-300 transition"
+                >
+                  Reset
+                </button>
+                </div>
               </div>
             </div>
           </div>
@@ -709,6 +741,8 @@ function DocumentsTable(props: any){
               message="The date range is invalid. Please ensure you use the correct format: dd/mm/yyyy mm/yyyy yyyy."
               onClose={() => {
                   setShowAlertErrorDate(false);
+                  setStartDate('');
+                  setEndDate('');
               }}
             />
           }
@@ -718,6 +752,8 @@ function DocumentsTable(props: any){
               message="Error: Start date cannot be after End date"
               onClose={() => {
                   setShowAlertStartAfterEnd(false);
+                  setStartDate('');
+                  setEndDate('');
               }}
             />
           }
@@ -730,7 +766,11 @@ function DocumentsTable(props: any){
                 setShowModalEditDocument(false)
                 setDocumentEdit(null);
                 getDocuments().then(); //refresh of documents
-                
+                setStartDate('');
+                setEndDate('');
+                setSortOrder('none');
+                setSelectedType('');
+
               }} 
               refreshSelectedDocument={refreshSelectedDocument}
               
