@@ -4,6 +4,7 @@ import { Document } from "../models/document"
 import { Stakeholder } from "../models/stakeholder"
 import Link from "../models/link";
 import {DocumentNotFoundError} from "../errors/document";
+import Resources from "../models/original_resources";
 
 class DocumentDAO {
     /**
@@ -256,7 +257,7 @@ class DocumentDAO {
                         // Query per ottenere i dati del documento
 
                         const sqlDoc = `SELECT * FROM documents WHERE id = ?`;
-                        const documentRow = await new Promise<any>((resolve, reject) => {
+                        const documentRow = await new Promise<any>((resolve) => {
                             db.get(sqlDoc, [docId], (err: Error | null, documentRow: any) => {
                                 if (err) return rejectDoc(err);
                                 if (!documentRow) return rejectDoc(new DocumentNotFoundError);
@@ -267,7 +268,7 @@ class DocumentDAO {
 
                         // Query per ottenere gli stakeholder associati
                         const sqlStakeholders = `SELECT sd.id_stakeholder, s.name, s.category FROM stakeholders_documents sd JOIN stakeholders s ON s.id = sd.id_stakeholder WHERE id_document = ?`;
-                        const stakeholderRows: any[] = await new Promise<any[]>((resolve, reject) => {
+                        const stakeholderRows: any[] = await new Promise<any[]>((resolve) => {
                             db.all(sqlStakeholders, [docId], (err: Error | null, stakeholderRows: any[]) => {
                                 if (err) return rejectDoc(err);
 
@@ -438,7 +439,6 @@ class DocumentDAO {
                 });
             } catch (error) {
                 reject(error);
-                console.error(error);
             }
         });
     }
@@ -446,18 +446,51 @@ class DocumentDAO {
     /**
      * Retrieves the resource data associated with the specified document from the database.
      * @param documentId The id of the document whose resource data is to be retrieved.
+     * @param resourceId The id of the resource to retrieve.
      * @returns A Promise that resolves to the resource data associated with the document.
      */
-    getResourceData(documentId: number): Promise<Uint8Array> {
+    getResourceData(documentId: number, resourceId: number): Promise<Uint8Array> {
         return new Promise<Uint8Array>((resolve, reject) => {
             try {
-                const sql = "SELECT resource_data FROM original_resources WHERE document_id = ?";
-                db.get(sql, [documentId], (err: Error | null, row: any) => {
+                const sql = "SELECT resource_data FROM original_resources WHERE document_id = ? AND resource_id = ?";
+                db.get(sql, [documentId, resourceId], (err: Error | null, row: any) => {
                     if (err) return reject(err);
                     if (!row) return reject(new DocumentNotFoundError);
 
                     // Return the resource data associated with the document
                     resolve(row.resource_data);
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    /**
+     * Retrieves all resources associated with a document from the database.
+     * @param documentId The id of the document whose resources are to be retrieved.
+     * @returns A Promise that resolves to an array of Resources objects.
+     */
+    getAllResourcesData(documentId: number): Promise<Resources[]> {
+        return new Promise<Resources[]>((resolve, reject) => {
+            try {
+                const sql = "SELECT resource_id, resource_name, uploaded_at,document_id FROM original_resources WHERE document_id = ?";
+                db.all(sql, [documentId], (err: Error | null, rows: any[]) => {
+                    if (err) return reject(err);
+                    if (!rows || rows.length == 0) return resolve([]);
+
+                    let resources: Resources[] = [];
+                    rows.forEach((row: any) => {
+                        // const idDoc = row.document_id;
+                        const idDoc = row.document_id;
+                        const id = row.resource_id;
+                        const data:null = null;
+                        const name = row.resource_name;
+                        const uploadTime = row.uploaded_at;
+                        resources.push({ id, idDoc, data, name, uploadTime });
+                    });
+
+                    resolve(resources);
                 });
             } catch (error) {
                 reject(error);

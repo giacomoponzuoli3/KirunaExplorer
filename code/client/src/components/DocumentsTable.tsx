@@ -1,15 +1,39 @@
 import { useEffect, useState } from "react";
 import API from "../API/API";
-import { TrashIcon, MapPinIcon, MapIcon, PencilIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon, PlusCircleIcon, ClipboardIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, MapPinIcon, MapIcon, PencilIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon, PlusCircleIcon, ClipboardIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { TruncatedText } from "./LinksDocument";
 import { useNavigate } from "react-router-dom";
 import Alert from "./Alert";
-import { ShowDocumentInfoModal } from "./ShowDocumentInfoModal";
 import { DocCoordinates } from "../models/document_coordinate";
 import { EditDocumentModal } from "./EditDocumentModal";
 import ConfirmModal from "./ConfirmModal";
 import { MagnifyingGlassIcon } from '@heroicons/react/24/solid'
 import { ModalEditGeoreference } from "./ModalEditGeoreference";
+import dayjs from 'dayjs';
+import 'dayjs/locale/it'; // Importa la localizzazione italiana
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import localeData from 'dayjs/plugin/localeData';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
+dayjs.extend(customParseFormat);
+dayjs.extend(localeData);
+dayjs.locale('it'); // Imposta il locale
+
+
+const documentTypes = [
+  "All Types",
+  "Informative document",
+  "Prescriptive document",
+  "Design document",
+  "Technical document",
+  "Material effect",
+  "Agreement",
+  "Conflict",
+  "Consultation",
+];
 
 function DocumentsTable(props: any){
     const navigate = useNavigate();
@@ -17,6 +41,7 @@ function DocumentsTable(props: any){
     const [documentsCoordinates, setDocumentsCoordinates] = useState<DocCoordinates[]>([]);
 
     const [documentsLinksCount, setDocumentsLinksCount] = useState<Map<number, number>>(new Map());
+    const [documentsResourcesCount, setDocumentsResourcesCount] = useState<Map<number, number>>(new Map());
 
     //filter documents
     const [filteredDocuments, setFilteredDocuments] = useState<DocCoordinates[]>([]); // Stato per documenti filtrati
@@ -35,16 +60,34 @@ function DocumentsTable(props: any){
 
     //modal
     const [showAlert, setShowAlert] = useState(false); // alert state
+    const [showAlertErrorDate, setShowAlertErrorDate] = useState(false); //alert state of error date filter
+    const [showAlertStartAfterEnd, setShowAlertStartAfterEnd] = useState(false); //alert state of error date filter
+
     const [showModalEditDocument, setShowModalEditDocument] = useState<boolean>(false);
     const [showModalConfirmDelete, setShowModalConfirmDelete] = useState<boolean>(false);
     const [showModalConfirmDeleteGeoreference, setShowModalConfirmDeleteGeoreference] = useState<boolean>(false);
     const [showModalGeoreference, setShowModalGeoreference] = useState<boolean>(false);
 
+    //section filter
+    const [sortOrder, setSortOrder] = useState("none"); // Per ordinamento alfabetico
+    const [selectedType, setSelectedType] = useState(""); // Per tipo documento
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
 
     //pagination controls
     const [currentPage, setCurrentPage] = useState(1);  // Track the current page
     const [paginatedLinks, setPaginatedLinks] = useState<DocCoordinates[]>([]);
     const itemsPerPage = 4; // Number of items to show per page
+
+    //dropdown of type document filter
+    const [isOpenTypeDocument, setIsOpenTypeDocument] = useState(false); // Gestione dello stato del dropdown
+    const [selectedValueTypeDocument, setSelectedValueTypeDocument] = useState(selectedType);
+
+    //dropdown of the order documents filter
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Stato per il dropdown
+    const [selectedOrder, setSelectedOrder] = useState(sortOrder); // Stato per l'ordine selezionato
+
+    const toggleDropdownTypeDocument = () => setIsOpenTypeDocument(!isOpenTypeDocument);
 
      // Calcola il numero totale di pagine in base ai documenti filtrati
     const totalPages = Math.ceil(filteredDocuments.length / itemsPerPage);
@@ -83,17 +126,135 @@ function DocumentsTable(props: any){
       setPaginatedLinks(filtered.slice(0, itemsPerPage)); // Aggiorna i documenti visualizzati
     };
 
+    //-------- Filter of order ---------//
+    const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen); // Funzione per togglare il dropdown
 
-  // Funzione per ottenere il numero di link per un documento
-  const getDocumentLinksCount = async (docId: number) => {
-    try {
-        const response = await API.getDocumentLinksById(docId);
-        return response.length; //the response is the array of links
-    } catch (error) {
-        console.error("Error fetching document links count", error);
-        return 0; // 0 if there is an error
-    }
-  };
+    const handleSelectOrder = (order: any) => {
+      setSelectedOrder(order); // Aggiorna l'ordine selezionato
+      handleSortOrderChange(order); // Passa l'ordine aggiornato al gestore di stato
+      setIsDropdownOpen(false); // Chiude il dropdown dopo la selezione
+    };
+
+
+    const handleSortOrderChange = (value: any) => {
+      setSortOrder(value);
+      // Aggiorna documenti ordinati
+      // Se l'ordinamento è "None", non fare nulla
+      if (value === "none") {
+        setFilteredDocuments(documentsCoordinates); // Ripristina i documenti originali senza ordinamento
+        return;
+      }
+
+      setFilteredDocuments((prevDocs) => {
+        const sortedDocs = [...prevDocs].sort((a, b) =>
+          value === "asc" ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)
+        );
+        return sortedDocs;
+      });
+      setCurrentPage(1); // Resetta la paginazione alla prima pagina
+      setPaginatedLinks(filteredDocuments.slice(0, itemsPerPage)); // Aggiorna i documenti visualizzati
+    };
+
+
+    //-------- Filter of Range Date ---------//
+    const handleFilterByDateRange = () => {
+      const normalizeDate = (dateStr: string) => {
+        const formats = ['DD/MM/YYYY', 'MM/YYYY', 'YYYY']; // Formati supportati
+        let formattedDate = dateStr;
+    
+        // Normalizzazione delle date
+        if (/^\d{2}\/\d{4}$/.test(dateStr)) {
+          formattedDate = `01/${dateStr}`; // Trasforma MM/YYYY in 01/MM/YYYY
+        }
+    
+        if (/^\d{4}$/.test(dateStr)) {
+          formattedDate = `01/01/${dateStr}`; // Trasforma YYYY in 01/01/YYYY
+        }
+    
+        const parsedDate = dayjs(formattedDate, formats, true); // Parsing rigoroso
+    
+        return parsedDate.isValid() ? parsedDate : null; // Restituisci null se la data non è valida
+      };
+    
+      // Normalizzazione delle date di inizio e fine
+      const normalizedStart = normalizeDate(startDate);
+      const normalizedEnd = normalizeDate(endDate);
+    
+      if (!normalizedStart || !normalizedEnd) {
+        setShowAlertErrorDate(true);
+        setFilteredDocuments(documentsCoordinates); // Ripristina i documenti originali
+        return;
+      }
+
+      // Confronta se la Start Date è maggiore della End Date
+      if (normalizedStart.isAfter(normalizedEnd)) {
+        setShowAlertStartAfterEnd(true);
+        return;
+      }
+        
+      const filtered = documentsCoordinates.filter((doc) => {    
+        const docDate = normalizeDate(doc.issuanceDate); // Normalizzazione della data
+        if (!docDate) {
+          return false; // Escludi se non valido
+        }
+    
+        // Filtro per il range di date
+        const isInRange =
+          docDate.isSameOrAfter(normalizedStart) &&
+          docDate.isSameOrBefore(normalizedEnd);
+    
+        return isInRange;
+      });
+    
+      setFilteredDocuments(filtered); // Aggiorna lo stato dei documenti filtrati
+
+      // Reset dei filtri di ordine e tipo documento
+      setSelectedOrder("none"); // Reset del filtro di ordine
+      setSelectedValueTypeDocument("All Types"); // Reset del filtro di tipo documento
+      setSortOrder("asc"); // Imposta l'ordine di default (A-Z)
+      setIsDropdownOpen(false); // Chiude il dropdown di ordinamento
+      setIsOpenTypeDocument(false); // Chiude il dropdown del tipo documento
+    };
+    
+    //-------- Filter of Type Document ---------//
+    const handleSelect = (type: any) => {
+      setSelectedValueTypeDocument(type);
+      handleTypeFilterChange(type);
+      setIsOpenTypeDocument(false); // Chiude il dropdown dopo la selezione
+    };
+
+    // Funzione per il filtro per tipo documento
+    const handleTypeFilterChange = (type: any) => {
+      setSelectedType(type);
+      setFilteredDocuments(() =>
+        type && type != "All Types" ? documentsCoordinates.filter((doc) => doc.type === type) : documentsCoordinates
+      );
+      setCurrentPage(1); // Resetta la paginazione alla prima pagina
+      setPaginatedLinks(filteredDocuments.slice(0, itemsPerPage)); // Aggiorna i documenti visualizzati
+    };
+
+
+    // Funzione per ottenere il numero di link per un documento
+    const getDocumentLinksCount = async (docId: number) => {
+      try {
+          const response = await API.getDocumentLinksById(docId);
+          return response.length; //the response is the array of links
+      } catch (error) {
+          console.error("Error fetching document links count", error);
+          return 0; // 0 if there is an error
+      }
+    };
+
+ 
+    const getDocumentResourcesCount = async (docId: number) => {
+      try {
+          const response = await API.getAllResourcesData(docId);
+          return response.length;
+      } catch (error) {
+          console.log(error)
+          return 0; // 0 if there is an error
+      }
+    };
 
   //get all DocCoordinates
   const getDocuments = async () => {
@@ -120,17 +281,21 @@ function DocumentsTable(props: any){
   useEffect(() => {
     const fetchLinksCount = async () => {
         const linksCountMap = new Map<number, number>();
-        
+        const resourcesCountMap = new Map<number, number>();
+
         for (const doc of documentsCoordinates) {
-            const count = await getDocumentLinksCount(doc.id); // Assicurati che ogni documento abbia un campo "id"
-            linksCountMap.set(doc.id, count); // Memorizza il conteggio dei link
+            const countLink = await getDocumentLinksCount(doc.id); // Assicurati che ogni documento abbia un campo "id"
+            linksCountMap.set(doc.id, countLink); // Memorizza il conteggio dei link
+            const countRes = await getDocumentResourcesCount(doc.id);
+            resourcesCountMap.set(doc.id, countRes);
         }
 
         setDocumentsLinksCount(linksCountMap); // Imposta lo stato
+        setDocumentsResourcesCount(resourcesCountMap);
     };
 
     if (documentsCoordinates.length > 0) {
-        fetchLinksCount(); // Chiamata quando i documenti sono disponibili
+        fetchLinksCount().then(); // Chiamata quando i documenti sono disponibili
     }
 }, [documentsCoordinates]);
 
@@ -164,14 +329,13 @@ function DocumentsTable(props: any){
   const handleDeleteDocument = (doc: DocCoordinates) => {
     setShowModalConfirmDelete(true);
     setDocumentDelete(doc);
-    console.log(documentDelete)
   } 
 
   const handleDeleteClick = async () => {
     try{
         if(documentDelete){
           await API.deleteDocument(documentDelete.id).then();
-          getDocuments();
+          getDocuments().then();
         }
         setDocumentDelete(null);
     }catch(err){
@@ -189,7 +353,7 @@ function DocumentsTable(props: any){
     try{
       if(documentGeoreferenceDelete){
         await API.deleteDocumentCoordinates(documentGeoreferenceDelete.id);
-        getDocuments();
+        getDocuments().then();
       }
       setDocumentGeoreferenceDelete(null);
     }catch(err){
@@ -199,7 +363,6 @@ function DocumentsTable(props: any){
 
   //---------- ADD DOCUMENT'S GEOREFERENCE -----------//
   const handleAddGeoreference = (doc: DocCoordinates) => {
-    console.log(doc.coordinates);
     setDocumentSelected(doc);
     setMode('insert');
     setShowModalGeoreference(true);
@@ -282,7 +445,118 @@ function DocumentsTable(props: any){
               </div>
             )}
           </div>
-      
+          <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
+            {/* Ordinamento */}
+            <div className="flex items-center space-x-2">
+              <label className="text-sm font-medium text-gray-700">Sort by:</label>
+              <div className="relative inline-block">
+                {/* Bottone per aprire il dropdown */}
+                <div
+                  onClick={toggleDropdown}
+                  className="flex items-center justify-between border border-gray-300 rounded-lg px-4 py-2 text-sm shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white cursor-pointer w-48"
+                >
+                  <span>
+                    {selectedOrder === "none" ? "None" : selectedOrder === "asc" ? "Title (A-Z)" : "Title (Z-A)"}
+                  </span>
+                  <ChevronDownIcon className="h-4 w-4 text-gray-500" />
+                </div>
+
+                {/* Dropdown Menu */}
+                {isDropdownOpen && (
+                  <div className="absolute left-0 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                    {/* Opzione "None" */}
+                    <div
+                      onClick={() => handleSelectOrder("none")}
+                      className="cursor-pointer hover:bg-blue-100 px-4 py-2 text-sm text-gray-700"
+                    >
+                      None
+                    </div>
+                    {/* Le opzioni del dropdown */}
+                    <div
+                      onClick={() => handleSelectOrder("asc")}
+                      className="cursor-pointer hover:bg-blue-100 px-4 py-2 text-sm text-gray-700"
+                    >
+                      Title (A-Z)
+                    </div>
+                    <div
+                      onClick={() => handleSelectOrder("desc")}
+                      className="cursor-pointer hover:bg-blue-100 px-4 py-2 text-sm text-gray-700"
+                    >
+                      Title (Z-A)
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Filtro per range di date */}
+            <div className="flex items-center space-x-4">
+              {/* Filtro per range di date */}
+              <div className="flex flex-col items-start">
+                <label className="text-xs font-medium text-gray-700">Start Date</label>
+                <input
+                  type="text"
+                  placeholder="dd/mm/yyyy, mm/yyyy, yyyy"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-48 border border-gray-300 rounded px-2 py-1 text-xs shadow-sm focus:outline-none focus:ring focus:ring-blue-200"
+                />
+              </div>
+
+              <div className="flex flex-col items-start">
+                <label className="text-xs font-medium text-gray-700">End Date</label>
+                <input
+                  type="text"
+                  placeholder="dd/mm/yyyy, mm/yyyy, yyyy"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-48 border border-gray-300 rounded px-2 py-1 text-xs shadow-sm focus:outline-none focus:ring focus:ring-blue-200"
+                />
+              </div>
+              
+              <div className="flex flex-col items-start">
+                <label className="text-xs font-medium text-white">-</label>
+                <button
+                  onClick={handleFilterByDateRange}
+                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded shadow-sm focus:outline-none focus:ring focus:ring-blue-300 transition"
+                >
+                  Filter
+                </button>
+              </div>
+            </div>
+
+            {/* Filtro per tipo documento */}
+            <div className="flex items-center space-x-2">
+              <label className="text-sm font-medium text-gray-700">Type Document:</label>
+              <div className="relative inline-block">
+                {/* Bottone per aprire il dropdown */}
+                <div
+                  onClick={toggleDropdownTypeDocument}
+                  className="flex items-center justify-between border border-gray-300 rounded-lg px-4 py-2 text-sm shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white cursor-pointer w-60"  // Imposta una larghezza fissa
+                >
+                  <span>{selectedValueTypeDocument || "All Types"}</span>
+                  <ChevronDownIcon className="h-4 w-4 text-gray-500" />
+                </div>
+
+                {/* Dropdown Menu */}
+                {isOpenTypeDocument && (
+                  <div className="absolute left-0 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                    {documentTypes.map((type) => (
+                      <div
+                        key={type}
+                        onClick={() => handleSelect(type)}
+                        className="cursor-pointer hover:bg-blue-100 px-4 py-2 text-sm text-gray-700"
+                      >
+                        {type}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+
           {filteredDocuments.length == 0 ? (
             <div className="flex flex-col items-center mt-6">
               <FaceFrownIcon className="h-10 w-10 text-gray-400" />
@@ -294,11 +568,11 @@ function DocumentsTable(props: any){
                 <table className="min-w-full bg-white border border-gray-200 shadow-lg rounded-lg table-auto">
                   <thead>
                     <tr className="bg-gray-200 text-gray-600">
-                      <th className="px-2 py-4 text-left text-sm font-semibold w-[5%]">Icon</th>
+                      <th className="px-2 py-4 text-left text-sm font-semibold w-[3%]">Icon</th>
                       <th className="px-2 py-4 text-center text-sm font-semibold w-[15%]">Title</th>
                       <th className="px-2 py-4 text-center text-sm font-semibold w-[15%]">Stakeholder(s)</th>
                       <th className="px-2 py-4 text-center text-sm font-semibold w-[5%]">Scale</th>
-                      <th className="px-2 py-4 text-center text-sm font-semibold w-[5%]">Pages</th>
+                      <th className="px-2 py-4 text-center text-sm font-semibold w-[7%]">Date</th>
                       <th className="px-2 py-4 text-center text-sm font-semibold w-[5%]">Language</th>
                       <th className="px-2 py-4 text-center text-sm font-semibold w-[25%]">Description</th>
                       <th className="px-2 py-4 text-center text-sm font-semibold w-[5%]">Links</th>
@@ -315,13 +589,13 @@ function DocumentsTable(props: any){
                           index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
                         }`}
                       >
-                        <td className="px-2 py-4 relative justify-center items-center w-[5%]">{props.getDocumentIcon(doc.type, 8)}</td>
+                        <td className="px-2 py-4 relative justify-center items-center w-[3%]">{props.getDocumentIcon(doc.type, 8)}</td>
                         <td className="px-2 py-4 text-sm text-gray-600 w-[15%] text-center">{doc.title}</td>
                         <td className="px-2 py-4 text-sm text-gray-600 w-[15%] text-center">
                           {doc.stakeHolders.map((sh) => sh.name).join(' / ')}
                         </td>
                         <td className="px-2 py-4 text-sm text-gray-600 w-[5%] text-center">{doc.scale}</td>
-                        <td className="px-2 py-4 text-sm text-gray-600 w-[5%] text-center">{doc.pages != null ? doc.pages : "-"}</td>
+                        <td className="px-2 py-4 text-sm text-gray-600 w-[7%] text-center">{doc.issuanceDate}</td>
                         <td className="px-2 py-4 text-sm text-gray-600 w-[5%] text-center">{doc.language != null ? doc.language : "-"}</td>
                         <td className="px-2 py-4 text-sm text-gray-600 w-[25%] text-center">
                           <TruncatedText
@@ -366,7 +640,7 @@ function DocumentsTable(props: any){
                                     className="flex items-center justify-center rounded-full border-1 border-yellow-500 hover:border-yellow-600 text-yellow-500 hover:text-yellow-600 w-7 h-7 hover:shadow-lg"
                                     onClick={() => handleEditGeoreference(doc)}
                                   >
-                                    <MapIcon className="h-4 w-4" />
+                                    <img src="/img/editMap-icon-yellow.png" alt="Informative Document" className="h-4 w-4"/>
                                   </button>
                                 </div>
                               )}
@@ -395,7 +669,7 @@ function DocumentsTable(props: any){
                               onClick={() => navigate(`${doc.id}/resources`, { state: { from: "/documents" } })}
                               className="bg-white text-gray-600 hover:bg-gray-200 rounded-full w-8 h-8 relative items-center justify-center text-xs font-medium border-1 hover:border-gray-800 hover:shadow-lg transition-all duration-300 ease-in-out"
                             >
-                              {documentsLinksCount.get(doc.id) != undefined ? documentsLinksCount.get(doc.id) : 0}
+                              {documentsResourcesCount.get(doc.id) != undefined ? documentsResourcesCount.get(doc.id) : 0}
                             </button>
                         </td>
                         {props.user.role === "Urban Planner" && (
@@ -424,6 +698,24 @@ function DocumentsTable(props: any){
             </>
           )}
 
+          {showAlertErrorDate &&
+            <Alert
+              message="The date range is invalid. Please ensure you use the correct format: dd/mm/yyyy mm/yyyy yyyy."
+              onClose={() => {
+                  setShowAlertErrorDate(false);
+              }}
+            />
+          }
+
+          {showAlertStartAfterEnd &&
+            <Alert
+              message="Error: Start date cannot be after End date"
+              onClose={() => {
+                  setShowAlertStartAfterEnd(false);
+              }}
+            />
+          }
+
           {documentEdit && (
             <EditDocumentModal 
               document={documentEdit} 
@@ -431,7 +723,7 @@ function DocumentsTable(props: any){
               onHide={() => {
                 setShowModalEditDocument(false)
                 setDocumentEdit(null);
-                getDocuments(); //refresh of documents
+                getDocuments().then(); //refresh of documents
                 
               }} 
               refreshSelectedDocument={refreshSelectedDocument}
@@ -462,7 +754,7 @@ function DocumentsTable(props: any){
           />}
 
           {/* Show the map with the coordinates of a specific document */}
-          {viewDocumentGeoreference ? <>{console.log("view")}</> : <></>}
+          {/*viewDocumentGeoreference ? <>{console.log("view")}</> : <></>*/}
 
           {showModalGeoreference && mode && documentSelected &&
                 <ModalEditGeoreference
@@ -474,7 +766,7 @@ function DocumentsTable(props: any){
                     geoJsonData={props.geoJsonData}
 
                     onClose={() => {    
-                      getDocuments(); //refresh of documents
+                      getDocuments().then(); //refresh of documents
                       setShowModalGeoreference(false)
                       setMode(null); //reset the mode
                     }}

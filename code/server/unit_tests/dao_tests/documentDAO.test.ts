@@ -7,6 +7,7 @@ import { DocLink } from "../../src/models/document_link"
 import { Database } from "sqlite3";
 import Link from "../../src/models/link"
 import {DocumentNotFoundError} from "../../src/errors/document";
+import Resources from "../../src/models/original_resources"
 
 jest.mock("../../src/db/db.ts");
 
@@ -20,11 +21,13 @@ describe('documentDAO', () => {
 
     const dao = new DocumentDAO();
     const testId = 1;
+    const resourceId = 2;
     const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
     const testStakeholder2 = new Stakeholder(2, "Bob", "urban developer");
     const testDocument = new Document(testId, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
     const testDocument2 = new Document(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2");
     const testDocument3 = new Document(3, "title 3", [testStakeholder2], "1:1", "2020-10-10", "Material effect", "English", "300", "description 3");
+    const mockResourceData = new Uint8Array([1, 2, 3, 4]);
 
     describe('addDocument', () => {
         test('It should successfully add a document', async () => {
@@ -1377,11 +1380,11 @@ describe('documentDAO', () => {
                 return {} as Database;
             })
     
-            await expect(dao.addResourceToDocument(testId, "title", new Uint8Array([10, 10, 20]))).resolves.toBeUndefined();
+            await expect(dao.addResourceToDocument(testId, "title", "2020-10-10")).resolves.toBeUndefined();
 
             expect(db.run).toHaveBeenCalledWith(
-                'INSERT INTO original_resources (id_doc, name, data) VALUES (?, ?, ?)',
-                [testId, "title", new Uint8Array([10, 10, 20])],
+                'INSERT INTO original_resources (document_id, resource_name, resource_data) VALUES (?, ?, ?)',
+                [testId, "title",  Buffer.from("2020-10-10", 'base64')],
                 expect.any(Function)
             );
     
@@ -1394,16 +1397,194 @@ describe('documentDAO', () => {
                     return {} as Database;
                 })
 
-            await expect(dao.addResourceToDocument).rejects.toThrow(`Database error`);
+             await expect(dao.addResourceToDocument(testId, "title", "2020-10-10")).rejects.toThrow('Database error');
         });
 
-        test('It should reject with error if an unexpected error occurs', async () => {
-            const unexpectedError = new Error("Unexpected error");
-            (db.run as jest.Mock).mockImplementation(() => {
-                throw unexpectedError;
-            });
+        test('should reject when the database returns an error', async () => {
+    
+            jest.spyOn(db, 'run')
+            .mockImplementationOnce((sql, params, callback) => {
+                callback(new Error('Unexpected error'));
+                return {} as Database;
+            })
 
-            await expect(dao.addResourceToDocument).rejects.toThrow("Unexpected error");
+            await expect(dao.addResourceToDocument(testId, "title", "2020-10-10")).rejects.toThrow('Unexpected error');
+    
+        });
+    });
+
+    describe(' getResourceData', () => {
+        test("It should get a specific resource to the specified document in the database", async () => {
+            jest.spyOn(db, 'get').mockImplementationOnce((sql, params, callback) => {
+                callback(null, { resource_data: mockResourceData });
+                return {} as Database;
+            })
+
+            await expect(dao.getResourceData(testId, resourceId)).resolves.toEqual(mockResourceData);
+
+            expect(db.get).toHaveBeenCalledWith(
+                'SELECT resource_data FROM original_resources WHERE document_id = ? AND resource_id = ?',
+                [testId, resourceId],
+                expect.any(Function)
+            );
+    
+        });
+
+        test('should reject with DocumentNotFoundError when no row is found', async () => {
+            jest.spyOn(db, 'get').mockImplementationOnce((sql, params, callback) => {
+                callback(null, null); // Simulate no row found
+                return {} as Database;
+            });
+    
+            await expect(dao.getResourceData(testId, resourceId)).rejects.toThrow(DocumentNotFoundError);
+    
+            expect(db.get).toHaveBeenCalledWith(
+                "SELECT resource_data FROM original_resources WHERE document_id = ? AND resource_id = ?",
+                [testId, resourceId],
+                expect.any(Function)
+            );
+        });
+
+        test('It should reject if there is a database error', async () => {
+            jest.spyOn(db, 'get')
+                .mockImplementationOnce((sql, params, callback) => {
+                    callback(new Error('Database error'));
+                    return {} as Database;
+                })
+
+             await expect(dao.getResourceData(testId, resourceId)).rejects.toThrow('Database error');
+        });
+
+        test('should reject when the database returns an error', async () => {
+    
+            jest.spyOn(db, 'get')
+            .mockImplementationOnce((sql, params, callback) => {
+                callback(new Error('Unexpected error'));
+                return {} as Database;
+            })
+
+            await expect(dao.getResourceData(testId, resourceId)).rejects.toThrow('Unexpected error');
+    
+        });
+    });
+
+    describe('getAllResourcesData', () => {
+    
+        test('should resolve with an array of resources when rows are returned', async () => {
+            const mockRows = [
+                {
+                    document_id: 1,
+                    resource_id: 1,
+                    resource_name: 'Resource 1',
+                    uploaded_at: new Date('2024-12-01T12:00:00Z'),
+                },
+                {
+                    document_id: 1,
+                    resource_id: 2,
+                    resource_name: 'Resource 2',
+                    uploaded_at: new Date('2024-12-02T12:00:00Z'),
+                },
+            ];
+            jest.spyOn(db, 'all').mockImplementationOnce((sql, params, callback) => {
+                callback(null, mockRows);
+                return {} as Database;
+            });
+    
+            const expectedResources: Resources[] = [
+                { id: 1, idDoc: 1, data: null, name: 'Resource 1', uploadTime: new Date('2024-12-01T12:00:00Z') },
+                { id: 2, idDoc: 1, data: null, name: 'Resource 2', uploadTime: new Date('2024-12-02T12:00:00Z') },
+            ];
+    
+            const result = await dao.getAllResourcesData(1);
+    
+            expect(result).toEqual(expectedResources);
+            expect(db.all).toHaveBeenCalledWith(
+                "SELECT resource_id, resource_name, uploaded_at,document_id FROM original_resources WHERE document_id = ?",
+                [1],
+                expect.any(Function)
+            );
+        });
+    
+        test('should resolve with an empty array when no rows are returned', async () => {
+            jest.spyOn(db, 'all').mockImplementationOnce((sql, params, callback) => {
+                callback(null, []); // Simulate no rows
+                return {} as Database;
+            });
+    
+            const result = await dao.getAllResourcesData(testId);
+    
+            expect(result).toEqual([]);
+            expect(db.all).toHaveBeenCalledWith(
+                "SELECT resource_id, resource_name, uploaded_at,document_id FROM original_resources WHERE document_id = ?",
+                [testId],
+                expect.any(Function)
+            );
+        });
+    
+        test('should reject with an error when the database query fails', async () => {
+            const mockError = new Error('Database error');
+            jest.spyOn(db, 'all').mockImplementationOnce((sql, params, callback) => {
+                callback(mockError, null); // Simulate database error
+                return {} as Database;
+            });
+    
+            await expect(dao.getAllResourcesData(testId)).rejects.toThrow('Database error');
+    
+            expect(db.all).toHaveBeenCalledWith(
+                "SELECT resource_id, resource_name, uploaded_at,document_id FROM original_resources WHERE document_id = ?",
+                [testId],
+                expect.any(Function)
+            );
+        });
+
+        describe('deleteResource', () => {
+            
+        
+            test('should resolve when the resource is successfully deleted', async () => {
+                jest.spyOn(db, 'run').mockImplementationOnce((sql, params, callback) => {
+                    callback(null); // Simulate successful deletion
+                    return {} as Database;
+                });
+        
+                await expect(dao.deleteResource(testId, "Resource 1")).resolves.not.toThrow();
+        
+                expect(db.run).toHaveBeenCalledWith(
+                    "DELETE FROM original_resources WHERE document_id = ? AND resource_name = ?",
+                    [testId, "Resource 1"],
+                    expect.any(Function)
+                );
+            });
+        
+            test('should reject with an error when the database query fails', async () => {
+                const mockError = new Error('Database error');
+                jest.spyOn(db, 'run').mockImplementationOnce((sql, params, callback) => {
+                    callback(mockError); // Simulate database error
+                    return {} as Database;
+                });
+        
+                await expect(dao.deleteResource(testId, "Resource 1")).rejects.toThrow('Database error');
+        
+                expect(db.run).toHaveBeenCalledWith(
+                    "DELETE FROM original_resources WHERE document_id = ? AND resource_name = ?",
+                    [testId, "Resource 1"],
+                    expect.any(Function)
+                );
+            });
+        
+            test('should resolve even if no rows are affected by the deletion query', async () => {
+                jest.spyOn(db, 'run').mockImplementationOnce((sql, params, callback) => {
+                    callback(null); // Simulate no error but no rows affected
+                    return {} as Database;
+                });
+        
+                await expect(dao.deleteResource(testId, "Resource 1")).resolves.not.toThrow();
+        
+                expect(db.run).toHaveBeenCalledWith(
+                    "DELETE FROM original_resources WHERE document_id = ? AND resource_name = ?",
+                    [testId, "Resource 1"],
+                    expect.any(Function)
+                );
+            });
         });
     });
 });

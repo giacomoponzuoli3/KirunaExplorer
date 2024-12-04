@@ -126,7 +126,7 @@ class DocumentRoutes {
             (req: any, res: any, next: any) => {
                 try {
                     this.controller.editDocument(
-                        req.params["id"],
+                        parseInt(req.params["id"], 10),
                         req.body["title"],
                         req.body["stakeHolders"],
                         req.body["scale"],
@@ -237,14 +237,15 @@ class DocumentRoutes {
         );
 
         this.router.get(
-            "/res/:idDoc",
+            "/res/:idDoc/:idRes",
             this.authenticator.isLoggedIn, //error 401
             this.authenticator.isPlanner, //error 403
             param("idDoc").isNumeric(),
+            param("idRes").isNumeric(),
             this.errorHandler.validateRequest,
             async (req: any, res: any, next: any) => {
                 try {
-                    const resources = await this.controller.getResourceData(req.params["idDoc"]);
+                    const resources = await this.controller.getResourceData(req.params["idDoc"], req.params["idRes"]);
                     res.status(200).json(resources);
                 } catch (err) {
                     next(err);
@@ -252,16 +253,30 @@ class DocumentRoutes {
             }
         );
 
-        this.router.delete(
+        this.router.get(
+            "/res-all/:idDoc",
+            param("idDoc").isNumeric(),
+            this.errorHandler.validateRequest,
+            async (req: any, res: any, next: any) => {
+                try {
+                    const resources = await this.controller.getAllResourcesData(req.params["idDoc"]);
+                    res.status(200).json(resources);
+                } catch (err) {
+                    next(err);
+                }
+            }
+        );
+
+         this.router.delete(
             "/res/:idDoc/:name",
             this.authenticator.isLoggedIn, //error 401
             this.authenticator.isPlanner, //error 403
-            param("id").isNumeric(),
+            param("idDoc").isNumeric(),
             param("name").isString().notEmpty(),
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
                 try {
-                    this.controller.deleteResource(req.params["id"], req.params["name"])
+                    this.controller.deleteResource(req.params["idDoc"], req.params["name"])
                         .then(() => res.status(200).json({ message: "Document deleted successfully" }))
                         .catch((err: Error) => next(err))
                 } catch (err) {

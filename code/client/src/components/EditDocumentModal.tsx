@@ -1,12 +1,11 @@
-import React, { useState,useEffect } from 'react';
-import { Container, Modal, Row, Col, Form, Button, Dropdown, ListGroup } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Container, Modal, Dropdown } from 'react-bootstrap';
 import { Document } from '../models/document';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import API from '../API/API';
 import { Stakeholder } from '../models/stakeholder';
 import '../modal.css'
 import Alert from "./Alert";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import Select from 'react-select';
 import ISO6391 from 'iso-639-1';
 import CreatableSelect from 'react-select/creatable';

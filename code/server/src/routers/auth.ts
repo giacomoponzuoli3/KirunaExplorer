@@ -110,12 +110,10 @@ class Authenticator {
     /**
      * Logs out the user.
      * @param req - The request object.
-     * @param res - The response object.
-     * @param next - The next middleware function.
      * @returns A Promise that resolves to null.
      */
-    logout(req: any, res: any, next: any) {
-        return new Promise((resolve, reject) => {
+    logout(req: any) {
+        return new Promise((resolve) => {
             req.logout(() => resolve(null))
         })
     }

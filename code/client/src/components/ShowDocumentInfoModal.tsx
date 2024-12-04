@@ -1,7 +1,6 @@
 
 import { useState } from 'react';
 import { Container, Modal, Row, Col } from 'react-bootstrap';
-import { Document } from '../models/document';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { User } from '../models/user';
 import API from '../API/API';
@@ -11,9 +10,8 @@ import { DocCoordinates } from '../models/document_coordinate';
 import { useNavigate } from 'react-router-dom';
 import { ModalEditGeoreference } from './ModalEditGeoreference';
 import ConfirmModal from './ConfirmModal';
-import { EditDocumentModal } from './EditDocumentModal';
 
-  
+
 interface ShowDocumentInfoModalProps {
     selectedDocumentCoordinates: DocCoordinates;
     show: boolean;
@@ -112,7 +110,7 @@ function ShowDocumentInfoModal({ geoJsonData, getDocumentIcon, selectedDocumentC
                                                 className="p-2 m-1 rounded-full border-2 bg-yellow-500 text-white hover:bg-yellow-600 transition-colors duration-200"
                                                 onClick={handleEditGeoreference}
                                             >
-                                                <MapIcon className="h-5 w-5 text-white" />
+                                                <img src="/img/editMap-icon-white.png" alt="Informative Document" className="h-5 w-5"/>
                                           </button>
                                         </div>
                                     )}
@@ -154,6 +152,12 @@ function ShowDocumentInfoModal({ geoJsonData, getDocumentIcon, selectedDocumentC
                         className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium"
                     >
                         View connections
+                    </button>
+                    <button 
+                        onClick={() => navigate(`documents/${selectedDocumentCoordinates.id}/resources`, { state: { from: "/documents" } })}
+                        className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium"
+                    >
+                        View resources
                     </button>
                 </Modal.Footer>
             </Modal>
