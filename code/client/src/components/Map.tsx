@@ -16,8 +16,8 @@ import geoJson from '../utility/KirunaMunicipality.json'
 
 // Limiti della mappa per Kiruna
 const kirunaBounds = new LatLngBounds(
-  [67.790390, 20.416509],  // Sud-ovest
-  [67.889194, 20.050656]   // Nord-est
+  [67.3556, 17.8994],  // Sud-ovest
+  [69.0592, 23.2858]   // Nord-est
 );
 
 const position: LatLngTuple = [67.8558, 20.2253];
@@ -97,12 +97,12 @@ function SetMapViewHome(props: any) {
 
   useEffect(() => {
     if (map.getZoom() === undefined) {
-      map.setView(position, 7);
+      map.setView(position, 8);
     }
 
     map.setMaxZoom(18);
     map.setMinZoom(2);
-    //map.setMaxBounds(kirunaBounds);
+    map.setMaxBounds(kirunaBounds);
     map.options.maxBoundsViscosity = 1.0;
 
     const satelliteLayer = L.tileLayer(
@@ -332,7 +332,7 @@ function SetMapViewHome(props: any) {
   return (
     <>
       {showPolygonMessage && (
-        <div className="fixed top-2/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] bg-gray-200 text-black text-sm px-2 py-1 rounded-md shadow-lg border">
+        <div className="fixed top-3/4 left-1/2 transform -translate-x-1/2 z-[1000] bg-gray-200 text-black text-sm px-4 py-2 rounded-md shadow-lg border">
           area: <strong>the entire municipality of Kiruna</strong>
         </div>
       )}
@@ -373,7 +373,7 @@ function SetMapViewEdit(props: any) {
 
     map.setMaxZoom(18);
     map.setMinZoom(3);
-    //map.setMaxBounds(kirunaBounds);
+    map.setMaxBounds(kirunaBounds);
 
     map.addLayer(drawnItems); // Aggiungi il gruppo alla mappa
 
@@ -654,12 +654,12 @@ const SetViewDocumentCoordinates = (props: any) => {
     const centralCoord = calculateCentroid(latLngs);
 
     if (map.getZoom() === undefined) {
-      map.setView(centralCoord, 7);
+      map.setView(centralCoord, 8);
     }
 
     map.setMaxZoom(18);
     map.setMinZoom(3);
-    //map.setMaxBounds(kirunaBounds);
+    map.setMaxBounds(kirunaBounds);
 
     const satelliteLayer = L.tileLayer(
       'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
@@ -808,11 +808,12 @@ function MapView(props: any) {
             >
               <SetViewDocumentCoordinates position={position} documentCoordinates={documentCoordinates} getDocumentIcon={props.getDocumentIcon} geoJsonData={props.geoJsonData} setShowPolygonMessage={setShowPolygonMessage}/>
               {showPolygonMessage && (
-                <div className="fixed top-2/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] bg-gray-200 text-black text-sm px-2 py-1 rounded-md shadow-lg border">
+                <div className="fixed top-3/4 left-1/2 transform -translate-x-1/2 z-[1000] bg-gray-200 text-black text-sm px-4 py-2 rounded-md shadow-lg border">
                   area: <strong>the entire municipality of Kiruna</strong>
                 </div>
               )}
             </MapContainer>
+            
           </div>
         </div>
       }
