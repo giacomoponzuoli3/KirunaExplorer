@@ -497,7 +497,10 @@ function GeoreferenceNewDocumentModal({
             justifyContent: 'center',
             backgroundColor: "#A7C7E7"
           }}>
-            If u need more information on how to select a point, draw an area, pick the whole area or enter coordinates, 
+            If u need more information on how to <b style={{ marginLeft: '4px' }}>select a point</b>,
+            <b style={{ marginLeft: '4px' }}>draw an area</b>, 
+            <b style={{ marginLeft: '4px', marginRight: '4px' }}>pick the whole area </b> 
+            or <b style={{ marginLeft: '4px', marginRight: '4px'}}>enter coordinates</b>, 
             click on the <b style={{ marginLeft: '4px' }}> Info Button</b>
             <i className="bi bi-info-square fs-8" style={{ marginLeft: '4px' }}></i>
           </label>
