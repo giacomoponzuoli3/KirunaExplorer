@@ -56,7 +56,7 @@ Retrospective index:
 - **Total estimation error ratio: sum of total hours spent / sum of total hours effort - 1**
 
 
-    $$\frac{\sum_i spent_{task_i}}{\sum_i estimation_{task_i}} - 1 = \frac{115,42}{112} - 1 = 1,0305 $$ 
+    $$\frac{\sum_i spent_{task_i}}{\sum_i estimation_{task_i}} - 1 = \frac{115,42}{112} - 1 = 0,0305 $$ 
     
 - **Absolute relative task estimation error: sum( abs( spent-task-i / estimation-task-i - 1))/n**
 
@@ -120,4 +120,4 @@ For the next sprint we should avoid last-minute task completion and aim to start
 
 - **One thing you are proud of as a Team!!**
 
-I am proud of how much we have grown as a team. We have learned to communicate effectively with each other, recognize and leverage our individual strengths, and address our weaknesses together. We’ve built a culture of giving both positive and constructive feedback, which has helped us improve continuously. Most importantly, we genuinely care about delivering a high-quality product and ensuring that our work reflects our collective dedication and effort
+We are proud of how much we have grown as a team. We have learned to communicate effectively with each other, recognize and leverage our individual strengths, and address our weaknesses together. We’ve built a culture of giving both positive and constructive feedback, which has helped us improve continuously. Most importantly, we genuinely care about delivering a high-quality product and ensuring that our work reflects our collective dedication and effort
