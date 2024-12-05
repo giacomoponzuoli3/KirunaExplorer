@@ -388,6 +388,8 @@ useEffect(() => {
           await API.deleteDocument(documentDelete.id).then();
           getDocuments().then();
         }
+        props.refreshDocumentsCoordinates();
+        props.refreshDocuments();
         setDocumentDelete(null);
     }catch(err){
       setShowAlert(true);
@@ -406,6 +408,8 @@ useEffect(() => {
         await API.deleteDocumentCoordinates(documentGeoreferenceDelete.id);
         getDocuments().then();
       }
+      props.refreshDocumentsCoordinates();
+      props.refreshDocuments();
       setDocumentGeoreferenceDelete(null);
     }catch(err){
       setShowAlert(true);
@@ -799,6 +803,8 @@ useEffect(() => {
               onHide={() => {
                 setShowModalEditDocument(false)
                 setDocumentEdit(null);
+                props.refreshDocumentsCoordinates();
+                props.refreshDocuments();
                 getDocuments().then(); //refresh of documents
                 setStartDate('');
                 setEndDate('');
