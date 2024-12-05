@@ -1,8 +1,7 @@
-TEMPLATE FOR RETROSPECTIVE (Team ##)
+RETROSPECTIVE SPRINT 3 (Team 12)
 =====================================
 
-The retrospective should include _at least_ the following
-sections:
+Retrospective index:
 
 - [process measures](#process-measures)
 - [quality measures](#quality-measures)
@@ -20,7 +19,7 @@ sections:
 > The number of points done is 18.
 - Nr of hours planned vs. spent (as a team)
 > The number of hours planned is 112h.
-> The number of hours spent is .
+> The number of hours spent is 115h 25m.
 
 **Remember**  a story is done ONLY if it fits the Definition of Done:
  
@@ -35,11 +34,11 @@ sections:
 
 | Story  | # Tasks | Points | Hours est. | Hours actual |
 |--------|---------|--------|------------|--------------|
-|  _#0_  |    35   |   -    |  60h 30m   |              |
-|  KX6   |    4    |   3    |    5h      |              |
-|  KX7   |    11   |   5    |    18h     |              |
-|  KX8   |    10   |   5    |    17h     |              |
-|  KX9   |    10   |   5    |  20h 30m   |              |
+|  _#0_  |    16   |   -    |  51h 30m   |     56h      |
+|  KX6   |    4    |   3    |    5h      |    5h 15m    |
+|  KX7   |    11   |   5    |    18h     |   21h 30m    |
+|  KX8   |    10   |   5    |    17h     |   16h 30m    |
+|  KX9   |    10   |   5    |  20h 30m   |   16h 10m    |
    
 
 > place technical tasks corresponding to story `#0` and leave out story points (not applicable in this case)
@@ -48,24 +47,33 @@ sections:
 
    estimate hours per task average: 2h 2m
 
-   actual hours per task average: 
+   actual hours per task average: 2h 3m
 
-   estimed standard deviation: 
+   estimed standard deviation: 2,177
 
-   actual standard deviation: 
+   actual standard deviation: 2,360
+
+- **Total estimation error ratio: sum of total hours spent / sum of total hours effort - 1**
 
 
-  
+    $$\frac{\sum_i spent_{task_i}}{\sum_i estimation_{task_i}} - 1 = \frac{115,42}{112} - 1 = 1,0305 $$ 
+    
+- **Absolute relative task estimation error: sum( abs( spent-task-i / estimation-task-i - 1))/n**
+
+
+    $$\frac{1}{n}\sum_i^n \left| \frac{spent_{task_i}}{estimation_{task_i}}-1 \right| = \frac{1}{5} ( 0,0874 + 0,05 + 0,1944 + 0,2941 + 0,2114 ) = 0,1675  $$
+
+ 
 ## QUALITY MEASURES 
 
 - Unit Testing:
   - Total hours estimated: **10h 30m**
-  - Total hours spent:
-  - Nr of automated unit test cases:  
+  - Total hours spent: **7h**
+  - Nr of automated unit test cases: **278** 
   - Coverage (if available)
 - E2E testing:
-  - Total hours estimated:
-  - Total hours spent:
+  - Total hours estimated: **7h**
+  - Total hours spent: **4h 30m**
 - Code review 
   - Total hours estimated: **6h**
   - Total hours spent: **6h**
@@ -80,7 +88,7 @@ sections:
 
 - **What caused your errors in estimation (if any)?**
 
-   -
+   -This sprint we overestimated the time for testing and we underestimated the time for developing the frontend. As a result of gaining more experience with testing, we needed less time to do them. Also the implementation of some features in the frontend turned out to be more complicated then we initially thought. 
 
 - **What lessons did you learn (both positive and negative) in this sprint?**
 
