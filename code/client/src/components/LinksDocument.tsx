@@ -289,7 +289,7 @@ function LinksDocument(props: any) {
                     <thead>
                       <tr className="bg-gray-100 border-b">
                         {headers.map((header, index) => (
-                          <th key={index} className={`p-4 text-left text-sm font-semibold w-[${header.width}]`}>
+                          <th className={`p-4 text-left text-sm font-semibold w-[${header.width}]`}>
                             {header.label}
                           </th>
                         ))}
@@ -300,7 +300,7 @@ function LinksDocument(props: any) {
                     </thead>
                     <tbody>
                       {paginatedLinks.map((doc, index) => (
-                        <tr key={index} className={`border-b transition duration-200 ease-in-out 
+                        <tr key={doc.id} className={`border-b transition duration-200 ease-in-out 
                           ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
                         `}>
                           <td className="p-4 w-[5%]">{props.getDocumentIcon(doc.type, 7)}</td>
