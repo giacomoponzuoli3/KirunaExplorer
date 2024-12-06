@@ -55,13 +55,13 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({ text, maxWords }) => {
 
 
 const headers = [
-  { label: 'Icon', width: '5%' },
-  { label: 'Title', width: '15%' },
-  { label: 'Stakeholder(s)', width: '15%' },
-  { label: 'Date', width: '10%' },
-  { label: 'Scale', width: '10%' },
-  { label: 'Description', width: '40%' },
-  { label: 'Type of Link', width: '10%' }
+  { id: 'icon', label: 'Icon', width: '5%' },
+  { id: 'title', label: 'Title', width: '15%' },
+  { id: 'stakeholders', label: 'Stakeholder(s)', width: '15%' },
+  { id: 'date', label: 'Date', width: '10%' },
+  { id: 'scale', label: 'Scale', width: '10%' },
+  { id: 'description', label: 'Description', width: '40%' },
+  { id: 'typeOfLink', label: 'Type of Link', width: '10%' }
 ];
 
 function LinksDocument(props: any) {
@@ -288,8 +288,8 @@ function LinksDocument(props: any) {
                   <table className="min-w-full bg-white border border-gray-200 shadow-lg rounded-lg table-auto">
                     <thead>
                       <tr className="bg-gray-100 border-b">
-                        {headers.map((header, index) => (
-                          <th className={`p-4 text-left text-sm font-semibold w-[${header.width}]`}>
+                        {headers.map((header) => (
+                          <th key={header.id} className={`p-4 text-left text-sm font-semibold w-[${header.width}]`}>
                             {header.label}
                           </th>
                         ))}
