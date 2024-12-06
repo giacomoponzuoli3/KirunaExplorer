@@ -487,6 +487,13 @@ useEffect(() => {
                 {/* Bottone per aprire il dropdown */}
                 <div
                   onClick={toggleDropdownTypeDocument}
+                  onKeyDown={(e) => {
+                    // Attiva il dropdown con 'Enter' o 'Space'
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      toggleDropdownTypeDocument();
+                    }
+                  }}
+                  tabIndex={0}  // Aggiungi tabIndex per rendere il div focusabile
                   className="flex items-center justify-between border border-gray-300 rounded-lg px-4 py-2 text-sm shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white cursor-pointer w-60"  // Imposta una larghezza fissa
                 >
                   <span>{selectedValueTypeDocument || "All Types"}</span>
@@ -500,6 +507,12 @@ useEffect(() => {
                       <div
                         key={type}
                         onClick={() => handleSelect(type)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            handleSelect(type);  // Se 'Enter' o 'Space' viene premuto, seleziona il tipo
+                          }
+                        }}
+                        tabIndex={0}  // Rende l'elemento focusabile
                         className="cursor-pointer hover:bg-blue-100 px-4 py-2 text-sm text-gray-700"
                       >
                         {type}
