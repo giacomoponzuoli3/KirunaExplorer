@@ -54,6 +54,15 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({ text, maxWords }) => {
 };
 
 
+const headers = [
+  { label: 'Icon', width: '5%' },
+  { label: 'Title', width: '15%' },
+  { label: 'Stakeholder(s)', width: '15%' },
+  { label: 'Date', width: '10%' },
+  { label: 'Scale', width: '10%' },
+  { label: 'Description', width: '40%' },
+  { label: 'Type of Link', width: '10%' }
+];
 
 function LinksDocument(props: any) {
     const navigate = useNavigate();
@@ -279,13 +288,11 @@ function LinksDocument(props: any) {
                   <table className="min-w-full bg-white border border-gray-200 shadow-lg rounded-lg table-auto">
                     <thead>
                       <tr className="bg-gray-100 border-b">
-                        <th className="p-4 text-left text-sm font-semibold w-[5%]">Icon</th>
-                        <th className="p-4 text-left text-sm font-semibold w-[15%]">Title</th>
-                        <th className="p-4 text-left text-sm font-semibold w-[15%]">Stakeholder(s)</th>
-                        <th className="p-4 text-left text-sm font-semibold w-[10%]">Date</th>
-                        <th className="p-4 text-left text-sm font-semibold w-[10%]">Scale</th>
-                        <th className="p-4 text-left text-sm font-semibold w-[40%]">Description</th>
-                        <th className="p-4 text-left text-sm font-semibold w-[10%]">Type of Link</th>
+                        {headers.map((header, index) => (
+                          <th key={index} className={`p-4 text-left text-sm font-semibold w-[${header.width}]`}>
+                            {header.label}
+                          </th>
+                        ))}
                         {props.isLogged && props.user.role == "Urban Planner" && (
                           <th className="p-4 text-left text-sm font-semibold w-[5%]">Actions</th>
                         )}
