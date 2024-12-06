@@ -273,13 +273,10 @@ class DocumentRoutes {
             param("name").isString().notEmpty(),
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
-                try {
-                    this.controller.deleteResource(req.params["idDoc"], req.params["name"])
-                        .then(() => res.status(200).json({ message: "Document deleted successfully" }))
-                        .catch((err: Error) => next(err))
-                } catch (err) {
-                    next(err);
-                }
+
+                this.controller.deleteResource(req.params["idDoc"], req.params["name"])
+                    .then(() => res.status(200).json({ message: "Document deleted successfully" }))
+                    .catch((err: Error) => next(err))
             }
         );
     }

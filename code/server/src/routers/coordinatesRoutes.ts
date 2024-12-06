@@ -54,14 +54,12 @@ class CoordinatesRoutes {
             }),
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
-                try {
-                    this.controller.setDocumentCoordinates(req.body.idDoc, req.body.coordinates)
-                        .then(() => {
-                            return res.status(200).json({ message: "Coordinates added successfully" });})
-                        .catch((err: Error) => next(err));
-                } catch (err) {
-                    next(err);
-                }
+
+                this.controller.setDocumentCoordinates(req.body.idDoc, req.body.coordinates)
+                    .then(() => {
+                        return res.status(200).json({ message: "Coordinates added successfully" });})
+                    .catch((err: Error) => next(err));
+
             }
         )
 
@@ -80,13 +78,10 @@ class CoordinatesRoutes {
             }),
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
-                try {
-                    this.controller.updateDocumentCoordinates(req.body.idDoc, req.body.coordinates)
-                        .then(() => res.status(200).json({ message: "Coordinates updated successfully" }))
-                        .catch((err: Error) => next(err))
-                } catch (err) {
-                    next(err)
-                }
+
+                this.controller.updateDocumentCoordinates(req.body.idDoc, req.body.coordinates)
+                    .then(() => res.status(200).json({ message: "Coordinates updated successfully" }))
+                    .catch((err: Error) => next(err))
             }
         )
         
@@ -101,13 +96,11 @@ class CoordinatesRoutes {
             param("id").isNumeric(),
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
-                try {
-                    this.controller.deleteDocumentCoordinates(req.params["id"])
-                        .then(() => res.status(200).json({ message: "Document's coordinates deleted successfully" }))
-                        .catch((err: Error) => next(err))
-                } catch (err) {
-                    next(err);
-                }
+
+                this.controller.deleteDocumentCoordinates(req.params["id"])
+                    .then(() => res.status(200).json({ message: "Document's coordinates deleted successfully" }))
+                    .catch((err: Error) => next(err))
+
             }
             
         )

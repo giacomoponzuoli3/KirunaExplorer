@@ -28,13 +28,10 @@ class ScaleRoutes {
         this.router.get(
             "/",
             (_req: any, res: any, next: any) => {
-                try {
-                    this.controller.getScales()
-                        .then((scales: Scale[]) => res.status(200).json(scales))
-                        .catch((err: Error) => next(err))
-                } catch (err) {
-                    next(err)
-                }
+
+                this.controller.getScales()
+                    .then((scales: Scale[]) => res.status(200).json(scales))
+                    .catch((err: Error) => next(err))
             }
         )
         
