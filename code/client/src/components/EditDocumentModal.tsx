@@ -23,14 +23,14 @@ const RequiredLabel: React.FC<RequiredLabelProps> = ({ text }) => (
 );
 
 interface EditDocumentModalProps {
-    document: Document;
-    show: boolean;
-    onHide: () => void;
+    readonly document: Document;
+    readonly show: boolean;
+    readonly onHide: () => void;
     refreshSelectedDocument: (doc: DocCoordinates) => void;
-    stakeholders: Stakeholder[];
-    scaleOptions: { value: string; label: string }[];
+    readonly stakeholders: Stakeholder[];
+    readonly scaleOptions: { value: string; label: string }[];
     //setScaleOptions: React.Dispatch<React.SetStateAction<{ value: string; label: string }[]>>;
-    onCreateScale: (inputValue: string) => Promise<void>;
+    readonly onCreateScale: (inputValue: string) => Promise<void>;
 }
 
 function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, stakeholders, scaleOptions, onCreateScale }: EditDocumentModalProps) {
