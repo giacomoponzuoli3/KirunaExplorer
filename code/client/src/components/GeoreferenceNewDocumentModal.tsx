@@ -403,8 +403,12 @@ function GeoreferenceNewDocumentModal({
             return
         }
 
-        const regexLat = /(\d+)°(\d+)'(\d+)''([NS])$/;
-        const regexLng = /(\d+)°(\d+)'(\d+)''([EW])$/;
+        //const regexLat = /(\d+)°(\d+)'(\d+)''([NS])$/;
+        //const regexLng = /(\d+)°(\d+)'(\d+)''([EW])$/;
+
+        const regexLat = /(\d{1,2})°(\d{1,2})'(\d{1,2})''([NS])$/;
+        const regexLng = /(\d{1,3})°(\d{1,2})'(\d{1,2})''([EW])$/;
+
         const lat = DMSStringToDecimal(latitude.trim().replace(/\s+/g, ''),regexLat)
         const lng = DMSStringToDecimal(longitude.trim().replace(/\s+/g, ''),regexLng)
         console.log("Latitude: " + lat)
