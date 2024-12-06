@@ -33,7 +33,6 @@ interface AddDocumentModalProps {
     stakeholders: Stakeholder[];
     showGeoreferenceNewDocumentModal: (doc: Document, files: File[]) => void;
     scaleOptions: { value: string; label: string }[];
-    //setScaleOptions: React.Dispatch<React.SetStateAction<{ value: string; label: string }[]>>;
     onCreateScale: (inputValue: string) => Promise<void>;
 }
 
@@ -41,7 +40,6 @@ interface AddDocumentModalProps {
 function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeoreferenceNewDocumentModal, scaleOptions, onCreateScale}: AddDocumentModalProps) {
     const [title, setTitle] = useState('');
     const [selectedStakeholders, setSelectedStakeholders] = useState<Stakeholder[]>([]);
-    //const [scaleOptions, setScaleOptions] = useState<{ value: string; label: string }[]>([]);
     const [scale, setScale] = useState('');
     const [issuanceDate, setIssuanceDate] = useState('');
     const [type, setType] = useState('');
@@ -57,7 +55,6 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
 
     const [showAlert, setShowAlert] = useState(false); // alert state
     const [alertMessage, setAlertMessage] = useState('');
-    const [showAlertErrorDate, setShowAlertErrorDate] = useState<boolean>(false);
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -65,7 +62,6 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
         setTitle('');
         setSelectedStakeholders([]);
         setScale('');
-        //setScaleOptions([]);
         setIssuanceDate('');
         setType('');
         setLanguage(null);
