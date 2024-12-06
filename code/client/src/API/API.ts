@@ -69,7 +69,20 @@ async function register(username: string, name: string, surname: string, passwor
 }
 
 /** ------------------- Document APIs ------------------------ */
-async function addDocument(title: string, stakeHolders: Stakeholder[], scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string) {
+interface AddDocumentParams {
+    title: string;
+    stakeHolders: Stakeholder[];
+    scale: string;
+    issuanceDate: string;
+    type: string;
+    language: string | null;
+    pages: string | null;
+    description: string;
+}
+
+
+async function addDocument(params: AddDocumentParams) {
+    const { title, stakeHolders, scale, issuanceDate, type, language, pages, description } = params;
     let response = await fetch(baseURL + "doc", {
         method: 'POST',
         headers: {

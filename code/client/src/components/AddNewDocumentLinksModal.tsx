@@ -154,14 +154,14 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoord
     // First add the document
     try {
         const doc = await API.addDocument(
-            document.title, 
-            document.stakeHolders, 
-            document.scale, 
-            document.issuanceDate, 
-            document.type, 
-            document.language, 
-            document.pages, 
-            document.description
+            {title: document.title, 
+            stakeHolders: document.stakeHolders, 
+            scale: document.scale, 
+            issuanceDate: document.issuanceDate, 
+            type: document.type, 
+            language: document.language, 
+            pages: document.pages, 
+            description: document.description}
         );
 
         if (newDocumentCoordinates) {
