@@ -129,9 +129,7 @@ function DocumentsTable(props: any){
 
     // function to filter documents
     const handleSearch = (term: string) => {
-      if(selectedOrder != 'none'){
-        handleSelectOrder('none');
-      }
+
       if(selectedType != 'All Types'){
         handleSelect('All Types');
       }
@@ -148,33 +146,6 @@ function DocumentsTable(props: any){
     };
 
     //-------- Filter of order ---------//
-    const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen); // Funzione per togglare il dropdown
-
-    const handleSelectOrder = (order: any) => {
-      setSelectedOrder(order); // Aggiorna l'ordine selezionato
-      handleSortOrderChange(order); // Passa l'ordine aggiornato al gestore di stato
-      setIsDropdownOpen(false); // Chiude il dropdown dopo la selezione
-    };
-
-
-    const handleSortOrderChange = (value: any) => {
-      setSortOrder(value);
-      // Aggiorna documenti ordinati
-      // Se l'ordinamento è "None", non fare nulla
-      if (value === "none") {
-        setFilteredDocuments(filteredDocuments); // Ripristina i documenti originali senza ordinamento
-        return;
-      }
-
-      setFilteredDocuments((prevDocs) => {
-          return [...prevDocs].sort((a, b) =>
-            value === "asc" ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)
-        );
-      });
-      setCurrentPage(1); // Resetta la paginazione alla prima pagina
-      setPaginatedLinks(filteredDocuments.slice(0, itemsPerPage)); // Aggiorna i documenti visualizzati
-    };
-
 
     //-------- Filter of Range Date ---------//
     const handleFilterByDateRange = () => {
@@ -438,7 +409,6 @@ useEffect(() => {
   function refreshSelectedDocument(doc: DocCoordinates) {
     setDocumentEdit(doc)
     props.refreshDocumentsCoordinates();
-    handleSelectOrder('none');
     handleSelect('All Types');
     setStartDate('');
     setEndDate('');
@@ -508,48 +478,6 @@ useEffect(() => {
             )}
           </div>
           <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-            {/* Ordinamento */}
-            <div className="flex items-center space-x-2">
-              <label className="text-sm font-medium text-gray-700">Sort by:</label>
-              <div className="relative inline-block">
-                {/* Bottone per aprire il dropdown */}
-                <div
-                  onClick={toggleDropdown}
-                  className="flex items-center justify-between border border-gray-300 rounded-lg px-4 py-2 text-sm shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white cursor-pointer w-48"
-                >
-                  <span>
-                    {selectedOrder === "none" ? "None" : selectedOrder === "asc" ? "Title (A-Z)" : "Title (Z-A)"}
-                  </span>
-                  <ChevronDownIcon className="h-4 w-4 text-gray-500" />
-                </div>
-
-                {/* Dropdown Menu */}
-                {isDropdownOpen && (
-                  <div className="absolute left-0 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-                    {/* Opzione "None" */}
-                    <div
-                      onClick={() => handleSelectOrder("none")}
-                      className="cursor-pointer hover:bg-blue-100 px-4 py-2 text-sm text-gray-700"
-                    >
-                      None
-                    </div>
-                    {/* Le opzioni del dropdown */}
-                    <div
-                      onClick={() => handleSelectOrder("asc")}
-                      className="cursor-pointer hover:bg-blue-100 px-4 py-2 text-sm text-gray-700"
-                    >
-                      Title (A-Z)
-                    </div>
-                    <div
-                      onClick={() => handleSelectOrder("desc")}
-                      className="cursor-pointer hover:bg-blue-100 px-4 py-2 text-sm text-gray-700"
-                    >
-                      Title (Z-A)
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
 
 
             {/* Filtro per tipo documento */}
@@ -620,7 +548,6 @@ useEffect(() => {
                   onClick={() =>{
                     setStartDate('');
                     setEndDate('');
-                    handleSelectOrder('none');
                     handleSelect('All Types');
                   }}
                   className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded shadow-sm focus:outline-none focus:ring focus:ring-blue-300 transition"
