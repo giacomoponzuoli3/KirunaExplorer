@@ -41,18 +41,14 @@ class StakeholderRoutes {
             body("category").isString().notEmpty(),
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
-                try {
-                    this.controller.addStakeholder(req.body.name, req.body.category)
-                        .then((id) => 
-                            res.status(201).json({ 
-                                message: "Stakeholder added successfully", 
-                                id: id 
-                            })
-                        )
-                        .catch((err: Error) => next(err));
-                } catch (err) {
-                    next(err);
-                }
+                this.controller.addStakeholder(req.body.name, req.body.category)
+                    .then((id) => 
+                        res.status(201).json({ 
+                            message: "Stakeholder added successfully", 
+                            id: id 
+                        })
+                    )
+                    .catch((err: Error) => next(err));
             }
         );        
     }

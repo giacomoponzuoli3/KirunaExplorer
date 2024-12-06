@@ -252,12 +252,17 @@ function ResourcesTable(props: any) {
     }, [idDocument])
 
     useEffect(() => {
-      try{
-        getResources().then();
-      }catch(err){
-        setShowAlert(true);
-      }
-        setLoading(false);
+      const fetchData = async () => {
+          try {
+              await getResources();  // Usa await per attendere la promessa
+          } catch (err) {
+              setShowAlert(true); // Gestisci gli errori
+          } finally {
+              setLoading(false); // Assicurati che setLoading venga chiamato dopo l'esecuzione
+          }
+      };
+  
+      fetchData();
     }, [idDocument]);
 
     useEffect(() => {
