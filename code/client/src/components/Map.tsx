@@ -229,12 +229,24 @@ function SetMapViewHome(props: any) {
               className: '',
             }),
           });
+
+          const popup = L.popup({
+            closeButton: false, // Disable the close button
+            autoClose: false,   // Prevent automatic closing
+            closeOnClick: false, // Prevent closing on click
+            offset: [10, -5],   // Adjust the position above the marker
+            className: "custom-popup"
+          })
+            .setLatLng(centralCoord) // Set popup position to the marker's coordinates
+            .setContent(`<p>${doc.title} (${doc.id})</p>`)
   
           marker.on('mouseover', () => {
 
             relatedLayer.addTo(map);
             
             activePolygons.add(relatedLayer);
+
+            map.openPopup(popup)
 
             if (doc.coordinates[0].municipality_area == 1) {
               setShowPolygonMessage(true);  // Mostra il messaggio
@@ -244,6 +256,8 @@ function SetMapViewHome(props: any) {
           marker.on('mouseout', () => {
             relatedLayer.removeFrom(map);
             activePolygons.delete(relatedLayer);
+
+            map.closePopup(popup)
 
             if (doc.coordinates[0].municipality_area == 1) {
               setShowPolygonMessage(false); //nascondi il messaggio
@@ -285,7 +299,7 @@ function SetMapViewHome(props: any) {
             className: "custom-popup"
           })
             .setLatLng([coord.latitude, coord.longitude]) // Set popup position to the marker's coordinates
-            .setContent(`<p>Coordinates: ${decimalToDMS(coord.latitude)} ${coord.latitude >= 0 ? "N" : "S"} , ${decimalToDMS(coord.longitude)} ${coord.longitude >= 0 ? "E" : "W"}</p>`)
+            .setContent(`<p>${doc.title} (${doc.id})</p>`)
 
           marker.on('mouseover', () => {
               map.openPopup(popup)
