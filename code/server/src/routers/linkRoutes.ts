@@ -28,7 +28,7 @@ class LinkRoutes {
         this.router.post( 
             "/",
             this.authenticator.isLoggedIn, //error 401
-            this.authenticator.isPlanner, //error 401
+            this.authenticator.isPlanner, //error 403
             body("idDoc1").isNumeric(),
             body("idDoc2").isNumeric(),
             body("idLink").isNumeric(),
@@ -47,7 +47,7 @@ class LinkRoutes {
         this.router.delete(
             "/",
             this.authenticator.isLoggedIn, //error 401
-            this.authenticator.isPlanner, //error 401
+            this.authenticator.isPlanner, //error 403
             body("idDoc1").isNumeric(),
             body("idDoc2").isNumeric(),
             body("idLink").isNumeric(),
@@ -66,7 +66,7 @@ class LinkRoutes {
         this.router.patch(
             "/",
             this.authenticator.isLoggedIn, //error 401
-            this.authenticator.isPlanner, //error 401
+            this.authenticator.isPlanner, //error 403
             body("idDoc1").isNumeric(),
             body("idDoc2").isNumeric(),
             body("oldLinkId").isNumeric(),
