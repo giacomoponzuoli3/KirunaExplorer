@@ -430,7 +430,22 @@ describe('documentController/documentDAO Integration tests', () => {
 
             await expect(controller.addResourceToDocument(1, "Resource 2", "data")).resolves.toBeUndefined();
 
-            await expect(controller.getAllResourcesData(testId)).resolves.toEqual(mockResources);
+            await expect(controller.getAllResourcesData(testId)).resolves.toEqual([
+                expect.objectContaining({
+                    id: 1,
+                    idDoc: 1,
+                    data: null,
+                    name: 'Resource 1',
+                    // No need to check uploadTime due to delays from db
+                }),
+                expect.objectContaining({
+                    id: 2,
+                    idDoc: 1,
+                    data: null,
+                    name: 'Resource 2',
+                    // No need to check uploadTime due to delays from db
+                }),
+            ]);
 
         });
 
