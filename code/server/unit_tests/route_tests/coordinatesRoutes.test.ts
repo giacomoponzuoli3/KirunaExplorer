@@ -7,7 +7,7 @@ import { Stakeholder } from "../../src/models/stakeholder"
 import { app } from "../../index";
 import request from 'supertest';
 import Authenticator from "../../src/routers/auth"
-import { User } from "../../src/models/user"
+import { User } from "../../../common_models/user"
 import { CoordinatesArrayError, CoordinatesTypeError } from "../../src/errors/coordinates";
 
 const baseURL = "/kiruna/coordinates"

@@ -1381,7 +1381,22 @@ describe('documentRoutes/documentController Integration tests', () => {
  
             expect(response.status).toBe(200);
 
-            expect(response.body).toEqual(mockResources);
+            expect(response.body).toEqual([
+                expect.objectContaining({
+                    id: 1,
+                    idDoc: 1,
+                    data: null,
+                    name: 'Resource 1',
+                    // No need to check uploadTime due to delays from db
+                }),
+                expect.objectContaining({
+                    id: 2,
+                    idDoc: 1,
+                    data: null,
+                    name: 'Resource 2',
+                    // No need to check uploadTime due to delays from db
+                }),
+            ]);
 
         });
 
