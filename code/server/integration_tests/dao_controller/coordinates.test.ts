@@ -19,6 +19,7 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
     });
 
     afterAll(async () => {
+        await cleanup();
         // Close the database connection
         await new Promise<void>((resolve, reject) => {
             db.close((err) => {
