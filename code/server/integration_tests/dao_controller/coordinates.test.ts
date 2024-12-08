@@ -19,6 +19,7 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
     });
 
     afterAll(async () => {
+        await cleanup();
         // Close the database connection
         await new Promise<void>((resolve, reject) => {
             db.close((err) => {
@@ -27,20 +28,27 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
             });
         });
     });
-
+    
     beforeEach(async () => {
         await cleanup();
- 
-         const query = `INSERT INTO stakeholders (name, category) VALUES (?, ?)`;
-         db.run(query, ["John", "urban developer"], function (err) {
-             if (err) {
-                 console.log("Stakeholder insertion error")
-             }
-         });
+    
+        const runAsync = (query: string, params: string[]) => {
+            return new Promise((resolve, reject) => {
+                db.run(query, params, function (err) {
+                    if (err) {
+                        reject(new Error('Database insertion error: ' + err.message)); 
+                    } else {
+                        resolve(this); 
+                    }
+                });
+            });
+        };
+    
+        await runAsync(`INSERT INTO stakeholders (name, category) VALUES (?, ?)`, ["John", "urban developer"]);
 
         jest.resetAllMocks();
-
-      });
+    });
+    
 
     const controller = new CoordinatesController();
     const documentController = new DocumentController();
