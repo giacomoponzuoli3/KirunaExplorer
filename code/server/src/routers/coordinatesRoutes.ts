@@ -105,6 +105,23 @@ class CoordinatesRoutes {
             
         )
 
+        /**
+         * Returns the all the existing georeferences (points and polygons), expect the municipality_area
+         */
+        this.router.get(
+            "/georeferences",
+            this.authenticator.isLoggedIn,
+            this.authenticator.isPlanner,
+            this.errorHandler.validateRequest,
+            (_req: any, res: any, next: any) => {
+
+                this.controller.getExistingGeoreferences()
+                    .then((georeferences) => res.status(200).json(georeferences))
+                    .catch((err: Error) => next(err))
+
+            }
+        )
+
     }
 }
 

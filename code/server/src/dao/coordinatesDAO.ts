@@ -3,6 +3,8 @@ import db from '../db/db'
 import { DocCoordinates } from '../models/document_coordinate'
 import { Stakeholder } from "../models/stakeholder"
 import { LatLng } from "../interfaces"
+import { resolve } from 'path';
+import { error } from 'console';
 
 class CoordinatesDAO {
      /**
@@ -153,6 +155,52 @@ class CoordinatesDAO {
             throw error; // Propagate error to caller
         }
     }
+
+    /**
+     * Get all the existing georeferences (points and polygons)
+     * @returns A Promise that returns the array of Coordinate[][] where each object is an array of coordinates that represent points or polygons 
+     */
+    getExistingGeoreferences(): Promise<Coordinate[][]> {
+        return new Promise<Coordinate[][]>((resolve, reject) => {
+            try{
+                const sql = `SELECT * 
+                                FROM document_coordinates
+                                WHERE municipality_area = 0
+                                ORDER BY document_id, point_order;`;
+                db.all(sql, [], (err: Error | null, rows: any[]) => {
+                    if(err){
+                        return reject(error);
+                    }
+
+                    const coordinatesByDocument: Record<number, Coordinate[]> = {};
+
+                    // Raggruppa le coordinate per document_id
+                    rows.forEach(row => {
+                        const documentId = row.document_id;
+                        
+                        // Se non esiste un array per questo document_id, crealo
+                        if (!coordinatesByDocument[documentId]) {
+                            coordinatesByDocument[documentId] = [];
+                        }
+
+                        // Aggiungi la coordinata al gruppo di questo document_id
+                        coordinatesByDocument[documentId].push(
+                            new Coordinate(row.id, row.point_order, row.latitude, row.longitude, 0)
+                        );
+                    });
+
+                    // Converte l'oggetto in un array di array di coordinate
+                    const result = Object.values(coordinatesByDocument);
+                    resolve(result);
+                });    
+            
+            }catch(error){
+                //general error during the operations
+                return reject(error);
+            }
+        })
+    }
+
 
 }
 
