@@ -2,90 +2,93 @@ import { describe, beforeEach, test, expect, jest } from "@jest/globals";
 import { LinkController } from "../../src/controllers/linkController";
 import { LinkDAO } from "../../src/dao/linkDAO"; // Ensure this import remains as per your requirement
 import Link from "../../src/models/link";
+import { LinkNotFoundError } from "../../src/errors/link";
 
 // Mock the LinkDAO class
-jest.mock("../../src/dao/linkDAO", () => {
-  return {
-    __esModule: true,
-    LinkDAO: jest.fn().mockImplementation(() => ({
-      addLink: jest.fn(),
-      deleteLinks: jest.fn(),
-      updateLink: jest.fn(),
-      getAllLinks: jest.fn(),
-    })),
-  };
-});
+jest.mock("../../src/dao/linkDAO");
 
 describe("LinkController", () => {
-  let linkController: LinkController;
-  let linkDAOInstance: jest.Mocked<LinkDAO>;
+
+  const dao = LinkDAO.prototype;
+  const controller = new LinkController();
 
   beforeEach(() => {
-    // Create a new instance of the mocked LinkDAO
-    linkDAOInstance = new (LinkDAO as jest.Mock)() as jest.Mocked<LinkDAO>;
-
-    // Initialize LinkController without passing the DAO instance
-    linkController = new LinkController(); // No arguments passed
-
-    // Assign the mocked instance to LinkDAO's prototype
-    (LinkDAO as jest.Mock).mockImplementation(() => linkDAOInstance);
-
     jest.clearAllMocks(); // Clear mock history before each test
+  });
+
+  describe("addLink", () => {
+    test("It should successfully add a link", async () => {
+      jest.spyOn(dao, 'addLink').mockResolvedValue(undefined);
+
+      await expect(controller.addLink(1, 2, 3)).resolves.toBeUndefined();
+      expect(dao.addLink).toHaveBeenCalledWith(1, 2, 3);
+    });
+
+    test("It should handle errors from LinkDAO when adding a link", async () => {
+      jest.spyOn(dao, 'addLink').mockRejectedValue(new Error("Add link error"));
+
+      await expect(controller.addLink(1, 2, 3)).rejects.toThrow("Add link error");
+      expect(dao.addLink).toHaveBeenCalledWith(1, 2, 3);
+    });
   });
 
   describe("deleteLink", () => {
     test("It should successfully delete a link", async () => {
-      // Mock the deleteLinks method to resolve successfully
-      linkDAOInstance.deleteLinks.mockResolvedValueOnce(undefined);
+      jest.spyOn(dao, 'deleteLinks').mockResolvedValue(undefined);
 
-      await expect(linkController.deleteLink(1, 2, 3)).resolves.toBeUndefined();
-      expect(linkDAOInstance.deleteLinks).toHaveBeenCalledWith(1, 2, 3);
+      await expect(controller.deleteLink(1, 2, 3)).resolves.toBeUndefined();
+      expect(dao.deleteLinks).toHaveBeenCalledWith(1, 2, 3);
     });
 
     test("It should handle errors from LinkDAO when deleting a link", async () => {
-      // Mock the deleteLinks method to throw an error
-      linkDAOInstance.deleteLinks.mockRejectedValueOnce(new Error("Delete link error"));
+      jest.spyOn(dao, 'deleteLinks').mockRejectedValue(new Error("Delete link error"));
 
-      await expect(linkController.deleteLink(1, 2, 3)).rejects.toThrow("Delete link error");
-      expect(linkDAOInstance.deleteLinks).toHaveBeenCalledWith(1, 2, 3);
+      await expect(controller.deleteLink(1, 2, 3)).rejects.toThrow("Delete link error");
+      expect(dao.deleteLinks).toHaveBeenCalledWith(1, 2, 3);
     });
   });
 
   describe("updateLink", () => {
     test("It should successfully update a link", async () => {
-      // Mock the updateLink method to resolve successfully
-      linkDAOInstance.updateLink.mockResolvedValueOnce(undefined);
+      jest.spyOn(dao, 'updateLink').mockResolvedValue(undefined);
 
-      await expect(linkController.updateLink(1, 2, 3, 4)).resolves.toBeUndefined();
-      expect(linkDAOInstance.updateLink).toHaveBeenCalledWith(1, 2, 3, 4);
+      await expect(controller.updateLink(1, 2, 3, 4)).resolves.toBeUndefined();
+      expect(dao.updateLink).toHaveBeenCalledWith(1, 2, 3, 4);
     });
 
     test("It should handle errors from LinkDAO when updating a link", async () => {
-      // Mock the updateLink method to throw an error
-      linkDAOInstance.updateLink.mockRejectedValueOnce(new Error("Update link error"));
+      jest.spyOn(dao, 'updateLink').mockRejectedValue(new Error("Update link error"));
 
-      await expect(linkController.updateLink(1, 2, 3, 4)).rejects.toThrow("Update link error");
-      expect(linkDAOInstance.updateLink).toHaveBeenCalledWith(1, 2, 3, 4);
+      await expect(controller.updateLink(1, 2, 3, 4)).rejects.toThrow("Update link error");
+      expect(dao.updateLink).toHaveBeenCalledWith(1, 2, 3, 4);
     });
   });
 
   describe("getAllLinks", () => {
     test("It should return all links successfully", async () => {
-      const mockLinks = [new Link(1, "Link 1"), new Link(2, "Link 2")];
-      // Mock the getAllLinks method to resolve with mock links
-      linkDAOInstance.getAllLinks.mockResolvedValueOnce(mockLinks);
+      const mockLink = new Link(1, "Link 1");
 
-      const links = await linkController.getAllLinks();
-      expect(links).toEqual(mockLinks);
-      expect(linkDAOInstance.getAllLinks).toHaveBeenCalled();
+      jest.spyOn(dao, 'getAllLinks').mockResolvedValue([mockLink]);
+
+      await expect(controller.getAllLinks()).resolves.toEqual([mockLink]);
+      expect(dao.getAllLinks).toHaveBeenCalled();
     });
 
-    test("It should handle errors from LinkDAO when retrieving all links", async () => {
-      // Mock the getAllLinks method to throw an error
-      linkDAOInstance.getAllLinks.mockRejectedValueOnce(new Error("Get all links error"));
+    test("It should return an error if there are no links", async () => {
 
-      await expect(linkController.getAllLinks()).rejects.toThrow("Get all links error");
-      expect(linkDAOInstance.getAllLinks).toHaveBeenCalled();
+      jest.spyOn(dao, 'getAllLinks').mockRejectedValueOnce(LinkNotFoundError);
+
+      await expect(controller.getAllLinks()).rejects.toEqual(LinkNotFoundError);
+      expect(dao.getAllLinks).toHaveBeenCalled();
+    });
+
+
+    test("It should handle errors from LinkDAO when retrieving all links", async () => {
+      jest.spyOn(dao, 'getAllLinks').mockRejectedValue(new Error("Get all links error"));
+
+      await expect(controller.getAllLinks()).rejects.toThrow("Get all links error");
+      expect(dao.getAllLinks).toHaveBeenCalled();
+
     });
   });
 });

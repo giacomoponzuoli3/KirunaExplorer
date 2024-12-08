@@ -1,5 +1,4 @@
 import { describe, afterAll, beforeAll, beforeEach, test, expect, jest } from "@jest/globals"
-import { DocumentDAO } from "../../src/dao/documentDAO"
 import DocumentController from "../../src/controllers/documentController"
 import { LinkController } from "../../src/controllers/linkController"
 import { Document } from "../../src/models/document"
@@ -11,7 +10,7 @@ import { Database } from "sqlite3";
 import { cleanup } from "../../src/db/cleanup";
 import { setup } from "../../src/db/setup";
 import { DocumentNotFoundError } from "../../src/errors/document";
-import Resources from "../../../common_models/original_resources";
+
 
 describe('documentController/documentDAO Integration tests', () => {
 
@@ -20,6 +19,7 @@ describe('documentController/documentDAO Integration tests', () => {
     });
 
     afterAll(async () => {
+        await cleanup();
         // Close the database connection
         await new Promise<void>((resolve, reject) => {
             db.close((err) => {
@@ -30,32 +30,29 @@ describe('documentController/documentDAO Integration tests', () => {
     });
 
     beforeEach(async () => {
+
         await cleanup();
-
-        let query = `INSERT INTO stakeholders (name, category) VALUES (?, ?)`;
-        db.run(query, ["John", "urban developer"], function (err) {
-            if (err) {
-                console.log("Stakeholder insertion error")
-            }
-        });
-
-        query = `INSERT INTO stakeholders (name, category) VALUES (?, ?)`;
-        db.run(query, ["Bob", "urban developer"], function (err) {
-            if (err) {
-                console.log("Stakeholder insertion error")
-            }
-        });
-
-        query = `INSERT INTO links (name) VALUES (?)`;
-        db.run(query, ["Update"], function (err) {
-            if (err) {
-                console.log("Link insertion error")
-            }
-        });
-
+    
+        const runAsync = (query: string, params: string[]) => {
+            return new Promise((resolve, reject) => {
+                db.run(query, params, function (err) {
+                    if (err) {
+                        reject(new Error('Database insertion error: ' + err.message));
+                    } else {
+                        resolve(this);  
+                    }
+                });
+            });
+        };
+    
+        await runAsync(`INSERT INTO stakeholders (name, category) VALUES (?, ?)`, ["John", "urban developer"]);
+        await runAsync(`INSERT INTO stakeholders (name, category) VALUES (?, ?)`, ["Bob", "urban developer"]);
+        await runAsync(`INSERT INTO links (name) VALUES (?)`, ["Update"]);
+        await runAsync(`INSERT INTO links (name) VALUES (?)`, ["Connection"]);
+    
         jest.resetAllMocks();
-
     });
+    
 
     const controller = new DocumentController();
     const linkController = new LinkController();
@@ -68,10 +65,6 @@ describe('documentController/documentDAO Integration tests', () => {
     const testDocument2 = new Document(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2");
     const testDocLink = new DocLink(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2", testLink);
     const mockResourceData =  Buffer.from("data", 'base64')
-    const mockResources: Resources[] = [
-        { id: 1, idDoc: 1, data: null, name: 'Resource 1', uploadTime: new Date() },
-        { id: 2, idDoc: 1, data: null, name: 'Resource 2', uploadTime: new Date() },
-    ];
 
     describe('addDocument', () => {
         test('It should successfully add a document', async () => {
@@ -149,7 +142,7 @@ describe('documentController/documentDAO Integration tests', () => {
 
         });
 
-        test('It should reject if there is no documents', async () => {
+        test('It should return an empty arrary if there is no documents', async () => {
 
             await expect(controller.getAllDocuments()).resolves.toEqual([]);
 
@@ -430,7 +423,22 @@ describe('documentController/documentDAO Integration tests', () => {
 
             await expect(controller.addResourceToDocument(1, "Resource 2", "data")).resolves.toBeUndefined();
 
-            await expect(controller.getAllResourcesData(testId)).resolves.toEqual(mockResources);
+            await expect(controller.getAllResourcesData(testId)).resolves.toEqual([
+                expect.objectContaining({
+                    id: 1,
+                    idDoc: 1,
+                    data: null,
+                    name: 'Resource 1',
+                    // No need to check uploadTime due to delays from db
+                }),
+                expect.objectContaining({
+                    id: 2,
+                    idDoc: 1,
+                    data: null,
+                    name: 'Resource 2',
+                    // No need to check uploadTime due to delays from db
+                }),
+            ]);
 
         });
 
