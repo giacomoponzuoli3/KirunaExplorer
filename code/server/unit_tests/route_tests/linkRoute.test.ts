@@ -7,6 +7,7 @@ import Link from "../../src/models/link"
 import { app } from "../../index";
 import Authenticator from "../../src/routers/auth"
 import { User } from "../../../common_models/user"
+import { LinkNotFoundError } from "../../src/errors/link"
 
 const baseURL = '/kiruna/link'
 
@@ -825,13 +826,12 @@ describe('LinkRoutes Unit Tests', () => {
             expect(controller.getAllLinks).toHaveBeenCalledWith();
         });
 
-        test('It should return an empty array if there are no links and return 200 status', async () => {
-            jest.spyOn(controller, "getAllLinks").mockResolvedValueOnce([]);
+        test('It should return an error if there are no links', async () => {
+            jest.spyOn(controller, "getAllLinks").mockRejectedValue(LinkNotFoundError);
 
             const response = await request(app).get(baseURL+"/");
 
-            expect(response.status).toBe(200);
-            expect(response.body).toEqual([]);
+            expect(response.status).toBe(503);
             expect(controller.getAllLinks).toHaveBeenCalledWith();
         });
 

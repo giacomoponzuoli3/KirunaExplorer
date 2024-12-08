@@ -12,7 +12,6 @@ import { setup } from "../../src/db/setup";
 import { app } from "../../index";
 import request from 'supertest';
 import { Role } from "../../../common_models/user"
-import Resources from "../../../common_models/original_resources";
 
 const baseURL = "/kiruna/doc"
 
@@ -22,7 +21,7 @@ describe('documentRoutes/documentController Integration tests', () => {
     const controller = new DocumentController();
     const linkController = new LinkController();
     const testUrbanPlanner = { username: "urban_planner", name: "urban", surname: "planner", password: "admin", role: Role.PLANNER };
-    const testResident = { username: "resident", name: "resident", surname: "resident", password: "admin", role: Role.PLANNER };
+    const testResident = { username: "resident", name: "resident", surname: "resident", password: "admin", role: Role.RESIDENT };
     const testLink = new Link(1, "Update");
     const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
     const testStakeholder2 = new Stakeholder(2, "Bob", "urban developer");
@@ -31,11 +30,7 @@ describe('documentRoutes/documentController Integration tests', () => {
     const testDocument2 = new Document(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2");
     const testDocLink = new DocLink(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2", testLink);
     const mockResourceData =  Buffer.from("data", 'base64')
-    const mockResources: Resources[] = [
-        { id: 1, idDoc: 1, data: null, name: 'Resource 1', uploadTime: new Date() },
-        { id: 2, idDoc: 1, data: null, name: 'Resource 2', uploadTime: new Date() },
-    ];
-
+  
     // Helper function that logs in a user and returns the cookie
     // Can be used to log in a user before the tests or in the tests
     const login = async (userInfo: any) => {
@@ -69,46 +64,33 @@ describe('documentRoutes/documentController Integration tests', () => {
     });
 
     beforeEach(async () => {
+
         await cleanup();
+    
+        const runAsync = (query: string, params: string[]) => {
+            return new Promise((resolve, reject) => {
+                db.run(query, params, function (err) {
+                    if (err) {
+                        reject(new Error('Database insertion error: ' + err.message));  
+                    } else {
+                        resolve(this); 
+                    }
+                });
+            });
+        };
 
-        let query = `INSERT INTO stakeholders (name, category) VALUES (?, ?)`;
-        db.run(query, ["John", "urban developer"], function (err) {
-            if (err) {
-                console.log("Stakeholder insertion error")
-            }
-        });
-
-        query = `INSERT INTO stakeholders (name, category) VALUES (?, ?)`;
-        db.run(query, ["Bob", "urban developer"], function (err) {
-            if (err) {
-                console.log("Stakeholder insertion error")
-            }
-        });
-
-        query = `INSERT INTO links (name) VALUES (?)`;
-        db.run(query, ["Update"], function (err) {
-            if (err) {
-                console.log("Link insertion error")
-            }
-        });
-
-        query = `INSERT INTO users (username, name, surname, role, password, salt) VALUES (?, ?, ?, ?, ?, ?)`;
-        db.run(query, ["urban_planner", "urban", "planner", "Urban Planner", "84f2763be5408b77c05292178b08b4a3", "1f39956c7101ff188ce0a015786f0493"], function (err) {
-            if (err) {
-                console.log("User insertion error")
-            }
-        });
-
-        query = `INSERT INTO users (username, name, surname, role, password, salt) VALUES (?, ?, ?, ?, ?, ?)`;
-        db.run(query, ["resident", "resident", "resident", "Resident", "84f2763be5408b77c05292178b08b4a3", "1f39956c7101ff188ce0a015786f0493"], function (err) {
-            if (err) {
-                console.log("User insertion error")
-            }
-        });
-
+        await runAsync(`INSERT INTO stakeholders (name, category) VALUES (?, ?)`, ["John", "urban developer"]);
+        await runAsync(`INSERT INTO stakeholders (name, category) VALUES (?, ?)`, ["Bob", "urban developer"]);
+        await runAsync(`INSERT INTO links (name) VALUES (?)`, ["Update"]);
+        await runAsync(`INSERT INTO links (name) VALUES (?)`, ["Connection"]);
+        await runAsync(`INSERT INTO users (username, name, surname, role, password, salt) VALUES (?, ?, ?, ?, ?, ?)`, 
+                       ["urban_planner", "urban", "planner", "Urban Planner", "84f2763be5408b77c05292178b08b4a3", "1f39956c7101ff188ce0a015786f0493"]);
+        await runAsync(`INSERT INTO users (username, name, surname, role, password, salt) VALUES (?, ?, ?, ?, ?, ?)`, 
+                       ["resident", "resident", "resident", "Resident", "84f2763be5408b77c05292178b08b4a3", "1f39956c7101ff188ce0a015786f0493"]);
+    
         jest.resetAllMocks();
-
     });
+    
 
     describe('POST /', () => {
 
