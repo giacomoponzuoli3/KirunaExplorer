@@ -63,6 +63,15 @@ export default function Navbar(props: any) {
               >
                 Home
               </Link>
+              {<Link
+                to="/diagram"
+                onClick={() => setActiveTab("diagram")}
+                className={`text-yellow-300 hover:text-yellow-400 text-base font-semibold px-2 py-1 no-underline ${
+                  activeTab === "diagram" ? "border-t-0 border-b-2 border-yellow-400" : "border-transparent"
+                } hover:bg-yellow-500/20 rounded-md transition-all duration-300`}
+              >
+                Diagram
+              </Link>}
               <Link
                 to="/documents"
                 onClick={() => setActiveTab("documents")}
@@ -106,15 +115,7 @@ export default function Navbar(props: any) {
                 </div>
                 </>
               )}
-              {/*<Link
-                to="/diagram"
-                onClick={() => setActiveTab("diagram")}
-                className={`text-yellow-300 hover:text-yellow-400 text-base font-semibold px-2 py-1 no-underline ${
-                  activeTab === "diagram" ? "border-t-0 border-b-2 border-yellow-400" : "border-transparent"
-                } hover:bg-yellow-500/20 rounded-md transition-all duration-300`}
-              >
-                Diagram
-              </Link>*/}
+              
             </div>
           </div>
 
