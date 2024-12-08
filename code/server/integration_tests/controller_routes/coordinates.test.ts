@@ -13,7 +13,6 @@ import { setup } from "../../src/db/setup";
 import { app } from "../../index";
 import request from 'supertest';
 import { Role } from "../../../common_models/user"
-import { CoordinatesArrayError, CoordinatesTypeError } from "../../src/errors/coordinates";
 
 const baseURL = "/kiruna/coordinates"
 
@@ -21,13 +20,11 @@ describe('coordinatesRoutes/coordinatesController Integration tests', () => {
 
     const testId = 1;
     const testUrbanPlanner = { username: "urban_planner", name: "urban", surname: "planner", password: "admin", role: Role.PLANNER };
-    const testResident = { username: "resident", name: "resident", surname: "resident", password: "admin", role: Role.PLANNER };
+    const testResident = { username: "resident", name: "resident", surname: "resident", password: "admin", role: Role.RESIDENT };
     const controller = new CoordinatesController();
     const documentController = new DocumentController();
     const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
     const testCoordinate1 = new Coordinate(1, 1, 40.7128, -74.0060,0);
-    const testCoordinate2 = new Coordinate(2, 1, -55.7128, 45.0060,0);
-    const testCoordinate3 = new Coordinate(3, 2, 40.7128, -74.0060,0);
     const testCoordinateMunicipalityArea = new Coordinate (2,null,null,null,1);
     const coordinate: LatLng = { lat: 40.7128, lng: -74.0060 };
     const coordinates: LatLng[] = [
@@ -79,31 +76,28 @@ describe('coordinatesRoutes/coordinatesController Integration tests', () => {
 
     beforeEach(async () => {
         await cleanup();
-
-        let query = `INSERT INTO stakeholders (name, category) VALUES (?, ?)`;
-        db.run(query, ["John", "urban developer"], function (err) {
-            if (err) {
-                console.log("Stakeholder insertion error")
-            }
-        });
-
-        query = `INSERT INTO users (username, name, surname, role, password, salt) VALUES (?, ?, ?, ?, ?, ?)`;
-        db.run(query, ["urban_planner", "urban", "planner", "Urban Planner", "84f2763be5408b77c05292178b08b4a3", "1f39956c7101ff188ce0a015786f0493"], function (err) {
-            if (err) {
-                console.log("User insertion error")
-            }
-        });
-
-        query = `INSERT INTO users (username, name, surname, role, password, salt) VALUES (?, ?, ?, ?, ?, ?)`;
-        db.run(query, ["resident", "resident", "resident", "Resident", "84f2763be5408b77c05292178b08b4a3", "1f39956c7101ff188ce0a015786f0493"], function (err) {
-            if (err) {
-                console.log("User insertion error")
-            }
-        });
+    
+        const runAsync = (query: string, params: string[]) => {
+            return new Promise((resolve, reject) => {
+                db.run(query, params, function (err) {
+                    if (err) {
+                        reject(new Error('Database insertion error: ' + err.message)); 
+                    } else {
+                        resolve(this); 
+                    }
+                });
+            });
+        };
+    
+        await runAsync(`INSERT INTO stakeholders (name, category) VALUES (?, ?)`, ["John", "urban developer"]);
+        await runAsync(`INSERT INTO users (username, name, surname, role, password, salt) VALUES (?, ?, ?, ?, ?, ?)`, 
+                       ["urban_planner", "urban", "planner", "Urban Planner", "84f2763be5408b77c05292178b08b4a3", "1f39956c7101ff188ce0a015786f0493"]);
+        await runAsync(`INSERT INTO users (username, name, surname, role, password, salt) VALUES (?, ?, ?, ?, ?, ?)`, 
+                       ["resident", "resident", "resident", "Resident", "84f2763be5408b77c05292178b08b4a3", "1f39956c7101ff188ce0a015786f0493"]);
 
         jest.resetAllMocks();
-
     });
+    
 
     describe('POST /', () => {
         test('It should set a coordinate for a document and return 200 status', async () => {

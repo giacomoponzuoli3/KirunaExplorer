@@ -2,6 +2,7 @@ import { describe, beforeEach, test, expect, jest } from "@jest/globals";
 import { LinkController } from "../../src/controllers/linkController";
 import { LinkDAO } from "../../src/dao/linkDAO"; // Ensure this import remains as per your requirement
 import Link from "../../src/models/link";
+import { LinkNotFoundError } from "../../src/errors/link";
 
 // Mock the LinkDAO class
 jest.mock("../../src/dao/linkDAO");
@@ -73,11 +74,11 @@ describe("LinkController", () => {
       expect(dao.getAllLinks).toHaveBeenCalled();
     });
 
-    test("It should return an empty array if there are no links", async () => {
+    test("It should return an error if there are no links", async () => {
 
-      jest.spyOn(dao, 'getAllLinks').mockResolvedValue([]);
+      jest.spyOn(dao, 'getAllLinks').mockRejectedValueOnce(LinkNotFoundError);
 
-      await expect(controller.getAllLinks()).resolves.toEqual([]);
+      await expect(controller.getAllLinks()).rejects.toEqual(LinkNotFoundError);
       expect(dao.getAllLinks).toHaveBeenCalled();
     });
 
