@@ -1,6 +1,7 @@
 import { DocCoordinates } from "../models/document_coordinate";
 import { CoordinatesDAO } from "../dao/coordinatesDAO";
 import { LatLng } from "../interfaces";
+import Coordinate from "../models/coordinate"; 
 
 class CoordinatesController {
     private dao: CoordinatesDAO;
@@ -44,6 +45,14 @@ class CoordinatesController {
      */
     deleteDocumentCoordinates(id_document: number): Promise<void> {
         return this.dao.deleteDocumentCoordinatesById(id_document);
+    }
+
+    /**
+     * Get all the existing georeferences (point and polygons), except the municipality_area
+     * @return A Promise that returns a Coordinate[][]
+     */
+    getExistingGeoreferences(): Promise<Coordinate[][]> {
+        return this.dao.getExistingGeoreferences();
     }
 
 }

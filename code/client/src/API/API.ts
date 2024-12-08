@@ -505,6 +505,20 @@ async function getMunicipalityArea() {
     }
 }
 
+async function getExistingGeoreferences() {
+    const response = await fetch(`${baseURL}coordinates/georeferences`, { credentials: "include" })
+    if (response.ok) {
+        return await response.json()
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+
 /** ------------------- Scale APIs ------------------------ */ 
   
 async function getScales() {
@@ -549,7 +563,7 @@ const API = {
     addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType, addResourceToDocument, getResourceData, deleteResource, getAllResourcesData,
     getAllStakeholders, addStakeholder,
     addLink, deleteLink, editLink, getAllLinks,
-    getAllDocumentsCoordinates, setDocumentCoordinates, updateDocumentCoordinates, deleteDocumentCoordinates, getMunicipalityArea,
+    getAllDocumentsCoordinates, setDocumentCoordinates, updateDocumentCoordinates, deleteDocumentCoordinates, getMunicipalityArea, getExistingGeoreferences,
     getScales, addScale
 }
 export default API
