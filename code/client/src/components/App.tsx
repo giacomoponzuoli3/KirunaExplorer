@@ -12,7 +12,7 @@ import { DocumentsTable } from './DocumentsTable';
 import { DocCoordinates } from '../models/document_coordinate';
 import { MapView } from './Map';
 import { ResourcesTable } from './ResourcesTable';
-import { DiagramDocuments } from './DiagramDocuments';
+import { Diagram } from './Diagram';
 
 function getDocumentIcon(type: string, size: number = 16): JSX.Element | null {
   const sizeClass = `w-${size} h-${size} m-0 p-0`;
@@ -182,7 +182,7 @@ function App() {
           <Route path="documents/:idDocument/links" element={<LinksDocument user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} />} />
           <Route path="documents/:idDocument/map" element={<MapView user={user} geoJsonData={geoJsonData} isLogged={isLogged} getDocumentIcon={getDocumentIcon} documentsCoordinates={documentsCoordinates}/>} />
           <Route path="documents/:idDocument/resources" element={<ResourcesTable user={user} isLogged={isLogged} />} />
-          <Route path="/diagram" element={<DiagramDocuments user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} refreshDocuments={getAllDocuments} refreshDocumentsCoordinates={getAllDocumentsCoordinates} />} />
+          <Route path="/diagram" element={<Diagram user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} refreshDocuments={getAllDocuments} refreshDocumentsCoordinates={getAllDocumentsCoordinates} />} />
           
         </Route>
       </Routes>
