@@ -217,17 +217,29 @@ function SetMapViewHome(props: any) {
           }
         
           const iconHtml = ReactDOMServer.renderToString(props.getDocumentIcon(doc.type, 5) || <></>);
-  
+
+          const defaultIcon = L.divIcon({
+            html: `
+              <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95 border-1 border-blue-950">
+                ${iconHtml}
+              </div>
+            `,
+            iconSize: [20, 20],
+            className: '',
+          })
+
+          const highlightedIcon = L.divIcon({
+            html: `
+              <div style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background-color: #FFD700; border-radius: 50%; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); border: 3px solid yellow; transform: scale(1.2);">
+                ${ReactDOMServer.renderToString(props.getDocumentIcon(doc.type, 5) || <></>)}
+              </div>
+            `,
+            iconSize: [20, 20],
+            className: '',
+          });
+
           const marker = L.marker(centralCoord, {
-            icon: L.divIcon({
-              html: `
-                <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95 border-1 border-blue-950">
-                  ${iconHtml}
-                </div>
-              `,
-              iconSize: [20, 20],
-              className: '',
-            }),
+            icon: defaultIcon,
           });
 
           const popup = L.popup({
@@ -266,6 +278,12 @@ function SetMapViewHome(props: any) {
           });
   
           marker.on('click', () => {
+            // Set the highlighted icon for the clicked marker
+            // if(marker.getIcon()===highlightedIcon){
+            //    marker.setIcon(defaultIcon);
+            // }else{
+            //    marker.setIcon(highlightedIcon);
+            // }
             props.onMarkerClick(doc);
           });
 
@@ -278,16 +296,28 @@ function SetMapViewHome(props: any) {
 
           const iconHtml = ReactDOMServer.renderToString(props.getDocumentIcon(doc.type, 5) || <></>);
 
+          const defaultIcon = L.divIcon({
+            html: `
+              <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95 border-1 border-blue-950">
+                ${iconHtml}
+              </div>
+            `,
+            iconSize: [20, 20],
+            className: '',
+          });
+
+          const highlightedIcon = L.divIcon({
+            html: `
+              <div style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background-color: #FFD700; border-radius: 50%; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); border: 3px solid yellow; transform: scale(1.2);">
+                ${ReactDOMServer.renderToString(props.getDocumentIcon(doc.type, 5) || <></>)}
+              </div>
+            `,
+            iconSize: [20, 20],
+            className: '',
+          });
+
           const marker = L.marker([coord.latitude, coord.longitude], {
-            icon: L.divIcon({
-              html: `
-                <div class="custom-marker flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95 border-1 border-blue-950">
-                  ${iconHtml}
-                </div>
-              `,
-              iconSize: [20, 20],
-              className: '',
-            })
+            icon: defaultIcon
 
           });
 
@@ -314,6 +344,12 @@ function SetMapViewHome(props: any) {
           });
   
           marker.on('click', () => {
+            // Set the highlighted icon for the clicked marker
+            // if(marker.getIcon()===highlightedIcon){
+            //    marker.setIcon(defaultIcon);
+            // }else{
+            //    marker.setIcon(highlightedIcon);
+            // }
             props.onMarkerClick(doc);
           });
 
