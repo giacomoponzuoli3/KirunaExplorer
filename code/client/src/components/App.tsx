@@ -13,6 +13,7 @@ import { DocCoordinates } from '../models/document_coordinate';
 import { MapView } from './Map';
 import { ResourcesTable } from './ResourcesTable';
 import { DiagramDocuments } from './DiagramDocuments';
+import KirunaLandingPage from './KirunaLandingPage';
 
 function getDocumentIcon(type: string, size: number = 16): JSX.Element | null {
   const sizeClass = `w-${size} h-${size} m-0 p-0`;
@@ -173,7 +174,8 @@ function App() {
             <Outlet/>
           </>
         }>
-          <Route index element={<HomePage geoJsonData={geoJsonData} documentsCoordinates={documentsCoordinates} documents={documents} user={user} refreshDocuments={getAllDocuments} refreshDocumentsCoordinates={getAllDocumentsCoordinates} stakeholders={stakeholders} getDocumentIcon={getDocumentIcon} scaleOptions={scaleOptions} onCreateScale={handleCreateScale}/>}/>
+          <Route index element={<KirunaLandingPage/>}/>
+          <Route path="/map" element={<HomePage geoJsonData={geoJsonData} documentsCoordinates={documentsCoordinates} documents={documents} user={user} refreshDocuments={getAllDocuments} refreshDocumentsCoordinates={getAllDocumentsCoordinates} stakeholders={stakeholders} getDocumentIcon={getDocumentIcon} scaleOptions={scaleOptions} onCreateScale={handleCreateScale}/>}/>
           <Route path="/login" element={<Login message={message} isLogged={isLogged} login={handleLogin} handleBack={handleBack}/>} />
           <Route path="*" element={<NotFoundLayout/>} />
           {/* Aggiungi altre route come la dashboard */}
