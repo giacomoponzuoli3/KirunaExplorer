@@ -20,6 +20,8 @@ export default function Navbar(props: any) {
   useEffect(() => {
     if (location.pathname === "/") {
       setActiveTab("home");
+    } else if (location.pathname === "/map") {
+      setActiveTab("map");
     } else if (location.pathname === "/documents") {
       setActiveTab("documents");
     } else if (location.pathname.endsWith("/links") && previousPath === "/documents") {
@@ -72,6 +74,15 @@ export default function Navbar(props: any) {
               >
                 Diagram
               </Link>}
+              <Link
+                to="/map"
+                onClick={() => setActiveTab("home")}
+                className={`text-yellow-300 hover:text-yellow-400 text-base font-semibold px-2 py-1 no-underline mr-2 ${
+                  activeTab === "map" ? "border-b-2 border-yellow-400" : "border-transparent"
+                } hover:bg-yellow-500/20 rounded-md transition-all duration-300`}
+              >
+                Map
+              </Link>
               <Link
                 to="/documents"
                 onClick={() => setActiveTab("documents")}
