@@ -1,20 +1,57 @@
 .custom-side-modal {
     position: fixed;
     top: 75px;
-    right: 0;
+    right: 15px;
     width: 30%;
     height: 80%;
-    background-color: white;
+    background-color: #ECE8DE;
     z-index: 1000;
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
     border-radius: 0.5rem;
     padding: 2px;
 }
 
+/* Custom scroll bar styles */
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+    opacity: 0; /* Hide scrollbar initially */
+    transition: opacity 0.3s ease-in-out; /* Smooth transition for appearance */
+}
+
+.modal-body:hover::-webkit-scrollbar {
+    opacity: 1; /* Show scrollbar on hover */
+}
+
+/* Scrollbar track (background) */
+.modal-body::-webkit-scrollbar-track {
+    background: transparent; /* Fully transparent for modern look */
+}
+
+/* Scrollbar thumb (the draggable part) */
+.modal-body::-webkit-scrollbar-thumb {
+    background: rgba(136, 136, 136, 0.5); /* Slightly transparent thumb */
+    border-radius: 10px;
+    transition: background 0.3s ease-in-out; /* Smooth transition for hover effect */
+}
+
+/* Scrollbar thumb on hover */
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(85, 85, 85, 0.8); /* Darker and more solid on hover */
+}
+
+/* Firefox support */
+.modal-body {
+    scrollbar-width: thin; /* Thin scrollbar */
+    scrollbar-color: rgba(136, 136, 136, 0.5) transparent; /* Thumb and track colors */
+}
+
+.modal-body:hover {
+    scrollbar-color: rgba(85, 85, 85, 0.8) transparent; /* On hover, darker thumb */
+}
+
 .modal-header {
-    background-color: white;
+    /*background-color: white;*/
     padding: 1rem;
     display: flex;
     justify-content: space-between;
@@ -47,6 +84,10 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    overflow-y: auto;
+
+    /* Smooth scrolling for better UX */
+    scroll-behavior: smooth;
 }
 
 .icon-section {
@@ -71,7 +112,7 @@
 
 .modal-footer {
     padding: 1rem;
-    background-color: white;
+    /*background-color: white;*/
     display: flex;
     justify-content: space-between;
 }

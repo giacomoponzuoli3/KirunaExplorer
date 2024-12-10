@@ -301,12 +301,12 @@ function SetMapViewHome(props: any) {
           marker.on('click', () => {
             // Set the highlighted icon for the clicked marker
             map.closePopup(popup);
+            const selectedDocId = selectedDocumentCoordinates?.id;
             if(showDetails){
-               //marker.setIcon(defaultIcon);
                handleCloseDetailsModal();
-            }else{
-               //marker.setIcon(highlightedIcon);
-               handleDocumentClick(doc);
+            }
+            if(selectedDocId !== doc.id){
+              handleDocumentClick(doc);
             }
           });
 
@@ -369,11 +369,11 @@ function SetMapViewHome(props: any) {
           marker.on('click', () => {
             // Set the highlighted icon for the clicked marker
             map.closePopup(popup);
+            const selectedDocId = selectedDocumentCoordinates?.id;
             if(showDetails){
-               //marker.setIcon(defaultIcon);
                handleCloseDetailsModal();
-            }else{
-               //marker.setIcon(highlightedIcon);
+            }
+            if(selectedDocId !== doc.id){
                handleDocumentClick(doc);
             }
           });
@@ -391,7 +391,7 @@ function SetMapViewHome(props: any) {
         
       };
 
-  }, [props.documentsCoordinates, showDetails]);
+  }, [props.documentsCoordinates, showDetails, selectedDocumentCoordinates]);
   
   
   
