@@ -129,21 +129,24 @@ function DocumentsTable(props: any){
 
     // function to filter documents
     const handleSearch = (term: string) => {
-
-      if(selectedType != 'All Types'){
+      if (selectedType != 'All Types') {
         handleSelect('All Types');
       }
       setStartDate('');
       setEndDate('');
 
       setSearchTerm(term);
+
       const filtered = documentsCoordinates.filter((doc) =>
-        doc.title.toLowerCase().includes(term.toLowerCase())
+        doc.title.toLowerCase().includes(term.toLowerCase()) ||
+        doc.description.toLowerCase().includes(term.toLowerCase()) // Controllo anche sulla descrizione
       );
+
       setFilteredDocuments(filtered);
       setCurrentPage(1); // Resetta la paginazione alla prima pagina
       setPaginatedLinks(filtered.slice(0, itemsPerPage)); // Aggiorna i documenti visualizzati
     };
+
 
     //-------- Filter of order ---------//
 
@@ -438,7 +441,7 @@ useEffect(() => {
           <div className="flex justify-between items-center mb-4">
             {/* Search Bar */}
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600 font-medium whitespace-nowrap">Search a document by title:</span>
+              <span className="text-sm text-gray-600 font-medium whitespace-nowrap">Search a document by title or by keywords:</span>
               <div className="relative w-full max-w-lg">
                 <input
                   type="text"
