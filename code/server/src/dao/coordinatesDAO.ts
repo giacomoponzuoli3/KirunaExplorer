@@ -3,7 +3,6 @@ import db from '../db/db'
 import { DocCoordinates } from '../models/document_coordinate'
 import { Stakeholder } from "../models/stakeholder"
 import { LatLng } from "../interfaces"
-import { resolve } from 'path';
 import { error } from 'console';
 
 class CoordinatesDAO {

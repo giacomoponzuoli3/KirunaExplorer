@@ -36,7 +36,7 @@ function getDocumentIcon(type: string, size: number = 16): JSX.Element | null {
       case 'Consultation':
         return <img src="/img/consultation-icon.png" alt="Technical Document" className={sizeClass}/>;
       default:
-        return <img src="/img/customTypeDocument.png" alt="Technical Document" className={sizeClass}/>;; // Return null if no matching type
+        return <img src="/img/customTypeDocument.png" alt="Technical Document" className={sizeClass}/>; // Return null if no matching type
     }
 }
 
