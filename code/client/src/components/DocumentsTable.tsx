@@ -786,7 +786,6 @@ useEffect(() => {
                 <ModalEditGeoreference
                     documentCoordinates={documentSelected}
                     mode={mode}
-                    refreshDocuments={props.refreshDocuments}
                     refreshDocumentsCoordinates={props.refreshDocumentsCoordinates}
 
                     geoJsonData={props.geoJsonData}

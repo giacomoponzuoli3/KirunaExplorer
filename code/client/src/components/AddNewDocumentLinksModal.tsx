@@ -10,13 +10,14 @@ import Alert from "./Alert";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 // Utilizziamo ISO 639-1 per ottenere le lingue
 import { LatLng } from 'leaflet';
+import { DocCoordinates } from '../models/document_coordinate';
 
 interface AddNewDocumentLinksModalProps {
     document: Document;
     show: boolean;
     onHide: () => void;
     refreshDocumentsCoordinates: () => void;
-    docs: Document[];
+    docs: DocCoordinates[];
     newDocumentCoordinates: LatLng | LatLng[] | null;
     filesUploaded: File[]
 }

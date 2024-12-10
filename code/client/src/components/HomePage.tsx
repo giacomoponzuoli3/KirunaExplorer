@@ -46,7 +46,6 @@ interface HomepageProps {
     documents: Document[];
     documentsCoordinates: DocCoordinates[];
     user: User;
-    refreshDocuments: () => void;
     refreshDocumentsCoordinates: () => void;
     getDocumentIcon: (type: string) => JSX.Element | null;
     stakeholders: Stakeholder[];
@@ -59,45 +58,21 @@ interface HomepageProps {
 
 //----------- Components -------------//
 
-function HomePage({documentsCoordinates, documents, user, refreshDocuments, refreshDocumentsCoordinates, getDocumentIcon, stakeholders, geoJsonData, scaleOptions, onCreateScale} : HomepageProps) {
+function HomePage({documentsCoordinates, user, refreshDocumentsCoordinates, getDocumentIcon, stakeholders, geoJsonData, scaleOptions, onCreateScale} : HomepageProps) {
 
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
-  const [selectedDocumentCoordinates, setSelectedDocumentCoordinates] = useState<DocCoordinates | null>(null);
   const [newDocumentCoordinates,setNewDocumentCoordinates] = useState<LatLng | LatLng[] | null>(null);
   const [newDocument, setNewDocument] = useState<Document | null>(null);
   const [files, setFiles] = useState<File[]>([]);//Resources of newDocument
   const navigate = useNavigate();
 
   //modals
-  const [showDetails, setShowDetails] = useState<boolean>(false);
   const [showAddDocumentModal, setShowAddDocumentModal] = useState<boolean>(false);
-  const [showEditDocumentModal, setShowEditDocumentModal] = useState<boolean>(false);
   const [showAddLinks, setShowAddLinks] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
   const [showGeoreferenceDocument, setShowGeoreferenceDocument] = useState<boolean>(false);
 
-  
-  
 
-  const handleCloseDetailsModal = () => {
-      setShowDetails(false);
-      setSelectedDocument(null);
-      setSelectedDocumentCoordinates(null);
-  };
-
-  const handleDocumentClick = async (doc: DocCoordinates) => {
-      const document = await API.getDocumentById(doc.id);
-      setSelectedDocument(document);
-      setSelectedDocumentCoordinates(doc);
-      setShowDetails(true);
-  }
-
-  function refreshSelectedDocument(doc: DocCoordinates) {
-    setSelectedDocument(doc)
-    setSelectedDocumentCoordinates(doc);
-    refreshDocumentsCoordinates();
-  }
 
   
 
@@ -117,25 +92,18 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
       style={{ height: "calc(100vh - 65px)", width: "100%" }}
     >
       {/* Impostiamo il centro, il livello di zoom e i vari documenti tramite SetMapView */}
-      <SetMapViewHome documentsCoordinates={documentsCoordinates} geoJsonData={geoJsonData} getDocumentIcon={getDocumentIcon} onMarkerClick={handleDocumentClick}/>
+      <SetMapViewHome documentsCoordinates={documentsCoordinates} 
+        geoJsonData={geoJsonData} getDocumentIcon={getDocumentIcon} 
+        user={user} refreshDocumentsCoordinates={refreshDocumentsCoordinates}
+        scaleOptions={scaleOptions} onCreateScale={onCreateScale}
+        stakeholders={stakeholders} 
+      />
 
     </MapContainer>
 
     {/* Show the Legend of document types */}
     {<DocumentLegend />}
 
-    {/* Modal to show the document info */}
-    {selectedDocumentCoordinates && selectedDocument && ( 
-      <ShowDocumentInfoModal 
-        show={showDetails}
-        setShow={setShowDetails} 
-        selectedDocumentCoordinates={selectedDocumentCoordinates}
-        onHide={handleCloseDetailsModal} getDocumentIcon={getDocumentIcon} 
-        user={user} handleEdit={() => {setShowDetails(false); setShowEditDocumentModal(true);}} refreshDocuments={refreshDocuments} 
-        geoJsonData={geoJsonData}
-        refreshDocumentsCoordinates={refreshDocumentsCoordinates}
-      />
-    )}
 
     {/* Search Document Button */}
     <button
@@ -162,32 +130,23 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
     <AddDocumentModal 
       show={showAddDocumentModal} 
       onHide={() => setShowAddDocumentModal(false)} 
-      refreshDocuments={refreshDocuments} 
       stakeholders={stakeholders} 
       showGeoreferenceNewDocumentModal = {(doc: Document, filesUploaded: File[]) => {
         setNewDocument(doc); setShowGeoreferenceDocument(true);
-      if(filesUploaded.length>0){setFiles(filesUploaded)} }}
+        if(filesUploaded.length>0){
+          setFiles(filesUploaded)
+        } 
+      }}
       scaleOptions={scaleOptions}
       //setScaleOptions={setScaleOptions}
       onCreateScale={onCreateScale}
     />
 
-    {selectedDocument && (
-      <EditDocumentModal 
-        document={selectedDocument} show={showEditDocumentModal} 
-        onHide={() => {setShowEditDocumentModal(false); setShowDetails(true);}} 
-        refreshSelectedDocument={refreshSelectedDocument}
-        
-        stakeholders={stakeholders}
-        scaleOptions={scaleOptions}
-        //setScaleOptions={setScaleOptions}
-        onCreateScale={onCreateScale}
-      />
-    )}
-
     {newDocument && (
       <GeoreferenceNewDocumentModal show={showGeoreferenceDocument} onHide={() => setShowGeoreferenceDocument(false)}
-      showAddNewDocumentLinks = {(coordinates: LatLng | LatLng[] | null) => {setNewDocumentCoordinates(coordinates); setShowAddLinks(true);}}
+      showAddNewDocumentLinks = {(coordinates: LatLng | LatLng[] | null) => {
+        setNewDocumentCoordinates(coordinates); setShowAddLinks(true);
+      }}
     />
     )}
 
@@ -197,7 +156,7 @@ function HomePage({documentsCoordinates, documents, user, refreshDocuments, refr
         show={showAddLinks} 
         onHide={() => setShowAddLinks(false)} 
         refreshDocumentsCoordinates={()=>{setNewDocument(null); setNewDocumentCoordinates(null); refreshDocumentsCoordinates();}}
-        docs={documents}
+        docs={documentsCoordinates}
         newDocumentCoordinates={newDocumentCoordinates}
         filesUploaded={files}
       />

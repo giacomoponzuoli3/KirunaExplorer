@@ -29,7 +29,6 @@ const RequiredLabel: React.FC<RequiredLabelProps> = ({ text }) => (
 interface AddDocumentModalProps {
     show: boolean;
     onHide: () => void;
-    refreshDocuments: () => void;
     stakeholders: Stakeholder[];
     showGeoreferenceNewDocumentModal: (doc: Document, files: File[]) => void;
     scaleOptions: { value: string; label: string }[];
@@ -37,7 +36,7 @@ interface AddDocumentModalProps {
 }
 
 
-function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeoreferenceNewDocumentModal, scaleOptions, onCreateScale}: AddDocumentModalProps) {
+function AddDocumentModal({ show, onHide, stakeholders,showGeoreferenceNewDocumentModal, scaleOptions, onCreateScale}: AddDocumentModalProps) {
     const [title, setTitle] = useState('');
     const [selectedStakeholders, setSelectedStakeholders] = useState<Stakeholder[]>([]);
     const [scale, setScale] = useState('');
@@ -168,10 +167,7 @@ function AddDocumentModal({ show, onHide, refreshDocuments, stakeholders,showGeo
         setShowAlert(true);
         return; // Exit early
       }
-
-      refreshDocuments();
       handleClose();
-      refreshDocuments();
       showGeoreferenceNewDocumentModal(new Document(0,title,selectedStakeholders,scale,issuanceDate,type, language, pages, description), files);
   };
 
