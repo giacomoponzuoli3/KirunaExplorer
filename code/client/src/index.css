@@ -55,5 +55,12 @@
   }
 
 
+  .diagram-svg-fix {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+
+
 
   
