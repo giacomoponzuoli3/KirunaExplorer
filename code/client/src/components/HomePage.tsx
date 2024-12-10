@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useLocation, Link, useNavigate} from 'react-router-dom';
-import API from '../API/API';
 import { Document } from "../models/document";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -17,8 +16,6 @@ import { GeoreferenceNewDocumentModal } from "./GeoreferenceNewDocumentModal";
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet-draw';
 import { DocCoordinates } from "../models/document_coordinate";
-import { ShowDocumentInfoModal } from "./ShowDocumentInfoModal";
-import { EditDocumentModal } from "./EditDocumentModal";
 import { AddNewDocumentLinksModal } from "./AddNewDocumentLinksModal";
 import { SetMapViewHome } from "./Map";
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';

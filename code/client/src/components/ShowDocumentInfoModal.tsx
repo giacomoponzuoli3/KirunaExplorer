@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Container, Modal, Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { User } from '../../../common_models/user';
 import API from '../API/API';

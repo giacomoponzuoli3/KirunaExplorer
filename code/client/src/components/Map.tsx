@@ -15,7 +15,6 @@ import Alert from './Alert';
 import geoJson from '../utility/KirunaMunicipality.json'
 import {decimalToDMS} from "../utility/utilities";
 import { ShowDocumentInfoModal } from './ShowDocumentInfoModal';
-import API from '../API/API';
 
 // Limiti della mappa per Kiruna
 const kirunaBounds = new LatLngBounds(
@@ -306,7 +305,7 @@ function SetMapViewHome(props: any) {
                handleCloseDetailsModal();
             }
             if(selectedDocId !== doc.id){
-              handleDocumentClick(doc);
+              handleDocumentClick(doc).then();
             }
           });
 
@@ -374,7 +373,7 @@ function SetMapViewHome(props: any) {
                handleCloseDetailsModal();
             }
             if(selectedDocId !== doc.id){
-               handleDocumentClick(doc);
+               handleDocumentClick(doc).then();
             }
           });
 

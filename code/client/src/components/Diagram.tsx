@@ -1,11 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { ReactFlow, Background, addEdge, applyNodeChanges, applyEdgeChanges, Node, Edge, ViewportPortal, Handle, Position } from '@xyflow/react';
+import { ReactFlow, addEdge, applyNodeChanges, applyEdgeChanges, Node, Edge, ViewportPortal } from '@xyflow/react';
 import 'reactflow/dist/style.css';
 import { DocCoordinates } from '../models/document_coordinate';
-import Link from '../models/link';
 import API from '../API/API';
 import DiagramTable from './DiagramTable';
-import Coordinate from '../models/coordinate';
 import { DocLink } from '../models/document_link';
 
 // Componente per il nodo personalizzato
@@ -312,7 +310,7 @@ const Diagram = (props: any) => {
   }, [nodes, documents]);
 
   useEffect(() => {
-    allDocuments();
+    allDocuments().then();
   }, []);
 
   useEffect(() => {
