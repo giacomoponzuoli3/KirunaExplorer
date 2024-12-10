@@ -86,11 +86,15 @@ function ShowDocumentInfoModal({
             </div>
             <div className="modal-body">
               <Row>
-                <Col>
+                <Col md={4}>
+                <Row>
                 <div className="icon-section">
                     {getDocumentIcon(selectedDocumentCoordinates.type, 16)}
                 </div>
+                </Row>
                 {user.role === "Urban Planner" && (
+                    <>
+                  <Row>  
                     <div className="action-buttons">
                         <button
                             title="Delete document"
@@ -106,9 +110,13 @@ function ShowDocumentInfoModal({
                         >
                             <PencilIcon className="h-5 w-5" />
                         </button>
+                    </div>
+                  </Row>
+                  <Row>
+                    <div className="action-buttons">    
                         <button
                             title="Edit document's georeference"
-                            className="btn-action bg-yellow-500 hover:bg-yellow-600"
+                            className="btn-action bg-yellow-500 hover:bg-yellow-600 mt-2"
                             onClick={handleEditGeoreference}
                         >
                             <img
@@ -118,22 +126,23 @@ function ShowDocumentInfoModal({
                             />
                         </button>
                     </div>
+                  </Row>
+                  </>
                 )}
                 </Col>
-                <Col>
-                <div className="details">
-                    <p><strong>Stakeholders:</strong> {selectedDocumentCoordinates.stakeHolders.map(sh => sh.name).join(' / ')}</p>
-                    <p><strong>Scale:</strong> {selectedDocumentCoordinates.scale}</p>
-                    <p><strong>Issuance Date:</strong> {selectedDocumentCoordinates.issuanceDate}</p>
-                    <p><strong>Type:</strong> {selectedDocumentCoordinates.type}</p>
-                    <p><strong>Language:</strong> {selectedDocumentCoordinates.language || '-'}</p>
-                    <p><strong>Pages:</strong> {selectedDocumentCoordinates.pages || '-'}</p>
+                <div className="details col-md-8">
+                    <p className="text-sm text-gray-600"><strong>Stakeholders:</strong> {selectedDocumentCoordinates.stakeHolders.map(sh => sh.name).join(' / ')}</p>
+                    <p className="text-sm text-gray-600"><strong>Scale:</strong> {selectedDocumentCoordinates.scale}</p>
+                    <p className="text-sm text-gray-600"><strong>Issuance Date:</strong> {selectedDocumentCoordinates.issuanceDate}</p>
+                    <p className="text-sm text-gray-600"><strong>Type:</strong> {selectedDocumentCoordinates.type}</p>
+                    <p className="text-sm text-gray-600"><strong>Language:</strong> {selectedDocumentCoordinates.language || '-'}</p>
+                    <p className="text-sm text-gray-600"><strong>Pages:</strong> {selectedDocumentCoordinates.pages || '-'}</p>
                 </div>
-                </Col>
                 </Row>
                 <Row>
                     <div className='description'>
-                        <p><strong>Description:</strong> {selectedDocumentCoordinates.description}</p>  
+                       <p><strong>Description:</strong></p>
+                       <p>{selectedDocumentCoordinates.description}</p>  
                     </div>
                 </Row>
             </div>
@@ -147,7 +156,7 @@ function ShowDocumentInfoModal({
                 </button>
                 <button
                     onClick={() =>
-                        navigate(`documents/${selectedDocumentCoordinates.id}/resources`, { state: { from: "/documents" } })
+                        navigate(`/documents/${selectedDocumentCoordinates.id}/resources`, { state: { from: "/documents" } })
                     }
                     className="btn-footer"
                 >
