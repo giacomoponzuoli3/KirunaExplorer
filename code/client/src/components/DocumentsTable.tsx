@@ -89,7 +89,7 @@ function DocumentsTable(props: any){
     //pagination controls
     const [currentPage, setCurrentPage] = useState(1);  // Track the current page
     const [paginatedLinks, setPaginatedLinks] = useState<DocCoordinates[]>([]);
-    const itemsPerPage = 4; // Number of items to show per page
+    const itemsPerPage = 10; // Number of items to show per page
 
     //dropdown of type document filter
     const [isOpenTypeDocument, setIsOpenTypeDocument] = useState(false); // Gestione dello stato del dropdown
