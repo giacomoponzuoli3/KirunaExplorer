@@ -175,7 +175,7 @@ function App() {
           </>
         }>
           <Route index element={<KirunaLandingPage/>}/>
-          <Route path="/map" element={<HomePage geoJsonData={geoJsonData} documentsCoordinates={documentsCoordinates} documents={documents} user={user} refreshDocuments={getAllDocuments} refreshDocumentsCoordinates={getAllDocumentsCoordinates} stakeholders={stakeholders} getDocumentIcon={getDocumentIcon} scaleOptions={scaleOptions} onCreateScale={handleCreateScale}/>}/>
+          <Route path="/map" element={<HomePage geoJsonData={geoJsonData} documentsCoordinates={documentsCoordinates} documents={documents} user={user} refreshDocumentsCoordinates={getAllDocumentsCoordinates} stakeholders={stakeholders} getDocumentIcon={getDocumentIcon} scaleOptions={scaleOptions} onCreateScale={handleCreateScale}/>}/>
           <Route path="/login" element={<Login message={message} isLogged={isLogged} login={handleLogin} handleBack={handleBack}/>} />
           <Route path="*" element={<NotFoundLayout/>} />
           {/* Aggiungi altre route come la dashboard */}

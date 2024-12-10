@@ -23,7 +23,7 @@ const RequiredLabel: React.FC<RequiredLabelProps> = ({ text }) => (
 );
 
 interface EditDocumentModalProps {
-    readonly document: Document;
+    readonly document: DocCoordinates;
     readonly show: boolean;
     readonly onHide: () => void;
     refreshSelectedDocument: (doc: DocCoordinates) => void;

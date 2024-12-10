@@ -14,6 +14,8 @@ import { useParams } from 'react-router-dom';
 import Alert from './Alert';
 import geoJson from '../utility/KirunaMunicipality.json'
 import {decimalToDMS} from "../utility/utilities";
+import { ShowDocumentInfoModal } from './ShowDocumentInfoModal';
+import API from '../API/API';
 
 // Limiti della mappa per Kiruna
 const kirunaBounds = new LatLngBounds(
@@ -80,6 +82,25 @@ function SetMapViewHome(props: any) {
   const map = useMap();
 
   const [showPolygonMessage, setShowPolygonMessage] = useState(false);
+  const [showDetails, setShowDetails] = useState<boolean>(false);
+  const [selectedDocumentCoordinates, setSelectedDocumentCoordinates] = useState<DocCoordinates | null>(null);
+
+  const handleCloseDetailsModal = () => {
+    setShowDetails(false);
+    setSelectedDocumentCoordinates(null);
+    //props.refreshDocumentsCoordinates()
+  };
+
+  const handleDocumentClick = async (doc: DocCoordinates) => {
+    setSelectedDocumentCoordinates(doc);
+    console.log(doc);
+    setShowDetails(true);
+  }
+
+  function refreshSelectedDocument(doc: DocCoordinates) {
+    setSelectedDocumentCoordinates(doc);
+    props.refreshDocumentsCoordinates();
+  }
 
   useEffect(() => {
     if (map.getZoom() === undefined) {
@@ -239,7 +260,7 @@ function SetMapViewHome(props: any) {
           });
 
           const marker = L.marker(centralCoord, {
-            icon: defaultIcon,
+            icon: showDetails && selectedDocumentCoordinates?.id === doc.id ? highlightedIcon : defaultIcon,
           });
 
           const popup = L.popup({
@@ -279,12 +300,14 @@ function SetMapViewHome(props: any) {
   
           marker.on('click', () => {
             // Set the highlighted icon for the clicked marker
-            // if(marker.getIcon()===highlightedIcon){
-            //    marker.setIcon(defaultIcon);
-            // }else{
-            //    marker.setIcon(highlightedIcon);
-            // }
-            props.onMarkerClick(doc);
+            map.closePopup(popup);
+            if(showDetails){
+               //marker.setIcon(defaultIcon);
+               handleCloseDetailsModal();
+            }else{
+               //marker.setIcon(highlightedIcon);
+               handleDocumentClick(doc);
+            }
           });
 
           // Aggiungi il marker al cluster
@@ -304,7 +327,7 @@ function SetMapViewHome(props: any) {
             `,
             iconSize: [20, 20],
             className: '',
-          });
+          })
 
           const highlightedIcon = L.divIcon({
             html: `
@@ -317,7 +340,7 @@ function SetMapViewHome(props: any) {
           });
 
           const marker = L.marker([coord.latitude, coord.longitude], {
-            icon: defaultIcon
+            icon: showDetails && selectedDocumentCoordinates?.id === doc.id ? highlightedIcon : defaultIcon
 
           });
 
@@ -345,12 +368,14 @@ function SetMapViewHome(props: any) {
   
           marker.on('click', () => {
             // Set the highlighted icon for the clicked marker
-            // if(marker.getIcon()===highlightedIcon){
-            //    marker.setIcon(defaultIcon);
-            // }else{
-            //    marker.setIcon(highlightedIcon);
-            // }
-            props.onMarkerClick(doc);
+            map.closePopup(popup);
+            if(showDetails){
+               //marker.setIcon(defaultIcon);
+               handleCloseDetailsModal();
+            }else{
+               //marker.setIcon(highlightedIcon);
+               handleDocumentClick(doc);
+            }
           });
 
           // Aggiungi il marker al cluster
@@ -361,7 +386,12 @@ function SetMapViewHome(props: any) {
       // Aggiungi il gruppo di cluster alla mappa
       map.addLayer(markersCluster);
 
-  }, [props.documentsCoordinates]);
+      return () => {
+        markersCluster.clearLayers();
+        
+      };
+
+  }, [props.documentsCoordinates, showDetails]);
   
   
   
@@ -372,6 +402,23 @@ function SetMapViewHome(props: any) {
           area: <strong>the entire municipality of Kiruna</strong>
         </div>
       )}
+      {/* Modal to show the document info */}
+     {selectedDocumentCoordinates && ( 
+      <ShowDocumentInfoModal 
+        show={showDetails}
+        selectedDocumentCoordinates={selectedDocumentCoordinates}
+        onHide={handleCloseDetailsModal} 
+        getDocumentIcon={props.getDocumentIcon} 
+        user={props.user}
+        geoJsonData={props.geoJsonData}
+        refreshDocumentsCoordinates={props.refreshDocumentsCoordinates}
+        scaleOptions={props.scaleOptions}
+        //setScaleOptions={setScaleOptions}
+        onCreateScale={props.onCreateScale}
+        stakeholders={props.stakeholders}
+        refreshSelectedDocument={refreshSelectedDocument} 
+      />
+     )}
       {null}
     </>
   );

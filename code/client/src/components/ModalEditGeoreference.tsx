@@ -15,7 +15,6 @@ import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
 interface ModalEditGeoreferenceProps {
   documentCoordinates: DocCoordinates;  // Documento con latitudine e longitudine
   onClose: () => void;  // Funzione per chiudere il modal
-  refreshDocuments: () => void;  // Funzione per ricaricare la lista dei documenti dopo la modifica
   refreshDocumentsCoordinates: () => void;  // Funzione per ricaricare la lista dei documenti dopo la modifica
   onBack: () => void;
   mode: string //Variabile che mi dice se sono in modalità di inserimento o update
@@ -25,7 +24,6 @@ interface ModalEditGeoreferenceProps {
 const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   documentCoordinates,
   onClose,
-  refreshDocuments,
   refreshDocumentsCoordinates,
   onBack,
   mode,
@@ -66,7 +64,6 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
 
         console.log("Entrato1")
         // Dopo aver aggiornato, ricarica i documenti
-        refreshDocuments();
         refreshDocumentsCoordinates();
         console.log("Entrato1")
 
