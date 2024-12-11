@@ -91,6 +91,11 @@ export async function setup() {
             FOREIGN KEY("document_id") REFERENCES "documents"("id") ON DELETE CASCADE
         )`);
 
+        await runQuery(`CREATE TABLE IF NOT EXISTS "scales" (
+            "scale_id"	INTEGER,
+            "name"	TEXT NOT NULL UNIQUE,
+            PRIMARY KEY("scale_id" AUTOINCREMENT)
+        )`);
 
         console.log("All tables created successfully.");
     } catch (err) {

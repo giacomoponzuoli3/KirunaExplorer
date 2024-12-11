@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Container, Modal, Dropdown } from 'react-bootstrap';
-import { Document } from '../models/document';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import API from '../API/API';
 import { Stakeholder } from '../models/stakeholder';
@@ -29,11 +28,13 @@ interface EditDocumentModalProps {
     refreshSelectedDocument: (doc: DocCoordinates) => void;
     readonly stakeholders: Stakeholder[];
     readonly scaleOptions: { value: string; label: string }[];
+    readonly typeOptions: { value: string; label: string }[];
     //setScaleOptions: React.Dispatch<React.SetStateAction<{ value: string; label: string }[]>>;
     readonly onCreateScale: (inputValue: string) => Promise<void>;
+    readonly onCreateType: (inputValue: string) => Promise<void>;
 }
 
-function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, stakeholders, scaleOptions, onCreateScale }: EditDocumentModalProps) {
+function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, stakeholders, scaleOptions, onCreateScale, typeOptions, onCreateType }: EditDocumentModalProps) {
     const [title, setTitle] = useState(document.title);
     const [selectedStakeholders, setSelectedStakeholders] = useState<Stakeholder[]>(document.stakeHolders);
     const [scale, setScale] = useState(document.scale);
@@ -106,7 +107,7 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
     const handleScale = (selectedOption: SingleValue<{ value: string; label: string }>) => {
     setScale(selectedOption ? selectedOption.value : '');
     };
-
+    /** 
     const typeOptions = [
         { value: 'Informative document', label: 'Informative document' },
         { value: 'Prescriptive document', label: 'Prescriptive document' },
@@ -116,7 +117,7 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
         { value: 'Agreement', label: 'Agreement' },
         { value: 'Conflict', label: 'Conflict' },
         { value: 'Consultation', label: 'Consultation' },
-      ];
+      ];*/
     
     const handleType = (selectedOption: SingleValue<{ value: string; label: string }>) => {
     setType(selectedOption ? selectedOption.value : '');
@@ -224,8 +225,9 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                                             options={typeOptions}
                                             value={type ? { value: type, label: type } : null}
                                             onChange={handleType}
+                                            onCreateOption={onCreateType}
                                             placeholder="Select or type a type..."
-                                            formatCreateLabel={(inputValue) => `Use custom type: "${inputValue}"`}
+                                            formatCreateLabel={(inputValue) => `Add a new type: "${inputValue}"`}
                                             styles={{
                                                 control: (base) => ({
                                                 ...base,
