@@ -562,6 +562,7 @@ async function addScale(scale: string) {
   
 async function getTypes() {
     const response = await fetch(baseURL + "type", {credentials: "include"})
+    console.log(response);
     if(response.ok) {
         return await response.json()
     } else {
