@@ -552,7 +552,12 @@ function GeoreferenceNewDocumentModal({
                   key={index}
                   position={[latitude, longitude]}
                   eventHandlers={{
-                    click: () => setCoordinates(new L.LatLng(latitude, longitude)),
+                    click: (e) => {
+                      setCoordinates(new L.LatLng(latitude, longitude));
+                      e.target
+                         .bindPopup("You picked this marker!", {className: "custom-popup",closeButton: false,})
+                         .openPopup(); // Open the popup
+                    },
                   }}
                   icon={customIcon}
                   ref={(marker) => {
@@ -578,13 +583,18 @@ function GeoreferenceNewDocumentModal({
                   pathOptions={{
                     opacity: 
                     coordinates instanceof L.LatLng
-      ? 0.3 // If a marker is clicked, dim all polygons
-      : coordinates instanceof Array && !arraysEqual(coordinates, latLngs)
-      ? 0.3
-      : 1,
+                                  ? 0.3 // If a marker is clicked, dim all polygons
+                                  : coordinates instanceof Array && !arraysEqual(coordinates, latLngs)
+                                  ? 0.3
+                                  : 1,
                   }}
                   eventHandlers={{
-                    click: () => setCoordinates(latLngs),
+                    click: (e) => {
+                      setCoordinates(latLngs);
+                      e.target
+                      .bindPopup("You picked this polygon!", {className: "custom-popup",closeButton: false,})
+                      .openPopup(); // Open the popup
+                 },
                   }}
                 />
               );
