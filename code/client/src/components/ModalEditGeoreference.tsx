@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MapContainer } from 'react-leaflet';
+import { MapContainer, Marker, Polygon } from 'react-leaflet';
 import L, { LatLng } from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -7,9 +7,10 @@ import 'leaflet-draw';
 import API from '../API/API';
 import { DocCoordinates } from "../models/document_coordinate";
 import {cityCoords, SetMapViewEdit} from './Map';
-import {InformationCircleIcon, Square2StackIcon, MapPinIcon, PencilSquareIcon} from '@heroicons/react/24/solid'
+import {InformationCircleIcon, Square2StackIcon, MapPinIcon, PencilSquareIcon, CursorArrowRaysIcon} from '@heroicons/react/24/solid'
 import Alert from './Alert';
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
+import Coordinate from '../models/coordinate';
 
 
 interface ModalEditGeoreferenceProps {
@@ -29,6 +30,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   mode,
   geoJsonData
 }) => {
+  const [existingGeoRef,setExistingGeoRef] = useState<Coordinate[][]>([])
   const [selectedPosition, setSelectedPosition] = useState<LatLng[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,6 +47,22 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
 
   // Determina se le coordinate rappresentano un poligono o un punto
   const isPolygon = documentCoordinates.coordinates && documentCoordinates.coordinates.length > 1;
+
+  const customIcon = new L.Icon({
+    iconUrl: '/img/marker.png',
+    iconSize: [25, 41],  // Dimensioni dell'icona
+    iconAnchor: [12, 41], // Punto di ancoraggio dell'icona
+    popupAnchor: [1, -34], // Punto da cui si apre il popup
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    shadowSize: [41, 41]  // Dimensioni dell'ombra
+  });
+
+  const arraysEqual = (arr1: L.LatLng[], arr2: L.LatLng[]) => {
+    if (arr1.length !== arr2.length) return false;
+    return arr1.every((point, index) =>
+      point.equals(arr2[index])
+    );
+  };
 
   const handleUpdate = async () => {
     if (selectedPosition != null) {
@@ -102,6 +120,20 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
     console.log(selectedPosition)
   }, [selectedPosition])
 
+  const getExistingAreasAndPoints = async () => {
+    try {
+        const allGeoRef: Coordinate[][] = await API.getExistingGeoreferences();
+        console.log("tuka sum");
+        setExistingGeoRef(allGeoRef);
+    } catch (err: any) {
+        console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    getExistingAreasAndPoints().then();
+  }, []); // Trigger this when the modal visibility (`show`) changes
+
 
   // Impostiamo il map component all'interno del modal
   return (
@@ -154,6 +186,18 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
           >
             <Square2StackIcon className="w-5 h-5 mr-2 inline" />
             New polygon
+          </button>
+
+          {/* Pick existing area or point */}
+          <button
+            title='Pick existing area or point'
+            className={`px-3 py-1 border-1 border-blue-500 text-blue-500 text-sm rounded-full hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-300 transition ease-in-out duration-200 ${
+              selectedButton === 'existingGeoRef' ? 'bg-blue-100 text-blue-500 border-blue-500 border-2' : ''
+            }`}
+            onClick={() => handleButtonClick('existingGeoRef')}
+          >
+            <CursorArrowRaysIcon className="w-5 h-5 mr-2 inline" />
+            Pick existing area or point
           </button>
 
           {/* Edit georeference */}
@@ -225,6 +269,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
             selectedButton === 'point' ? 'Click the "Draw a Marker" icon in the top-right corner to place a point on the map' :
             selectedButton === 'polygon' ? 'Click the "Draw a polygon" icon in the top-right corner to draw a polygon by selecting multiple points' :
             selectedButton === 'edit' ? 'Click the "Edit Georeference" icon in the top-right corner to modify the existing georeference' :
+            selectedButton === 'existingGeoRef' ? 'Click on one of the points or areas on the map to reference the document to that area or point' :
             ''
           } 
         </span>
@@ -242,6 +287,61 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
                 useMunicipalArea={useMunicipalArea}
                 documentCoordinates={documentCoordinates}
               />
+              {selectedButton === 'existingGeoRef' && existingGeoRef.map((coordinateArray, index) => {
+            if (coordinateArray.length === 1) {
+              const { latitude, longitude } = coordinateArray[0];
+              return (
+                <Marker
+                  key={index}
+                  position={[latitude, longitude]}
+                  eventHandlers={{
+                    click: (e) => {
+                      setSelectedPosition([new L.LatLng(latitude, longitude)]);
+                      e.target
+                         .bindPopup("You picked this marker!", {className: "custom-popup",closeButton: false,})
+                         .openPopup(); // Open the popup
+                    },
+                  }}
+                  icon={customIcon}
+                  ref={(marker) => {
+                    if (marker) {
+                      const iconElement = marker.getElement();
+                      if (iconElement) {
+                        iconElement.style.opacity = selectedPosition && selectedPosition?.length > 1
+                        ? "0.3" // If a polygon is clicked, dim all markers
+                        : selectedPosition && selectedPosition?.length === 1 && !arraysEqual(selectedPosition,[new L.LatLng(latitude, longitude)])
+                        ? "0.3"
+                        : "1";
+                      }
+                    }
+                  }}
+                />
+              );
+            } else if (coordinateArray.length > 1) {
+              const latLngs = coordinateArray.map(coord => new L.LatLng(coord.latitude, coord.longitude) );
+              return (
+                <Polygon
+                  key={index}
+                  positions={latLngs}
+                  pathOptions={{
+                    opacity: 
+                    selectedPosition && selectedPosition?.length === 1 ? 0.3 // If a marker is clicked, dim all polygons
+                      : selectedPosition && selectedPosition?.length > 1 && !arraysEqual(selectedPosition, latLngs)
+                      ? 0.3 : 1,
+                  }}
+                  eventHandlers={{
+                    click: (e) => {
+                      setSelectedPosition(latLngs);
+                      e.target
+                      .bindPopup("You picked this polygon!", {className: "custom-popup",closeButton: false,})
+                      .openPopup(); // Open the popup
+                 },
+                  }}
+                />
+              );
+            }
+            return null;
+          })}
             </MapContainer>
           </div>
 

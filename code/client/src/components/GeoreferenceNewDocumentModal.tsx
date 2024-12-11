@@ -13,6 +13,7 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import { decimalToDMS } from '../utility/utilities'
 import API from "../API/API";
 import Coordinate from "../models/coordinate";
+import {CursorArrowRaysIcon} from '@heroicons/react/24/solid'
 
 // Extend the L.MarkerOptions type to include isStandalone
 declare module 'leaflet' {
@@ -452,20 +453,6 @@ function GeoreferenceNewDocumentModal({
         }
   };
 
-  const pickExistingAreaOrPoint = () => {
-    //if(isPickExistingMode){
-    console.log(existingGeoRef);
-    //}
-  };
-
-  const showExistingAreasAndPoints = () => {
-    if(!isPickExistingMode){
-    console.log(existingGeoRef);
-    setIsPickExistingMode(true);
-    }else{
-      setIsPickExistingMode(false);
-    }
-  };
 
   const arraysEqual = (arr1: L.LatLng[], arr2: L.LatLng[]) => {
     if (arr1.length !== arr2.length) return false;
@@ -477,7 +464,6 @@ function GeoreferenceNewDocumentModal({
   const getExistingAreasAndPoints = async () => {
     try {
         const allGeoRef: Coordinate[][] = await API.getExistingGeoreferences();
-        console.log("tuka sum");
         setExistingGeoRef(allGeoRef);
     } catch (err: any) {
         console.log(err);
@@ -543,8 +529,7 @@ function GeoreferenceNewDocumentModal({
               resetForm={resetForm} 
               setCoordinates={(position: LatLng | LatLng[]) => setCoordinates(position)}
             />
-            {isPickExistingMode &&
-          existingGeoRef.map((coordinateArray, index) => {
+            {isPickExistingMode && existingGeoRef.map((coordinateArray, index) => {
             if (coordinateArray.length === 1) {
               const { latitude, longitude } = coordinateArray[0];
               return (
@@ -727,6 +712,7 @@ function GeoreferenceNewDocumentModal({
             backgroundColor: isPickExistingMode ? "#0d6efd" : "white", 
             color: isPickExistingMode ? "white" : "#4a4a4a", // Text color adjusts based on mode   
             borderColor: isPickExistingMode ? "#0d6efd" : "black",
+            padding: 0
             }}
             onClick={() => {
               setIsInfoMode(false);
@@ -737,10 +723,9 @@ function GeoreferenceNewDocumentModal({
               setCoordinates(null);
               setIsEnterCoordinatesMode(false);
               clearOtherLayers();
-              //showExistingAreasAndPoints();
             }}
           >
-            <i className="bi bi-pin-angle fs-8"></i>
+            <CursorArrowRaysIcon className="h-5 w-5"/>
           </Button>
 
           {/** Info button */}
