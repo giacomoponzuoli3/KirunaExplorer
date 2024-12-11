@@ -469,7 +469,7 @@ function SetMapViewEdit(props: any) {
     const latLngs = documentCoordinates.coordinates.map((coord: any) => [coord.latitude, coord.longitude]);
 
     // Aggiungi poligono o punto dall'attuale documento
-    if (documentCoordinates.coordinates.length === 1 && documentCoordinates.coordinates[0].municipality_area == 0 && props.selectedButton != "Entire Area") { //if it is a point
+    if (documentCoordinates.coordinates.length === 1 && documentCoordinates.coordinates[0].municipality_area == 0 && props.selectedButton != "Entire Area" && props.selectedButton != "existingGeoRef") { //if it is a point
       const marker = L.marker(latLngs[0], {icon: defaultIcon});
 
       const popup = L.popup({
@@ -499,7 +499,7 @@ function SetMapViewEdit(props: any) {
       drawnItems.addLayer(marker);
       setSelectedPosition(); // Imposta la posizione selezionata
     } else {
-      if( props.selectedButton != "Entire Area"){
+      if( props.selectedButton != "Entire Area" && props.selectedButton != "existingGeoRef"){
         let polygon;
 
         if (documentCoordinates.coordinates.length > 1) {
