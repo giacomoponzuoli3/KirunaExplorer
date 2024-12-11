@@ -363,7 +363,7 @@ useEffect(() => {
           getDocuments().then();
         }
         props.refreshDocumentsCoordinates();
-        props.refreshDocuments();
+        //props.refreshDocuments();
         setDocumentDelete(null);
     }catch(err){
       setShowAlert(true);
@@ -383,7 +383,7 @@ useEffect(() => {
         getDocuments().then();
       }
       props.refreshDocumentsCoordinates();
-      props.refreshDocuments();
+      //props.refreshDocuments();
       setDocumentGeoreferenceDelete(null);
     }catch(err){
       setShowAlert(true);
@@ -747,7 +747,7 @@ useEffect(() => {
                 setShowModalEditDocument(false)
                 setDocumentEdit(null);
                 props.refreshDocumentsCoordinates();
-                props.refreshDocuments();
+                //props.refreshDocuments();
                 getDocuments().then(); //refresh of documents
                 setStartDate('');
                 setEndDate('');

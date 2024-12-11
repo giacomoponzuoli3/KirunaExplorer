@@ -40,7 +40,6 @@ function getPolygonKey(latLngs: LatLngTuple[]): string {
 //----------- Interfaces -------------//
 
 interface HomepageProps {
-    documents: Document[];
     documentsCoordinates: DocCoordinates[];
     user: User;
     refreshDocumentsCoordinates: () => void;
