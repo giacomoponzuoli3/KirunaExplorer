@@ -12,7 +12,7 @@ class ScaleDAO {
                     if (err) return reject(err);
                     if (!rows || rows.length === 0) return reject(new ScaleNotFoundError);
 
-                    const scales: Scale[] = rows.map((row: any) => new Scale(row.id, row.name));
+                    const scales: Scale[] = rows.map((row: any) => new Scale(row.scale_id, row.name));
                     resolve(scales);
                 });
             } catch (error) {
