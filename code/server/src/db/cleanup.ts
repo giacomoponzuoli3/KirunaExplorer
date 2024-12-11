@@ -16,7 +16,8 @@ export async function cleanup() {
     }
 
     try {
-        // Clear tables (order does not matter for `DELETE`)
+        
+        await clearTable("scales");
         await clearTable("original_resources");
         await clearTable("document_coordinates");
         await clearTable("documents_links");
