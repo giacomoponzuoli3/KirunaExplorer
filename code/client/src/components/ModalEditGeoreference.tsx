@@ -298,7 +298,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
                     click: (e) => {
                       setSelectedPosition([new L.LatLng(latitude, longitude)]);
                       e.target
-                         .bindPopup("You picked this marker!", {className: "custom-popup",closeButton: false,})
+                         .bindPopup("You picked this point!", {className: "custom-popup",closeButton: false,})
                          .openPopup(); // Open the popup
                     },
                   }}
@@ -333,7 +333,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
                     click: (e) => {
                       setSelectedPosition(latLngs);
                       e.target
-                      .bindPopup("You picked this polygon!", {className: "custom-popup",closeButton: false,})
+                      .bindPopup("You picked this area!", {className: "custom-popup",closeButton: false,})
                       .openPopup(); // Open the popup
                  },
                   }}
