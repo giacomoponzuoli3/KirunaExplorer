@@ -558,12 +558,52 @@ async function addScale(scale: string) {
 }
 
 
+/** ------------------- Type APIs ------------------------ */ 
+  
+async function getTypes() {
+    const response = await fetch(baseURL + "type", {credentials: "include"})
+    console.log(response);
+    if(response.ok) {
+        return await response.json()
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.message
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error. Please reload the page")
+    }
+}
+
+async function addType(type: string) {
+    const response = await fetch(baseURL + "type", {
+        method:  'POST',
+        credentials: "include",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            name: type
+        })
+    });
+
+    if (response.ok) {
+        return 
+    } else {
+        const errDetail = await response.json();
+        if (errDetail.error)
+            throw errDetail.error
+        if (errDetail.message)
+            throw errDetail.message
+        throw new Error("Error occured when adding a type");
+    }
+}
+
+
 const API = {
     login, logOut, getUserInfo, register,
     addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType, addResourceToDocument, getResourceData, deleteResource, getAllResourcesData,
     getAllStakeholders, addStakeholder,
     addLink, deleteLink, editLink, getAllLinks,
     getAllDocumentsCoordinates, setDocumentCoordinates, updateDocumentCoordinates, deleteDocumentCoordinates, getMunicipalityArea, getExistingGeoreferences,
-    getScales, addScale
+    getScales, addScale, getTypes, addType
 }
 export default API

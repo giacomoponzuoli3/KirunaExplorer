@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Container, Modal, Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { User } from '../../../common_models/user';
 import API from '../API/API';
@@ -23,7 +23,9 @@ interface ShowDocumentInfoModalProps {
     refreshDocumentsCoordinates: () => void;
     geoJsonData: any
     scaleOptions: { value: string; label: string }[];
+    typeOptions: { value: string; label: string }[];
     onCreateScale: (inputValue: string) => Promise<void>;
+    onCreateType: (inputValue: string) => Promise<void>;
     stakeholders: Stakeholder[];
     refreshSelectedDocument: (doc: DocCoordinates) => void;
 }
@@ -31,7 +33,7 @@ interface ShowDocumentInfoModalProps {
 function ShowDocumentInfoModal({ 
     geoJsonData, getDocumentIcon, selectedDocumentCoordinates, 
     refreshDocumentsCoordinates, show, onHide, user, 
-    scaleOptions, onCreateScale, stakeholders, refreshSelectedDocument 
+    scaleOptions, typeOptions, onCreateScale, onCreateType, stakeholders, refreshSelectedDocument 
    }: ShowDocumentInfoModalProps) {
 
     const navigate = useNavigate();  
@@ -190,7 +192,9 @@ function ShowDocumentInfoModal({
         
                 stakeholders={stakeholders}
                 scaleOptions={scaleOptions}
+                typeOptions={typeOptions}
                 onCreateScale={onCreateScale}
+                onCreateType={onCreateType}
               />
 
 

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useLocation, Link, useNavigate} from 'react-router-dom';
-import API from '../API/API';
 import { Document } from "../models/document";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -17,8 +16,6 @@ import { GeoreferenceNewDocumentModal } from "./GeoreferenceNewDocumentModal";
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet-draw';
 import { DocCoordinates } from "../models/document_coordinate";
-import { ShowDocumentInfoModal } from "./ShowDocumentInfoModal";
-import { EditDocumentModal } from "./EditDocumentModal";
 import { AddNewDocumentLinksModal } from "./AddNewDocumentLinksModal";
 import { SetMapViewHome } from "./Map";
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
@@ -51,14 +48,16 @@ interface HomepageProps {
     stakeholders: Stakeholder[];
     geoJsonData: any;
     scaleOptions: { value: string; label: string }[];
+    typeOptions: { value: string; label: string }[];
     //setScaleOptions: React.Dispatch<React.SetStateAction<{ value: string; label: string }[]>>;
     onCreateScale: (inputValue: string) => Promise<void>;
+    onCreateType: (inputValue: string) => Promise<void>;
 }
 
 
 //----------- Components -------------//
 
-function HomePage({documentsCoordinates, user, refreshDocumentsCoordinates, getDocumentIcon, stakeholders, geoJsonData, scaleOptions, onCreateScale} : HomepageProps) {
+function HomePage({documentsCoordinates, user, refreshDocumentsCoordinates, getDocumentIcon, stakeholders, geoJsonData, scaleOptions, onCreateScale, typeOptions, onCreateType} : HomepageProps) {
 
   const [newDocumentCoordinates,setNewDocumentCoordinates] = useState<LatLng | LatLng[] | null>(null);
   const [newDocument, setNewDocument] = useState<Document | null>(null);
@@ -96,7 +95,7 @@ function HomePage({documentsCoordinates, user, refreshDocumentsCoordinates, getD
         geoJsonData={geoJsonData} getDocumentIcon={getDocumentIcon} 
         user={user} refreshDocumentsCoordinates={refreshDocumentsCoordinates}
         scaleOptions={scaleOptions} onCreateScale={onCreateScale}
-        stakeholders={stakeholders} 
+        stakeholders={stakeholders} typeOptions={typeOptions} onCreateType={onCreateType}
       />
 
     </MapContainer>
@@ -138,8 +137,10 @@ function HomePage({documentsCoordinates, user, refreshDocumentsCoordinates, getD
         } 
       }}
       scaleOptions={scaleOptions}
+      typeOptions={typeOptions}
       //setScaleOptions={setScaleOptions}
       onCreateScale={onCreateScale}
+      onCreateType={onCreateType}
     />
 
     {newDocument && (

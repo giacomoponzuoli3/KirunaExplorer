@@ -32,11 +32,13 @@ interface AddDocumentModalProps {
     stakeholders: Stakeholder[];
     showGeoreferenceNewDocumentModal: (doc: Document, files: File[]) => void;
     scaleOptions: { value: string; label: string }[];
+    typeOptions: { value: string; label: string }[];
     onCreateScale: (inputValue: string) => Promise<void>;
+    onCreateType: (inputValue: string) => Promise<void>;
 }
 
 
-function AddDocumentModal({ show, onHide, stakeholders,showGeoreferenceNewDocumentModal, scaleOptions, onCreateScale}: AddDocumentModalProps) {
+function AddDocumentModal({ show, onHide, stakeholders,showGeoreferenceNewDocumentModal, scaleOptions, onCreateScale, typeOptions, onCreateType}: AddDocumentModalProps) {
     const [title, setTitle] = useState('');
     const [selectedStakeholders, setSelectedStakeholders] = useState<Stakeholder[]>([]);
     const [scale, setScale] = useState('');
@@ -183,8 +185,8 @@ function AddDocumentModal({ show, onHide, stakeholders,showGeoreferenceNewDocume
       { value: '1:5000', label: '1:5000' },
       { value: '1:7500', label: '1:7500' },
       { value: '1:10000', label: '1:10000' },
-    ];*/
-
+    ];
+    
     const typeOptions = [
       { value: 'Informative document', label: 'Informative document' },
       { value: 'Prescriptive document', label: 'Prescriptive document' },
@@ -194,7 +196,7 @@ function AddDocumentModal({ show, onHide, stakeholders,showGeoreferenceNewDocume
       { value: 'Agreement', label: 'Agreement' },
       { value: 'Conflict', label: 'Conflict' },
       { value: 'Consultation', label: 'Consultation' },
-    ];
+    ];*/
 
 
     
@@ -295,8 +297,9 @@ function AddDocumentModal({ show, onHide, stakeholders,showGeoreferenceNewDocume
                       options={typeOptions}
                       value={type ? { value: type, label: type } : null}
                       onChange={handleType}
+                      onCreateOption={onCreateType}
                       placeholder="Select or type a type..."
-                      formatCreateLabel={(inputValue) => `Use custom type: "${inputValue}"`}
+                      formatCreateLabel={(inputValue) => `Add a new type: "${inputValue}"`}
                       styles={{
                         control: (base) => ({
                           ...base,

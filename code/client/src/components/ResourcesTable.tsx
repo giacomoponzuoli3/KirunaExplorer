@@ -262,7 +262,7 @@ function ResourcesTable(props: any) {
           }
       };
   
-      fetchData();
+      fetchData().then();
     }, [idDocument]);
 
     useEffect(() => {

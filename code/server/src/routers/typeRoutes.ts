@@ -1,17 +1,17 @@
-import { ScaleController } from "../controllers/scaleController"
+import { TypeController } from "../controllers/typeController"
 import express, {Router} from "express"
 import ErrorHandler from "../helper"
-import Scale from "../models/scale";
+import DocType from "../models/type";
 import Authenticator from "./auth";
 
-class ScaleRoutes {
-    private controller: ScaleController
+class TypeRoutes {
+    private controller: TypeController
     private readonly router: Router
     private errorHandler: ErrorHandler
     private authenticator: Authenticator
 
     constructor(authenticator: Authenticator) {
-        this.controller = new ScaleController()
+        this.controller = new TypeController()
         this.router = express.Router()
         this.errorHandler = new ErrorHandler()
         this.authenticator = authenticator;
@@ -29,11 +29,12 @@ class ScaleRoutes {
             "/",
             (_req: any, res: any, next: any) => {
 
-                this.controller.getScales()
-                    .then((scales: Scale[]) => res.status(200).json(scales))
+                this.controller.getTypes()
+                    .then((types: DocType[]) => res.status(200).json(types))
                     .catch((err: Error) => next(err))
             }
         )
+        
 
         this.router.post(
             "/",
@@ -44,13 +45,13 @@ class ScaleRoutes {
                 try {
                     const {name} = req.body
                     if (!name || typeof name !== 'string') {
-                        return res.status(422).json({ error: "Invalid scale name provided" });
+                        return res.status(422).json({ error: "Invalid type name provided" });
                     }
 
-                    await this.controller.addScale(name);
-                    res.status(200).json({ message: "Scale added successfully" });
+                    await this.controller.addTypes(name);
+                    res.status(200).json({ message: "Type added successfully" });
                 } catch (err) {
-                    //console.error("Error in POST /scales:", err);
+                    console.error("Error in POST /types:", err);
                     next(err);
                 }
             }
@@ -58,4 +59,4 @@ class ScaleRoutes {
     }
 }
 
-export default ScaleRoutes
+export default TypeRoutes
