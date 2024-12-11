@@ -34,24 +34,6 @@ class ScaleRoutes {
                     .catch((err: Error) => next(err))
             }
         )
-        
-        /** 
-         * his.router.post( 
-            "/",
-            this.authenticator.isLoggedIn, //error 401
-            this.authenticator.isPlanner, //error 401
-            this.errorHandler.validateRequest,
-            (req: any, res: any, next: any) => {
-                try {
-                    this.controller.addLink(req.body.idDoc1, req.body.idDoc2, req.body.idLink)
-                        .then(() => res.status(200).json({ message: "Link added successfully" }))
-                        .catch((err: Error) => next(err))
-                } catch (err) {
-                    next(err)
-                }
-            }
-        )
-         */
 
         this.router.post(
             "/",
@@ -62,13 +44,13 @@ class ScaleRoutes {
                 try {
                     const {name} = req.body
                     if (!name || typeof name !== 'string') {
-                        return res.status(400).json({ error: "Invalid scale name provided" });
+                        return res.status(422).json({ error: "Invalid scale name provided" });
                     }
 
                     await this.controller.addScale(name);
                     res.status(200).json({ message: "Scale added successfully" });
                 } catch (err) {
-                    console.error("Error in POST /scales:", err);
+                    //console.error("Error in POST /scales:", err);
                     next(err);
                 }
             }
