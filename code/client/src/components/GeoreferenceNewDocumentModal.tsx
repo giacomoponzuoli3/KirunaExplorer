@@ -540,7 +540,7 @@ function GeoreferenceNewDocumentModal({
                     click: (e) => {
                       setCoordinates(new L.LatLng(latitude, longitude));
                       e.target
-                         .bindPopup("You picked this marker!", {className: "custom-popup",closeButton: false,})
+                         .bindPopup("You picked this point!", {className: "custom-popup",closeButton: false,})
                          .openPopup(); // Open the popup
                     },
                   }}
@@ -577,7 +577,7 @@ function GeoreferenceNewDocumentModal({
                     click: (e) => {
                       setCoordinates(latLngs);
                       e.target
-                      .bindPopup("You picked this polygon!", {className: "custom-popup",closeButton: false,})
+                      .bindPopup("You picked this area!", {className: "custom-popup",closeButton: false,})
                       .openPopup(); // Open the popup
                  },
                   }}
