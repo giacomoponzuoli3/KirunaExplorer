@@ -191,8 +191,8 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
           {/* Pick existing area or point */}
           <button
             title='Pick existing area or point'
-            className={`px-3 py-1 border-1 border-blue-500 text-blue-500 text-sm rounded-full hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-300 transition ease-in-out duration-200 ${
-              selectedButton === 'existingGeoRef' ? 'bg-blue-100 text-blue-500 border-blue-500 border-2' : ''
+            className={`px-3 py-2 border-1 border-yellow-500 text-yellow-500 text-sm rounded-full hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-300 transition ease-in-out duration-200 ${
+              selectedButton === 'existingGeoRef' ? 'bg-yellow-100 text-yellow-500 border-yellow-500 border-2' : ''
             }`}
             onClick={() => handleButtonClick('existingGeoRef')}
           >
