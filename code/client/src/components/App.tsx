@@ -30,13 +30,13 @@ function getDocumentIcon(type: string, size: number = 16): JSX.Element | null {
       case 'Technical document':
         return <img src="/img/technicalDocument-icon.png" alt="Technical Document" className={sizeClass}/>;
       case 'Agreement':
-        return <img src="/img/agreement-icon.png" alt="Technical Document" className={sizeClass}/>;
+        return <img src="/img/agreement-icon.png" alt="Agreement" className={sizeClass}/>;
       case 'Conflict':
-        return <img src="/img/conflict-icon.png" alt="Technical Document" className={sizeClass}/>;
+        return <img src="/img/conflict-icon.png" alt="Conflict" className={sizeClass}/>;
       case 'Consultation':
-        return <img src="/img/consultation-icon.png" alt="Technical Document" className={sizeClass}/>;
+        return <img src="/img/consultation-icon.png" alt="Consultation" className={sizeClass}/>;
       default:
-        return <img src="/img/customTypeDocument.png" alt="Technical Document" className={sizeClass}/>; // Return null if no matching type
+        return <img src="/img/customTypeDocument.png" alt="Custom Document" className={sizeClass}/>; // Return null if no matching type
     }
 }
 
@@ -48,7 +48,6 @@ function App() {
   const [isLogged, setIsLogged] = useState<any>(false);
   const [message, setMessage] = useState<any>('');
 
-  const [documents, setDocuments] = useState<Document[]>([]);
   const [documentsCoordinates, setDocumentsCoordinates] = useState<DocCoordinates[]>([]);
 
   const [stakeholders, setStakeholders] = useState<Stakeholder[]>([]);
@@ -57,17 +56,7 @@ function App() {
 
   const [typeOptions, setTypeOptions] = useState<{ value: string; label: string }[]>([]);
 
-  
 
-  //API call to get all the documents so we can display them
-  const getAllDocuments = async () => {
-    try {
-        const docs = await API.getAllDocuments();
-        setDocuments(docs);
-    } catch (err: any) {
-        console.log(err);
-    }
-  };
 
   const [geoJsonData, setGeoJsonData] = useState(null);
 
@@ -98,7 +87,7 @@ function App() {
   };
 
   useEffect(() => {
-      getAllDocuments().then();
+      //getAllDocuments().then();
       getAllDocumentsCoordinates().then()
       getAllStakeholders().then();
   }, []);
@@ -202,16 +191,16 @@ function App() {
           </>
         }>
           <Route index element={<KirunaLandingPage/>}/>
-          <Route path="/map" element={<HomePage geoJsonData={geoJsonData} documentsCoordinates={documentsCoordinates} documents={documents} user={user} refreshDocumentsCoordinates={getAllDocumentsCoordinates} stakeholders={stakeholders} getDocumentIcon={getDocumentIcon} scaleOptions={scaleOptions} onCreateScale={handleCreateScale} typeOptions={typeOptions} onCreateType={handleCreateType}/>}/>
+          <Route path="/map" element={<HomePage geoJsonData={geoJsonData} documentsCoordinates={documentsCoordinates} user={user} refreshDocumentsCoordinates={getAllDocumentsCoordinates} stakeholders={stakeholders} getDocumentIcon={getDocumentIcon} scaleOptions={scaleOptions} onCreateScale={handleCreateScale} typeOptions={typeOptions} onCreateType={handleCreateType}/>}/>
           <Route path="/login" element={<Login message={message} isLogged={isLogged} login={handleLogin} handleBack={handleBack}/>} />
           <Route path="*" element={<NotFoundLayout/>} />
           {/* Aggiungi altre route come la dashboard */}
           <Route path="/:idDocument/links" element={<LinksDocument user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} />} />
-          <Route path="/documents/:idDocument?" element={<DocumentsTable user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} refreshDocuments={getAllDocuments} refreshDocumentsCoordinates={getAllDocumentsCoordinates} scaleOptions={scaleOptions} onCreateScale={handleCreateScale} typeOptions={typeOptions} onCreateType={handleCreateType}/>} />
+          <Route path="/documents/:idDocument?" element={<DocumentsTable user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} refreshDocumentsCoordinates={getAllDocumentsCoordinates} scaleOptions={scaleOptions} onCreateScale={handleCreateScale} typeOptions={typeOptions} onCreateType={handleCreateType}/>} />
           <Route path="documents/:idDocument/links" element={<LinksDocument user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} />} />
           <Route path="documents/:idDocument/map" element={<MapView user={user} geoJsonData={geoJsonData} isLogged={isLogged} getDocumentIcon={getDocumentIcon} documentsCoordinates={documentsCoordinates}/>} />
           <Route path="documents/:idDocument/resources" element={<ResourcesTable user={user} isLogged={isLogged} />} />
-          <Route path="/diagram" element={<Diagram user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} refreshDocuments={getAllDocuments} refreshDocumentsCoordinates={getAllDocumentsCoordinates} />} />
+          <Route path="/diagram" element={<Diagram user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} refreshDocumentsCoordinates={getAllDocumentsCoordinates} />} />
           
         </Route>
       </Routes>
