@@ -3,7 +3,7 @@ import { useState, useRef } from 'react';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect } from "react";
-import { MapContainer, useMap } from 'react-leaflet';
+import { MapContainer, Marker, Polygon, useMap } from 'react-leaflet';
 import { LatLngTuple, LatLngBounds, LatLng } from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -11,6 +11,8 @@ import Alert from "./Alert";
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { decimalToDMS } from '../utility/utilities'
+import API from "../API/API";
+import Coordinate from "../models/coordinate";
 
 // Extend the L.MarkerOptions type to include isStandalone
 declare module 'leaflet' {
@@ -302,7 +304,10 @@ function GeoreferenceNewDocumentModal({
   showAddNewDocumentLinks
 }: GeoreferenceNewDocumentModalProps) {
   const [isEnterCoordinatesMode, setIsEnterCoordinatesMode] = useState(false);
+  const [isPickExistingMode, setIsPickExistingMode] = useState(false);
   const [isInfoMode, setIsInfoMode] = useState(false);
+
+  const [existingGeoRef,setExistingGeoRef] = useState<Coordinate[][]>([])
   const [coordinates,setCoordinates] = useState<LatLng | LatLng[] | null>(null);
   const [wholeMapPolygon, setWholeMapPolygon] = useState<L.Polygon | null>(null); // Track the whole map polygon
   const [latitude, setLatitude] = useState('');
@@ -315,6 +320,8 @@ function GeoreferenceNewDocumentModal({
     setLatitude('');
     setLongitude('');
     setIsEnterCoordinatesMode(false);
+    setIsPickExistingMode(false);
+    setIsInfoMode(false);
     setCoordinates(null);
     setWholeMapPolygon(null);
     setShowAlert(false);
@@ -356,16 +363,6 @@ function GeoreferenceNewDocumentModal({
       } else {
         const bounds = mapRef.current.getBounds();
         if (bounds) {
-            // Get the corners of the current map view
-            const KnorthWest = kirunaBounds.getNorthWest();
-            const KnorthEast = kirunaBounds.getNorthEast();
-            const KsouthEast = kirunaBounds.getSouthEast();
-            const KsouthWest = kirunaBounds.getSouthWest();
-
-            const northWest = bounds.getNorthWest();
-            const northEast = bounds.getNorthEast();
-            const southEast = bounds.getSouthEast();
-            const southWest = bounds.getSouthWest();
 
             // Define a polygon that covers the map bounds
             const newPolygon = L.polygon([
@@ -402,9 +399,6 @@ function GeoreferenceNewDocumentModal({
 
             return
         }
-
-        //const regexLat = /(\d+)°(\d+)'(\d+)''([NS])$/;
-        //const regexLng = /(\d+)°(\d+)'(\d+)''([EW])$/;
 
         const regexLat = /(\d{1,2})°(\d{1,2})'(\d{1,2})''([NS])$/;
         const regexLng = /(\d{1,3})°(\d{1,2})'(\d{1,2})''([EW])$/;
@@ -458,11 +452,44 @@ function GeoreferenceNewDocumentModal({
         }
   };
 
+  const pickExistingAreaOrPoint = () => {
+    //if(isPickExistingMode){
+    console.log(existingGeoRef);
+    //}
+  };
+
+  const showExistingAreasAndPoints = () => {
+    if(!isPickExistingMode){
+    console.log(existingGeoRef);
+    setIsPickExistingMode(true);
+    }else{
+      setIsPickExistingMode(false);
+    }
+  };
+
+  const arraysEqual = (arr1: L.LatLng[], arr2: L.LatLng[]) => {
+    if (arr1.length !== arr2.length) return false;
+    return arr1.every((point, index) =>
+      point.equals(arr2[index])
+    );
+  };
+
+  const getExistingAreasAndPoints = async () => {
+    try {
+        const allGeoRef: Coordinate[][] = await API.getExistingGeoreferences();
+        console.log("tuka sum");
+        setExistingGeoRef(allGeoRef);
+    } catch (err: any) {
+        console.log(err);
+    }
+  };
+
   useEffect(() => {
     if (show && mapRef.current) {
       // Trigger a re-render of the map when modal is shown
       mapRef.current.invalidateSize();
     }
+    getExistingAreasAndPoints().then();
   }, [show]); // Trigger this when the modal visibility (`show`) changes
 
   return (
@@ -516,6 +543,54 @@ function GeoreferenceNewDocumentModal({
               resetForm={resetForm} 
               setCoordinates={(position: LatLng | LatLng[]) => setCoordinates(position)}
             />
+            {isPickExistingMode &&
+          existingGeoRef.map((coordinateArray, index) => {
+            if (coordinateArray.length === 1) {
+              const { latitude, longitude } = coordinateArray[0];
+              return (
+                <Marker
+                  key={index}
+                  position={[latitude, longitude]}
+                  eventHandlers={{
+                    click: () => setCoordinates(new L.LatLng(latitude, longitude)),
+                  }}
+                  icon={customIcon}
+                  ref={(marker) => {
+                    if (marker) {
+                      const iconElement = marker.getElement();
+                      if (iconElement) {
+                        iconElement.style.opacity = coordinates instanceof Array
+                        ? "0.3" // If a polygon is clicked, dim all markers
+                        : coordinates instanceof L.LatLng && !coordinates.equals(new L.LatLng(latitude, longitude))
+                        ? "0.3"
+                        : "1";
+                      }
+                    }
+                  }}
+                />
+              );
+            } else if (coordinateArray.length > 1) {
+              const latLngs = coordinateArray.map(coord => new L.LatLng(coord.latitude, coord.longitude) );
+              return (
+                <Polygon
+                  key={index}
+                  positions={latLngs}
+                  pathOptions={{
+                    opacity: 
+                    coordinates instanceof L.LatLng
+      ? 0.3 // If a marker is clicked, dim all polygons
+      : coordinates instanceof Array && !arraysEqual(coordinates, latLngs)
+      ? 0.3
+      : 1,
+                  }}
+                  eventHandlers={{
+                    click: () => setCoordinates(latLngs),
+                  }}
+                />
+              );
+            }
+            return null;
+          })}
           </MapContainer>
 
           {/* Button for selecting whole area */}
@@ -536,6 +611,8 @@ function GeoreferenceNewDocumentModal({
               
             }}
             onClick={() => {
+                setIsInfoMode(false);
+                setIsPickExistingMode(false);
                 setLatitude('');
                 setLongitude('');
                 setCoordinates([]);
@@ -572,6 +649,8 @@ function GeoreferenceNewDocumentModal({
             borderColor: isEnterCoordinatesMode ? "#0d6efd" : "black",
             }}
             onClick={() => {
+              setIsInfoMode(false);
+              setIsPickExistingMode(false);
               setLatitude('');
               setLongitude('');
               setWholeMapPolygon(null)
@@ -623,6 +702,37 @@ function GeoreferenceNewDocumentModal({
             </div>
           )}
 
+          {/* A button for the possibility of choosing an existing area or point*/}
+          <Button title="Pick existing area or point"
+            style={{
+            position: 'absolute',
+            top: '300px',  // Adjust based on position under zoom controls
+            right: '40px', // Adjust for placement on map
+            zIndex: 1000,
+            width: '30px',
+            height: '30px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: isPickExistingMode ? "#0d6efd" : "white", 
+            color: isPickExistingMode ? "white" : "#4a4a4a", // Text color adjusts based on mode   
+            borderColor: isPickExistingMode ? "#0d6efd" : "black",
+            }}
+            onClick={() => {
+              setIsInfoMode(false);
+              setIsPickExistingMode((prev) => !prev);
+              setLatitude('');
+              setLongitude('');
+              setWholeMapPolygon(null)
+              setCoordinates(null);
+              setIsEnterCoordinatesMode(false);
+              clearOtherLayers();
+              //showExistingAreasAndPoints();
+            }}
+          >
+            <i className="bi bi-pin-angle fs-8"></i>
+          </Button>
+
           {/** Info button */}
           <Button title="Info"
             style={{
@@ -638,6 +748,9 @@ function GeoreferenceNewDocumentModal({
             }}
             variant={isInfoMode ? "primary" : "secondary"}
             onClick={() => {
+              setLatitude('');
+              setLongitude('');
+              setIsEnterCoordinatesMode(false);
               setIsInfoMode(!isInfoMode)
             }}
           >
