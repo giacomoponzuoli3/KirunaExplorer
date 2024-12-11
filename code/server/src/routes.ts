@@ -7,6 +7,7 @@ import LinkRoutes from "./routers/linkRoutes"
 import { StakeholderRoutes } from "./routers/stakeholderRoutes"
 import { CoordinatesRoutes } from "./routers/coordinatesRoutes"
 import ScaleRoutes from "./routers/scaleRoutes"
+import TypeRoutes from "./routers/typeRoutes"
 
 
 const morgan = require("morgan")
@@ -39,6 +40,7 @@ function initRoutes(app: express.Application) {
     const stakeholderRoutes = new StakeholderRoutes();
     const coordinatesRoutes = new CoordinatesRoutes(authenticator);
     const scaleRoutes = new ScaleRoutes(authenticator);
+    const typeRoutes = new TypeRoutes(authenticator);
 
     app.use(`${prefix}/sessions`, authRoutes.getRouter())
     app.use(`${prefix}/doc`, docRoutes.getRouter())
@@ -46,6 +48,8 @@ function initRoutes(app: express.Application) {
     app.use(`${prefix}/stakeholders`, stakeholderRoutes.getRouter())
     app.use(`${prefix}/coordinates`, coordinatesRoutes.getRouter())
     app.use(`${prefix}/scale`, scaleRoutes.getRouter())
+    app.use(`${prefix}/type`, typeRoutes.getRouter())
+    
 
     ErrorHandler.registerErrorHandler(app)
 }

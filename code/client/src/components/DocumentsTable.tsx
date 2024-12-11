@@ -759,8 +759,10 @@ useEffect(() => {
               
               stakeholders={documentEdit.stakeHolders}
               scaleOptions={props.scaleOptions}
+              typeOptions={props.typeOptions}
               //setScaleOptions={setScaleOptions}
               onCreateScale={props.onCreateScale}
+              onCreateType={props.onCreateType}
             />
           )}
 
