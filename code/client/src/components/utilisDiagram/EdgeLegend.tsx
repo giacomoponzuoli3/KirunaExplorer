@@ -26,10 +26,10 @@ const EdgeLegend = () => {
   };
 
   return (
-    <div className="pt-3 h-screen border-1 border-t-gray-300  bg-white w-full mb-4">
-      <h4 className="text-lg font-semibold mb-2 ml-2">Legend of Connection Types</h4>
+    <div className="pt-3 max-h-screen border-1 border-t-gray-300  bg-white w-full mb-4">
       {/* Contenitore per la legenda, usiamo flex per l'allineamento orizzontale */}
       <div className="flex justify-evenly items-center">
+        <span className="flex font-semibold items-center space-x-4 pb-2 text-md">Legend:</span>
         {Object.entries(edgeTypes).map(([key, { color, label, dashArray }]) => (
           <div key={key} className="flex items-center space-x-4 pb-2">
             {/* Tratto per il tipo di edge usando SVG */}
