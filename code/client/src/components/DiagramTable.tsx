@@ -9,11 +9,12 @@ const DiagramTable = (props: any) => {
       width: `${props.scrollWidth}px`, // Larghezza totale
       height: `${props.scrollHeight}px`, // Altezza totale
       tableLayout: 'fixed', // Mantiene larghezze uniformi
+      zIndex: 0
     }}
     className="border-collapse border border-gray-200"
   >
     {/* Header con gli anni */}
-    <thead className="bg-gray-50 sticky top-0 z-10">
+    <thead className="bg-gray-50 sticky top-0 ">
       <tr>
         <th
           style={{ width: `${sideWidth}px` }}
@@ -42,11 +43,12 @@ const DiagramTable = (props: any) => {
           key={`docscale-${scale}`} 
           className={`border-b border-gray-200 ${
             scaleIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-          } hover:bg-gray-100 transition-all duration-200`}
+          }  transition-all duration-200`}
         >
           <td 
             style={{ height: `${scale}px` }}
             className={`side-cell border-r-2 border-gray-300 p-4 text-gray-700 font-medium`}
+            
           >
             {scale}
           </td>
@@ -57,8 +59,6 @@ const DiagramTable = (props: any) => {
               style={{ width: `${year}px` }}
               className={`border-r border-gray-200 relative`}
             >
-              {/* Linea diagonale (opzionale) */}
-              {/* <div className="absolute inset-0 w-full h-1 bg-blue-500 rotate-45 transform origin-bottom-left"></div> */}
             </td>
           ))}
         </tr>
