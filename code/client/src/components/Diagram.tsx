@@ -359,7 +359,7 @@ const Diagram = (props: any) => {
     
           translateExtent={[
             [0, 0],
-            [scrollWidth ?? 0, (scrollHeight && scrollHeight > 750) ? scrollHeight : 650]
+            [scrollWidth ?? 0, (scrollHeight && scrollHeight > 750) ? scrollHeight : 600]
           ]}
           nodeExtent={[
             [200, 50],
