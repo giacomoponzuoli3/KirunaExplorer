@@ -13,7 +13,7 @@ class DocCoordinates {
     scale: string
     issuanceDate: string
     type: string
-    language: string 
+    language: string | null
     pages: string | null
     description: string
     coordinates: Coordinate[]
@@ -38,7 +38,7 @@ class DocCoordinates {
         scale: string,
         issuanceDate: string,
         type: string,
-        language: string,
+        language: string | null = null,
         pages: string | null = null,
         description: string,
         coordinates: Coordinate[]
