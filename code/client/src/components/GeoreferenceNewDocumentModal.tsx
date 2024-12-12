@@ -767,12 +767,11 @@ function GeoreferenceNewDocumentModal({
             <li>
               <i className="bi bi-geo-alt-fill fs-8"></i>
               <strong> Draw a Marker Button:</strong> Lets you select a
-              specific coordinate on the map by placing a marker.
+              specific coordinate on the map by placing a point.
             </li>
             <li>
               <i className="bi bi-pentagon-fill fs-8"></i>
-              <strong> Draw a Polygon Button:</strong> Enables drawing a custom
-              polygon area on the map.
+              <strong> Draw a Polygon Button:</strong> Enables drawing a custom area on the map.
             </li>
             <li>
               <i className="bi bi-arrows-fullscreen fs-8"></i>
@@ -782,15 +781,21 @@ function GeoreferenceNewDocumentModal({
             <li>
               <i className="bi bi-card-text fs-8"></i>
               <strong> Enter Coordinates Button:</strong> Allows you to input
-              latitude and longitude to place a marker on the map.
+              latitude and longitude to place a point on the map.
+            </li>
+            <li>
+              <CursorArrowRaysIcon className="h-4 w-4 inline"/>
+              <strong> Pick existing area or point button:</strong> When clicking this button 
+              all the existing areas and points <br/> will be shown on the map.
+              You can pick an existing area or point by clicking on it.
             </li>
             <li>
               <i className="bi bi-pencil-square fs-8"></i>
-              <strong> Edit Layers Button:</strong> Lets you edit the marker or the area you drew on the map.
+              <strong> Edit Layers Button:</strong> Lets you edit the point or the area you drew on the map.
             </li>
             <li>
             <i className="bi bi-trash3 fs-8"></i>
-              <strong> Delete Layers Button:</strong> Allows you to delete the marker or the area you drew on the map.
+              <strong> Delete Layers Button:</strong> Allows you to delete the point or the area you drew on the map.
             </li>
             </ul>  
             </div>
