@@ -1,12 +1,21 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { ReactFlow, Background, addEdge, applyNodeChanges, applyEdgeChanges, Node, Edge, ViewportPortal, Handle, Position, getConnectedEdges, getBezierPath } from '@xyflow/react';
+import React, {useCallback, useEffect, useState} from 'react';
+import {
+  addEdge,
+  applyEdgeChanges,
+  applyNodeChanges,
+  Edge,
+  getConnectedEdges,
+  Node,
+  ReactFlow,
+  ViewportPortal
+} from '@xyflow/react';
 
-import { DocCoordinates } from '../models/document_coordinate';
+import {DocCoordinates} from '../models/document_coordinate';
 
 import API from '../API/API';
 import DiagramTable from './DiagramTable';
 
-import { edgeTypes, nodeTypes } from './utilisDiagram/nodesEdgesTypes';
+import {edgeTypes, nodeTypes} from './utilisDiagram/nodesEdgesTypes';
 import '@xyflow/react/dist/style.css';
 import EdgeLegend from './utilisDiagram/EdgeLegend';
 
@@ -245,52 +254,50 @@ const Diagram = (props: any) => {
   
 
   const createNodes = (getDocuments: DocCoordinates[], uniqueYears: number[], uniqueScales: string[], widths: number[], heights: number[], normalizeDate: (date: string) => number, occupiedPositions: Set<string>, props: any) => {
-    const createdNodes = getDocuments.map((doc: DocCoordinates, index: number) => {
+    // Restituisci i nodi creati
+    return getDocuments.map((doc: DocCoordinates, index: number) => {
       // Trova gli indici unici per l'anno e la scala
       const yearIndex = uniqueYears.indexOf(normalizeDate(doc.issuanceDate));
       const scaleIndex = uniqueScales.indexOf(doc.scale);
-  
+
       // Calcolare la posizione base in base all'indice dell'anno e della scala
       const xBase = widths.slice(0, yearIndex).reduce((acc, w) => acc + w + 50, 210); // Posizione X base
       const yBase = heights.slice(0, scaleIndex).reduce((acc, h) => acc + h + 23, 90);  // Posizione Y base
-  
+
       // Verifica se la posizione è già occupata
       let x = xBase;
       let y = yBase;
-  
+
       // Creiamo una chiave unica per la posizione
       let positionKey = `${x},${y}`;
       let offset = 50;
-  
+
       // Se la posizione è già occupata, aggiungi un offset per cercare una nuova posizione
       while (occupiedPositions.has(positionKey)) {
         x += offset;
         positionKey = `${x},${y}`;
       }
-  
+
       // Segna la nuova posizione come occupata
       occupiedPositions.add(`${x},${y}`);
-  
+
       // Crea il nodo
       return {
         id: doc.id.toString(),
         type: 'icon', // Tipo di nodo personalizzato
-        position: { x, y }, 
-        data: { 
+        position: {x, y},
+        data: {
           label: props.getDocumentIcon(doc.type, 5), // Usa la funzione per ottenere l'icona
-          doc 
+          doc
         },
         zIndex: 5,
       };
     });
-  
-    // Restituisci i nodi creati
-    return createdNodes;
   };
   
         
   useEffect(() => {
-    if(nodes.length === 0) allDocuments();
+    if(nodes.length === 0) allDocuments().then();
 
   }, []);
 

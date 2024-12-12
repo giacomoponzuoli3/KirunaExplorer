@@ -12,11 +12,9 @@ import { DocumentPlusIcon } from "@heroicons/react/24/outline";
 import { MapContainer } from 'react-leaflet';
 import {LatLng, LatLngTuple} from 'leaflet'; // Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
-import { GeoreferenceNewDocumentModal } from "./GeoreferenceNewDocumentModal";
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet-draw';
 import { DocCoordinates } from "../models/document_coordinate";
-import { AddNewDocumentLinksModal } from "./AddNewDocumentLinksModal";
 import { SetMapViewHome } from "./Map";
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
