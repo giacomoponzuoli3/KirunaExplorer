@@ -13,16 +13,17 @@ import { LatLng } from 'leaflet';
 import { DocCoordinates } from '../models/document_coordinate';
 
 interface AddNewDocumentLinksModalProps {
-    document: Document;
-    show: boolean;
-    onHide: () => void;
-    refreshDocumentsCoordinates: () => void;
-    docs: DocCoordinates[];
-    newDocumentCoordinates: LatLng | LatLng[] | null;
-    filesUploaded: File[]
+  document: Document;
+  onHide: () => void;
+  refreshDocumentsCoordinates: () => void;
+  docs: DocCoordinates[];
+  newDocumentCoordinates: LatLng | LatLng[] | null;
+  filesUploaded: File[];
+  handlePrevStep: () => void;
+  setMode: (mode: string) => void;
 }
 
-function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoordinates, docs, newDocumentCoordinates,filesUploaded}: AddNewDocumentLinksModalProps) {
+function AddNewDocumentLinksModal({ document, onHide, refreshDocumentsCoordinates, docs, newDocumentCoordinates, filesUploaded, handlePrevStep,setMode}: AddNewDocumentLinksModalProps) {
     const [typesLink, setTypesLink] = useState<Link[]>([]); // vector of types of links
     const [documents] = useState<Document[]>(docs.filter((d: Document) => d.id != document.id)); // vector of all documents except one
 
@@ -234,17 +235,6 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoord
   console.log(documentLinks);
  };
 
- const handleClose = () => {
-
-    onHide();
-    refreshDocumentsCoordinates();
-    setSelectedDocument(null)
-    setSelectedTypeLink(null)
-    setSelectedDocumentName('')
-    setSelectedTypeLinkName('')
-    setDocumentLinks([])
-   
-  };
 
   const filteredDocuments = documents.filter((doc) =>
     doc.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -254,14 +244,7 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoord
 
   return (
       <>
-      <Modal show={show} onHide={handleClose}  size="xl" aria-labelledby="example-custom-modal-styling-title">
-        <Modal.Header closeButton className="bg-gray-100">
-          <Modal.Title id="example-custom-modal-styling-title" className="text-2xl font-bold text-gray-800">
-            Would you like to add links to the new document?
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="bg-white">
-          <Container>
+          <div className="flex-grow p-4">
             <Row>
               <Col xs={12} md={4}>
                 <div className=" flex items-center justify-center bg-gray-100">
@@ -450,20 +433,24 @@ function AddNewDocumentLinksModal({ document,show, onHide, refreshDocumentsCoord
                     )}
               </Col>
             </Row>
-          </Container>
-        </Modal.Body>
-        <Modal.Footer className="bg-gray-100 flex justify-end space-x-4">
+        </div>
+        <div className="flex justify-end space-x-4">
         <p className="text-sm text-gray-600 mt-2">
             This step is optional. You can submit without linking the new document to other documents at this time.
           </p>
+          <button
+            className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md"
+            onClick={() => {setMode('geoRef'); handlePrevStep();}}
+          >
+            Back
+          </button>
           <button 
               className="px-4 py-2 bg-blue-950 hover:bg-blue-500 text-white rounded-md" 
               onClick={handleLink} 
           >
               Submit
           </button>
-        </Modal.Footer>
-      </Modal>
+        </div>
     </>
   );
 }

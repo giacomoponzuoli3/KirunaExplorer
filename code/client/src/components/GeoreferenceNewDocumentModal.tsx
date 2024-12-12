@@ -294,16 +294,13 @@ function SetMapView({resetForm, setCoordinates}: SetMapViewInterface) {
 }
 
 interface GeoreferenceNewDocumentModalProps {
-    show: boolean;
-    onHide: () => void;
-    showAddNewDocumentLinks: (coordinates: LatLng | LatLng[] | null) => void;
+    setMode: (mode: string) => void;
+    setNewDocumentCoordinates: (coordinates: LatLng | LatLng[] | null) => void;
+    handleNextStep: () => void;
+    handlePrevStep: () => void;
 }
 
-function GeoreferenceNewDocumentModal({
-  show,
-  onHide,
-  showAddNewDocumentLinks
-}: GeoreferenceNewDocumentModalProps) {
+function GeoreferenceNewDocumentModal({setMode,setNewDocumentCoordinates, handleNextStep, handlePrevStep}: GeoreferenceNewDocumentModalProps) {
   const [isEnterCoordinatesMode, setIsEnterCoordinatesMode] = useState(false);
   const [isPickExistingMode, setIsPickExistingMode] = useState(false);
   const [isInfoMode, setIsInfoMode] = useState(false);
@@ -330,14 +327,15 @@ function GeoreferenceNewDocumentModal({
   };
 
     const handleClose = () => {
-        onHide();
         clearOtherLayers();
         resetForm();
     };
 
   const handleSubmit = async () => {
-    showAddNewDocumentLinks(coordinates);
+    setNewDocumentCoordinates(coordinates);
     handleClose();
+    setMode('links');
+    handleNextStep();
   };
 
   const clearOtherLayers = () => {
@@ -471,30 +469,16 @@ function GeoreferenceNewDocumentModal({
   };
 
   useEffect(() => {
-    if (show && mapRef.current) {
+    if (mapRef.current) {
       // Trigger a re-render of the map when modal is shown
       mapRef.current.invalidateSize();
     }
     getExistingAreasAndPoints().then();
-  }, [show]); // Trigger this when the modal visibility (`show`) changes
+  }, []); // Trigger this when the modal visibility (`show`) changes
 
   return (
-    <Modal 
-      size="xl" 
-      aria-labelledby="example-modal-sizes-title-lg"
-      show={show} 
-      onHide={handleClose} 
-    >
-      <Modal.Header closeButton className="bg-gray-100">
-        <Modal.Title id="example-modal-sizes-title-lg" className="text-2xl font-bold text-gray-800">
-          Would you like to georeference the new document?
-        </Modal.Title>
-      </Modal.Header>
-
-      <Modal.Body 
-        className="bg-white overflow-auto" // Prevent vertical scrollbar, ensure content fits
-      >
-        <Container>
+        <>
+        <div className="flex-grow">
           {showAlert && (
             <Alert
               message={alertMessage}
@@ -523,7 +507,7 @@ function GeoreferenceNewDocumentModal({
           </label>
 
           {/* Map Container */}
-          <MapContainer ref={mapRef} style={{ height: "50vh",width: "100%"}}
+          <MapContainer ref={mapRef} style={{ height: "65vh",width: "100%"}}
           >
             <SetMapView
               resetForm={resetForm} 
@@ -592,8 +576,8 @@ function GeoreferenceNewDocumentModal({
           <Button title="Select the whole area"
             style={{
               position: 'absolute',
-              top: '230px',  // Adjust based on position under zoom controls
-              right: '40px', // Adjust for placement on map
+              top: '265px',  // Adjust based on position under zoom controls
+              right: '28px', // Adjust for placement on map
               zIndex: 1000,
               width: '30px',
               height: '30px',
@@ -631,8 +615,8 @@ function GeoreferenceNewDocumentModal({
           <Button title="Enter coordinates"
             style={{
             position: 'absolute',
-            top: '265px',  // Adjust based on position under zoom controls
-            right: '40px', // Adjust for placement on map
+            top: '300px',  // Adjust based on position under zoom controls
+            right: '28px', // Adjust for placement on map
             zIndex: 1000,
             width: '30px',
             height: '30px',
@@ -701,8 +685,8 @@ function GeoreferenceNewDocumentModal({
           <Button title="Pick existing area or point"
             style={{
             position: 'absolute',
-            top: '300px',  // Adjust based on position under zoom controls
-            right: '40px', // Adjust for placement on map
+            top: '335px',  // Adjust based on position under zoom controls
+            right: '28px', // Adjust for placement on map
             zIndex: 1000,
             width: '30px',
             height: '30px',
@@ -732,8 +716,8 @@ function GeoreferenceNewDocumentModal({
           <Button title="Info"
             style={{
             position: 'absolute',
-            top: '145px',  // Adjust based on position under zoom controls
-            left: '40px', // Adjust for placement on map
+            top: '200px',  // Adjust based on position under zoom controls
+            left: '30px', // Adjust for placement on map
             zIndex: 1000,
             width: '30px',
             height: '30px',
@@ -800,19 +784,23 @@ function GeoreferenceNewDocumentModal({
             </ul>  
             </div>
           )}
-        </Container>
-      </Modal.Body>
+        </div>
 
-      <Modal.Footer className="bg-gray-100 flex justify-end space-x-4">
-        <p className="text-sm text-gray-600 mt-2">This step is optional. You can skip it if you don't wish to georeference the document at this time.</p>
+      <div className="flex justify-end space-x-4">
+         <button
+            className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md"
+            onClick={() => {setMode('resources'); handlePrevStep();}}
+          >
+            Back
+          </button>
           <button
             className="px-4 py-2 bg-blue-950 hover:bg-blue-500 text-white rounded-md"
             onClick={handleSubmit}
           >
             Next
           </button>
-        </Modal.Footer>
-    </Modal>
+        </div>
+        </>
 
   );
 }

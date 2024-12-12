@@ -129,38 +129,14 @@ function HomePage({documentsCoordinates, user, refreshDocumentsCoordinates, getD
       show={showAddDocumentModal} 
       onHide={() => setShowAddDocumentModal(false)} 
       stakeholders={stakeholders} 
-      showGeoreferenceNewDocumentModal = {(doc: Document, filesUploaded: File[]) => {
-        setNewDocument(doc); setShowGeoreferenceDocument(true);
-        if(filesUploaded.length>0){
-          setFiles(filesUploaded)
-        } 
-      }}
+      refreshDocumentsCoordinates = {refreshDocumentsCoordinates}
+      documentsCoordinates={documentsCoordinates}
       scaleOptions={scaleOptions}
       typeOptions={typeOptions}
       //setScaleOptions={setScaleOptions}
       onCreateScale={onCreateScale}
       onCreateType={onCreateType}
     />
-
-    {newDocument && (
-      <GeoreferenceNewDocumentModal show={showGeoreferenceDocument} onHide={() => setShowGeoreferenceDocument(false)}
-      showAddNewDocumentLinks = {(coordinates: LatLng | LatLng[] | null) => {
-        setNewDocumentCoordinates(coordinates); setShowAddLinks(true);
-      }}
-    />
-    )}
-
-    {newDocument && (
-      <AddNewDocumentLinksModal 
-        document={newDocument} 
-        show={showAddLinks} 
-        onHide={() => setShowAddLinks(false)} 
-        refreshDocumentsCoordinates={()=>{setNewDocument(null); setNewDocumentCoordinates(null); refreshDocumentsCoordinates();}}
-        docs={documentsCoordinates}
-        newDocumentCoordinates={newDocumentCoordinates}
-        filesUploaded={files}
-      />
-    )}
   </>
     
   );      
