@@ -5,7 +5,6 @@ import { Routes, Route, Outlet } from 'react-router-dom';
 import {Login} from './Login';
 import { HomePage } from './HomePage';
 import { NotFoundLayout } from './NotFoundLayout';
-import { Document } from '../models/document';
 import { LinksDocument } from './LinksDocument';
 import { Stakeholder } from '../models/stakeholder';
 import { DocumentsTable } from './DocumentsTable';

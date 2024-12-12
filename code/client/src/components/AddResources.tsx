@@ -1,17 +1,8 @@
 import React, { useState } from 'react';
-import { Modal, Dropdown } from 'react-bootstrap';
-import { Document } from '../models/document';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import API from '../API/API';
-import { Stakeholder } from '../models/stakeholder';
 import '../modal.css'
 import { TrashIcon, DocumentIcon } from "@heroicons/react/24/outline";
-import Alert from "./Alert";
-import Select from 'react-select';
-import ISO6391 from 'iso-639-1';  // Utilizziamo ISO 639-1 per ottenere le lingue
-import CreatableSelect from 'react-select/creatable';
-import { SingleValue } from 'react-select';
-import { DocCoordinates } from '../models/document_coordinate';
+// Utilizziamo ISO 639-1 per ottenere le lingue
 
 interface RequiredLabelProps {
     text: string; // Explicitly define the type of 'text' as string

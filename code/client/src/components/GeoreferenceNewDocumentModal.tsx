@@ -1,4 +1,4 @@
-import {Button, Col, Container, Form, Modal, Row} from "react-bootstrap"
+import {Button, Col, Form, Row} from "react-bootstrap"
 import { useState, useRef } from 'react';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';

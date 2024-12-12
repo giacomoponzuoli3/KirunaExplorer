@@ -1,6 +1,5 @@
 import { TypeDAO } from "../dao/typeDAO";
 import DocType from "../models/type";
-import Type from "../models/type";
 
 class TypeController {
     private dao: TypeDAO;

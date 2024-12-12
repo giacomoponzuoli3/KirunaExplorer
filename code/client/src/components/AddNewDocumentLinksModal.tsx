@@ -1,5 +1,5 @@
 import React, { useState,useEffect } from 'react';
-import { Container, Modal, Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import { Document } from '../models/document';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import API from '../API/API';
