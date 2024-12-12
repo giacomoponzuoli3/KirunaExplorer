@@ -14,18 +14,15 @@ const KirunaLandingPage: React.FC = () => {
           <div className="absolute inset-0 bg-blue-900 bg-opacity-30"></div> 
           <div className="relative max-w-4xl mx-auto text-center py-24">
             <h1 className="text-5xl font-bold mb-4 text-yellow-400">Discover Kiruna</h1>
-            <p className="text-lg mb-6 text-yellow-400 shadow-md">
-              The northernmost gem of Sweden, where nature and adventure await.
-            </p>
             <div className="flex justify-center space-x-4">
-              <button
-                className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold py-3 px-6 rounded-lg"
-                onClick={() => navigate("/map")}
-              >
+            <button
+              className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-blue-900 font-bold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transform transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-yellow-300"
+              onClick={() => navigate("/map")}
+            >
                 Go to Map
               </button>
               <button
-                className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold py-3 px-6 rounded-lg"
+                className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-blue-900 font-bold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transform transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-yellow-300"
                 onClick={() => navigate("/diagram")}
               >
                 Go to Diagram
@@ -145,7 +142,16 @@ const KirunaLandingPage: React.FC = () => {
       {/* Footer */}
       <footer className="py-6 bg-blue-900 text-yellow-200">
         <div className="max-w-5xl mx-auto text-center">
-          <p className="text-sm">&copy; 2024 Kiruna Explorer. All Rights Reserved.</p>
+          <p className="text-sm">
+            &copy; 2024 Kiruna Explorer. All Rights Reserved.  
+            This work is licensed under the <a 
+              href="https://opensource.org/licenses/Artistic-2.0" 
+              className="text-yellow-300 hover:text-yellow-400 underline" 
+              target="_blank" 
+              rel="noopener noreferrer">
+              Artistic License 2.0
+            </a>.
+          </p>
         </div>
       </footer>
     </div>
