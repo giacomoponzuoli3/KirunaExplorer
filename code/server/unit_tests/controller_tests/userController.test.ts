@@ -1,8 +1,5 @@
 import { describe, afterEach, test, expect, jest } from "@jest/globals"
-import db from "../../src/db/db"
 import { User } from "../../../common_models/user";
-import crypto from "crypto"
-import { Database } from "sqlite3";
 import { UserDAO } from "../../src/dao/userDAO"
 import { UserAlreadyExistsError, UserNotFoundError } from "../../src/errors/user";
 import  UserController  from "../../src/controllers/userController";
@@ -22,7 +19,7 @@ describe('stakeholderController', () => {
 
     describe('createUser', () => {
 
-        test('It should successfully add a stakeholder', async () => {
+        test('It should successfully add a user', async () => {
             jest.spyOn(dao, 'createUser').mockResolvedValue(true);
 
             await expect(controller.createUser("urban_planner", "urban", "planner", "admin", "Urban Planner")).resolves.toBe(true);
@@ -60,7 +57,7 @@ describe('stakeholderController', () => {
 
     describe('getUserByUsername', () => {
 
-        test('it should resolve with the user object when the user is found', async () => {
+        test('it should retrieve a user by the username', async () => {
             jest.spyOn(dao, 'getUserByUsername').mockResolvedValue(testUser);
 
             await expect(controller.getUserByUsername("urban_planner")).resolves.toEqual(testUser);
