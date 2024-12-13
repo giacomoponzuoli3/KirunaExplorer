@@ -173,6 +173,9 @@ Contains the navbar and an error message
    - resource_name TEXT NOT NULL
    - resource_data BLOB NOT NULL
    - uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+- Table `Types`: contains a row for each type, with attributes:
+  - type_id INTEGER NOT NULL (primary key)
+  - name TEXT NOT NULL UNIQUE
 
 ## Main React Components
 
@@ -184,6 +187,7 @@ when the user is not logged in.
 user is logged in.
 - `Homepage` (in `Homepage.tsx`): shows a map showing, for each document in the database with geo-referencing information, an icon
 indicating the type. Clicking on the icon opens a modal showing the document's information.
+- `KirunaLandingPage` (in `KirunaLandingPage.tsx`): shows a landing page as a first page.
 - `ButtonHomePage` (in `Homepage.tsx`): a button used to return to the home page. It's shown in the navbar of the login
 page, to return to the homepage without logging in.
 - `AddDocumentModal` (in `DocumentModals.tsx`): shows a form to fill in the information for a document to add, and attaches files, as a resource, to document.
@@ -210,6 +214,8 @@ Editing and submitting the form will call the API to update a link.
 - `ConfirmModal` (in `ConfirmModal.tsx`): is displayed to delete a connection or resource. It is used in the LinksDocument component and appears when an urban planner clicks the button to delete a connection. Additionally, it is used in the ResourcesTable component and appears when an urban planner clicks the button to delete a resource.
 - `DocumentsTable` (in `DocumentsTable.tsx`): displays a list of all documents along with their information and the number of links. Clicking on the number of links redirects to a page that lists all the links associated with the document. Similarly, clicking on the number of resources redirects to a page that lists all the resources of the document. If the user is logged in as an urban planner, additional buttons are shown to edit or delete the document and to edit, add, or delete the georeference of the document.
 - `ResourcesDocument` (in `ResourcesDocument.tsx`): shows a paged table, containing the list of resources of document. Additionally, is displayed for each resource: one button to delete. At the end of the page, if the user is logged in as an urban planner, shows a button which, when clicked, opens a modal to add a new resource.
+- `Diagram` (in `Diagram.tsx`): the component used to display all documents and their links on a diagram.
+- `DocumentLegend` (in `DocumentLegend.tsx`): is used on diagram component, and shows signs on a diagram to guide user.    
 
 ## Screenshots
 
