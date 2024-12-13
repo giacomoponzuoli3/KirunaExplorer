@@ -74,7 +74,7 @@ describe('stakeholderRoutes/stakeholderController Integration Tests', () => {
     const controller = new StakeholderController();
     const testStakeholder = new Stakeholder(1, "John", "urban developer");
     const testUrbanPlanner = { username: "urban_planner", name: "urban", surname: "planner", password: "admin", role: Role.PLANNER };
-    const testResident = { username: "resident", name: "resident", surname: "resident", password: "admin", role: Role.RESIDENT };;
+    const testResident = { username: "resident", name: "resident", surname: "resident", password: "admin", role: Role.RESIDENT };
 
     describe('POST /', () => {
         test('It should register a stakeholder and return 201 status', async () => {
@@ -201,20 +201,10 @@ describe('stakeholderRoutes/stakeholderController Integration Tests', () => {
 
     describe('GET /', () => {
         test('It should retrieve all the stakeholders and return 200 status', async () => {
+            
+            await expect(controller.addStakeholder("John", "urban developer")).resolves.toEqual(1);
 
-            const cookie = await login(testUrbanPlanner);
-
-            let response = await request(app).post(baseURL + '/')
-                .send({
-                    name: "John",
-                    category: "urban developer"
-                }).set("Cookie", cookie).expect(201);
-
-
-            expect(response.body).toEqual({ message: "Stakeholder added successfully", id: 1 });
-
-            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
-            response = await request(app).get(baseURL + "/");
+            const response = await request(app).get(baseURL + "/");
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual([testStakeholder]);

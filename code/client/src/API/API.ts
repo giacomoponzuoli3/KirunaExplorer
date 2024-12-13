@@ -2,7 +2,7 @@ import { Stakeholder } from "../models/stakeholder";
 import LatLng from "../interfaces";
 const baseURL = "http://localhost:3001/kiruna/"
 
-/** ------------------- Access APIs ------------------------ */
+/** ------------------- Access & User APIs ------------------------ */
 
 async function login(username: string, password: string) {
     let response = await fetch(baseURL + "sessions", {
@@ -44,11 +44,8 @@ async function getUserInfo() {
     }
 }
 
-/** ------------------- User APIs ------------------------ */
-
-
 async function register(username: string, name: string, surname: string, password: string, role: string) {
-    let response = await fetch(baseURL + "users", {
+    let response = await fetch(baseURL + "sessions/register", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

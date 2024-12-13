@@ -1,4 +1,4 @@
-import { describe, beforeAll, beforeEach, test, expect, jest } from "@jest/globals"
+import { describe, beforeEach, test, expect, jest } from "@jest/globals"
 import { CoordinatesController } from "../../src/controllers/coordinatesController"
 import Coordinate from '../../src/models/coordinate';
 import { LatLng } from '../../src/interfaces';
@@ -8,11 +8,10 @@ import { app } from "../../index";
 import request from 'supertest';
 import Authenticator from "../../src/routers/auth"
 import { User } from "../../../common_models/user"
-import { CoordinatesArrayError, CoordinatesTypeError } from "../../src/errors/coordinates";
 
 const baseURL = "/kiruna/coordinates"
 
-jest.mock("../../src/controllers/documentController.ts");
+jest.mock("../../src/controllers/coordinatesController.ts");
 jest.mock("../../src/routers/auth");
 
 describe('coordinateRoutes', () => {

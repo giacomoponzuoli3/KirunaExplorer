@@ -1,7 +1,5 @@
 import { describe, afterEach, test, expect, jest } from "@jest/globals"
 import request from 'supertest'
-import express, { Express } from 'express'
-import LinkRoutes from '../../src/routers/linkRoutes'
 import { LinkController } from '../../src/controllers/linkController'
 import Link from "../../src/models/link"
 import { app } from "../../index";
