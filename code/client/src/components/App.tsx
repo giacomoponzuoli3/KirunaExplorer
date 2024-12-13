@@ -199,7 +199,7 @@ function App() {
           <Route path="documents/:idDocument/links" element={<LinksDocument user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} />} />
           <Route path="documents/:idDocument/map" element={<MapView user={user} geoJsonData={geoJsonData} isLogged={isLogged} getDocumentIcon={getDocumentIcon} documentsCoordinates={documentsCoordinates}/>} />
           <Route path="documents/:idDocument/resources" element={<ResourcesTable user={user} isLogged={isLogged} />} />
-          <Route path="/diagram" element={<Diagram user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} refreshDocumentsCoordinates={getAllDocumentsCoordinates} />} />
+          <Route path="/diagram" element={<Diagram user={user} isLogged={isLogged} getDocumentIcon={getDocumentIcon} refreshDocumentsCoordinates={getAllDocumentsCoordinates} documentsCoordinates={documentsCoordinates} stakeholders={stakeholders} scaleOptions={scaleOptions} onCreateScale={handleCreateScale} typeOptions={typeOptions} onCreateType={handleCreateType}/>} />
           
         </Route>
       </Routes>
