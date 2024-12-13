@@ -19,8 +19,9 @@ class AuthRoutes {
      * @param authenticator - The authenticator object used for authentication.
      */
     constructor(authenticator: Authenticator) {
-        this.authService = authenticator
-        this.errorHandler = new ErrorHandler()
+        this.controller = new UserController();
+        this.authService = authenticator;
+        this.errorHandler = new ErrorHandler();
         this.router = express.Router();
         this.initRoutes();
     }
@@ -59,7 +60,7 @@ class AuthRoutes {
             (req: any, res: any, next: any) => {
                 try {
                     this.controller.createUser(req.body.username, req.body.name, req.body.surname, req.body.password, req.body.role)
-                        .then(() => res.status(200).end())
+                        .then(() => res.status(200).json({ message: "User registered successfully" }))
                         .catch((err) => next(err))
                 } catch (e) {
                     next(e);

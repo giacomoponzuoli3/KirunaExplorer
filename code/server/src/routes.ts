@@ -37,7 +37,7 @@ function initRoutes(app: express.Application) {
     const authRoutes = new AuthRoutes(authenticator)
     const docRoutes = new DocumentRoutes(authenticator);
     const linkRoutes = new LinkRoutes(authenticator);
-    const stakeholderRoutes = new StakeholderRoutes();
+    const stakeholderRoutes = new StakeholderRoutes(authenticator);
     const coordinatesRoutes = new CoordinatesRoutes(authenticator);
     const scaleRoutes = new ScaleRoutes(authenticator);
     const typeRoutes = new TypeRoutes(authenticator);
