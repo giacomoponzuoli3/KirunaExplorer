@@ -2,17 +2,20 @@ import express, {Router} from "express"
 import ErrorHandler from "../helper"
 import StakeholderController from "../controllers/stakeholderController"
 import {Stakeholder} from "../models/stakeholder";
+import Authenticator from "./auth"
 import {body} from "express-validator"
 
 class StakeholderRoutes {
     private controller: StakeholderController
     private readonly router: Router
     private errorHandler: ErrorHandler
+    private authenticator: Authenticator
 
-    constructor() {
+    constructor(authenticator: Authenticator) {
         this.controller = new StakeholderController()
         this.router = express.Router()
         this.errorHandler = new ErrorHandler()
+        this.authenticator = authenticator;
         this.initRoutes()
     }
 
@@ -37,6 +40,8 @@ class StakeholderRoutes {
 
         this.router.post(
             "/",
+            this.authenticator.isLoggedIn,
+            this.authenticator.isPlanner,
             body("name").isString().notEmpty(),
             body("category").isString().notEmpty(),
             this.errorHandler.validateRequest,
