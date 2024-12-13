@@ -7,7 +7,8 @@ import {
   getConnectedEdges,
   Node,
   ReactFlow,
-  ViewportPortal
+  ViewportPortal,
+  NodeMouseHandler
 } from '@xyflow/react';
 
 import {DocCoordinates} from '../models/document_coordinate';
@@ -18,6 +19,7 @@ import DiagramTable from './DiagramTable';
 import {edgeTypes, nodeTypes} from './utilisDiagram/nodesEdgesTypes';
 import '@xyflow/react/dist/style.css';
 import EdgeLegend from './utilisDiagram/EdgeLegend';
+import { ShowDocumentInfoModal } from './ShowDocumentInfoModal';
 
 
 const Diagram = (props: any) => {
@@ -41,6 +43,12 @@ const Diagram = (props: any) => {
   //scroll diagram
   const [scrollHeight, setScrollHeight] = useState<number | null>(null);
   const [scrollWidth, setScrollWidth] = useState<number | null>(null);
+
+  //modal document info
+  const [isModalInfoOpen, setIsModalInfoOpen] = useState(false);
+  const [selectedDocumentCoordinates, setSelectedDocumentCoordinates] = useState<DocCoordinates | null>(null);
+  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const [isReload, setIsReload] = useState(false);
 
 
   const onNodesChange = useCallback(
@@ -294,12 +302,45 @@ const Diagram = (props: any) => {
       };
     });
   };
+
+  const handleCloseDetailsModal = () => {
+    setIsModalInfoOpen(false);
+    setSelectedNode(null)
+    setSelectedDocumentCoordinates(null)
+  };
+
+  function refreshSelectedDocument(doc: DocCoordinates) {
+    // props.refreshDocumentsCoordinates();
+    setIsReload(true);
+  }
+        
+    const onNodeClick: NodeMouseHandler = (event, node) => {
+    console.log('Node clicked:', node);
   
+    // No need to access documents directly here
+    setSelectedNode(node);
+  };
+  
+  useEffect(() => {
+    if (selectedNode && documents) {
+      const document = documents.find((doc) => doc.id === Number(selectedNode.id)) ?? null;
+      setSelectedDocumentCoordinates(document);
+      setIsModalInfoOpen(true);
+    }
+  }, [selectedNode, documents]); 
         
   useEffect(() => {
     if(nodes.length === 0) allDocuments().then();
 
   }, []);
+
+  useEffect(() => {
+    if(isReload){
+      allDocuments().then();
+      setIsReload(false)
+    }
+
+  }, [isReload]);
 
   useEffect(() => {
     if (nodes.length > 0 && edges.length > 0) {
@@ -343,6 +384,24 @@ const Diagram = (props: any) => {
       }} 
       className="diagram-svg-fix"
     >
+      {/* Modal to show the document info */}
+     {isModalInfoOpen && selectedDocumentCoordinates &&( 
+      <ShowDocumentInfoModal 
+        show={isModalInfoOpen}
+        selectedDocumentCoordinates={selectedDocumentCoordinates}
+        onHide={handleCloseDetailsModal} 
+        getDocumentIcon={props.getDocumentIcon} 
+        user={props.user}
+        geoJsonData={props.geoJsonData}
+        refreshDocumentsCoordinates={props.refreshDocumentsCoordinates}
+        scaleOptions={props.scaleOptions}
+        typeOptions={props.typeOptions}
+        onCreateScale={props.onCreateScale}
+        onCreateType={props.onCreateType}
+        stakeholders={props.stakeholders}
+        refreshSelectedDocument={refreshSelectedDocument} 
+      />
+     )}
     
       {nodes.length > 0 && edges.length > 0 && (
         
