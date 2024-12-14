@@ -314,7 +314,7 @@ const Diagram = (props: any) => {
     setIsReload(true);
   }
         
-    const onNodeClick: NodeMouseHandler = (event, node) => {
+  const onNodeClick: NodeMouseHandler = (event, node) => {
     console.log('Node clicked:', node);
   
     // No need to access documents directly here
@@ -415,6 +415,7 @@ const Diagram = (props: any) => {
 
           onEdgesChange={onEdgesChange}
           onConnect={onConnect} // Funzione di callback per il collegamento
+          onNodeClick={onNodeClick}
     
           connectionLineStyle={{ stroke: "rgb(0, 0, 0)", strokeWidth: 2 }}
 
