@@ -1,6 +1,6 @@
 import { describe, beforeEach, beforeAll, afterAll, test, expect, jest } from "@jest/globals";
-import Scale from "../../src/models/scale";
-import { ScaleController } from "../../src/controllers/scaleController";
+import Type from "../../src/models/type";
+import { TypeController } from "../../src/controllers/typeController";
 import db from "../../src/db/db"
 import { Database } from "sqlite3";
 import { cleanup } from "../../src/db/cleanup";
@@ -9,9 +9,9 @@ import { app } from "../../index";
 import request from 'supertest';
 import { Role } from "../../../common_models/user"
 
-const baseURL = "/kiruna/scale"
+const baseURL = "/kiruna/type"
 
-describe('scaleRoutes/scaleController Integration Tests', () => {
+describe('typeRoutes/typeController Integration Tests', () => {
 
     // Helper function that logs in a user and returns the cookie
     // Can be used to log in a user before the tests or in the tests
@@ -71,23 +71,23 @@ describe('scaleRoutes/scaleController Integration Tests', () => {
 
 
 
-    const controller = new ScaleController();
-    const testScale = new Scale(1, "1:100");
+    const controller = new TypeController();
+    const testType = new Type(1, "Informative");
     const testUrbanPlanner = { username: "urban_planner", name: "urban", surname: "planner", password: "admin", role: Role.PLANNER };
     const testResident = { username: "resident", name: "resident", surname: "resident", password: "admin", role: Role.RESIDENT };;
 
     describe('POST /', () => {
-        test('It should register a scale and return 200 status', async () => {
+        test('It should register a type and return 200 status', async () => {
 
             const cookie = await login(testUrbanPlanner);
 
             const response = await request(app).post(baseURL + '/')
                 .send({
-                    name: "1:100"
+                    name: "Informative"
                 }).set("Cookie", cookie).expect(200);
 
 
-            expect(response.body).toEqual({ message: "Scale added successfully" });
+            expect(response.body).toEqual({ message: "Type added successfully" });
 
             await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
         });
@@ -104,23 +104,24 @@ describe('scaleRoutes/scaleController Integration Tests', () => {
         test('It should return 422 status if name is not a string', async () => {
             const cookie = await login(testUrbanPlanner);
 
-            await request(app).post(baseURL + "/")
+            const response = await request(app).post(baseURL + "/")
                 .send({
                     name: 1,
                 }).set("Cookie", cookie).expect(422);
 
+            expect(response.body.error).toEqual("Invalid type name provided");
             await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
         });
 
         test('It should return 422 status if name is missing', async () => {
             const cookie = await login(testUrbanPlanner);
 
-            await request(app).post(baseURL + "/")
+            const response = await request(app).post(baseURL + "/")
                 .send({
                     name: null
                 }).set("Cookie", cookie).expect(422);
 
-
+            expect(response.body.error).toEqual("Invalid type name provided");
             await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
         });
 
@@ -128,7 +129,7 @@ describe('scaleRoutes/scaleController Integration Tests', () => {
 
             const response = await request(app).post(baseURL + '/')
                 .send({
-                    name: "1:100"
+                    name: "Informative"
                 });
 
             expect(response.status).toBe(401);
@@ -140,7 +141,7 @@ describe('scaleRoutes/scaleController Integration Tests', () => {
 
             const response = await request(app).post(baseURL + '/')
                 .send({
-                    name: "1:100"
+                    name: "Informative"
                 }).set("Cookie", cookie).expect(403);
 
             expect(response.body.error).toBe('User is not an urban planner');
@@ -158,7 +159,7 @@ describe('scaleRoutes/scaleController Integration Tests', () => {
 
             const response = await request(app).post(baseURL + "/")
                 .send({
-                    name: "1:100"
+                    name: "Informative"
                 }).set("Cookie", cookie).expect(503);
 
             expect(response.body.error).toBe('Internal Server Error');
@@ -172,14 +173,14 @@ describe('scaleRoutes/scaleController Integration Tests', () => {
 
 
     describe('GET /', () => {
-        test('It should retrieve all the scales and return 200 status', async () => {
+        test('It should retrieve all the types and return 200 status', async () => {
 
-            await expect(controller.addScale("1:100")).resolves.toBe(1);
+            await expect(controller.addTypes("Informative")).resolves.toBe(1);
 
             const response = await request(app).get(baseURL + "/");
 
             expect(response.status).toBe(200);
-            expect(response.body).toEqual([testScale]);
+            expect(response.body).toEqual([testType]);
 
         });
 

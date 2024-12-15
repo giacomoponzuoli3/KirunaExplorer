@@ -97,6 +97,14 @@ export async function setup() {
             PRIMARY KEY("scale_id" AUTOINCREMENT)
         )`);
 
+        
+        await runQuery(`CREATE TABLE IF NOT EXISTS "types" (
+            "type_id"	INTEGER,
+            "name"	TEXT NOT NULL UNIQUE,
+            PRIMARY KEY("type_id" AUTOINCREMENT)
+        )`);
+
+
         console.log("All tables created successfully.");
     } catch (err) {
         console.error(err.message);
