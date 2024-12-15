@@ -24,6 +24,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import localeData from 'dayjs/plugin/localeData';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import { Stakeholder } from '../models/stakeholder';
 
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
@@ -85,6 +86,7 @@ function DocumentsTable(props: any){
     const [selectedType, setSelectedType] = useState(""); // Per tipo documento
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+    const [selectedStakeholder, setSelectedStkeholder] = useState("");
 
     //pagination controls
     const [currentPage, setCurrentPage] = useState(1);  // Track the current page
@@ -95,11 +97,23 @@ function DocumentsTable(props: any){
     const [isOpenTypeDocument, setIsOpenTypeDocument] = useState(false); // Gestione dello stato del dropdown
     const [selectedValueTypeDocument, setSelectedValueTypeDocument] = useState(selectedType);
 
+    //dropdown of stakeholder document filter
+    const [isOpenStakeholder, setIsOpenStakeholder] = useState(false); 
+    const [selectedValueStakehplder, setSelectedValueStakrholder] = useState(selectedStakeholder);
+    const stakeholdersWithAll = [{ name: "All Stakeholders" }, ...props.stakeholders];
+
     //dropdown of the order documents filter
     const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Stato per il dropdown
     const [selectedOrder, setSelectedOrder] = useState(sortOrder); // Stato per l'ordine selezionato
 
-    const toggleDropdownTypeDocument = () => setIsOpenTypeDocument(!isOpenTypeDocument);
+    const toggleDropdownTypeDocument = () => {
+      setIsOpenTypeDocument(!isOpenTypeDocument);
+      if(isOpenTypeDocument) setIsOpenStakeholder(false)
+    }
+    const toggleDropdownStakeholder = () => {
+      setIsOpenStakeholder(!isOpenStakeholder);
+      if(isOpenStakeholder) setIsOpenTypeDocument(false)
+    }
 
      // Calcola il numero totale di pagine in base ai documenti filtrati
     const totalPages = Math.ceil(filteredDocuments.length / itemsPerPage);
@@ -131,6 +145,9 @@ function DocumentsTable(props: any){
     const handleSearch = (term: string) => {
       if (selectedType != 'All Types') {
         handleSelect('All Types');
+      }
+      if (selectedStakeholder != 'All Stakeholders') {
+        handleSelectStakeholder('All Stakeholders');
       }
       setStartDate('');
       setEndDate('');
@@ -205,10 +222,12 @@ function DocumentsTable(props: any){
       // Reset dei filtri di ordine e tipo documento
       setSelectedOrder("none"); // Reset del filtro di ordine
       setSelectedValueTypeDocument("All Types"); // Reset del filtro di tipo documento
+      setSelectedValueStakrholder("All Stakeholders");
       setSearchTerm('');
       setSortOrder("asc"); // Imposta l'ordine di default (A-Z)
       setIsDropdownOpen(false); // Chiude il dropdown di ordinamento
       setIsOpenTypeDocument(false); // Chiude il dropdown del tipo documento
+      setIsOpenStakeholder(false);
     };
     
     //-------- Filter of Type Document ---------//
@@ -216,6 +235,7 @@ function DocumentsTable(props: any){
       setSelectedValueTypeDocument(type);
       handleTypeFilterChange(type);
       setIsOpenTypeDocument(false); // Chiude il dropdown dopo la selezione
+      setIsOpenStakeholder(false);
       setStartDate('');
       setEndDate('');
       setSearchTerm('');
@@ -224,13 +244,53 @@ function DocumentsTable(props: any){
     // Funzione per il filtro per tipo documento
     const handleTypeFilterChange = (type: any) => {
       setSelectedType(type);
-      setFilteredDocuments(() =>
-        type && type != "All Types" && type != "Others" ? documentsCoordinates.filter((doc) => doc.type === type) : type == "All Types" ? documentsCoordinates : documentsCoordinates.filter((doc) => !documentTypes.includes(doc.type) || doc.type == "Others")
-      );
+      setFilteredDocuments(filterDropDown(selectedStakeholder,type))
       setCurrentPage(1); // Resetta la paginazione alla prima pagina
       setPaginatedLinks(filteredDocuments.slice(0, itemsPerPage)); // Aggiorna i documenti visualizzati
     };
 
+    const handleSelectStakeholder =  (stakeholder: any) => {
+      setSelectedValueStakrholder(stakeholder);
+      handleStakeholderFilterChange(stakeholder);
+      setIsOpenStakeholder(false); 
+      setIsOpenTypeDocument(false); 
+      setStartDate('');
+      setEndDate('');
+      setSearchTerm('');
+    };
+
+    const handleStakeholderFilterChange = (stakeholder: any) => {
+      setSelectedStkeholder(stakeholder);
+      setFilteredDocuments(filterDropDown(stakeholder,selectedType))
+      setCurrentPage(1); //
+      setPaginatedLinks(filteredDocuments.slice(0, itemsPerPage));
+    };
+
+    const filterDropDown = (stakeholderName: any, type: any) =>{
+      let documentsArray = documentsCoordinates;
+      let filterDocuments = [];
+        
+      if(type && type != "All Types" && type != "Others"){
+        filterDocuments = (stakeholderName && stakeholderName != "All Stakeholders" && stakeholderName!='')? 
+          documentsArray.filter((doc) => doc.type === type && 
+            doc.stakeHolders.some((stakeholder) => stakeholder.name === stakeholderName))
+            :documentsArray.filter((doc) => doc.type === type)
+        return filterDocuments
+      } 
+      if (type === "All Types") {
+        filterDocuments = (stakeholderName && stakeholderName != "All Stakeholders" && stakeholderName!='')?
+          documentsArray.filter((doc) =>  doc.stakeHolders.some((stakeholder) => stakeholder.name === stakeholderName))
+          :documentsArray
+        return filterDocuments
+      } 
+      filterDocuments = (stakeholderName && stakeholderName != "All Stakeholders" && stakeholderName!='')?
+        documentsArray.filter((doc) => (!documentTypes.includes(doc.type) || doc.type == "Others") && 
+          doc.stakeHolders.some((stakeholder) => stakeholder.name === stakeholderName))
+        :documentsArray.filter((doc) => !documentTypes.includes(doc.type) || doc.type == "Others")
+      
+      return filterDocuments;
+      
+    }
 
     // Funzione per ottenere il numero di link per un documento
     const getDocumentLinksCount = async (docId: number) => {
@@ -413,10 +473,12 @@ useEffect(() => {
     setDocumentEdit(doc)
     props.refreshDocumentsCoordinates();
     handleSelect('All Types');
+    handleSelectStakeholder('All Stakeholders')
     setStartDate('');
     setEndDate('');
     setSortOrder('none');
     setSelectedType('');
+    setSelectedStkeholder('')
   }
 
     if(showAlert){
@@ -526,6 +588,49 @@ useEffect(() => {
               </div>
             </div>
 
+            {/* Filter stakeholder */}
+              <div className="flex items-center space-x-2">
+              <label className="text-sm font-medium text-gray-700">Stakeholder of Document:</label>
+              <div className="relative inline-block">
+                {/* Bottone per aprire il dropdown */}
+                <div
+                  onClick={toggleDropdownStakeholder}
+                  onKeyDown={(e) => {
+                    // Attiva il dropdown con 'Enter' o 'Space'
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      toggleDropdownStakeholder();
+                    }
+                  }}
+                  tabIndex={0}  // Aggiungi tabIndex per rendere il div focusabile
+                  className="flex items-center justify-between border border-gray-300 rounded-lg px-4 py-2 text-sm shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white cursor-pointer w-60"  // Imposta una larghezza fissa
+                >
+                  <span>{selectedValueStakehplder || "All Stakeholders"}</span>
+                  <ChevronDownIcon className="h-4 w-4 text-gray-500" />
+                </div>
+
+                {/* Dropdown Menu */}
+                {isOpenStakeholder && (
+                  <div className="absolute left-0 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                    {stakeholdersWithAll.map((stakeholder: Stakeholder) => (
+                      <div
+                        key={stakeholder.name}
+                        onClick={() => handleSelectStakeholder(stakeholder.name)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            handleSelectStakeholder(stakeholder.name);  // Se 'Enter' o 'Space' viene premuto, seleziona il tipo
+                          }
+                        }}
+                        tabIndex={0}  // Rende l'elemento focusabile
+                        className="cursor-pointer hover:bg-blue-100 px-4 py-2 text-sm text-gray-700"
+                      >
+                        {stakeholder.name}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Filtro per range di date */}
             <div className="flex items-center space-x-4">
               {/* Filtro per range di date */}
@@ -565,6 +670,7 @@ useEffect(() => {
                     setStartDate('');
                     setEndDate('');
                     handleSelect('All Types');
+                    handleSelectStakeholder('All Stakeholders');
                   }}
                   className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded shadow-sm focus:outline-none focus:ring focus:ring-blue-300 transition"
                 >
@@ -753,6 +859,7 @@ useEffect(() => {
                 setEndDate('');
                 setSortOrder('none');
                 setSelectedType('');
+                setSelectedStkeholder('')
 
               }} 
               refreshSelectedDocument={refreshSelectedDocument}
