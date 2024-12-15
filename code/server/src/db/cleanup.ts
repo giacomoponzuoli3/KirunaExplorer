@@ -17,6 +17,7 @@ export async function cleanup() {
 
     try {
         
+        await clearTable("types");
         await clearTable("scales");
         await clearTable("original_resources");
         await clearTable("document_coordinates");
