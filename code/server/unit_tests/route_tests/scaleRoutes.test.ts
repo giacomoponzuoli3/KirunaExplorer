@@ -156,7 +156,10 @@ describe('scaleRoutes tests', () => {
                 req.user = u;
                 return next();
             });
-            jest.spyOn(controller, 'addScale').mockRejectedValueOnce(new Error('Internal Server Error'));
+            
+            jest.spyOn(controller, 'addScale').mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).post(baseURL + "/")
                 .send({
@@ -191,7 +194,9 @@ describe('scaleRoutes tests', () => {
         });
 
         test('It should return 503 if there is an error', async () => {
-            jest.spyOn(controller, "getScales").mockRejectedValueOnce(new Error('Internal Server Error'));
+            jest.spyOn(controller, "getScales").mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).get(baseURL + "/");
 

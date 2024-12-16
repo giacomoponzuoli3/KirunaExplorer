@@ -144,7 +144,7 @@ describe('coordinatesDAO', () => {
                     longitude: 150,
                     municipality_area: 0
                 },
-                 // First stakeholder with the municipality area
+                // First stakeholder with the municipality area
                 {
                     id: 2,
                     title: 'title 2',
@@ -191,7 +191,7 @@ describe('coordinatesDAO', () => {
                     return {} as Database;
                 })
 
-            await expect(dao.getAllDocumentsCoordinates()).resolves.toEqual([testDocCoordinate,testDocCoordinateMunicipalityArea]);
+            await expect(dao.getAllDocumentsCoordinates()).resolves.toEqual([testDocCoordinate, testDocCoordinateMunicipalityArea]);
 
             expect(db.all).toHaveBeenCalledWith(
                 `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude,dc.longitude, dc.point_order, dc.municipality_area FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id ORDER BY dc.point_order`,
@@ -545,6 +545,48 @@ describe('coordinatesDAO', () => {
 
             // Call the function and expect it to reject
             await expect(dao.updateDocumentCoordinates(documentId, coordinate)).rejects.toThrow('Unexpected error');
+        });
+    });
+
+    describe('getExistingGeoreferences', () => {
+        test('it should successfully get all the existing georeferences (points and polygons)', async () => {
+            const mockRows = [
+                { document_id: 1, id: 1, point_order: 1, latitude: 10, longitude: 20 },
+                { document_id: 1, id: 2, point_order: 2, latitude: 15, longitude: 25 }
+            ];
+
+            jest.spyOn(db, 'all').mockImplementationOnce((sql, params, callback) => {
+                callback(null, mockRows);
+                return {} as Database;
+            });
+
+            await expect(dao.getExistingGeoreferences()).resolves.toEqual([[new Coordinate(1, 1, 10, 20, 0), new Coordinate(2, 2, 15, 25, 0)]]);
+
+            expect(db.all).toHaveBeenCalledWith(
+                `SELECT * FROM document_coordinates WHERE municipality_area = 0 ORDER BY document_id, point_order;`,
+                [],
+                expect.any(Function)
+            );
+        });
+
+        test('it should reject if there is a database error', async () => {
+            
+            jest.spyOn(db, 'all').mockImplementationOnce((sql, params, callback) => {
+                callback(new Error('Database error'));
+                return {} as Database;
+            });
+            
+            await expect(dao.getExistingGeoreferences()).rejects.toThrow('Database error');
+            
+        });
+
+        test('it should reject if an unexpected error occurs', async () => {
+
+            (db.all as jest.Mock).mockImplementation(() => {
+                throw new Error("Unexpected error");
+            });
+
+            await expect(dao.getExistingGeoreferences()).rejects.toThrow("Unexpected error");
         });
     });
 

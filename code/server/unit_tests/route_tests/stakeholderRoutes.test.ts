@@ -198,7 +198,10 @@ describe('stakeholders tests', () => {
                 req.user = u;
                 return next();
             });
-            jest.spyOn(controller, 'addStakeholder').mockRejectedValueOnce(new Error('Internal Server Error'));
+            
+            jest.spyOn(controller, 'addStakeholder').mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).post(baseURL + "/")
                 .send({
@@ -234,8 +237,11 @@ describe('stakeholders tests', () => {
         });
 
         test('It should return 503 if there is an error', async () => {
-            jest.spyOn(controller, "getAllStakeholders").mockRejectedValueOnce(new Error('Internal Server Error'));
 
+            jest.spyOn(controller, "getAllStakeholders").mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
+    
             const response = await request(app).get(baseURL + "/");
 
             expect(response.status).toBe(503);
