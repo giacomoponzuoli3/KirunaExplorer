@@ -91,7 +91,7 @@ const Diagram = (props: any) => {
         new Set(
           getDocuments.map((doc: DocCoordinates) => doc.scale)
         )
-      ).sort() as string[];
+      ).sort((a: any, b: any) => a.localeCompare(b)) as string[];
 
       //get the years
       const uniqueYears = Array.from(
@@ -100,7 +100,7 @@ const Diagram = (props: any) => {
             .map((doc: DocCoordinates) => normalizeDate(doc.issuanceDate)) // Mappa subito con normalizeDate
             .filter((year: number) => !isNaN(year)) // Filtra solo gli anni validi (non NaN)
         )
-      ).sort() as number[];
+      ).sort((a: any, b: any) => a - b) as number[];
       
       setScales(uniqueScales);
       setYears(uniqueYears);
