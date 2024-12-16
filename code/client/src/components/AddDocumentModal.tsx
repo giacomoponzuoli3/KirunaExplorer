@@ -118,7 +118,7 @@ function AddDocumentModal({ show, onHide, stakeholders,refreshDocumentsCoordinat
             ): mode === 'links'  && document? (
               <AddNewDocumentLinksModal 
                   document={document}
-                  onHide={onHide} 
+                  handleClose={handleClose}
                   refreshDocumentsCoordinates={refreshDocumentsCoordinates}
                   docs={documentsCoordinates}
                   newDocumentCoordinates={newDocumentCoordinates}
