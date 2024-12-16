@@ -45,7 +45,7 @@ const EdgeLegend = () => {
               />
             </svg>
             {/* Etichetta */}
-            <span className="text-sm text-gray-700">{label}</span>
+            <span className="text-base text-gray-700">{label}</span>
           </div>
         ))}
       </div>

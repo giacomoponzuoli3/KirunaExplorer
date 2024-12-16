@@ -91,7 +91,7 @@ const Diagram = (props: any) => {
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [isReload, setIsReload] = useState(false);
 
-  const [isLegendVisible, setIsLegendVisible] = useState(false);
+  const [isLegendVisible, setIsLegendVisible] = useState(true);
   const [nodeInfo, setNodeInfo] = useState<{ type: string, icon: JSX.Element, description: string }[]>([]);
 
 
@@ -421,24 +421,24 @@ const Diagram = (props: any) => {
           <h2 className="text-3xl font-bold text-black-600 text-center mb-6">
                 Diagram of Documents
           </h2>
-      </div>
-      {/* Toggle Button */}
-      <button 
-          onClick={toggleLegend} 
-          style={{
-            position: 'absolute',
-            top: '10px',
-            right: '10px',
-            zIndex: 20,
-            padding: '10px 15px',
-            backgroundColor: 'black',
-            color: 'white',
-            borderRadius: '5px',
-            cursor: 'pointer'
-          }}
-        >
-          {isLegendVisible ? "Hide Legend" : "Show Legend"}
+          {/* Toggle Button */}
+          <button 
+            onClick={toggleLegend} 
+            style={{
+              position: 'absolute',
+              top: '85px',
+              right: '10px',
+              zIndex: 20,
+              padding: '10px 15px',
+              backgroundColor: 'black',
+              color: 'white',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            {isLegendVisible ? "Hide Legend" : "Show Legend"}
         </button>
+      </div>
       <div 
       style={{ 
         width: '100%', 
