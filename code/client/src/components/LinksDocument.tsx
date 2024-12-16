@@ -1,6 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import { Document } from "../models/document";
 import API from "../API/API";
 import { TrashIcon, PlusIcon, FaceFrownIcon, PencilIcon,ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
 import Alert from "./Alert";
@@ -8,6 +7,7 @@ import ConfirmModal from './ConfirmModal';
 import { AddLinkModal } from "./AddLinkModal";
 import { DocLink } from "../models/document_link";
 import { EditLinkModal } from "./EditLinkModal";
+import { DocCoordinates } from "../models/document_coordinate";
 
 interface TruncatedTextProps {
   text: string;
@@ -68,7 +68,7 @@ function LinksDocument(props: any) {
     const navigate = useNavigate();
 
     const { idDocument } = useParams();
-    const [document, setDocument] = useState<Document | null>(null);
+    const [document, setDocument] = useState<DocCoordinates | null>(null);
     const [documentLinks, setDocumentLinks] = useState<DocLink[]>([]);
     const [showModal, setShowModal] = useState(false);
     //delete

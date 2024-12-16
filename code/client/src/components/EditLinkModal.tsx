@@ -3,13 +3,13 @@ import API from "../API/API";
 import { useNavigate } from "react-router-dom";
 import Alert from "./Alert";
 import Link from "../models/link";
-import { Document } from "../models/document";
+import { DocCoordinates } from "../models/document_coordinate";
 
 function EditLinkModal(props: any) {
     const navigate = useNavigate();
 
     const [typesLink, setTypesLink] = useState<Link[]>([]); // vector of types of links except one
-    const [documents, setDocuments] = useState<Document[]>([]); // vector of all documents except one
+    const [documents, setDocuments] = useState<DocCoordinates[]>([]); // vector of all documents except one
 
     const [selectedNewTypeLink, setSelectedNewTypeLink] = useState<number | null>(null); // Selected new type of link
     const [showTypeLinkDropdown, setShowTypeLinkDropdown] = useState(false); // State to show type link dropdown
@@ -63,9 +63,9 @@ function EditLinkModal(props: any) {
 
         const getAllDocuments = async () => {
             try {
-                const allDocuments = await API.getAllDocuments();
+                const allDocuments = await API.getAllDocumentsCoordinates();
                 const documents = allDocuments.filter(
-                    (d: Document) => d.id !== props.firstDocument.id
+                    (d: DocCoordinates) => d.id !== props.firstDocument.id
                 );
                 setDocuments(documents);
             } catch (err) {

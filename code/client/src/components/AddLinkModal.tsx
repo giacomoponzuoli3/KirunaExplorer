@@ -1,16 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Document } from "../models/document";
 import API from "../API/API";
 import Alert from "./Alert";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import Link from "../models/link";
+import { DocCoordinates } from "../models/document_coordinate";
 
 function AddLinkModal(props: any) {
     const navigate = useNavigate();
 
     const [typesLink, setTypesLink] = useState<Link[]>([]); // vector of types of links
-    const [documents, setDocuments] = useState<Document[]>([]); // vector of all documents except one
+    const [documents, setDocuments] = useState<DocCoordinates[]>([]); // vector of all documents except one
 
     const [selectedDocument, setSelectedDocument] = useState<number | null>(null); // Selected document
     const [selectedTypeLink, setSelectedTypeLink] = useState<number | null>(null); // Selected type of link
@@ -62,8 +62,8 @@ function AddLinkModal(props: any) {
 
         const getAllDocuments = async () => {
             try {
-                const allDocuments = await API.getAllDocuments();
-                const documents = allDocuments.filter((d: Document) => d.id != props.idDocument);
+                const allDocuments = await API.getAllDocumentsCoordinates();
+                const documents = allDocuments.filter((d: DocCoordinates) => d.id != props.idDocument);
                 setDocuments(documents);
             } catch (err) {
                 setShowAlert(true);
