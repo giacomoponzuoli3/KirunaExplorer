@@ -93,20 +93,29 @@ const Diagram = (props: any) => {
         )
       ).sort((a: any, b: any) => a.localeCompare(b)) as string[];
 
-      //get the years
-      const uniqueYears = Array.from(
-        new Set(
-          getDocuments
-            .map((doc: DocCoordinates) => normalizeDate(doc.issuanceDate)) // Mappa subito con normalizeDate
-            .filter((year: number) => !isNaN(year)) // Filtra solo gli anni validi (non NaN)
-        )
-      ).sort((a: any, b: any) => a - b) as number[];
+      // Conta il numero di documenti associati a ciascun anno
+      const yearCounts = getDocuments
+      .map((doc: DocCoordinates) => normalizeDate(doc.issuanceDate)) // Estrai l'anno
+      .filter((year: number) => !isNaN(year)) // Filtra solo gli anni validi (non NaN)
+      .reduce((counts: Record<number, number>, year: number) => {
+        counts[year] = (counts[year] || 0) + 1; // Conta le occorrenze di ciascun anno
+        return counts;
+      }, {});
+
+      // Ottieni gli anni unici ordinati
+      const uniqueYears = Array.from(new Set(Object.keys(yearCounts).map(Number))).sort((a, b) => a - b) as number[];
+
+      // Calcola la larghezza di ciascuna colonna in base al numero di documenti
+      const widths = uniqueYears.map(year => {
+      const count = yearCounts[year] || 0; // Ottieni il conteggio dei documenti associati a questo anno
+      return 250 + (count * 50); // Aggiungi 50px per ogni documento
+      });
       
       setScales(uniqueScales);
       setYears(uniqueYears);
       
       const heights = Array(uniqueScales.length).fill(50);
-      const widths = Array(uniqueYears.length).fill(250);
+  
     
       setScaleHeights(heights);
       setYearsWidths(widths);
@@ -194,35 +203,16 @@ const Diagram = (props: any) => {
           let offset = 30; // Offset di default
           let overlapCount = 0;
           
-          if(pairKey == "1-4-3"){
-            console.log("1-4-3")
-          }
-          if(pairKey == "1-4-1"){
-            console.log("1-4-1")
-          }
-          if(pairKey == "1-4-4"){
-            console.log("1-4-4")
-          }
           // Verifica se l'edge si sovrappone con altri
           edgePositions.forEach((existingEdge) => {
             if (areEdgesOverlapping(
               { sourceX, sourceY, targetX, targetY, type: link.relatedLink.name },
               existingEdge
             )) {
-              console.log("entraot");
               overlapCount++; // Incrementa il conteggio delle sovrapposizioni
             }
           });
 
-          if(pairKey == "1-4-1"){
-            console.log("1-4-1 offset: " + offset);
-          }
-          if(pairKey == "1-4-4"){
-            console.log("1-4-4 offeset: " + offset);
-          }
-          if(pairKey == "1-4-3"){
-            console.log("1-4-3 offset: " + offset)
-          }
   
           // Se ci sono sovrapposizioni, applica l'offset
           if (overlapCount > 0) {
@@ -411,7 +401,6 @@ const Diagram = (props: any) => {
 
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
-
 
           onEdgesChange={onEdgesChange}
           onConnect={onConnect} // Funzione di callback per il collegamento
