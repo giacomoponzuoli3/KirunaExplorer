@@ -77,7 +77,7 @@ class CoordinatesDAO {
         return new Promise<void>((resolve, reject) => {
             try {
                 const coordinatesArray = Array.isArray(coords) ? coords : [coords];
-                console.log(coordinatesArray)
+                
                 if(coordinatesArray.length > 0){
                     const coordinatesInserts = coordinatesArray.map((point, index) => {
                         return new Promise<void>((innerResolve, innerReject) => {
