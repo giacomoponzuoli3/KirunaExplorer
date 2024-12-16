@@ -551,4 +551,59 @@ describe('coordinatesRoutes/coordinatesController Integration tests', () => {
             dbSpy.mockRestore();
         });
     });
+
+    describe('GET /georeferences', () => {
+        test('It should retrieves all the existing georeferences (points and polygons), expect the municipality_area and return 200 status', async () => {
+
+            const cookie = await login(testUrbanPlanner);
+
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
+
+            const response = await request(app).get(baseURL + "/georeferences").set("Cookie", cookie).expect(200);
+
+            expect(response.body).toEqual([[testCoordinate1]]);
+         
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+        });
+
+        
+        test('It should return 401 status if the user is not logged in', async () => {
+
+            const response = await request(app).get(baseURL + "/georeferences")
+
+            expect(response.status).toBe(401);
+            expect(response.body.error).toBe('Unauthenticated user');
+        });
+
+        test('It should return 403 status if the user is not an urban planner', async () => {
+
+            const cookie = await login(testResident);
+
+            const response = await request(app).get(baseURL + "/georeferences").set("Cookie", cookie).expect(403);
+
+            expect(response.body.error).toBe('User is not an urban planner');
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+        });
+
+        test('It should return 503 if there is an error', async () => {
+
+            const cookie = await login(testUrbanPlanner);
+
+            const dbSpy = jest.spyOn(db, 'all').mockImplementation(function (sql, params, callback) {
+                callback(new Error('Database error'), null);
+                return {} as Database;
+            });
+
+            const response = await request(app).get(baseURL + "/georeferences").set("Cookie", cookie).expect(503);
+
+            expect(response.body.error).toBe('Internal Server Error');
+
+            await request(app).delete("/kiruna/sessions/current").set("Cookie", cookie).expect(200);
+
+            dbSpy.mockRestore();
+        });
+    });
 });

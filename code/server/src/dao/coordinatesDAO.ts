@@ -162,13 +162,10 @@ class CoordinatesDAO {
     getExistingGeoreferences(): Promise<Coordinate[][]> {
         return new Promise<Coordinate[][]>((resolve, reject) => {
             try{
-                const sql = `SELECT * 
-                                FROM document_coordinates
-                                WHERE municipality_area = 0
-                                ORDER BY document_id, point_order;`;
+                const sql = `SELECT * FROM document_coordinates WHERE municipality_area = 0 ORDER BY document_id, point_order;`;
                 db.all(sql, [], (err: Error | null, rows: any[]) => {
                     if(err){
-                        return reject(error);
+                        return reject(err);
                     }
 
                     const coordinatesByDocument: Record<number, Coordinate[]> = {};

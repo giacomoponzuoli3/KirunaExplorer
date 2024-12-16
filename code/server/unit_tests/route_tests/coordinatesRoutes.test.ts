@@ -41,12 +41,12 @@ describe('coordinateRoutes', () => {
     describe('GET /', () => {
         test('It should retrieves all documents with their coordinates and return 200 status', async () => {
 
-            jest.spyOn(controller, "getAllDocumentsCoordinates").mockResolvedValueOnce([testDocCoordinate,testDocCoordinateMunicipalityArea]);
+            jest.spyOn(controller, "getAllDocumentsCoordinates").mockResolvedValueOnce([testDocCoordinate, testDocCoordinateMunicipalityArea]);
 
             const response = await request(app).get(baseURL + "/");
 
             expect(response.status).toBe(200);
-            expect(response.body).toEqual([testDocCoordinate,testDocCoordinateMunicipalityArea]);
+            expect(response.body).toEqual([testDocCoordinate, testDocCoordinateMunicipalityArea]);
             expect(controller.getAllDocumentsCoordinates).toHaveBeenCalledWith();
         });
 
@@ -63,7 +63,9 @@ describe('coordinateRoutes', () => {
 
         test('It should return 503 if there is an error', async () => {
 
-            jest.spyOn(controller, "getAllDocumentsCoordinates").mockRejectedValueOnce(new Error('Internal Server Error'));
+            jest.spyOn(controller, "getAllDocumentsCoordinates").mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).get(baseURL + "/");
 
@@ -288,7 +290,9 @@ describe('coordinateRoutes', () => {
                 return next();
             });
 
-            jest.spyOn(controller, 'setDocumentCoordinates').mockRejectedValueOnce(new Error('Internal Server Error'));
+            jest.spyOn(controller, 'setDocumentCoordinates').mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).post(baseURL + "/")
                 .send({
@@ -403,7 +407,10 @@ describe('coordinateRoutes', () => {
                 req.user = u;
                 return next();
             });
-            jest.spyOn(controller, "deleteDocumentCoordinates").mockRejectedValueOnce(new Error('Internal Server Error'));
+
+            jest.spyOn(controller, "deleteDocumentCoordinates").mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).delete(baseURL + `/${testId}`);
 
@@ -569,7 +576,9 @@ describe('coordinateRoutes', () => {
                 return next();
             });
 
-            jest.spyOn(controller, "updateDocumentCoordinates").mockRejectedValueOnce(new Error("Internal Server Error"));
+            jest.spyOn(controller, "updateDocumentCoordinates").mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).post(baseURL).send({
                 idDoc: 1,
@@ -580,6 +589,92 @@ describe('coordinateRoutes', () => {
             expect(response.body.error).toBe("Internal Server Error");
         });
 
+    });
+
+    describe('GET /georeferences', () => {
+        test('It should retrieves all the existing georeferences (points and polygons), expect the municipality_area and return 200 status', async () => {
+     
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user = u; 
+                return next();
+            });
+
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user = u; 
+                return next();
+            });
+
+            jest.spyOn(controller, "getExistingGeoreferences").mockResolvedValueOnce([[testCoordinate1]]);
+
+            const response = await request(app).get(baseURL + "/georeferences");
+
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual([[testCoordinate1]]);
+            expect(controller.getExistingGeoreferences).toHaveBeenCalledWith();
+        });
+
+        
+        test('It should return 401 status if the user is not logged in', async () => {
+
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                return res.status(401).json({ error: "Unauthenticated user" });
+            });
+
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user = u;
+                return next();
+            });
+
+
+            jest.spyOn(controller, "getExistingGeoreferences").mockResolvedValueOnce([[testCoordinate1]]);
+
+            const response = await request(app).get(baseURL + "/georeferences");
+
+            expect(response.status).toBe(401);
+            expect(response.body.error).toBe('Unauthenticated user');
+        });
+
+        test('It should return 403 status if the user is not an urban planner', async () => {
+
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user = u;
+                return next();
+            });
+
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                return res.status(403).json({ error: "User is not an urban planner" });
+            });
+
+            jest.spyOn(controller, "getExistingGeoreferences").mockResolvedValueOnce([[testCoordinate1]]);
+
+            const response = await request(app).get(baseURL + "/georeferences");
+
+            expect(response.status).toBe(403);
+
+            expect(response.body.error).toBe('User is not an urban planner');
+        });
+
+        test('It should return 503 if there is an error', async () => {
+
+            jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
+                req.user = u; 
+                return next();
+            });
+
+            jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
+                req.user = u; 
+                return next();
+            });
+
+            jest.spyOn(controller, "getExistingGeoreferences").mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
+
+            const response = await request(app).get(baseURL + "/georeferences");
+
+            expect(response.status).toBe(503);
+            expect(response.body.error).toBe('Internal Server Error');
+        });
     });
 
 });

@@ -238,4 +238,35 @@ describe('coordinatesController', () => {
         });
     });
 
+    describe('getExistingGeoreferences', () => {
+        test('it should successfully get all the existing georeferences (points and polygons)', async () => {
+    
+            jest.spyOn(dao, 'getExistingGeoreferences').mockResolvedValue([[new Coordinate(1, 1, 10, 20, 0), new Coordinate(2, 2, 15, 25, 0)]]);
+
+            await expect(controller.getExistingGeoreferences()).resolves.toEqual([[new Coordinate(1, 1, 10, 20, 0), new Coordinate(2, 2, 15, 25, 0)]]);
+
+            expect(dao.getExistingGeoreferences).toHaveBeenCalledWith();
+
+        });
+
+        test('it should reject if there is a database error', async () => {
+            
+            jest.spyOn(dao, 'getExistingGeoreferences').mockRejectedValue(new Error('Database error'));
+
+            await expect(controller.getExistingGeoreferences()).rejects.toThrow('Database error');
+
+            expect(dao.getExistingGeoreferences).toHaveBeenCalledWith();
+            
+        });
+
+        test('it should reject if an unexpected error occurs', async () => {
+
+            jest.spyOn(dao, 'getExistingGeoreferences').mockRejectedValue(new Error('Unexpected error'));
+
+            await expect(controller.getExistingGeoreferences()).rejects.toThrow('Unexpected error');
+
+            expect(dao.getExistingGeoreferences).toHaveBeenCalledWith();
+        });
+    });
+
 });

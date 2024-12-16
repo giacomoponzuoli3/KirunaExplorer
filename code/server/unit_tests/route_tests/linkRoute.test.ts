@@ -251,7 +251,9 @@ describe('LinkRoutes Unit Tests', () => {
                 return next();
             });
 
-            jest.spyOn(controller, 'addLink').mockRejectedValueOnce(new Error('Internal Server Error'));
+            jest.spyOn(controller, 'addLink').mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).post(baseURL + '/')
                 .send({
@@ -498,7 +500,9 @@ describe('LinkRoutes Unit Tests', () => {
                 return next();
             });
 
-            jest.spyOn(controller, "deleteLink").mockRejectedValueOnce(new Error('Internal Server Error'));
+            jest.spyOn(controller, "deleteLink").mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).delete(baseURL + '/')
                 .send({
@@ -798,7 +802,9 @@ describe('LinkRoutes Unit Tests', () => {
                 return next();
             });
 
-            jest.spyOn(controller, "updateLink").mockRejectedValueOnce(new Error('Internal Server Error'));
+            jest.spyOn(controller, "updateLink").mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).patch(baseURL + '/')
                 .send({
@@ -834,7 +840,9 @@ describe('LinkRoutes Unit Tests', () => {
         });
 
         test('It should return 503 if there is an error', async () => {
-            jest.spyOn(controller, "getAllLinks").mockRejectedValueOnce(new Error('Internal Server Error'));
+            jest.spyOn(controller, "getAllLinks").mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).get(baseURL+"/");
 

@@ -486,7 +486,10 @@ describe('documentRoutes', () => {
                 req.user=u;
                 return next();
             });
-            jest.spyOn(controller, 'addDocument').mockRejectedValueOnce(new Error('Internal Server Error'));
+
+            jest.spyOn(controller, 'addDocument').mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
            
             const response = await request(app).post(baseURL+"/")
             .send({
@@ -528,7 +531,9 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 503 if there is an error', async () => {
-            jest.spyOn(controller, "getAllDocuments").mockRejectedValueOnce(new Error('Internal Server Error'));
+            jest.spyOn(controller, "getAllDocuments").mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).get(baseURL+"/");
 
@@ -565,7 +570,9 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 503 if there is an error', async () => {
-            jest.spyOn(controller, "getDocumentById").mockRejectedValueOnce(new Error('Internal Server Error'));
+            jest.spyOn(controller, "getDocumentById").mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).get(baseURL+`/${testId}`);
 
@@ -677,7 +684,10 @@ describe('documentRoutes', () => {
                 req.user=u;
                 return next();
             });
-            jest.spyOn(controller, "deleteDocument").mockRejectedValueOnce(new Error('Internal Server Error'));
+
+            jest.spyOn(controller, "deleteDocument").mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).delete(baseURL+`/${testId}`);
 
@@ -1206,7 +1216,10 @@ describe('documentRoutes', () => {
                 req.user=u;
                 return next();
             });
-            jest.spyOn(controller, 'editDocument').mockRejectedValueOnce(new Error('Internal Server Error'));
+
+            jest.spyOn(controller, 'editDocument').mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
            
             const response = await request(app).patch(baseURL+`/${testId}`)
             .send({
@@ -1252,7 +1265,9 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 503 if there is an error', async () => {
-            jest.spyOn(controller, "getDocumentLinksById").mockRejectedValueOnce(new Error('Internal Server Error'));
+            jest.spyOn(controller, "getDocumentLinksById").mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).get(baseURL+`/${testId}/links`);
 
@@ -1288,7 +1303,9 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 503 if there is an error', async () => {
-            jest.spyOn(controller, "getDocumentTitleById").mockRejectedValueOnce(new Error('Internal Server Error'));
+            jest.spyOn(controller, "getDocumentTitleById").mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).get(baseURL+`/${testId}/title`);
 
@@ -1323,7 +1340,9 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 503 if there is an error', async () => {
-            jest.spyOn(controller, "getDocumentDescriptionById").mockRejectedValueOnce(new Error('Internal Server Error'));
+            jest.spyOn(controller, "getDocumentDescriptionById").mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).get(baseURL+`/${testId}/description`);
 
@@ -1358,7 +1377,9 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 503 if there is an error', async () => {
-            jest.spyOn(controller, "getDocumentIssuanceDateById").mockRejectedValueOnce(new Error('Internal Server Error'));
+            jest.spyOn(controller, "getDocumentIssuanceDateById").mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).get(baseURL+`/${testId}/issuanceDate`);
 
@@ -1413,7 +1434,9 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 503 if there is an error', async () => {
-            jest.spyOn(controller, "getAllDocumentsOfSameType").mockRejectedValueOnce(new Error('Internal Server Error'));
+            jest.spyOn(controller, "getAllDocumentsOfSameType").mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).post(baseURL+"/type")
             .send({ type : "Material effect"});
@@ -1625,7 +1648,10 @@ describe('documentRoutes', () => {
                 req.user=u;
                 return next();
             });
-            jest.spyOn(controller, 'addResourceToDocument').mockRejectedValueOnce(new Error('Internal Server Error'));
+
+            jest.spyOn(controller, 'addResourceToDocument').mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
            
             const response = await request(app).post(baseURL+"/res")
             .send({  
@@ -1674,7 +1700,9 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 503 if there is an error', async () => {
-            jest.spyOn(controller, 'getResourceData').mockRejectedValueOnce(new Error('Internal Server Error'));
+            jest.spyOn(controller, 'getResourceData').mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).get(baseURL + '/res/1/2')
 
@@ -1718,7 +1746,9 @@ describe('documentRoutes', () => {
         });
 
         test('It should return 503 if there is an error', async () => {
-            jest.spyOn(controller, 'getAllResourcesData').mockRejectedValueOnce(new Error('Internal Server Error'));
+            jest.spyOn(controller, 'getAllResourcesData').mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).get(baseURL + '/res-all/1')
 
@@ -1833,7 +1863,10 @@ describe('documentRoutes', () => {
                 req.user=u;
                 return next();
             });
-            jest.spyOn(controller, 'deleteResource').mockRejectedValueOnce(new Error('Internal Server Error'));
+
+            jest.spyOn(controller, 'deleteResource').mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).delete(baseURL + '/res/1/testName')
 
