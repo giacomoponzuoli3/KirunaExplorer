@@ -4,7 +4,6 @@ import { Database } from "sqlite3";
 import { CoordinatesController } from "../../src/controllers/coordinatesController"
 import DocumentController from "../../src/controllers/documentController"
 import Coordinate from '../../src/models/coordinate';
-import { Document } from '../../src/models/document';
 import { LatLng } from '../../src/interfaces';
 import { DocCoordinates } from '../../src/models/document_coordinate'
 import { Stakeholder } from "../../src/models/stakeholder"
@@ -38,8 +37,8 @@ describe('coordinatesRoutes/coordinatesController Integration tests', () => {
       ];
 
     const testDocCoordinateMunicipalityArea = new DocCoordinates(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2", [testCoordinateMunicipalityArea]);
-    const testDocument = new Document(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
-    const testDocument2 = new Document(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2");
+    const testDocument = new DocCoordinates(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description",[]);
+    const testDocument2 = new DocCoordinates(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2",[]);
     const testDocCoordinate = new DocCoordinates(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description", [testCoordinate1]);
 
     // Helper function that logs in a user and returns the cookie
