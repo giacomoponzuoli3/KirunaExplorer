@@ -448,7 +448,6 @@ function SetMapViewEdit(props: any) {
   );
 
   const drawnItems = new L.FeatureGroup(); // Gruppo di elementi disegnati
-  let currentMarker: L.Marker | null = null;
 
   useEffect(() => {
     if (map.getZoom() === undefined) {
@@ -579,7 +578,6 @@ function SetMapViewEdit(props: any) {
 
       if (event.layerType === 'marker') {
         // Aggiungi il nuovo marker sulla mappa
-        currentMarker = layer;
 
         layer.unbindPopup();
 

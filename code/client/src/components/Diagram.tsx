@@ -344,7 +344,8 @@ const Diagram = (props: any) => {
         position: {x, y},
         data: {
           label: props.getDocumentIcon(doc.type, 5), // Usa la funzione per ottenere l'icona
-          doc
+          doc, 
+          isSelected: false
         },
         zIndex: 5,
       };
@@ -375,6 +376,14 @@ const Diagram = (props: any) => {
       setSelectedDocumentCoordinates(document);
       setIsModalInfoOpen(true);
     }
+    const updatedNodes = nodes.map((n) => ({
+      ...n,
+      data: {
+        ...n.data,
+        isSelected: n.id === selectedNode?.id, // Pass selected state to the node
+      },
+    }));
+    setNodes(updatedNodes)
   }, [selectedNode, documents]); 
         
   useEffect(() => {

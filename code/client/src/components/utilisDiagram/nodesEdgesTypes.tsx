@@ -9,9 +9,19 @@ import { Handle, Position } from "@xyflow/react";
 const IconNode = ({ data }: any) => {
 
     return (
-      <div className="custom-marker flex items-center justify-center w-4 h-4 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95 border-1 border-blue-950 z-[1000]"
-      >
-        
+      <div 
+      className={`flex items-center justify-center 
+        transition duration-200 transform 
+        ${data.isSelected ? 'scale-110' : ''}`} // Add scaling only on selection
+      style={{
+        width: data.isSelected ? '48px' : '45px',
+        height: data.isSelected ? '48px' : '45px',
+        backgroundColor: data.isSelected ? '#FFD700' : 'white', // Yellow for selected, Blue for default
+        borderRadius: '50%',
+        border: data.isSelected ? '3px solid #ffbf00' : '1px solid #ddd', // Yellow border on select
+        boxShadow: data.isSelected ? '0 2px 10px rgba(0, 0, 0, 0.2)' : '0 2px 5px rgba(0, 0, 0, 0.1)',
+      }}
+      >  
         {/* Handle input */}
         <Handle
           type="target"
@@ -146,8 +156,6 @@ const IconNode = ({ data }: any) => {
 
   
         {data.label}
-  
-  ì
   
       </div>
     );
