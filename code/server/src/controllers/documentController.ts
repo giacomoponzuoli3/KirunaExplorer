@@ -1,8 +1,8 @@
-import { Document } from "../models/document";
 import { DocumentDAO } from "../dao/documentDAO";
 import { DocLink } from "../models/document_link";
 import { Stakeholder } from "../models/stakeholder";
 import Resources from "../../../common_models/original_resources";
+import { DocCoordinates } from "../models/document_coordinate";
 
 class DocumentController {
     private dao: DocumentDAO;
@@ -24,7 +24,7 @@ class DocumentController {
      * @param description The description of the document to add.
      * @returns A Promise that resolves when the document has been added.
      */
-    addDocument(title: string, stakeHolders: Stakeholder[], scale: string, issuanceDate: string, type: string, language: string, pages: string, description: string): Promise<Document> {
+    addDocument(title: string, stakeHolders: Stakeholder[], scale: string, issuanceDate: string, type: string, language: string, pages: string, description: string): Promise<DocCoordinates> {
         return this.dao.addDocument(title, stakeHolders, scale, issuanceDate, type, language, pages, description);
     }
 
@@ -33,16 +33,8 @@ class DocumentController {
      * @param id The id of the document to retrieve.
      * @returns A Promise that resolves to the document with the specified id.
      */
-    getDocumentById(id: number): Promise<Document> {
+    getDocumentById(id: number): Promise<DocCoordinates> {
         return this.dao.getDocumentById(id);
-    }
-
-    /**
-     * Retrieves all documents from the database.
-     * @returns A Promise that resolves to an array of Document objects.
-     */
-    getAllDocuments(): Promise<Document[]> {
-        return this.dao.getAllDocuments();
     }
 
     /**
@@ -67,7 +59,7 @@ class DocumentController {
      * @param description The updated description of the document.
      * @returns A Promise that resolves when the document has been updated.
      */
-    editDocument(id: number, title: string, stakeHolders: Stakeholder[], scale: string, issuanceDate: string, type: string, language: string, pages: string, description: string): Promise<Document> {
+    editDocument(id: number, title: string, stakeHolders: Stakeholder[], scale: string, issuanceDate: string, type: string, language: string, pages: string, description: string): Promise<DocCoordinates> {
         return this.dao.editDocument(id, title, stakeHolders, scale, issuanceDate, type, language, pages, description);
     }
 
@@ -116,7 +108,7 @@ class DocumentController {
      * @returns A Promise that resolves to an array of Document objects.
      */
 
-    getAllDocumentsOfSameType(type: string): Promise<Document[]> {
+    getAllDocumentsOfSameType(type: string): Promise<DocCoordinates[]> {
         return this.dao.getAllDocumentsOfSameType(type);
     }
 

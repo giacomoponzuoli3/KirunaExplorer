@@ -3,8 +3,8 @@ import express, {Router} from "express"
 import {body, param} from "express-validator"
 import ErrorHandler from "../helper"
 import Authenticator from "./auth"
-import {Document} from "../models/document";
 import {DocLink} from "../models/document_link";
+import { DocCoordinates } from "../models/document_coordinate"
 
 
 class DocumentRoutes {
@@ -52,7 +52,7 @@ class DocumentRoutes {
                         req.body["pages"],
                         req.body["description"]
                     )
-                        .then((document: Document) => res.status(200).json(document))
+                        .then((document: DocCoordinates) => res.status(200).json(document))
                         .catch((err: Error) => {next(err); console.log(err);})
                 } catch (err) {
                     next(err);
@@ -62,26 +62,13 @@ class DocumentRoutes {
     
 
         this.router.get(
-            "/",
-            (_req: any, res: any, next: any) => {
-                try {
-                    this.controller.getAllDocuments()
-                        .then((documents: Document[]) => res.status(200).json(documents))
-                        .catch((err: Error) => next(err))
-                } catch (err) {
-                    next(err);
-                }
-            }
-        );
-
-        this.router.get(
             "/:id",
             param("id").isNumeric(),
             this.errorHandler.validateRequest,
             (req: any, res: any, next: any) => {
                 try {
                     this.controller.getDocumentById(req.params["id"])
-                        .then((document: Document) => res.status(200).json(document))
+                        .then((document: DocCoordinates) => res.status(200).json(document))
                         .catch((err: Error) => {
                             //console.log(err)
                             next(err)
@@ -136,7 +123,7 @@ class DocumentRoutes {
                         req.body["pages"],
                         req.body["description"]
                     )
-                        .then((document: Document) => res.status(200).json(document))
+                        .then((document: DocCoordinates) => res.status(200).json(document))
                         .catch((err: Error) => next(err))
                 } catch (err) {
                     next(err);

@@ -1,10 +1,11 @@
 import { DocLink } from "../models/document_link";
 import db from "../db/db"
-import { Document } from "../models/document"
 import { Stakeholder } from "../models/stakeholder"
 import Link from "../models/link";
 import {DocumentNotFoundError} from "../errors/document";
 import Resources from "../../../common_models/original_resources";
+import { DocCoordinates } from "../models/document_coordinate";
+import Coordinate from "../models/coordinate";
 
 class DocumentDAO {
     /**
@@ -19,8 +20,8 @@ class DocumentDAO {
      * @param description The description of the document to add.
      * @returns A Promise that resolves when the document has been added.
      */
-    addDocument(title: string, stakeHolders: Stakeholder[], scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string): Promise<Document> {
-        return new Promise<Document>(async (resolve, reject) => {
+    addDocument(title: string, stakeHolders: Stakeholder[], scale: string, issuanceDate: string, type: string, language: string|null, pages: string|null, description: string): Promise<DocCoordinates> {
+        return new Promise<DocCoordinates>(async (resolve, reject) => {
             try {
                 // Step 1: Insert the document
                 const documentId = await new Promise<number>((resolve, reject) => {
@@ -43,7 +44,7 @@ class DocumentDAO {
                     })
                 );
 
-                const doc = new Document(documentId, title, stakeHolders, scale, issuanceDate, type, language, pages, description);
+                const doc = new DocCoordinates(documentId, title, stakeHolders, scale, issuanceDate, type, language, pages, description,[]);
 
                 // Step 3: Wait for all stakeholder insertions to complete
                 Promise.all(stakeholderInserts)
@@ -60,10 +61,10 @@ class DocumentDAO {
      * @param id The id of the document to retrieve.
      * @returns A Promise that resolves to the document with the specified id.
      */
-    getDocumentById(id: number): Promise<Document> {
-        return new Promise<Document>((resolve, reject) => {
+    getDocumentById(id: number): Promise<DocCoordinates> {
+        return new Promise<DocCoordinates>((resolve, reject) => {
             try {
-                const sql = `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.id = ?`;
+                const sql = `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude,dc.longitude, dc.point_order, dc.municipality_area FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.id = ? ORDER BY dc.point_order`;
     
                 db.all(sql, [id], (err: Error | null, rows: any[]) => {
                     if (err) return reject(err);
@@ -71,7 +72,7 @@ class DocumentDAO {
 
                     // Initialize document with the first row's data
                     const row = rows[0];
-                    const document: Document = new Document(
+                    const document: DocCoordinates = new DocCoordinates(
                         row.id,
                         row.title,
                         [], // Placeholder for stakeholders, populated below
@@ -80,7 +81,8 @@ class DocumentDAO {
                         row.type,
                         row.language,
                         row.pages,
-                        row.description
+                        row.description,
+                        []
                     );
 
                     // Populate stakeholders
@@ -89,6 +91,16 @@ class DocumentDAO {
                         row.stakeholder_name,
                         row.stakeholder_category
                     ));
+
+                    document.coordinates = rows.map(row => {  
+                      // Add coordinate only if it exists and is not already added
+                      if ((row.coordinate_id !== null && row.latitude !== null && row.longitude !== null) || (row.municipality_area == 1)) {
+                        if (!document.coordinates.some(coordinate => coordinate.id === row.coordinate_id)) {
+                            return new Coordinate(row.coordinate_id, row.point_order, row.latitude, row.longitude, row.municipality_area);
+                
+                        }
+                      }
+                    })
     
                     resolve(document);
                 });
@@ -97,54 +109,6 @@ class DocumentDAO {
             }
         });
     }
-    
-
-    /**
-     * Retrieves all documents from the database.
-     * @returns A Promise that resolves to an array of Document objects.
-     */
-    getAllDocuments(): Promise<Document[]> {
-        return new Promise<Document[]>((resolve, reject) => {
-            try {
-                const sql = `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id`;
-    
-                db.all(sql, [], (err: Error | null, rows: any[]) => {
-                    if (err) return reject(err);
-                    if (!rows || rows.length == 0) return resolve([]);
-
-                    // Group rows by document and map stakeholders to each document
-                    const documentsMap = new Map<number, Document>();
-                    rows.forEach((row: any) => {
-                        const documentId = row.id;
-                        if (!documentsMap.has(documentId)) {
-                            documentsMap.set(documentId, new Document(
-                                row.id,
-                                row.title,
-                                [],  // Placeholder for stakeholders, populated below
-                                row.scale,
-                                row.issuance_date,
-                                row.type,
-                                row.language,
-                                row.pages,
-                                row.description
-                            ));
-                        }
-    
-                        // Add stakeholder (always available) to the document's stakeholders array
-                        const stakeholder = new Stakeholder(row.stakeholder_id, row.stakeholder_name, row.stakeholder_category);
-                        documentsMap.get(documentId)?.stakeHolders.push(stakeholder);
-                    });
-    
-                    // Convert map values to array
-                    const documents = Array.from(documentsMap.values());
-                    resolve(documents);
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
-    
     
     /**
      * Deletes a document from the database.
@@ -180,8 +144,8 @@ class DocumentDAO {
      * @param description The description of the document to update.
      * @returns A Promise that resolves when the document has been updated.
      */
-    editDocument(id: number, title: string, stakeHolders: Stakeholder[], scale: string, issuanceDate: string, type: string, language: string | null, pages: string | null, description: string): Promise<Document> {
-        return new Promise<Document>(async (resolve, reject) => {
+    editDocument(id: number, title: string, stakeHolders: Stakeholder[], scale: string, issuanceDate: string, type: string, language: string | null, pages: string | null, description: string): Promise<DocCoordinates> {
+        return new Promise<DocCoordinates>(async (resolve, reject) => {
             try {
                 // Step 1: Edit document information (except stakeholders).
                 const updateDocumentSql = "UPDATE documents SET title = ?, scale = ?, issuance_date = ?, type = ?, language = ?, pages = ?, description = ? WHERE id = ?";
@@ -215,7 +179,7 @@ class DocumentDAO {
                     })
                 );
 
-                const doc = new Document(id, title, stakeHolders, scale, issuanceDate, type, language, pages, description);
+                const doc = new DocCoordinates(id, title, stakeHolders, scale, issuanceDate, type, language, pages, description,[]);
 
                 // Step 3: Wait for all stakeholder insertions to complete
                 Promise.all(stakeholderInserts)
@@ -377,20 +341,20 @@ class DocumentDAO {
      * @param type The type of the document to retrieve.
      * @returns A Promise that resolves to an array of Document objects.
      */
-    getAllDocumentsOfSameType(type: string): Promise<Document[]> {
-        return new Promise<Document[]>((resolve, reject) => {
+    getAllDocumentsOfSameType(type: string): Promise<DocCoordinates[]> {
+        return new Promise<DocCoordinates[]>((resolve, reject) => {
             try {
-                const sql = `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.type = ?`;
+                const sql = `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude,dc.longitude, dc.point_order, dc.municipality_area FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.type = ? ORDER BY dc.point_order`;
                 db.all(sql, [type], (err: Error | null, rows: any[]) => {
                     if (err) return reject(err);
                     if (!rows || rows.length == 0) return resolve([]);
 
                     // Group rows by document and map stakeholders to each document
-                    const documentsMap = new Map<number, Document>();
+                    const documentsMap = new Map<number, DocCoordinates>();
                     rows.forEach((row: any) => {
                         const documentId = row.id;
                         if (!documentsMap.has(documentId)) {
-                            documentsMap.set(documentId, new Document(
+                            documentsMap.set(documentId, new DocCoordinates(
                                 row.id,
                                 row.title,
                                 [],  // Placeholder for stakeholders, populated below
@@ -399,13 +363,27 @@ class DocumentDAO {
                                 row.type,
                                 row.language,
                                 row.pages,
-                                row.description
+                                row.description,
+                                []
                             ));
                         }
 
-                        // Add stakeholder (always available) to the document's stakeholders array
-                        const stakeholder = new Stakeholder(row.stakeholder_id, row.stakeholder_name, row.stakeholder_category);
-                        documentsMap.get(documentId)?.stakeHolders.push(stakeholder);
+                        const doc = documentsMap.get(documentId);
+                        if (doc) {
+                            // Add stakeholder only if they are not already added
+                            if (!doc.stakeHolders.some(stakeholder => stakeholder.id === row.stakeholder_id)) {
+                                const stakeholder = new Stakeholder(row.stakeholder_id, row.stakeholder_name, row.stakeholder_category);
+                                doc.stakeHolders.push(stakeholder);
+                            }
+                    
+                            // Add coordinate only if it exists and is not already added
+                            if ((row.coordinate_id !== null && row.latitude !== null && row.longitude !== null) || (row.municipality_area == 1)) {
+                                if (!doc.coordinates.some(coordinate => coordinate.id === row.coordinate_id)) {
+                                    const coordinate = new Coordinate(row.coordinate_id, row.point_order, row.latitude, row.longitude, row.municipality_area);
+                                    doc.coordinates.push(coordinate);
+                                }
+                            }
+                        }
                     });
 
                     // Convert map values to array

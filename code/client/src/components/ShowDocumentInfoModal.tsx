@@ -186,7 +186,8 @@ function ShowDocumentInfoModal({
             }
 
              <EditDocumentModal 
-                document={selectedDocumentCoordinates} show={showEditDocumentModal} 
+                document={selectedDocumentCoordinates} 
+                show={showEditDocumentModal} 
                 onHide={() => {setShowEditDocumentModal(false);}} 
                 refreshSelectedDocument={refreshSelectedDocument}
         
