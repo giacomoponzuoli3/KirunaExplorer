@@ -10,7 +10,6 @@ const IconNode = ({ data }: any) => {
 
     return (
       <div className="custom-marker flex items-center justify-center w-4 h-4 bg-white rounded-full shadow-lg text-white transition duration-200 transform hover:scale-110 active:scale-95 border-1 border-blue-950 z-[1000]"
-        onClick={() => {}}
       >
         
         {/* Handle input */}
