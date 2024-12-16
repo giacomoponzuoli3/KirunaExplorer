@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Modal, Dropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import API from '../API/API';
@@ -35,14 +35,14 @@ interface EditDocumentModalProps {
 }
 
 function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, stakeholders, scaleOptions, onCreateScale, typeOptions, onCreateType }: EditDocumentModalProps) {
-    const [title, setTitle] = useState(document.title);
-    const [selectedStakeholders, setSelectedStakeholders] = useState<Stakeholder[]>(document.stakeHolders);
-    const [scale, setScale] = useState(document.scale);
-    const [issuanceDate, setIssuanceDate] = useState(document.issuanceDate);
-    const [type, setType] = useState(document.type);
-    const [language, setLanguage] = useState<string | null>(document.language);
-    const [pages, setPages] = useState<string | null>(document.pages);
-    const [description, setDescription] = useState(document.description);
+    const [title, setTitle] = useState("");
+    const [selectedStakeholders, setSelectedStakeholders] = useState<Stakeholder[]>([]);
+    const [scale, setScale] = useState("");
+    const [issuanceDate, setIssuanceDate] = useState("");
+    const [type, setType] = useState("");
+    const [language, setLanguage] = useState<string | null>("");
+    const [pages, setPages] = useState<string | null>("");
+    const [description, setDescription] = useState("");
     
     const [addingOther, setAddingOther] = useState(false); 
     const [newStakeholderName, setNewStakeholderName] = useState('');
@@ -52,6 +52,18 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
     const [showAlert, setShowAlert] = useState(false); // alert state
     const [showAlertErrorDate, setShowAlertErrorDate] = useState<boolean>(false);
     const [showAlertStakeHoldersError, setShowAlertStakeHoldersError] = useState<boolean>(false);
+
+    // Synchronize state with the `document` prop whenever it changes
+    useEffect(() => {
+        setTitle(document.title);
+        setSelectedStakeholders(document.stakeHolders);
+        setScale(document.scale);
+        setIssuanceDate(document.issuanceDate);
+        setType(document.type);
+        setLanguage(document.language);
+        setPages(document.pages);
+        setDescription(document.description);
+    }, [document]);
 
     const toggleSelect = (option: Stakeholder) => {
         setSelectedStakeholders((prevSelectedStakeholders) => {
@@ -94,30 +106,9 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
       label: ISO6391.getName(code),
     }));
 
-    /**const scaleOptions = [
-        { value: '1:1000', label: '1:1000' },
-        { value: '1:2000', label: '1:2000' },
-        { value: '1:5000', label: '1:5000' },
-        { value: '1:7500', label: '1:7500' },
-        { value: '1:10000', label: '1:10000' },
-      ];
-    */
-
-
     const handleScale = (selectedOption: SingleValue<{ value: string; label: string }>) => {
     setScale(selectedOption ? selectedOption.value : '');
     };
-    /** 
-    const typeOptions = [
-        { value: 'Informative document', label: 'Informative document' },
-        { value: 'Prescriptive document', label: 'Prescriptive document' },
-        { value: 'Design document', label: 'Design document' },
-        { value: 'Technical document', label: 'Technical document' },
-        { value: 'Material effect', label: 'Material effect' },
-        { value: 'Agreement', label: 'Agreement' },
-        { value: 'Conflict', label: 'Conflict' },
-        { value: 'Consultation', label: 'Consultation' },
-      ];*/
     
     const handleType = (selectedOption: SingleValue<{ value: string; label: string }>) => {
     setType(selectedOption ? selectedOption.value : '');

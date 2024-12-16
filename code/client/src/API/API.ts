@@ -101,19 +101,6 @@ async function addDocument(params: AddDocumentParams) {
     }
 }
 
-async function getAllDocuments() {
-    const response = await fetch(baseURL + "doc", { credentials: "include" })
-    if (response.ok) {
-        return await response.json()
-    } else {
-        const errDetail = await response.json();
-        if (errDetail.error)
-            throw errDetail.error
-        if (errDetail.message)
-            throw errDetail.message
-        throw new Error("Error. Please reload the page")
-    }
-}
 
 async function getDocumentById(id: number) {
     const response = await fetch(baseURL + "doc/" + id, { credentials: "include" })
@@ -597,7 +584,7 @@ async function addType(type: string) {
 
 const API = {
     login, logOut, getUserInfo, register,
-    addDocument, getAllDocuments, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType, addResourceToDocument, getResourceData, deleteResource, getAllResourcesData,
+    addDocument, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType, addResourceToDocument, getResourceData, deleteResource, getAllResourcesData,
     getAllStakeholders, addStakeholder,
     addLink, deleteLink, editLink, getAllLinks,
     getAllDocumentsCoordinates, setDocumentCoordinates, updateDocumentCoordinates, deleteDocumentCoordinates, getMunicipalityArea, getExistingGeoreferences,
