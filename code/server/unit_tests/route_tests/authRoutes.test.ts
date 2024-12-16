@@ -137,7 +137,9 @@ describe('authRoutes', () => {
 
         test('It should return 503 if there is an error', async () => {
 
-            jest.spyOn(controller, 'createUser').mockRejectedValueOnce(new Error('Internal Server Error'));
+            jest.spyOn(controller, 'createUser').mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).post(baseURL + "/register")
                 .send({
@@ -274,7 +276,9 @@ describe('authRoutes', () => {
                 return next();
             });
 
-            jest.spyOn(auth, 'logout').mockRejectedValueOnce(new Error('Internal Server Error'));
+            jest.spyOn(auth, 'logout').mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
 
             const response = await request(app).delete(baseURL + '/current')
                 .send({});
