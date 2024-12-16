@@ -257,4 +257,53 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
         });
     });
 
+    describe('getExistingGeoreferences', () => {
+        test('it should successfully get all the existing georeferences (point)', async () => {
+    
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
+
+            await expect(controller.getExistingGeoreferences()).resolves.toEqual([[testCoordinate1]]);
+
+        });
+
+        test('it should successfully get all the existing georeferences (polygon)', async () => {
+
+            const newTestCoordinate2 = new Coordinate(2, 2, -55.7128, 45.0060,0);
+    
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+
+            await expect(controller.setDocumentCoordinates(1,coordinates)).resolves.toBeUndefined();
+
+            await expect(controller.getExistingGeoreferences()).resolves.toEqual([[testCoordinate1,newTestCoordinate2]]);
+
+        });
+
+        test('it should reject if there is a database error', async () => {
+            
+            const dbSpy = jest.spyOn(db, 'all').mockImplementation(function (sql, params, callback) {
+                callback(new Error('Database error'), null);
+                return {} as Database;
+            });
+
+            await expect(controller.getExistingGeoreferences()).rejects.toThrow('Database error');
+
+            dbSpy.mockRestore();
+            
+        });
+
+        test('it should reject if an unexpected error occurs', async () => {
+
+            const dbSpy = jest.spyOn(db, 'all').mockImplementation(function (sql, params, callback) {
+                callback(new Error('Unexpected error'), null);
+                return {} as Database;
+            });
+
+            await expect(controller.getExistingGeoreferences()).rejects.toThrow('Unexpected error');
+
+            dbSpy.mockRestore();
+        });
+    });
+
 });
