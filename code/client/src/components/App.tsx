@@ -3,7 +3,7 @@ import {Navbar} from "./Navbar"
 import API from '../API/API';
 import { Routes, Route, Outlet } from 'react-router-dom';
 import {Login} from './Login';
-import { HomePage } from './HomePage';
+import { MapPage } from './MapPage';
 import { NotFoundLayout } from './NotFoundLayout';
 import { LinksDocument } from './LinksDocument';
 import { Stakeholder } from '../models/stakeholder';
@@ -190,7 +190,7 @@ function App() {
           </>
         }>
           <Route index element={<KirunaLandingPage/>}/>
-          <Route path="/map" element={<HomePage geoJsonData={geoJsonData} documentsCoordinates={documentsCoordinates} user={user} refreshDocumentsCoordinates={getAllDocumentsCoordinates} stakeholders={stakeholders} getDocumentIcon={getDocumentIcon} scaleOptions={scaleOptions} onCreateScale={handleCreateScale} typeOptions={typeOptions} onCreateType={handleCreateType}/>}/>
+          <Route path="/map" element={<MapPage geoJsonData={geoJsonData} documentsCoordinates={documentsCoordinates} user={user} refreshDocumentsCoordinates={getAllDocumentsCoordinates} stakeholders={stakeholders} getDocumentIcon={getDocumentIcon} scaleOptions={scaleOptions} onCreateScale={handleCreateScale} typeOptions={typeOptions} onCreateType={handleCreateType}/>}/>
           <Route path="/login" element={<Login message={message} isLogged={isLogged} login={handleLogin} handleBack={handleBack}/>} />
           <Route path="*" element={<NotFoundLayout/>} />
           {/* Aggiungi altre route come la dashboard */}

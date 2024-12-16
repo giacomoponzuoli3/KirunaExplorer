@@ -1,6 +1,5 @@
 import React, { useState,useEffect } from 'react';
 import { Row, Col } from 'react-bootstrap';
-import { Document } from '../models/document';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import API from '../API/API';
 import '../modal.css'
@@ -13,7 +12,7 @@ import { LatLng } from 'leaflet';
 import { DocCoordinates } from '../models/document_coordinate';
 
 interface AddNewDocumentLinksModalProps {
-  document: Document;
+  document: DocCoordinates;
   handleClose: () => void;
   refreshDocumentsCoordinates: () => void;
   docs: DocCoordinates[];
@@ -25,7 +24,7 @@ interface AddNewDocumentLinksModalProps {
 
 function AddNewDocumentLinksModal({ document, handleClose, refreshDocumentsCoordinates, docs, newDocumentCoordinates, filesUploaded, handlePrevStep, setMode}: AddNewDocumentLinksModalProps) {
     const [typesLink, setTypesLink] = useState<Link[]>([]); // vector of types of links
-    const [documents] = useState<Document[]>(docs.filter((d: Document) => d.id != document.id)); // vector of all documents except one
+    const [documents] = useState<DocCoordinates[]>(docs.filter((d: DocCoordinates) => d.id != document.id)); // vector of all documents except one
 
     const [selectedDocument, setSelectedDocument] = useState<number | null>(null); // Selected document
     const [selectedTypeLink, setSelectedTypeLink] = useState<number | null>(null); // Selected type of link

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useLocation, Link, useNavigate} from 'react-router-dom';
-import { Document } from "../models/document";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { User } from "../../../common_models/user";
@@ -37,7 +36,7 @@ function getPolygonKey(latLngs: LatLngTuple[]): string {
 
 //----------- Interfaces -------------//
 
-interface HomepageProps {
+interface MapPageProps {
     documentsCoordinates: DocCoordinates[];
     user: User;
     refreshDocumentsCoordinates: () => void;
@@ -54,11 +53,7 @@ interface HomepageProps {
 
 //----------- Components -------------//
 
-function HomePage({documentsCoordinates, user, refreshDocumentsCoordinates, getDocumentIcon, stakeholders, geoJsonData, scaleOptions, onCreateScale, typeOptions, onCreateType} : HomepageProps) {
-
-  const [newDocumentCoordinates,setNewDocumentCoordinates] = useState<LatLng | LatLng[] | null>(null);
-  const [newDocument, setNewDocument] = useState<Document | null>(null);
-  const [files, setFiles] = useState<File[]>([]);//Resources of newDocument
+function MapPage({documentsCoordinates, user, refreshDocumentsCoordinates, getDocumentIcon, stakeholders, geoJsonData, scaleOptions, onCreateScale, typeOptions, onCreateType} : MapPageProps) {
   const navigate = useNavigate();
 
   //modals
@@ -159,4 +154,4 @@ function ButtonHomePage(){
 }
 
 
-export { HomePage, ButtonHomePage };
+export { MapPage, ButtonHomePage };
