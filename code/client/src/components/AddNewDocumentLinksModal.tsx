@@ -14,7 +14,7 @@ import { DocCoordinates } from '../models/document_coordinate';
 
 interface AddNewDocumentLinksModalProps {
   document: Document;
-  onHide: () => void;
+  handleClose: () => void;
   refreshDocumentsCoordinates: () => void;
   docs: DocCoordinates[];
   newDocumentCoordinates: LatLng | LatLng[] | null;
@@ -23,7 +23,7 @@ interface AddNewDocumentLinksModalProps {
   setMode: (mode: string) => void;
 }
 
-function AddNewDocumentLinksModal({ document, onHide, refreshDocumentsCoordinates, docs, newDocumentCoordinates, filesUploaded, handlePrevStep, setMode}: AddNewDocumentLinksModalProps) {
+function AddNewDocumentLinksModal({ document, handleClose, refreshDocumentsCoordinates, docs, newDocumentCoordinates, filesUploaded, handlePrevStep, setMode}: AddNewDocumentLinksModalProps) {
     const [typesLink, setTypesLink] = useState<Link[]>([]); // vector of types of links
     const [documents] = useState<Document[]>(docs.filter((d: Document) => d.id != document.id)); // vector of all documents except one
 
@@ -218,7 +218,7 @@ function AddNewDocumentLinksModal({ document, onHide, refreshDocumentsCoordinate
 
     // Refresh of documents
     refreshDocumentsCoordinates();
-    onHide();
+    handleClose();
 
     // Reset values
     setSelectedDocument(null);
