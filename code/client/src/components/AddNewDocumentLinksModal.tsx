@@ -23,7 +23,7 @@ interface AddNewDocumentLinksModalProps {
   setMode: (mode: string) => void;
 }
 
-function AddNewDocumentLinksModal({ document, onHide, refreshDocumentsCoordinates, docs, newDocumentCoordinates, filesUploaded, handlePrevStep,setMode}: AddNewDocumentLinksModalProps) {
+function AddNewDocumentLinksModal({ document, onHide, refreshDocumentsCoordinates, docs, newDocumentCoordinates, filesUploaded, handlePrevStep, setMode}: AddNewDocumentLinksModalProps) {
     const [typesLink, setTypesLink] = useState<Link[]>([]); // vector of types of links
     const [documents] = useState<Document[]>(docs.filter((d: Document) => d.id != document.id)); // vector of all documents except one
 
@@ -209,6 +209,7 @@ function AddNewDocumentLinksModal({ document, onHide, refreshDocumentsCoordinate
             } catch (error) {
                 console.error("Failed to upload file:", file.name, error);
             }
+
         }
     } catch (err) {
         setShowAlert(true);

@@ -3,7 +3,6 @@ import db from '../db/db'
 import { DocCoordinates } from '../models/document_coordinate'
 import { Stakeholder } from "../models/stakeholder"
 import { LatLng } from "../interfaces"
-import { error } from 'console';
 
 class CoordinatesDAO {
      /**
@@ -78,6 +77,7 @@ class CoordinatesDAO {
         return new Promise<void>((resolve, reject) => {
             try {
                 const coordinatesArray = Array.isArray(coords) ? coords : [coords];
+                console.log(coordinatesArray)
                 if(coordinatesArray.length > 0){
                     const coordinatesInserts = coordinatesArray.map((point, index) => {
                         return new Promise<void>((innerResolve, innerReject) => {
@@ -98,7 +98,6 @@ class CoordinatesDAO {
                         .then(() => resolve())
                         .catch((error) => reject(error));
                 }else{
-                    
                     const sql = `INSERT INTO document_coordinates (document_id, municipality_area) VALUES (?, ?)`;
                 
                     db.run(sql, [id, 1], (err: Error | null) => {
