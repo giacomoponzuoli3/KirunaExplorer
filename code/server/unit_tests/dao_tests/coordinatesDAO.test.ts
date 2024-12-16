@@ -390,13 +390,13 @@ describe('coordinatesDAO', () => {
         test('It should reject if there is a database error', async () => {
             const coordinate: LatLng = { lat: 45.0, lng: -93.0 };
 
-            jest.spyOn(db, 'run').mockImplementation(() => {
-                throw new Error("Database error");
+            jest.spyOn(db, 'run').mockImplementationOnce((sql, params, callback) => {
+                callback(new Error('Database error'));
+                return {} as Database;
             });
 
             await expect(dao.setDocumentCoordinates(1, coordinate)).rejects.toThrow("Database error");
         });
-
 
         test('It should reject if there is an unexpected error', async () => {
             const coordinate: LatLng = { lat: 45.0, lng: -93.0 };
