@@ -22,6 +22,47 @@ import EdgeLegend from './utilisDiagram/EdgeLegend';
 import { ShowDocumentInfoModal } from './ShowDocumentInfoModal';
 
 
+const DiagramLegend = ({ nodeInfo, getDocumentIcon }: { nodeInfo: { type: string, icon: JSX.Element, description: string }[], getDocumentIcon: (type: string, size: number) => JSX.Element | null }) => {
+  // Generate the node legends based on the document types
+  const documentTypes = Array.from(new Set(nodeInfo.map((info) => info.type)));
+
+  return (
+    <div style={{
+      padding: '10px',
+      backgroundColor: 'white',
+      border: '1px solid black',
+      borderRadius: '5px',
+      maxWidth: '350px',
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    }}>
+      <h3 style={{ fontWeight: 'bold', marginBottom: '10px' }}></h3>
+
+      {/* Node Section */}
+      <div style={{ marginBottom: '20px' }}>
+        <h4 style={{ fontWeight: 'semi bold', marginBottom: '5px', fontSize: '16px' }}>Document Type</h4>
+        <div>
+          {documentTypes.map((type) => {
+            const icon = getDocumentIcon(type, 5);  // Call the function to get the icon for each type
+            return (
+              <div key={type} style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
+                <div style={{ marginRight: '10px' }}>
+                  {icon}
+                </div>
+                <span>{type}</span>  {/* You can add a description or customize the text here */}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Edge Section */}
+      <EdgeLegend/>
+    </div>
+  );
+};
+
+
+
 const Diagram = (props: any) => {
   const [documents, setDocuments] = useState<DocCoordinates[] | null>(null);
 
@@ -49,6 +90,15 @@ const Diagram = (props: any) => {
   const [selectedDocumentCoordinates, setSelectedDocumentCoordinates] = useState<DocCoordinates | null>(null);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [isReload, setIsReload] = useState(false);
+
+  const [isLegendVisible, setIsLegendVisible] = useState(false);
+  const [nodeInfo, setNodeInfo] = useState<{ type: string, icon: JSX.Element, description: string }[]>([]);
+
+
+  const toggleLegend = () => {
+    setIsLegendVisible(!isLegendVisible);
+  };
+
 
 
   const onNodesChange = useCallback(
@@ -86,6 +136,14 @@ const Diagram = (props: any) => {
       const getDocuments = await API.getAllDocumentsCoordinates();
       setDocuments(getDocuments);
       
+      // nodeInfo for the legend
+      const nodeInfoList = getDocuments.map((doc: DocCoordinates) => ({
+        type: doc.type,
+        icon: props.getDocumentIcon(doc.type, 16),  // Get icon based on document type
+        description: doc.description || 'No description', // Add description or any relevant text
+      }));
+
+      setNodeInfo(nodeInfoList);
       //get the scales
       const uniqueScales = Array.from(
         new Set(
@@ -364,6 +422,23 @@ const Diagram = (props: any) => {
                 Diagram of Documents
           </h2>
       </div>
+      {/* Toggle Button */}
+      <button 
+          onClick={toggleLegend} 
+          style={{
+            position: 'absolute',
+            top: '10px',
+            right: '10px',
+            zIndex: 20,
+            padding: '10px 15px',
+            backgroundColor: 'black',
+            color: 'white',
+            borderRadius: '5px',
+            cursor: 'pointer'
+          }}
+        >
+          {isLegendVisible ? "Hide Legend" : "Show Legend"}
+        </button>
       <div 
       style={{ 
         width: '100%', 
@@ -447,9 +522,39 @@ const Diagram = (props: any) => {
             </ViewportPortal>}
         </ReactFlow>
       )}
+      {/*isLegendVisible && (
+            <div 
+              style={{
+                position: 'absolute',
+                top: '50px',
+                right: '10px',
+                zIndex: 20,
+                padding: '10px',
+                backgroundColor: 'white',
+                border: '1px solid black',
+                borderRadius: '5px',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                flexDirection: 'column',
+                gap: '10px'
+              }}
+            >
+              <EdgeLegend />
+            </div>
+          )*/}
+      {isLegendVisible && (
+            <div 
+              style={{
+                position: 'absolute',
+                top: '50px',
+                right: '10px',
+                zIndex: 20
+              }}
+            >
+              <DiagramLegend nodeInfo={nodeInfo} getDocumentIcon={props.getDocumentIcon}/>
+            </div>
+          )}
       
     </div>
-      <EdgeLegend />
     </> 
     );
   }
