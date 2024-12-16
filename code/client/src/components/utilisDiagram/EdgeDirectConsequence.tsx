@@ -39,6 +39,7 @@ const EdgeDirectConsequence = ({
     sourceY,
     targetX,
     targetY,
+    
     curvature: curve
   });
 

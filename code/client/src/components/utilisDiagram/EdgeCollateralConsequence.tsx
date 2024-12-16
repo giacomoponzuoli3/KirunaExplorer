@@ -44,8 +44,7 @@ const EdgeCollateralConsequence = ({
     sourceY,
     targetX,
     targetY,
-    sourcePosition: sourceX < 300 ? Position.Right : Position.Left,  // O la posizione che preferisci
-    targetPosition: Position.Right, // O la posizione che preferisci
+
     curvature: curve
   });
 

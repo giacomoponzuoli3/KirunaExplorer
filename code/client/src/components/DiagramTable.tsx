@@ -1,7 +1,7 @@
 
 const DiagramTable = (props: any) => {
   const sideWidth = 200;
-
+  console.log(props.yearsWidths);
   return (
     <table
     style={{
@@ -56,7 +56,7 @@ const DiagramTable = (props: any) => {
           {props.years.map((year: any, yearIndex: any) => (
             <td
               key={`${scale}-${yearIndex}`}
-              style={{ width: `${year}px` }}
+              style={{ width: `${props.yearsWidths[yearIndex]}px` }}
               className={`border-r border-gray-200 relative`}
             >
             </td>
