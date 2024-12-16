@@ -26,10 +26,10 @@ const EdgeLegend = () => {
   };
 
   return (
-    <div className="pt-3 max-h-screen border-1 border-t-gray-300  bg-white w-full mb-4">
+    <div className="pt-3 bg-white w-full mb-4">
       {/* Contenitore per la legenda, usiamo flex per l'allineamento orizzontale */}
-      <div className="flex justify-evenly items-center">
-        <span className="flex font-semibold items-center space-x-4 pb-2 text-md">Legend:</span>
+      <div className="flex flex-col items-start">
+        <span className="flex font-semibold pb-2 text-md">Connection Type </span>
         {Object.entries(edgeTypes).map(([key, { color, label, dashArray }]) => (
           <div key={key} className="flex items-center space-x-4 pb-2">
             {/* Tratto per il tipo di edge usando SVG */}
@@ -37,7 +37,7 @@ const EdgeLegend = () => {
               <line
                 x1="0"
                 y1="2"
-                x2={label === "Update" ? "70" : "40"}
+                x2="60"
                 y2="2"
                 stroke={color}
                 strokeWidth="4"
@@ -45,7 +45,7 @@ const EdgeLegend = () => {
               />
             </svg>
             {/* Etichetta */}
-            <span className="text-sm text-gray-700">{label}</span>
+            <span className="text-base text-gray-700">{label}</span>
           </div>
         ))}
       </div>
