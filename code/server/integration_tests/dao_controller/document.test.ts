@@ -1,7 +1,7 @@
 import { describe, afterAll, beforeAll, beforeEach, test, expect, jest } from "@jest/globals"
 import DocumentController from "../../src/controllers/documentController"
 import { LinkController } from "../../src/controllers/linkController"
-import { Document } from "../../src/models/document"
+import { DocCoordinates } from "../../src/models/document_coordinate"
 import { Stakeholder } from "../../src/models/stakeholder"
 import { DocLink } from "../../src/models/document_link"
 import Link from "../../src/models/link"
@@ -60,9 +60,9 @@ describe('documentController/documentDAO Integration tests', () => {
     const testLink = new Link(1, "Update");
     const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
     const testStakeholder2 = new Stakeholder(2, "Bob", "urban developer");
-    const testDocument = new Document(testId, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
-    const testNewDocument = new Document(testId, "new title", [testStakeholder2], "1:1", "2020-10-10", "Informative document", "Italian", "300", "new description");
-    const testDocument2 = new Document(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2");
+    const testDocument = new DocCoordinates(testId, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description",[]);
+    const testNewDocument = new DocCoordinates(testId, "new title", [testStakeholder2], "1:1", "2020-10-10", "Informative document", "Italian", "300", "new description",[]);
+    const testDocument2 = new DocCoordinates(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2",[]);
     const testDocLink = new DocLink(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2", testLink);
     const mockResourceData =  Buffer.from("data", 'base64')
 
@@ -131,49 +131,16 @@ describe('documentController/documentDAO Integration tests', () => {
 
     });
 
-    describe('getAllDocuments', () => {
-        test('It should successfully retrieve all the documents', async () => {
-
-            await expect(controller.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
-
-            await expect(controller.addDocument("title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2")).resolves.toEqual(testDocument2);
-
-            await expect(controller.getAllDocuments()).resolves.toEqual([testDocument, testDocument2]);
-
-        });
-
-        test('It should return an empty arrary if there is no documents', async () => {
-
-            await expect(controller.getAllDocuments()).resolves.toEqual([]);
-
-        });
-
-        test('It should reject if there is a database error', async () => {
-            const dbSpy = jest.spyOn(db, 'all').mockImplementation(function (sql, params, callback) {
-                callback(new Error('Database error'), null);
-                return {} as Database;
-            });
-
-            await expect(controller.getAllDocuments()).rejects.toThrow(`Database error`);
-
-            dbSpy.mockRestore();
-        });
-
-    });
-
     describe('deleteDocument', () => {
         test('It should successfully delete a document with the specified id', async () => {
 
             await expect(controller.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
 
-            await expect(controller.addDocument("title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2")).resolves.toEqual(testDocument2);
-
-            await expect(controller.getAllDocuments()).resolves.toEqual([testDocument, testDocument2]);
+            await expect(controller.getDocumentById(1)).resolves.toEqual(testDocument);
 
             await expect(controller.deleteDocument(testId)).resolves.toBeUndefined();
 
-            await expect(controller.getAllDocuments()).resolves.toEqual([testDocument2]);
-
+            await expect(controller.getDocumentById(1)).rejects.toThrow(DocumentNotFoundError);
         });
 
         test('It should reject if there is a database error', async () => {

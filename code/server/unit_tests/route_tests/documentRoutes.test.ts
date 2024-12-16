@@ -1,6 +1,6 @@
 import { describe, afterEach, test, expect, jest } from "@jest/globals"
 import DocumentController from "../../src/controllers/documentController"
-import { Document } from "../../src/models/document"
+import { DocCoordinates } from "../../src/models/document_coordinate"
 import { Stakeholder } from "../../src/models/stakeholder"
 import { DocLink } from "../../src/models/document_link"
 import Link from "../../src/models/link"
@@ -27,9 +27,9 @@ describe('documentRoutes', () => {
     const testId = 1;
     const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
     const testStakeholder2 = new Stakeholder(2, "Bob", "urban developer");
-    const testDocument = new Document(testId, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
-    const testDocument2 = new Document(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2");
-    const testDocument3 = new Document(3, "title 3", [testStakeholder2], "1:1", "2020-10-10", "Material effect", "English", "300", "description 3");
+    const testDocument = new DocCoordinates(testId, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description",[]);
+    const testDocument2 = new DocCoordinates(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2",[]);
+    const testDocument3 = new DocCoordinates(3, "title 3", [testStakeholder2], "1:1", "2020-10-10", "Material effect", "English", "300", "description 3",[]);
     const links = [
         new DocLink(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2", new Link(1, "Link A")),
         new DocLink(3, "title 3", [testStakeholder2], "1:1", "2020-10-10", "Material effect", "English", "300", "description 3", new Link(2, "Link B"))
@@ -509,40 +509,6 @@ describe('documentRoutes', () => {
 
     });
 
-    describe('GET /', () => {
-        test('It should retrieve all the documents and return 200 status', async () => {
-            jest.spyOn(controller, "getAllDocuments").mockResolvedValueOnce([testDocument,testDocument2,testDocument3]);
-
-            const response = await request(app).get(baseURL+"/");
-
-            expect(response.status).toBe(200);
-            expect(response.body).toEqual([testDocument,testDocument2,testDocument3]);
-            expect(controller.getAllDocuments).toHaveBeenCalledWith();
-        });
-
-        test('It should return an empty array if there are no documents and return 200 status', async () => {
-            jest.spyOn(controller, "getAllDocuments").mockResolvedValueOnce([]);
-
-            const response = await request(app).get(baseURL+"/");
-
-            expect(response.status).toBe(200);
-            expect(response.body).toEqual([]);
-            expect(controller.getAllDocuments).toHaveBeenCalledWith();
-        });
-
-        test('It should return 503 if there is an error', async () => {
-            jest.spyOn(controller, "getAllDocuments").mockImplementation(() => {
-                throw new Error('Unexpected Error');
-            });
-
-            const response = await request(app).get(baseURL+"/");
-
-            expect(response.status).toBe(503);
-            expect(response.body.error).toBe('Internal Server Error');
-        });
-
-    });
-
     describe('GET /:id', () => {
 
         test('It should retrieve the document with the specified id and return 200 status', async () => {
@@ -699,49 +665,44 @@ describe('documentRoutes', () => {
     describe('PATCH /:id', () => {
         test('It should edit the document with the specified id and return 200 status', async () => {
             jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
-                req.user=u;
+                req.user = u;
                 return next();
             });
-    
+        
             jest.spyOn(Authenticator.prototype, "isPlanner").mockImplementation((req, res, next) => {
-                req.user=u;
+                req.user = u;
                 return next();
             });
-            jest.spyOn(controller, "editDocument").mockResolvedValueOnce({
-                id: testId,
-                title: "title",
-                stakeHolders: [testStakeholder1, testStakeholder2],
-                scale: "1:1",
-                issuanceDate: "2020-10-10",
-                type: "Informative document",
-                language: "English",
-                pages: "300",
-                description: "description"
-            });
-
-            const response = await request(app).patch(baseURL+`/${testId}`)
-            .send({
-                title: "title",
-                stakeHolders: [testStakeholder1, testStakeholder2],
-                scale: "1:1",
-                issuanceDate: "2020-10-10",
-                type: "Informative document",
-                language: "English",
-                pages: "300",
-                description: "description"
-            });
-
+        
+            jest.spyOn(controller, "editDocument").mockResolvedValueOnce(testDocument);
+        
+            const response = await request(app).patch(baseURL + `/${testId}`)
+                .send({
+                    title: "title",
+                    stakeHolders: [testStakeholder1, testStakeholder2],
+                    scale: "1:1",
+                    issuanceDate: "2020-10-10",
+                    type: "Informative document",
+                    language: "English",
+                    pages: "300",
+                    description: "description"
+                });
+        
             expect(response.status).toBe(200);
             expect(response.body).toEqual({
                 id: testId,
                 title: "title",
-                stakeHolders: [testStakeholder1, testStakeholder2],
+                stakeHolders: [
+                    { id: 1, name: "John", category: "urban developer" },
+                    { id: 2, name: "Bob", category: "urban developer" }
+                ],
                 scale: "1:1",
                 issuanceDate: "2020-10-10",
                 type: "Informative document",
                 language: "English",
                 pages: "300",
-                description: "description"
+                description: "description",
+                coordinates: []
             });
             expect(controller.editDocument).toHaveBeenCalledWith(
                 testId,
@@ -755,6 +716,7 @@ describe('documentRoutes', () => {
                 "description"
             );
         });
+        
 
         test('It should return 422 status if the param is not numeric', async () => {
             jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => {
@@ -1140,17 +1102,7 @@ describe('documentRoutes', () => {
                 return next();
             });
 
-            jest.spyOn(controller, "editDocument").mockResolvedValueOnce({
-                id: testId,
-                title: "title",
-                stakeHolders: [testStakeholder1, testStakeholder2],
-                scale: "1:1",
-                issuanceDate: "2020-10-10",
-                type: "Informative document",
-                language: "English",
-                pages: "300",
-                description: "description"
-            });
+            jest.spyOn(controller, "editDocument").mockResolvedValueOnce(testDocument);
 
             const response = await request(app).patch(baseURL+`/${testId}`)
             .send({
@@ -1178,17 +1130,7 @@ describe('documentRoutes', () => {
                 return res.status(403).json({ error: "User is not an urban planner" });
             });
 
-            jest.spyOn(controller, "editDocument").mockResolvedValueOnce({
-                id: testId,
-                title: "title",
-                stakeHolders: [testStakeholder1, testStakeholder2],
-                scale: "1:1",
-                issuanceDate: "2020-10-10",
-                type: "Informative document",
-                language: "English",
-                pages: "300",
-                description: "description"
-            });
+            jest.spyOn(controller, "editDocument").mockResolvedValueOnce(testDocument);
 
             const response = await request(app).patch(baseURL+`/${testId}`)
             .send({

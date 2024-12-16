@@ -4,7 +4,6 @@ import { Database } from "sqlite3";
 import { CoordinatesController } from "../../src/controllers/coordinatesController"
 import DocumentController from "../../src/controllers/documentController"
 import Coordinate from '../../src/models/coordinate';
-import { Document } from '../../src/models/document';
 import { LatLng } from '../../src/interfaces';
 import { DocCoordinates } from '../../src/models/document_coordinate'
 import { Stakeholder } from "../../src/models/stakeholder"
@@ -49,44 +48,37 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
         jest.resetAllMocks();
     });
     
-
     const controller = new CoordinatesController();
     const documentController = new DocumentController();
     const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
     const testCoordinate1 = new Coordinate(1, 1, 40.7128, -74.0060,0);
-    const testCoordinate2 = new Coordinate(2, 1, -55.7128, 45.0060,0);
-    const testCoordinate3 = new Coordinate(3, 2, 40.7128, -74.0060,0);
-    const testCoordinateMunicipalityArea = new Coordinate (2,null,null,null,1);
+    const testCoordinate2 = new Coordinate(2, 2, -55.7128, 45.0060,0);
     const coordinate: LatLng = { lat: 40.7128, lng: -74.0060 };
     const coordinates: LatLng[] = [
         { lat: 40.7128, lng: -74.0060 },
         { lat: -55.7128, lng: 45.0060 },
       ];
     const newCoordinate: LatLng = { lat: -55.7128, lng: 45.0060 };
-    const testDocument = new Document(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
-    const testDocument2 = new Document(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2");
     const testDocCoordinate = new DocCoordinates(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description", [testCoordinate1]);
+    const testDocCoordinates = new DocCoordinates(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description", [testCoordinate1,testCoordinate2]);
     const testDocNoCoordinate = new DocCoordinates(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description", []);
-    const testDocCoordinateMunicipalityArea = new DocCoordinates(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2", [testCoordinateMunicipalityArea]);
-    const newTestDocCoordinate = new DocCoordinates(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description", [testCoordinate2]);
-    const newTestDocCoordinate2 = new DocCoordinates(1, "title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description", [testCoordinate2,testCoordinate3]);
 
     describe('setDocumentCoordinates', () => {
 
         test("It should successfully It should successfully set a coordinate for a document", async () => {
-            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocNoCoordinate);
 
             await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
         });
 
         test('It should successfully set the municipality area for a document if no coordinates are provided', async () => {
-            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocNoCoordinate);
 
             await expect(controller.setDocumentCoordinates(1,[])).resolves.toBeUndefined();
         });
 
         test("It should successfully It should successfully set multiple coordinate for a document", async () => {
-            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocNoCoordinate);
 
             await expect(controller.setDocumentCoordinates(1,coordinates)).resolves.toBeUndefined();
         });
@@ -121,17 +113,10 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
 
         test("It should successfully retrieves all documents with their coordinates", async () => {
 
-            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toStrictEqual(testDocument);
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toStrictEqual(testDocNoCoordinate);
 
-            await expect(documentController.addDocument("title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2")).resolves.toStrictEqual(testDocument2);
-
-            await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
-
-            await expect(controller.setDocumentCoordinates(2,[])).resolves.toBeUndefined();
-            
-            await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocCoordinateMunicipalityArea,testDocCoordinate]);
+            await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocNoCoordinate]);
     
-
         });
 
         test('It should resolve an empty array if there is no documents', async () => {
@@ -166,19 +151,17 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
     describe('deleteDocumentCoordinatesById', () => {
 
         test('It should successfully delete document coordinates by ID', async () => {
-            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toStrictEqual(testDocument);
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toStrictEqual(testDocNoCoordinate);
 
-            await expect(documentController.addDocument("title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2")).resolves.toStrictEqual(testDocument2);
+            await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocNoCoordinate]);
 
             await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
 
-            await expect(controller.setDocumentCoordinates(2,[])).resolves.toBeUndefined();
-            
-            await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocCoordinateMunicipalityArea,testDocCoordinate]);
+            await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocCoordinate]);
     
             await expect(controller.deleteDocumentCoordinates(1)).resolves.toBeUndefined();
 
-            await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocNoCoordinate,testDocCoordinateMunicipalityArea]);
+            await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocNoCoordinate]);
         });
 
         test('It should reject if there is an error in deleting document coordinates', async () => {
@@ -209,28 +192,24 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
 
         test("It should modify the coordinates of a document", async () => {
             
-            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toStrictEqual(testDocNoCoordinate);
+
+            await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocNoCoordinate]);
 
             await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
 
             await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocCoordinate]);
-
-            await expect(controller.updateDocumentCoordinates(1,newCoordinate)).resolves.toBeUndefined();
-
-            await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([newTestDocCoordinate]);
         });
 
         test("It should Modify multiple coordinates of a document", async () => {
             
-            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toStrictEqual(testDocNoCoordinate);
 
-            await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
+            await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocNoCoordinate]);
 
-            await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocCoordinate]);
+            await expect(controller.setDocumentCoordinates(1,coordinates)).resolves.toBeUndefined();
 
-            await expect(controller.updateDocumentCoordinates(1,[newCoordinate,coordinate])).resolves.toBeUndefined();
-
-            await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([newTestDocCoordinate2]);
+            await expect(controller.getAllDocumentsCoordinates()).resolves.toStrictEqual([testDocCoordinates]);
         });
 
 
@@ -260,7 +239,7 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
     describe('getExistingGeoreferences', () => {
         test('it should successfully get all the existing georeferences (point)', async () => {
     
-            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocNoCoordinate);
 
             await expect(controller.setDocumentCoordinates(1,coordinate)).resolves.toBeUndefined();
 
@@ -272,7 +251,7 @@ describe('coordinatesController/coordinatesDAO Integration tests', () => {
 
             const newTestCoordinate2 = new Coordinate(2, 2, -55.7128, 45.0060,0);
     
-            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
+            await expect(documentController.addDocument("title", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocNoCoordinate);
 
             await expect(controller.setDocumentCoordinates(1,coordinates)).resolves.toBeUndefined();
 

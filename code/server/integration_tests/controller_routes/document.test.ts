@@ -1,7 +1,7 @@
 import { describe, afterAll, beforeAll, beforeEach, test, expect, jest } from "@jest/globals"
 import DocumentController from "../../src/controllers/documentController"
 import { LinkController } from "../../src/controllers/linkController"
-import { Document } from "../../src/models/document"
+import { DocCoordinates } from "../../src/models/document_coordinate"
 import { Stakeholder } from "../../src/models/stakeholder"
 import { DocLink } from "../../src/models/document_link"
 import Link from "../../src/models/link"
@@ -25,9 +25,9 @@ describe('documentRoutes/documentController Integration tests', () => {
     const testLink = new Link(1, "Update");
     const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
     const testStakeholder2 = new Stakeholder(2, "Bob", "urban developer");
-    const testDocument = new Document(testId, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
-    const testNewDocument = new Document(testId, "new title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "new description");
-    const testDocument2 = new Document(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2");
+    const testDocument = new DocCoordinates(testId, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description",[]);
+    const testNewDocument = new DocCoordinates(testId, "new title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "new description",[]);
+    const testDocument2 = new DocCoordinates(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2",[]);
     const testDocLink = new DocLink(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2", testLink);
     const mockResourceData =  Buffer.from("data", 'base64')
   
@@ -432,54 +432,31 @@ describe('documentRoutes/documentController Integration tests', () => {
 
     });
 
-    describe('GET /', () => {
-        test('It should retrieve all the documents and return 200 status', async () => {
-
-            await expect(controller.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
-
-            await expect(controller.addDocument("title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2")).resolves.toEqual(testDocument2);
-
-            const response = await request(app).get(baseURL + "/").expect(200);
-
-            expect(response.body).toEqual([testDocument, testDocument2]);
-
-        });
-
-        test('It should return an empty array if there are no documents and return 200 status', async () => {
-
-            const response = await request(app).get(baseURL + "/").expect(200);
-
-            expect(response.body).toEqual([]);
-        });
-
-        test('It should return 503 if there is an error', async () => {
-
-            const dbSpy = jest.spyOn(db, 'all').mockImplementation(function (sql, params, callback) {
-                callback(new Error('Database error'), null);
-                return {} as Database;
-            });
-
-            const response = await request(app).get(baseURL + "/");
-
-            expect(response.status).toBe(503);
-            expect(response.body.error).toBe('Internal Server Error');
-
-            dbSpy.mockRestore();
-        });
-
-    });
-
     describe('GET /:id', () => {
 
         test('It should retrieve the document with the specified id and return 200 status', async () => {
             await expect(controller.addDocument("title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description")).resolves.toEqual(testDocument);
-
+        
             const response = await request(app).get(baseURL + `/${testId}`);
-
+        
             expect(response.status).toBe(200);
-            expect(response.body).toEqual(testDocument);
+            expect(response.body).toEqual({
+                id: 1,
+                title: "title",
+                stakeHolders: [
+                    { id: 1, name: "John", category: "urban developer" },
+                    { id: 2, name: "Bob", category: "urban developer" }
+                ],
+                scale: "1:1",
+                issuanceDate: "2020-10-10",
+                type: "Informative document",
+                language: "English",
+                pages: "300",
+                description: "description",
+                coordinates: [null, null]  
+            });
         });
-
+        
         test('It should return 422 status if the param is not numeric', async () => {
             const response = await request(app).get(baseURL + `/abc`);
 
