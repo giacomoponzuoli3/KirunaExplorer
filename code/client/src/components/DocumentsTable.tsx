@@ -268,7 +268,7 @@ function DocumentsTable(props: any){
 
     const filterDropDown = (stakeholderName: any, type: any) =>{
       let documentsArray = documentsCoordinates;
-      let filterDocuments = [];
+      let filterDocuments: any[];
         
       if(type && type != "All Types" && type != "Others"){
         filterDocuments = (stakeholderName && stakeholderName != "All Stakeholders" && stakeholderName!='')? 

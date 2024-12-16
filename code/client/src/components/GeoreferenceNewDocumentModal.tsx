@@ -1,5 +1,5 @@
 import {Button, Col, Form, Row} from "react-bootstrap"
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect } from "react";
@@ -306,7 +306,7 @@ function GeoreferenceNewDocumentModal({setMode,setNewDocumentCoordinates, handle
   const [isInfoMode, setIsInfoMode] = useState(false);
 
   const [existingGeoRef,setExistingGeoRef] = useState<Coordinate[][]>([])
-  const [coordinates,setCoordinates] = useState<LatLng | LatLng[] | null>(null);
+  const [coordinates, setCoordinates] = useState<LatLng | LatLng[] | null>(null);
   const [wholeMapPolygon, setWholeMapPolygon] = useState<L.Polygon | null>(null); // Track the whole map polygon
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
@@ -332,7 +332,7 @@ function GeoreferenceNewDocumentModal({setMode,setNewDocumentCoordinates, handle
     };
 
   const handleSubmit = async () => {
-    setNewDocumentCoordinates(coordinates);
+    setNewDocumentCoordinates(coordinates! || []);
     handleClose();
     setMode('links');
     handleNextStep();
@@ -786,20 +786,24 @@ function GeoreferenceNewDocumentModal({setMode,setNewDocumentCoordinates, handle
           )}
         </div>
 
-      <div className="flex justify-end space-x-4">
-         <button
-            className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md"
-            onClick={() => {setMode('resources'); handlePrevStep();}}
-          >
-            Back
-          </button>
-          <button
-            className="px-4 py-2 bg-blue-950 hover:bg-blue-500 text-white rounded-md"
-            onClick={handleSubmit}
-          >
-            Next
-          </button>
-        </div>
+            <div className="flex justify-end space-x-4">
+                <p className="text-sm text-gray-600 mt-2">This step is optional. If you skip it, the document will be assigned to the entire Kiruna municipality.</p>
+                <button
+                    className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md"
+                    onClick={() => {
+                        setMode('resources');
+                        handlePrevStep();
+                    }}
+                >
+                    Back
+                </button>
+                <button
+                    className="px-4 py-2 bg-blue-950 hover:bg-blue-500 text-white rounded-md"
+                    onClick={handleSubmit}
+                >
+                    Next
+                </button>
+            </div>
         </>
 
   );

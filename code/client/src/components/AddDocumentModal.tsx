@@ -42,7 +42,7 @@ interface AddDocumentModalProps {
 function AddDocumentModal({ show, onHide, stakeholders,refreshDocumentsCoordinates,documentsCoordinates, scaleOptions, onCreateScale, typeOptions, onCreateType}: AddDocumentModalProps) {
 
     const [document, setDocument] = useState<DocCoordinates | null>(null);
-    const [newDocumentCoordinates,setNewDocumentCoordinates] = useState<LatLng | LatLng[] | null>(null);
+    const [newDocumentCoordinates, setNewDocumentCoordinates] = useState<LatLng | LatLng[] | null>(null);
     const [files, setFiles] = useState<File[]>([]);//Resources of newDocument
     const [mode, setMode] = useState('docInfo');
     const steps = [
