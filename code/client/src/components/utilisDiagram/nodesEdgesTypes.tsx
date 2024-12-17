@@ -4,9 +4,12 @@ import EdgePrevision from "./EdgePrevision";
 import EdgeUpdate from "./EdgeUpdate";
 import EdgeDefault from "./EdgeDefault";
 import { Handle, Position } from "@xyflow/react";
+import { useState } from "react";
 
 // Componente per il nodo personalizzato
 const IconNode = ({ data }: any) => {
+
+  const [isHovered, setIsHovered] = useState(false); // State to track hover
 
     return (
       <div 
@@ -21,7 +24,31 @@ const IconNode = ({ data }: any) => {
         border: data.isSelected ? '3px solid #ffbf00' : '1px solid #ddd', // Yellow border on select
         boxShadow: data.isSelected ? '0 2px 10px rgba(0, 0, 0, 0.2)' : '0 2px 5px rgba(0, 0, 0, 0.1)',
       }}
+
+      onMouseEnter={() => setIsHovered(true)} // Show tooltip on hover
+      onMouseLeave={() => setIsHovered(false)} // Hide tooltip when not hovered
       >  
+      {/* Tooltip */}
+      {isHovered && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '150%', // Show tooltip above the node
+            left: '50%',
+            transform: 'translateX(-50%)',
+            whiteSpace: 'nowrap',
+            backgroundColor: 'rgba(0, 123, 255, 0.9)',
+            color: '#fff',
+            padding: '10px 15px',
+            borderRadius: '10px',
+            fontSize: '12px',
+            zIndex: 1000,
+            boxShadow: '0 8px 16px rgba(0, 0, 0, 0.3)',
+          }}
+        >
+          {data.doc.title} {/* Display the document title */}
+        </div>
+      )}
         {/* Handle input */}
         <Handle
           type="target"
