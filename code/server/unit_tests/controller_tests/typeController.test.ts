@@ -1,6 +1,5 @@
 import { describe, afterEach, test, expect, jest } from "@jest/globals";
 import { TypeDAO } from "../../src/dao/typeDAO"
-import { Database } from "sqlite3";
 import Type from "../../src/models/type"
 import { TypeController } from "../../src/controllers/typeController";
 

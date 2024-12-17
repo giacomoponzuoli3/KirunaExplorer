@@ -1,7 +1,8 @@
 import { describe, afterEach, test, expect, jest } from "@jest/globals"
 import { DocumentDAO } from "../../src/dao/documentDAO"
 import db from "../../src/db/db"
-import { Document } from "../../src/models/document"
+import Coordinate from "../../src/models/coordinate"
+import { DocCoordinates } from "../../src/models/document_coordinate"
 import { Stakeholder } from "../../src/models/stakeholder"
 import { DocLink } from "../../src/models/document_link"
 import { Database } from "sqlite3";
@@ -24,9 +25,9 @@ describe('documentDAO', () => {
     const resourceId = 2;
     const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
     const testStakeholder2 = new Stakeholder(2, "Bob", "urban developer");
-    const testDocument = new Document(testId, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
-    const testDocument2 = new Document(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2");
-    const testDocument3 = new Document(3, "title 3", [testStakeholder2], "1:1", "2020-10-10", "Material effect", "English", "300", "description 3");
+    const testDocument = new DocCoordinates(testId, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description",[]);
+    const testDocument2 = new DocCoordinates(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2",[]);
+    const testDocument3 = new DocCoordinates(3, "title 3", [testStakeholder2], "1:1", "2020-10-10", "Material effect", "English", "300", "description 3",[new Coordinate(1, 1, 40.7128, -74.0060, 0)]);
     const mockResourceData = new Uint8Array([1, 2, 3, 4]);
 
     describe('addDocument', () => {
@@ -197,7 +198,12 @@ describe('documentDAO', () => {
                     description: "description",
                     stakeholder_id: 1,
                     stakeholder_name: "John",
-                    stakeholder_category: "urban developer"
+                    stakeholder_category: "urban developer",
+                    coordinate_id: 1,
+                    latitude: 40.7128,
+                    longitude: -74.0060,
+                    point_order: 1,
+                    municipality_area: 0
                 },
                 {
                     id: testId,
@@ -210,19 +216,27 @@ describe('documentDAO', () => {
                     description: "description",
                     stakeholder_id: 2,
                     stakeholder_name: "Bob",
-                    stakeholder_category: "urban developer"
+                    stakeholder_category: "urban developer",
+                    coordinate_id: 2,
+                    latitude: 34.0522,
+                    longitude: -118.2437,
+                    point_order: 2,
+                    municipality_area: 0
                 }
             ];
+
+            const testDoc = new DocCoordinates(testId,"title",[testStakeholder1,testStakeholder2],"1:1","2020-10-10","Informative document","English","300","description",[new Coordinate(1, 1, 40.7128, -74.0060, 0),new Coordinate(2, 2, 34.0522, -118.2437, 0)]);
+
             jest.spyOn(db, 'all')
                 .mockImplementationOnce((sql, params, callback) => {
                     callback(null, testRows);
                     return {} as Database;
                 })
 
-            await expect(dao.getDocumentById(testId)).resolves.toEqual(testDocument);
+            await expect(dao.getDocumentById(testId)).resolves.toEqual(testDoc);
 
             expect(db.all).toHaveBeenCalledWith(
-                `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.id = ?`,
+             `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude,dc.longitude, dc.point_order, dc.municipality_area FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.id = ? ORDER BY dc.point_order`,
                 [testId],
                 expect.any(Function)
             );
@@ -239,7 +253,7 @@ describe('documentDAO', () => {
             await expect(dao.getDocumentById(testId)).rejects.toThrow(new DocumentNotFoundError());
 
             expect(db.all).toHaveBeenCalledWith(
-                `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.id = ?`,
+                `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude,dc.longitude, dc.point_order, dc.municipality_area FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.id = ? ORDER BY dc.point_order`,
                 [testId],
                 expect.any(Function)
             );
@@ -256,7 +270,7 @@ describe('documentDAO', () => {
             await expect(dao.getDocumentById(testId)).rejects.toThrow(`Database error`);
 
             expect(db.all).toHaveBeenCalledWith(
-                `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.id = ?`,
+                `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude,dc.longitude, dc.point_order, dc.municipality_area FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.id = ? ORDER BY dc.point_order`,
                 [testId],
                 expect.any(Function)
             );
@@ -269,97 +283,6 @@ describe('documentDAO', () => {
             });
 
             await expect(dao.getDocumentById(testId)).rejects.toThrow("Unexpected error");
-        });
-    });
-
-    describe('getAllDocuments', () => {
-        test('It should successfully retrieve all the documents', async () => {
-            const testRows = [
-                {
-                    id: testId,
-                    title: "title",
-                    scale: "1:1",
-                    issuance_date: "2020-10-10",
-                    type: "Informative document",
-                    language: "English",
-                    pages: "300",
-                    description: "description",
-                    stakeholder_id: 1,
-                    stakeholder_name: "John",
-                    stakeholder_category: "urban developer"
-                },
-                {
-                    id: testId,
-                    title: "title",
-                    scale: "1:1",
-                    issuance_date: "2020-10-10",
-                    type: "Informative document",
-                    language: "English",
-                    pages: "300",
-                    description: "description",
-                    stakeholder_id: 2,
-                    stakeholder_name: "Bob",
-                    stakeholder_category: "urban developer"
-                }
-            ];
-            jest.spyOn(db, 'all')
-                .mockImplementationOnce((sql, params, callback) => {
-                    callback(null, testRows);
-                    return {} as Database;
-                })
-
-            await expect(dao.getAllDocuments()).resolves.toEqual([testDocument]);
-
-            expect(db.all).toHaveBeenCalledWith(
-                `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id`,
-                [],
-                expect.any(Function)
-            );
-
-        });
-
-        test('It should resolve an empty array if there is no documents', async () => {
-            jest.spyOn(db, 'all')
-                .mockImplementationOnce((sql, params, callback) => {
-                    callback(null, null);
-                    return {} as Database;
-                })
-
-            await expect(dao.getAllDocuments()).resolves.toEqual([]);
-
-            expect(db.all).toHaveBeenCalledWith(
-                `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id`,
-                [],
-                expect.any(Function)
-            );
-
-        });
-
-        test('It should reject if there is a database error', async () => {
-            jest.spyOn(db, 'all')
-                .mockImplementationOnce((sql, params, callback) => {
-                    callback(new Error('Database error'));
-                    return {} as Database;
-                })
-
-            await expect(dao.getAllDocuments()).rejects.toThrow(`Database error`);
-
-            expect(db.all).toHaveBeenCalledWith(
-                `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id`,
-                [],
-                expect.any(Function)
-            );
-
-        });
-
-        test("It should reject with error if an unexpected error occurs", async () => {
-
-            const unexpectedError = new Error("Unexpected error");
-            (db.all as jest.Mock).mockImplementation(() => {
-                throw unexpectedError;
-            });
-
-            await expect(dao.getAllDocuments()).rejects.toThrow("Unexpected error");
         });
     });
 
@@ -1310,6 +1233,11 @@ describe('documentDAO', () => {
                     language: "English",
                     pages: "300",
                     description: "description 3",
+                    coordinate_id: 1,
+                    latitude: 40.7128,
+                    longitude: -74.0060,
+                    point_order: 1,
+                    municipality_area: 0
                 }
             ];
 
@@ -1321,7 +1249,7 @@ describe('documentDAO', () => {
             await expect(dao.getAllDocumentsOfSameType("Material effect")).resolves.toEqual([testDocument3]);
 
             expect(db.all).toHaveBeenCalledWith(
-                'SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.type = ?',
+             `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude,dc.longitude, dc.point_order, dc.municipality_area FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.type = ? ORDER BY dc.point_order`,
                 ["Material effect"],
                 expect.any(Function)
             );
@@ -1338,7 +1266,7 @@ describe('documentDAO', () => {
             await expect(dao.getAllDocumentsOfSameType("Material effect")).rejects.toThrow("Select Error");
 
             expect(db.all).toHaveBeenCalledWith(
-                'SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.type = ?',
+                `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude,dc.longitude, dc.point_order, dc.municipality_area FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.type = ? ORDER BY dc.point_order`,
                 ["Material effect"],
                 expect.any(Function)
             );
@@ -1354,7 +1282,7 @@ describe('documentDAO', () => {
             await expect(dao.getAllDocumentsOfSameType("Material effect")).resolves.toEqual([]);
 
             expect(db.all).toHaveBeenCalledWith(
-                'SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category FROM documents d JOIN stakeholders_documents sd ON d.id = sd.id_document JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.type = ?',
+                `SELECT d.*, s.id AS stakeholder_id, s.name AS stakeholder_name, s.category AS stakeholder_category, dc.id AS coordinate_id, dc.latitude,dc.longitude, dc.point_order, dc.municipality_area FROM documents d LEFT JOIN document_coordinates dc ON dc.document_id = d.id LEFT JOIN stakeholders_documents sd ON d.id = sd.id_document LEFT JOIN stakeholders s ON sd.id_stakeholder = s.id WHERE d.type = ? ORDER BY dc.point_order`,
                 ["Material effect"],
                 expect.any(Function)
             );

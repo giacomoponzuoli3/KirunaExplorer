@@ -2,7 +2,7 @@ import { describe, afterAll, beforeAll, beforeEach, test, expect, jest } from "@
 import request from 'supertest'
 import { LinkController } from '../../src/controllers/linkController'
 import DocumentController from "../../src/controllers/documentController"
-import { Document } from "../../src/models/document"
+import { DocCoordinates } from "../../src/models/document_coordinate"
 import { Stakeholder } from "../../src/models/stakeholder"
 import Link from '../../src/models/link'
 import { app } from "../../index";
@@ -25,8 +25,8 @@ describe('linkRoutes/linkController Integration Tests', () => {
     const testLink2 = new Link(2, "Connection");
     const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
     const testStakeholder2 = new Stakeholder(2, "Bob", "urban developer");
-    const testDocument = new Document(testId, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
-    const testDocument2 = new Document(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2");
+    const testDocument = new DocCoordinates(testId, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description",[]);
+    const testDocument2 = new DocCoordinates(2, "title 2", [testStakeholder1], "1:1", "2020-10-10", "Informative document", "English", "300", "description 2",[]);
 
     // Helper function that logs in a user and returns the cookie
     // Can be used to log in a user before the tests or in the tests

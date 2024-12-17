@@ -1,7 +1,7 @@
 import { describe, afterEach, test, expect, jest } from "@jest/globals"
 import { DocumentDAO } from "../../src/dao/documentDAO"
 import DocumentController from "../../src/controllers/documentController"
-import { Document } from "../../src/models/document"
+import { DocCoordinates } from "../../src/models/document_coordinate"
 import { Stakeholder } from "../../src/models/stakeholder"
 import { DocLink } from "../../src/models/document_link"
 import Link from "../../src/models/link"
@@ -22,8 +22,8 @@ describe('documentController', () => {
     const resourceId = 2;
     const testStakeholder1 = new Stakeholder(1, "John", "urban developer");
     const testStakeholder2 = new Stakeholder(2, "Bob", "urban developer");
-    const testDocument = new Document(testId, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description");
-    const testDocument3 = new Document(3, "title 3", [testStakeholder2], "1:1", "2020-10-10", "Material effect", "English", "300", "description 3");
+    const testDocument = new DocCoordinates(testId, "title", [testStakeholder1, testStakeholder2], "1:1", "2020-10-10", "Informative document", "English", "300", "description",[]);
+    const testDocument3 = new DocCoordinates(3, "title 3", [testStakeholder2], "1:1", "2020-10-10", "Material effect", "English", "300", "description 3",[]);
     const mockResourceData = new Uint8Array([1, 2, 3, 4]);
     const mockResources: Resources[] = [
         { id: 1, idDoc: 1, data: null, name: 'Resource 1', uploadTime: new Date('2024-12-01T12:00:00Z') },
@@ -112,38 +112,6 @@ describe('documentController', () => {
             expect(dao.getDocumentById).toHaveBeenCalledWith(testId);
         });
 
-    });
-
-    describe('getAllDocuments', () => {
-        test('It should successfully retrieve all the documents', async () => {
-          
-            jest.spyOn(dao, 'getAllDocuments').mockResolvedValue([testDocument])
-            await expect(controller.getAllDocuments()).resolves.toEqual([testDocument]);
-
-            expect(dao.getAllDocuments).toBeCalledWith();
-
-        });
-
-        test('It should return an empty array if there is no documents', async () => {
-            jest.spyOn(dao, 'getAllDocuments').mockResolvedValue([])
-            await expect(controller.getAllDocuments()).resolves.toEqual([]);
-
-            expect(dao.getAllDocuments).toBeCalledWith();
-        });
-
-        test('It should reject if there is a database error', async () => {
-            jest.spyOn(dao, 'getAllDocuments').mockRejectedValue(`Database error`)
-            await expect(controller.getAllDocuments()).rejects.toEqual(`Database error`);
-
-            expect(dao.getAllDocuments).toBeCalledWith();
-        });
-
-        test("It should reject with error if an unexpected error occurs", async () => {
-            jest.spyOn(dao, 'getAllDocuments').mockRejectedValue("Unexpected error")
-            await expect(controller.getAllDocuments()).rejects.toEqual("Unexpected error");
-
-            expect(dao.getAllDocuments).toBeCalledWith();
-        });
     });
 
     describe('deleteDocument', () => {
