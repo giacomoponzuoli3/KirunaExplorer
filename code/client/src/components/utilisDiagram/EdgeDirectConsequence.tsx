@@ -1,5 +1,6 @@
 import { EdgeProps, Position, getBezierPath } from "@xyflow/react";
 import { EdgeData } from "./EdgeCollateralConsequence";
+import { useState } from "react";
 
 const EdgeDirectConsequence = ({
   id,
@@ -9,6 +10,8 @@ const EdgeDirectConsequence = ({
   targetY,
   data
 }: EdgeProps & {data: EdgeData}) => {
+
+  const [hovered, setHovered] = useState(false); // Track hover state
 
   // Ottieni l'offset da 'data'
   const { offset = 0 } = data || {};
@@ -44,13 +47,44 @@ const EdgeDirectConsequence = ({
   });
 
   return (
+    <g>
     <path 
       id={id} 
       d={edgePath} 
       stroke="#FF5733" 
       strokeWidth={2} 
       fill="none" 
+      onMouseEnter={() => setHovered(true)} // Show tooltip
+      onMouseLeave={() => setHovered(false)} // Hide tooltip
     />
+    {/* Tooltip rendered using foreignObject */}
+    {hovered && (
+      <foreignObject
+      x={controlX - 50} // Adjust X position to center the div
+      y={controlY - 50} // Adjust Y position above the edge
+      width={250}       // Width of the tooltip
+      height={50}       // Height of the tooltip
+      style={{ overflow: 'visible', pointerEvents: 'none' }} // Ensure visibility
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: 'rgba(0, 123, 255, 0.9)', // Background color
+          color: '#fff',
+          padding: '5px 10px',
+          borderRadius: '8px',
+          fontSize: '12px',
+          boxShadow: '0 8px 16px rgba(0, 0, 0, 0.3)',
+          pointerEvents: 'none', // Ensure it doesn't block mouse events
+        }}
+      >
+        Connection type: Direct Consequence {/* Display the document title */}
+      </div>
+    </foreignObject>
+  )}
+  </g>
   );
 };
 

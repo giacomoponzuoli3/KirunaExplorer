@@ -4,15 +4,56 @@ import EdgePrevision from "./EdgePrevision";
 import EdgeUpdate from "./EdgeUpdate";
 import EdgeDefault from "./EdgeDefault";
 import { Handle, Position } from "@xyflow/react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import ReactDOM from "react-dom";
 
+// Tooltip Component
+const Tooltip = ({ title, x, y }: { title: string; x: number; y: number}) => {
+
+  return ReactDOM.createPortal(
+    <div
+      style={{
+        position: 'absolute',
+        top: y, // Adjust position above the node
+        left: x,
+        transform: 'translateX(-50%)',
+        whiteSpace: 'nowrap',
+        backgroundColor: 'rgba(0, 123, 255, 0.9)',
+        color: '#fff',
+        padding: '5px 10px',
+        borderRadius: '8px',
+        fontSize: '12px',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+        zIndex: 9999,
+        pointerEvents: 'none', // Tooltip won't block interactions
+      }}
+    >
+      {title}
+    </div>,
+    document.body // Render the tooltip outside the React Flow container
+  );
+};
 // Componente per il nodo personalizzato
-const IconNode = ({ data }: any) => {
+const IconNode = ({ data, position }: any) => {
 
   const [isHovered, setIsHovered] = useState(false); // State to track hover
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 }); // Position for tooltip
+  const nodeRef = useRef<HTMLDivElement | null>(null); // Ref to the node div
+
+  useEffect(() => {
+    if (isHovered && nodeRef.current) {
+      const rect = nodeRef.current.getBoundingClientRect();
+      // Set the tooltip position above the node (adjust as needed)
+      setTooltipPosition({
+        x: rect.left + rect.width / 2, // Center the tooltip horizontally
+        y: rect.top + 350, // Position above the node, you can adjust the `-20` as needed
+      });
+    }
+  }, [isHovered]);
 
     return (
       <div 
+      ref={nodeRef} // Attach ref to the node
       className={`flex items-center justify-center 
         transition duration-200 transform 
         ${data.isSelected ? 'scale-110' : ''}`} // Add scaling only on selection
@@ -30,24 +71,7 @@ const IconNode = ({ data }: any) => {
       >  
       {/* Tooltip */}
       {isHovered && (
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '150%', // Show tooltip above the node
-            left: '50%',
-            transform: 'translateX(-50%)',
-            whiteSpace: 'nowrap',
-            backgroundColor: 'rgba(0, 123, 255, 0.9)',
-            color: '#fff',
-            padding: '10px 15px',
-            borderRadius: '10px',
-            fontSize: '12px',
-            zIndex: 1000,
-            boxShadow: '0 8px 16px rgba(0, 0, 0, 0.3)',
-          }}
-        >
-          {data.doc.title} {/* Display the document title */}
-        </div>
+        <Tooltip title={data.doc.title} x={tooltipPosition.x} y={tooltipPosition.y}/>
       )}
         {/* Handle input */}
         <Handle
