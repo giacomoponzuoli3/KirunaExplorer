@@ -103,23 +103,15 @@ function AddDocumentForm({document,handleClose,handlePrevStep,setMode,setDocumen
                 return; // Exit the function early
             }
         
-            const pagesRegex = /^\d+(-\d+)?$/;
+            const pagesRegex = /^\d+(-\d+)*$/;
       
             if(pages){
               if (!pagesRegex.test(pages)) {
-               setAlertMessage("Invalid pages format. Please use a single number or a page range in the format: number-number.");
+               setAlertMessage("Invalid pages format. Please use a single number or multiple numbers separated by '-'.");
                setShowAlert(true);
                return; // Exit the function early if the format is invalid
               }
       
-              // Additional validation for range order
-              const [start, end] = pages.split("-").map(Number);
-      
-              if (end !== undefined && start >= end) {
-                setAlertMessage("Invalid page range. When you enter a range the first number must be less than the second.");
-                setShowAlert(true);
-                return; // Exit the function early if the range is invalid
-              }
             }
             setDocument(new DocCoordinates(0,title,selectedStakeholders,scale,issuanceDate,type, language, pages, description,[]));
             setMode('resources');

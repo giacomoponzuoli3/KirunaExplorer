@@ -300,28 +300,16 @@ function GeoreferenceNewDocumentModal({setMode,setNewDocumentCoordinates, handle
         if (bounds) {
 
           // Define the entire world as the outer boundary
-    const worldCoordinates: LatLngTuple[] = [
-      [-90, -180], // Bottom-left corner of the world
-      [-90, 180],  // Bottom-right corner of the world
-      [90, 180],   // Top-right corner of the world
-      [90, -180],  // Top-left corner of the world
-      [-90, -180], // Closing the loop
-    ];
-
-    // Define your specific bounds (kirunaBounds) as the inner "hole"
-    const kirunaCoordinates: LatLngTuple[] = [
-      [67.3556, 17.8994], // Bottom-left
-      [69.0592, 17.8994], // Top-left
-      [69.0592, 23.2858], // Top-right
-      [67.3556, 23.2858], // Bottom-right
-      [67.3556, 17.8994], // Bottom-left
-    ];
+          const worldCoordinates: LatLngTuple[] = [
+           [-90, -180], // Bottom-left corner of the world
+           [-90, 180],  // Bottom-right corner of the world
+           [90, 180],   // Top-right corner of the world
+           [90, -180],  // Top-left corner of the world
+           [-90, -180], // Closing the loop
+          ];
 
            const newPolygon = L.polygon(worldCoordinates);
 
-          // const newPolygon = L.polygon([
-          //   KsouthWest, KnorthWest,KnorthEast,KsouthEast,KsouthWest
-          // ]);
 
             // Clear any existing polygons or markers, if needed
             clearOtherLayers();
@@ -350,8 +338,8 @@ function GeoreferenceNewDocumentModal({setMode,setNewDocumentCoordinates, handle
             return
         }
 
-        const regexLat = /(\d{1,2})°(\d{1,2})'(\d{1,2})''([NS])$/;
-        const regexLng = /(\d{1,3})°(\d{1,2})'(\d{1,2})''([EW])$/;
+        const regexLat = /(\d{1,2}(?:\.\d+)?)°(\d{1,2}(?:\.\d+)?)'(\d{1,2}(?:\.\d+)?)''([NS])$/;
+        const regexLng = /(\d{1,3}(?:\.\d+)?)°(\d{1,2}(?:\.\d+)?)'(\d{1,2}(?:\.\d+)?)''([EW])$/;
 
         const lat = DMSStringToDecimal(latitude.trim().replace(/\s+/g, ''),regexLat)
         const lng = DMSStringToDecimal(longitude.trim().replace(/\s+/g, ''),regexLng)
@@ -410,10 +398,34 @@ function GeoreferenceNewDocumentModal({setMode,setNewDocumentCoordinates, handle
     );
   };
 
+  function calculateArea(latLngs: LatLng[]) {
+    let area = 0;
+  
+    for (let i = 0; i < latLngs.length; i++) {
+      const p1 = latLngs[i];
+      const p2 = latLngs[(i + 1) % latLngs.length]; // Wrap around
+      area += (p2.lng - p1.lng) * (p2.lat + p1.lat);
+    }
+  
+    return Math.abs(area / 2);
+  }
+
   const getExistingAreasAndPoints = async () => {
     try {
         const allGeoRef: Coordinate[][] = await API.getExistingGeoreferences();
-        setExistingGeoRef(allGeoRef);
+        const sortedGeoRef: Coordinate[][] = allGeoRef
+        .map((coordinateArray) => {
+          if (coordinateArray.length > 1) {
+            const latLngs = coordinateArray.map(coord => new L.LatLng(coord.latitude, coord.longitude));
+            const area = calculateArea(latLngs);
+            return { coordinates: coordinateArray, area }; // Add area for sorting
+          }
+          return { coordinates: coordinateArray, area: 0 }; // Mark single points with area 0
+        })
+        .sort((a, b) => b.area - a.area) // Sort smallest to largest
+        .map(({ coordinates }) => coordinates); // Extract only the coordinates
+        console.log(sortedGeoRef)
+        setExistingGeoRef(sortedGeoRef);
     } catch (err: any) {
         console.log(err);
     }
@@ -507,6 +519,7 @@ function GeoreferenceNewDocumentModal({setMode,setNewDocumentCoordinates, handle
                                   : coordinates instanceof Array && !arraysEqual(coordinates, latLngs)
                                   ? 0.3
                                   : 1,
+                    fillColor: coordinates instanceof Array && arraysEqual(coordinates, latLngs) ? "yellow" : "", // Default fill color
                   }}
                   eventHandlers={{
                     click: (e) => {
@@ -514,7 +527,8 @@ function GeoreferenceNewDocumentModal({setMode,setNewDocumentCoordinates, handle
                       e.target
                       .bindPopup("You picked this area!", {className: "custom-popup",closeButton: false,})
                       .openPopup(); // Open the popup
-                 },
+                      L.DomEvent.stopPropagation(e); // Stop propagation to larger areas
+                    },
                   }}
                 />
               );

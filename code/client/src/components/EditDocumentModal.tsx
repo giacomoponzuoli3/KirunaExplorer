@@ -368,7 +368,7 @@ function EditDocumentModal({ document, show, onHide, refreshSelectedDocument, st
                                     <Select
                                         options={languageOptions}
                                         isClearable={true}
-                                        value={language ? languageOptions.find((lang) => lang.value === language) : null}
+                                        value={language ? languageOptions.find((lang) => lang.label === language) : null}
                                         onChange={(selectedOption) => setLanguage(selectedOption ? selectedOption.label : null)}
                                         placeholder="Select Language"
                                         className="shadow-sm"

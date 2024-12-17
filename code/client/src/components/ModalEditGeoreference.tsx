@@ -120,11 +120,34 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
     console.log(selectedPosition)
   }, [selectedPosition])
 
+  function calculateArea(latLngs: LatLng[]) {
+      let area = 0;
+    
+      for (let i = 0; i < latLngs.length; i++) {
+        const p1 = latLngs[i];
+        const p2 = latLngs[(i + 1) % latLngs.length]; // Wrap around
+        area += (p2.lng - p1.lng) * (p2.lat + p1.lat);
+      }
+    
+      return Math.abs(area / 2);
+  }
+
   const getExistingAreasAndPoints = async () => {
     try {
         const allGeoRef: Coordinate[][] = await API.getExistingGeoreferences();
-        console.log("tuka sum");
-        setExistingGeoRef(allGeoRef);
+        const sortedGeoRef: Coordinate[][] = allGeoRef
+        .map((coordinateArray) => {
+          if (coordinateArray.length > 1) {
+            const latLngs = coordinateArray.map(coord => new L.LatLng(coord.latitude, coord.longitude));
+            const area = calculateArea(latLngs);
+            return { coordinates: coordinateArray, area }; // Add area for sorting
+          }
+          return { coordinates: coordinateArray, area: 0 }; // Mark single points with area 0
+        })
+        .sort((a, b) => b.area - a.area) // Sort smallest to largest
+        .map(({ coordinates }) => coordinates); // Extract only the coordinates
+        console.log(sortedGeoRef)
+        setExistingGeoRef(sortedGeoRef);
     } catch (err: any) {
         console.log(err);
     }
@@ -328,6 +351,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
                     selectedPosition && selectedPosition?.length === 1 ? 0.3 // If a marker is clicked, dim all polygons
                       : selectedPosition && selectedPosition?.length > 1 && !arraysEqual(selectedPosition, latLngs)
                       ? 0.3 : 1,
+                      fillColor: selectedPosition && selectedPosition?.length > 1 && arraysEqual(selectedPosition, latLngs) ? "yellow" : "", // Default fill color
                   }}
                   eventHandlers={{
                     click: (e) => {

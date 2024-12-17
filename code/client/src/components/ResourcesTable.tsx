@@ -171,8 +171,8 @@ function ResourcesTable(props: any) {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = event.target.files; // HTMLInputElement.files can be FileList or null
     if (fileList) {
-      const oversizedFiles = Array.from(fileList).filter(file => file.size > 50 * 1024 * 1024); // 50 MB
-      const notOversizedFiles = Array.from(fileList).filter(file => file.size < 50 * 1024 * 1024);
+      const oversizedFiles = Array.from(fileList).filter(file => file.size > 100 * 1024 * 1024); // 50 MB
+      const notOversizedFiles = Array.from(fileList).filter(file => file.size < 100 * 1024 * 1024);
       if (oversizedFiles.length > 0) {
         setAlertMessage(
           `The following files exceed 50 MB: ${oversizedFiles
