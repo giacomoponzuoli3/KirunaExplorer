@@ -20,10 +20,10 @@ const Tooltip = ({ title, x, y }: { title: string; x: number; y: number}) => {
         whiteSpace: 'nowrap',
         backgroundColor: 'rgba(0, 123, 255, 0.9)',
         color: '#fff',
-        padding: '5px 10px',
+        padding: '10px 15px',
         borderRadius: '8px',
         fontSize: '12px',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+        boxShadow: '0 8px 16px rgba(0, 0, 0, 0.3)',
         zIndex: 9999,
         pointerEvents: 'none', // Tooltip won't block interactions
       }}
