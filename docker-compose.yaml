@@ -1,14 +1,19 @@
+version: '3.8'
+
 services:
   client:
     build:
       context: ./code/client
+    image: mbollo/se2-2024-12-kiruna-explorer:client
     ports:
       - "3000:3000"
     networks:
       - kiruna-network
+
   server:
     build:
       context: ./code/server
+    image: mbollo/se2-2024-12-kiruna-explorer:server
     ports:
       - "3001:3001"
     volumes:

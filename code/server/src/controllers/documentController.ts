@@ -1,7 +1,7 @@
 import { DocumentDAO } from "../dao/documentDAO";
 import { DocLink } from "../models/document_link";
 import { Stakeholder } from "../models/stakeholder";
-import Resources from "../../../common_models/original_resources";
+import Resources from "../models/original_resources";
 import { DocCoordinates } from "../models/document_coordinate";
 
 class DocumentController {

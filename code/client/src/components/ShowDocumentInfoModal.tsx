@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { User } from '../../../common_models/user';
+import { User } from '../models/user';
 import API from '../API/API';
 import '../modal.css'
 import { TrashIcon, PencilIcon} from "@heroicons/react/24/outline";

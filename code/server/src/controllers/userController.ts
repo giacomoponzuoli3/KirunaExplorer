@@ -1,5 +1,5 @@
 import {UserDAO} from "../dao/userDAO"
-import { User } from "../../../common_models/user";
+import { User } from "../models/user";
 
 /**
  * Represents a controller for managing users.

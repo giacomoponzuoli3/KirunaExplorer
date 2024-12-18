@@ -3,7 +3,7 @@ import db from "../db/db"
 import { Stakeholder } from "../models/stakeholder"
 import Link from "../models/link";
 import {DocumentNotFoundError} from "../errors/document";
-import Resources from "../../../common_models/original_resources";
+import Resources from "../models/original_resources";
 import { DocCoordinates } from "../models/document_coordinate";
 import Coordinate from "../models/coordinate";
 

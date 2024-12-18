@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useLocation, Link, useNavigate} from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { User } from "../../../common_models/user";
+import { User } from "../models/user";
 import { AddDocumentModal } from "./AddDocumentModal";
 import { Stakeholder } from "../models/stakeholder";
 import {DocumentLegend} from "./DocumentLegend"

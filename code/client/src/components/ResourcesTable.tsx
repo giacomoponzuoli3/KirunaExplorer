@@ -6,7 +6,7 @@ import { TrashIcon, PlusIcon, FaceFrownIcon, ChevronRightIcon, ChevronLeftIcon, 
 import Alert from "./Alert";
 import ConfirmModal from './ConfirmModal';
 import { DocCoordinates } from "../models/document_coordinate";
-import Resources from "../../../common_models/original_resources";
+import Resources from "../models/original_resources";
 
 
 function ResourcesTable(props: any) {
