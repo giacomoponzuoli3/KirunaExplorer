@@ -153,7 +153,7 @@ function AddResources({setMode,docFiles,setDocFiles, handleNextStep, handlePrevS
           </div>
           <div className="flex justify-end space-x-4">
           <p className="text-sm text-gray-600 mt-2">This step is optional. You can skip it if you don't wish to add resources to the document at this time.</p>
-            <button
+          <button
             className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md"
             onClick={() => {setMode('docInfo'); handlePrevStep();}}
           >

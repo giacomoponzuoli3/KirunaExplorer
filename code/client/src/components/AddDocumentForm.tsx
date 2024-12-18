@@ -343,7 +343,8 @@ function AddDocumentForm({document,handleClose,handlePrevStep,setMode,setDocumen
             </form>
           </div>
           <div className="flex justify-end space-x-4">
-            <button
+          <p className="text-sm text-gray-600 mt-2">This fields marked with <span style={{ color: 'red' }}>*</span> are mandatory. Continuing whithout filling them won't be possible</p>
+          <button
             className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md"
             onClick={handleClose}
           >
@@ -414,7 +415,8 @@ function AddDocumentForm({document,handleClose,handlePrevStep,setMode,setDocumen
             </form>
           </div>
           <div className="flex justify-end space-x-4">
-            <button
+          <p className="text-sm text-gray-600 mt-2">This fields marked with <span style={{ color: 'red' }}>*</span> are mandatory. Continuing whithout filling them won't be possible</p>
+          <button
             className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md"
             onClick={() => {setDocInfoMode('basicInfo'); handlePrevStep();}}
           >
