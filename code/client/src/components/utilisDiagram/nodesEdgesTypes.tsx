@@ -34,7 +34,7 @@ const Tooltip = ({ title, x, y }: { title: string; x: number; y: number}) => {
   );
 };
 // Componente per il nodo personalizzato
-const IconNode = ({ data, position }: any) => {
+const IconNode = ({ data, }: any) => {
 
   const [isHovered, setIsHovered] = useState(false); // State to track hover
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 }); // Position for tooltip
@@ -46,7 +46,7 @@ const IconNode = ({ data, position }: any) => {
       // Set the tooltip position above the node (adjust as needed)
       setTooltipPosition({
         x: rect.left + rect.width / 2, // Center the tooltip horizontally
-        y: rect.top + 350, // Position above the node, you can adjust the `-20` as needed
+        y: rect.top + 420, // Position above the node, you can adjust the `-20` as needed
       });
     }
   }, [isHovered]);

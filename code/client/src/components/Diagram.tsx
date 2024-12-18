@@ -149,7 +149,19 @@ const Diagram = (props: any) => {
         new Set(
           getDocuments.map((doc: DocCoordinates) => doc.scale)
         )
-      ).sort((a: any, b: any) => a.localeCompare(b)) as string[];
+      ).sort((a: any, b: any) => {
+        // Handle non-numeric scales like "blueprints/effects" and "Text"
+        if (!a.includes(':') && !b.includes(':')) return 0;
+        if (!a.includes(':')) return 1; // Place non-numeric scales at the end
+        if (!b.includes(':')) return -1;
+      
+        // Split the scale string by the colon
+        const aValue = parseInt(a.split(':')[1], 10);
+        const bValue = parseInt(b.split(':')[1], 10);
+      
+        // Compare the numeric values
+        return aValue - bValue;
+      }) as string[];
 
       // Conta il numero di documenti associati a ciascun anno
       const yearCounts = getDocuments
@@ -172,7 +184,7 @@ const Diagram = (props: any) => {
       setScales(uniqueScales);
       setYears(uniqueYears);
       
-      const heights = Array(uniqueScales.length).fill(50);
+      const heights = Array(uniqueScales.length).fill(52);
   
     
       setScaleHeights(heights);
@@ -318,7 +330,11 @@ const Diagram = (props: any) => {
 
       // Calcolare la posizione base in base all'indice dell'anno e della scala
       const xBase = widths.slice(0, yearIndex).reduce((acc, w) => acc + w + 50, 210); // Posizione X base
-      const yBase = heights.slice(0, scaleIndex).reduce((acc, h) => acc + h + 23, 90);  // Posizione Y base
+      const yBase = heights.slice(0, scaleIndex).reduce((acc, h) => acc + h + 23, 80);  // Posizione Y base
+
+      if(doc.scale === "1:30000" || doc.scale === "Text"){
+        console.log("Scale "+doc.scale+" ybase: " + yBase)
+      }
 
       // Verifica se la posizione è già occupata
       let x = xBase;
@@ -345,7 +361,9 @@ const Diagram = (props: any) => {
         data: {
           label: props.getDocumentIcon(doc.type, 5), // Usa la funzione per ottenere l'icona
           doc, 
-          isSelected: false
+          isSelected: false,
+          x,
+          y
         },
         zIndex: 5,
       };
@@ -410,7 +428,8 @@ const Diagram = (props: any) => {
 
   useEffect(() => {
     if(scaleHeights){
-      setScrollHeight(scaleHeights.reduce((total: any, height: any) => total + height, 0));
+      setScrollHeight(scaleHeights.reduce((total: any, height: any) => total + height, 300));
+      console.log(scaleHeights.reduce((acc, curr) => acc + curr,  350))
     }
     
   }, [scaleHeights])
@@ -451,10 +470,12 @@ const Diagram = (props: any) => {
       <div 
       style={{ 
         width: '100%', 
-        height: !scaleHeights ? `700px` : scaleHeights.reduce((acc, curr) => acc + curr,  250), 
+        height: !scaleHeights ? `900px` : scaleHeights.reduce((acc, curr) => acc + curr,350), 
         border: "none", 
         transform: 'none',
-        position: 'relative' // Aggiungi questa proprietà per controllare il posizionamento degli altri componenti
+        position: 'relative', // Aggiungi questa proprietà per controllare il posizionamento degli altri componenti
+        overflowX: 'auto', // Allow horizontal scrolling for overflow content
+        whiteSpace: 'nowrap' // Ensure no wrapping of scale text
       }} 
       className="diagram-svg-fix"
     >
@@ -503,7 +524,7 @@ const Diagram = (props: any) => {
           ]}
           nodeExtent={[
             [200, 50],
-            [+Infinity, 650]
+            [+Infinity, 900]
           ]}
           minZoom={1}
           nodesDraggable={false}
