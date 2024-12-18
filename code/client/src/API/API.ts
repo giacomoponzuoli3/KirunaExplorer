@@ -166,69 +166,6 @@ async function getDocumentLinksById(id: number) {
     }
 }
 
-async function getDocumentDescriptionById(id: number) {
-    const response = await fetch(baseURL + "doc/" + id + "/description", { credentials: "include" })
-    if (response.ok) {
-        return await response.json()
-    } else {
-        const errDetail = await response.json();
-        if (errDetail.error)
-            throw errDetail.error
-        if (errDetail.message)
-            throw errDetail.message
-        throw new Error("Error. Please reload the page")
-    }
-}
-
-async function getDocumentTitleById(id: number) {
-    const response = await fetch(baseURL + "doc/" + id + "/title", { credentials: "include" })
-    if (response.ok) {
-        return await response.json()
-    } else {
-        const errDetail = await response.json();
-        if (errDetail.error)
-            throw errDetail.error
-        if (errDetail.message)
-            throw errDetail.message
-        throw new Error("Error. Please reload the page")
-    }
-}
-
-async function getDocumentIssuanceDateById(id: number) {
-    const response = await fetch(baseURL + "doc/" + id + "/issuanceDate", { credentials: "include" })
-    if (response.ok) {
-        return await response.json()
-    } else {
-        const errDetail = await response.json();
-        if (errDetail.error)
-            throw errDetail.error
-        if (errDetail.message)
-            throw errDetail.message
-        throw new Error("Error. Please reload the page")
-    }
-}
-
-async function getAllDocumentsOfSameType(type: string) {
-    let response = await fetch(baseURL + "doc", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        credentials: "include",
-        body: JSON.stringify({ type: type},)
-    })
-    if (response.ok) {
-        return await response.json()
-    } else {
-        const errDetail = await response.json();
-        if (errDetail.error)
-            throw errDetail.error
-        if (errDetail.message)
-            throw errDetail.message
-        throw new Error("Error. Please reload the page")
-    }
-}
-
 async function addResourceToDocument(idDoc: number, name: string, data: string) {
     let response = await fetch(baseURL + "doc/res", {
         method: 'POST',
@@ -475,20 +412,6 @@ async function deleteDocumentCoordinates(idDoc: number){
     }
 }
 
-async function getMunicipalityArea() {
-    const response = await fetch(baseURL + "coordinates" + "/municipality")
-    if (response.ok) {
-        return await response.json()
-    } else {
-        const errDetail = await response.json();
-        if (errDetail.error)
-            throw errDetail.error
-        if (errDetail.message)
-            throw errDetail.message
-        throw new Error("Error. Please reload the page")
-    }
-}
-
 async function getExistingGeoreferences() {
     const response = await fetch(`${baseURL}coordinates/georeferences`, { credentials: "include" })
     if (response.ok) {
@@ -584,10 +507,10 @@ async function addType(type: string) {
 
 const API = {
     login, logOut, getUserInfo, register,
-    addDocument, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, getDocumentDescriptionById, getDocumentTitleById, getDocumentIssuanceDateById, getAllDocumentsOfSameType, addResourceToDocument, getResourceData, deleteResource, getAllResourcesData,
+    addDocument, getDocumentById, deleteDocument, editDocument, getDocumentLinksById, addResourceToDocument, getResourceData, deleteResource, getAllResourcesData,
     getAllStakeholders, addStakeholder,
     addLink, deleteLink, editLink, getAllLinks,
-    getAllDocumentsCoordinates, setDocumentCoordinates, updateDocumentCoordinates, deleteDocumentCoordinates, getMunicipalityArea, getExistingGeoreferences,
+    getAllDocumentsCoordinates, setDocumentCoordinates, updateDocumentCoordinates, deleteDocumentCoordinates, getExistingGeoreferences,
     getScales, addScale, getTypes, addType
 }
 export default API

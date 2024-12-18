@@ -7,13 +7,15 @@ import logo from '../img/iconKiruna.png';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 
 
-export default function Navbar(props: any) {
-  const navigate = useNavigate();
+
+
+function Navbar(props: any){
+  useNavigate();
   const location = useLocation();
 
   const previousPath: string | null = location.state?.from || null;
 
-  // State to track the active option 
+  // State to track the active option
   const [activeTab, setActiveTab] = useState("home");
 
   // Set `activeTab` with the current position
@@ -25,11 +27,11 @@ export default function Navbar(props: any) {
     } else if (location.pathname === "/documents") {
       setActiveTab("documents");
     } else if (location.pathname.endsWith("/links") && previousPath === "/documents") {
-      setActiveTab("links"); 
+      setActiveTab("links");
     } else if (location.pathname.endsWith("/map") && previousPath === "/documents") {
-      setActiveTab("map"); 
+      setActiveTab("map");
     } else if (location.pathname.endsWith("/resources") && previousPath === "/documents") {
-      setActiveTab("resources"); 
+      setActiveTab("resources");
     } else if (location.pathname === "/diagram") {
       setActiveTab("diagram");
     } else {
@@ -55,7 +57,7 @@ export default function Navbar(props: any) {
             </div>
 
             {/* Navigation links (Documents and Diagram) */}
-            <div className="flex space-x-2 ml-10 items-center"> 
+            <div className="flex space-x-2 ml-10 items-center">
               <Link
                 to="/"
                 onClick={() => setActiveTab("home")}
@@ -99,7 +101,7 @@ export default function Navbar(props: any) {
                 <div className={`text-yellow-300 hover:text-yellow-400 text-base font-semibold px-2 py-1 no-underline ${
                   activeTab === "links" ? "border-b-2 border-yellow-400 " : "border-transparent"
                 }  rounded-md `}>
-                  
+
                   <span className="text-base font-semibold">Links</span>
                 </div>
                 </>
@@ -110,7 +112,7 @@ export default function Navbar(props: any) {
                 <div className={`text-yellow-300 hover:text-yellow-400 text-base font-semibold px-2 py-1 no-underline ${
                   activeTab === "map" ? "border-b-2 border-yellow-400 " : "border-transparent"
                 }  rounded-md `}>
-                  
+
                   <span className="text-base font-semibold">Map</span>
                 </div>
                 </>
@@ -121,12 +123,12 @@ export default function Navbar(props: any) {
                 <div className={`text-yellow-300 hover:text-yellow-400 text-base font-semibold px-2 py-1 no-underline ${
                   activeTab === "resources" ? "border-b-2 border-yellow-400 " : "border-transparent"
                 }  rounded-md `}>
-                  
+
                   <span className="text-base font-semibold">Resources</span>
                 </div>
                 </>
               )}
-              
+
             </div>
           </div>
 
@@ -138,7 +140,7 @@ export default function Navbar(props: any) {
                 <LoginButton />
               </>
             ) : (
-              <>   
+              <>
                 <LogoutButton className="ml-4" logout={props.logout} />
               </>
             )}
@@ -147,6 +149,4 @@ export default function Navbar(props: any) {
       </div>
     </Disclosure>
   );
-}
-
-export {Navbar}
+} export {Navbar}

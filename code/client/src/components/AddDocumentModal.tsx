@@ -12,17 +12,6 @@ import { AddNewDocumentLinksModal } from './AddNewDocumentLinksModal';
 import { AddResources } from './AddResources';
 import { Stepper } from './Stepper';
 
-interface RequiredLabelProps {
-    text: string; // Explicitly define the type of 'text' as string
-}
-
-const RequiredLabel: React.FC<RequiredLabelProps> = ({ text }) => (
-    <span>
-        {text} <span style={{ color: 'red' }}>*</span>
-    </span>
-);
-
-
 
 /* ------------ Interfaces -------- */
 

@@ -67,7 +67,7 @@ function DocumentsTable(props: any){
     //document's georeference delete
     const [documentGeoreferenceDelete, setDocumentGeoreferenceDelete] = useState<DocCoordinates | null>(null);
     //view document's georeference 
-    const [viewDocumentGeoreference, setViewDocumentGeoreference] = useState<DocCoordinates | null>(null);
+
     //document selected for edit/add georeference
     const [documentSelected, setDocumentSelected] = useState<DocCoordinates | null>(null);
 
@@ -103,8 +103,8 @@ function DocumentsTable(props: any){
     const stakeholdersWithAll = [{ name: "All Stakeholders" }, ...props.stakeholders];
 
     //dropdown of the order documents filter
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Stato per il dropdown
-    const [selectedOrder, setSelectedOrder] = useState(sortOrder); // Stato per l'ordine selezionato
+    const [, setIsDropdownOpen] = useState(false); // Stato per il dropdown
+    const [, setSelectedOrder] = useState(sortOrder); // Stato per l'ordine selezionato
 
     const toggleDropdownTypeDocument = () => {
       setIsOpenTypeDocument(!isOpenTypeDocument);

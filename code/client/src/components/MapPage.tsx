@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocation, Link, useNavigate} from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { User } from "../models/user";
@@ -9,7 +9,7 @@ import {DocumentLegend} from "./DocumentLegend"
 import Alert from "./Alert"
 import { DocumentPlusIcon } from "@heroicons/react/24/outline";
 import { MapContainer } from 'react-leaflet';
-import {LatLng, LatLngTuple} from 'leaflet'; // Import del tipo corretto
+// Import del tipo corretto
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet-draw';
@@ -20,18 +20,6 @@ import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 //----------- Functions -------------//
 
 // Funzione per ottenere una "firma" unica per un poligono
-function getPolygonKey(latLngs: LatLngTuple[]): string {
-  // Ordina le coordinate del poligono per latitudine e longitudine
-  const sortedCoords = latLngs
-    .map(coord => `${coord[0]},${coord[1]}`)  // Converti le coordinate in stringhe
-    .sort((a: string, b: string) => {
-        if (a < b) return -1
-        if (a > b) return 1
-
-        return 0
-    });  // Ordina le coordinate in ordine crescente
-  return sortedCoords.join(";");
-}
 
 
 //----------- Interfaces -------------//
@@ -58,10 +46,10 @@ function MapPage({documentsCoordinates, user, refreshDocumentsCoordinates, getDo
 
   //modals
   const [showAddDocumentModal, setShowAddDocumentModal] = useState<boolean>(false);
-  const [showAddLinks, setShowAddLinks] = useState<boolean>(false);
+
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
-  const [showGeoreferenceDocument, setShowGeoreferenceDocument] = useState<boolean>(false);
+
 
 
 
@@ -135,23 +123,5 @@ function MapPage({documentsCoordinates, user, refreshDocumentsCoordinates, getDo
   );      
 }
 
-function ButtonHomePage(){
-  const location = useLocation();
-  const isLoginPath = location.pathname === '/';
-  return (
-    <>
-      { !isLoginPath ? (
-        <Link 
-          to={`/`}
-          className="inline-flex mr-4 items-center gap-2 bg-gray-200 hover:bg-gray-300 text-black rounded-md px-4 py-2 text-sm font-medium no-underline"
-        >
-          <i className="bi bi-house-door-fill"></i> 
-          <span className="hidden md:inline">Back Home</span>
-        </Link>
-      ) : null }
-    </>
-  );
-}
 
-
-export { MapPage, ButtonHomePage };
+export { MapPage };

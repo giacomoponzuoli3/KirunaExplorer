@@ -9,7 +9,7 @@ function EditLinkModal(props: any) {
     const navigate = useNavigate();
 
     const [typesLink, setTypesLink] = useState<Link[]>([]); // vector of types of links except one
-    const [documents, setDocuments] = useState<DocCoordinates[]>([]); // vector of all documents except one
+    const [, setDocuments] = useState<DocCoordinates[]>([]); // vector of all documents except one
 
     const [selectedNewTypeLink, setSelectedNewTypeLink] = useState<number | null>(null); // Selected new type of link
     const [showTypeLinkDropdown, setShowTypeLinkDropdown] = useState(false); // State to show type link dropdown

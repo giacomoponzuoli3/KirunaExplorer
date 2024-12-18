@@ -4,17 +4,6 @@ import '../modal.css'
 import { TrashIcon, DocumentIcon } from "@heroicons/react/24/outline";
 // Utilizziamo ISO 639-1 per ottenere le lingue
 
-interface RequiredLabelProps {
-    text: string; // Explicitly define the type of 'text' as string
-}
-
-const RequiredLabel: React.FC<RequiredLabelProps> = ({ text }) => (
-    <span>
-        {text} <span style={{ color: 'red' }}>*</span>
-    </span>
-);
-
-
 
 /* ------------ Interfaces -------- */
 
@@ -32,8 +21,8 @@ function AddResources({setMode,docFiles,setDocFiles, handleNextStep, handlePrevS
     const [files, setFiles] = useState<File[]>(docFiles);//resources
 
 
-    const [showAlert, setShowAlert] = useState(false); // alert state
-    const [alertMessage, setAlertMessage] = useState('');
+    const [, setShowAlert] = useState(false); // alert state
+    const [, setAlertMessage] = useState('');
 
 
 

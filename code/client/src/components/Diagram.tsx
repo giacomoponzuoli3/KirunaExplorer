@@ -323,7 +323,7 @@ const Diagram = (props: any) => {
 
   const createNodes = (getDocuments: DocCoordinates[], uniqueYears: number[], uniqueScales: string[], widths: number[], heights: number[], normalizeDate: (date: string) => number, occupiedPositions: Set<string>, props: any) => {
     // Restituisci i nodi creati
-    return getDocuments.map((doc: DocCoordinates, index: number) => {
+    return getDocuments.map((doc: DocCoordinates) => {
       // Trova gli indici unici per l'anno e la scala
       const yearIndex = uniqueYears.indexOf(normalizeDate(doc.issuanceDate));
       const scaleIndex = uniqueScales.indexOf(doc.scale);
@@ -376,7 +376,7 @@ const Diagram = (props: any) => {
     setSelectedDocumentCoordinates(null)
   };
 
-  function refreshSelectedDocument(doc: DocCoordinates) {
+  function refreshSelectedDocument() {
     // props.refreshDocumentsCoordinates();
     setIsReload(true);
   }

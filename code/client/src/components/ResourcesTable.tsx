@@ -16,9 +16,9 @@ function ResourcesTable(props: any) {
     const [selectedDoc, setSelectedDoc] = useState<DocCoordinates | null>(null);
     const [files, setFiles] = useState<File[]>([]);//resources
     const linkRef = useRef<HTMLAnchorElement>(null);
-    
+
     const [showModal, setShowModal] = useState(false);
-    const [refreshPage, setRefreshPage] = useState(false);
+
 
     const [resources, setResources] = useState<Resources[]>([]);
 
@@ -132,7 +132,7 @@ function ResourcesTable(props: any) {
 
             // Step 3: Call the API to upload the resource
             try {
-                const response = await API.addResourceToDocument(
+                await API.addResourceToDocument(
                     selectedDoc.id,        // Replace with the actual document ID
                     file.name,     // Use the file name
                     base64Data     // Pass the file data as base64 string

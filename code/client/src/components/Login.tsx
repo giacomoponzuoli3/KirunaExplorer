@@ -96,7 +96,7 @@ function LogoutButton(props: any) {
   );
 }
 
-function LoginButton(props: any) {
+function LoginButton() {
   const location = useLocation();
   const isLoginPath = location.pathname === '/login';
   return (

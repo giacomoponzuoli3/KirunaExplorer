@@ -33,7 +33,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
   const [existingGeoRef,setExistingGeoRef] = useState<Coordinate[][]>([])
   const [selectedPosition, setSelectedPosition] = useState<LatLng[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
   const [useMunicipalArea, setUseMunicipalArea] = useState(documentCoordinates.coordinates.length == 0 ? false :  documentCoordinates.coordinates[0].municipality_area == 1);  // Stato per la checkbox
 
   //state for the selection
@@ -298,7 +298,7 @@ const ModalEditGeoreference: React.FC<ModalEditGeoreferenceProps> = ({
         </span>
         <form className="flex flex-col flex-grow">
           {/* Mappa Leaflet */}
-          <div  className={`relative w-full h-full mb-2 ${useMunicipalArea || selectedButton === null ? 'pointer-events-none opacity-50' : ''}`}>
+          <div  className={`relative w-full h-full mb-2 ${useMunicipalArea ? 'pointer-events-none opacity-50' : ''}`}>
             <MapContainer
               className={`relative w-full `}
               style={{ height: '100%' }}

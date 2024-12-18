@@ -26,11 +26,6 @@ class User {
  * Represents the role of a user.
  * The values present in this enum are the only valid values for the role of a user.
  */
-enum Role {
-    PLANNER = "Urban Planner",
-    RESIDENT = "Resident",
-    DEVELOPER = "Urban Developer"
-}
 
 
-export { User, Role}
+export { User }
