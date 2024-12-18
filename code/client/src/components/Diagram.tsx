@@ -377,7 +377,10 @@ const Diagram = (props: any) => {
   };
 
   function refreshSelectedDocument(document: DocCoordinates) {
-    // props.refreshDocumentsCoordinates();
+    if(selectedDocumentCoordinates){
+      const coord = selectedDocumentCoordinates?.coordinates
+      document.coordinates = coord;
+    }
     setSelectedDocumentCoordinates(document)
     setIsReload(true);
   }

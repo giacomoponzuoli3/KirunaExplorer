@@ -49,6 +49,7 @@ function ShowDocumentInfoModal({
     const handleEditGeoreference = () => {
         
         if(selectedDocumentCoordinates.coordinates.length !== 0){
+            console.log("tuka sum")
           setShowModalEditGeoreference(true);
         }
     

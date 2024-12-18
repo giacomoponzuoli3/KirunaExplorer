@@ -97,6 +97,10 @@ function SetMapViewHome(props: any) {
   }
 
   function refreshSelectedDocument(doc: DocCoordinates) {
+    if(selectedDocumentCoordinates){
+    const coord = selectedDocumentCoordinates?.coordinates
+    doc.coordinates = coord;
+    }
     setSelectedDocumentCoordinates(doc);
     props.refreshDocumentsCoordinates();
   }
