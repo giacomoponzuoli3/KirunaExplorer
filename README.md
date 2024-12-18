@@ -241,9 +241,18 @@ Editing and submitting the form will call the API to update a link.
 ## Screenshots
 
 Homepage:
-![Homepage](./screenshots/HomePage1.png "Homepage")
+![Homepage](./screenshots/NewHomePage.png "Homepage")
 
-Document info: 
+Map:
+![Map](./screenshots/HomePage1.png "Homepage")
+
+Diagram:
+![Diagram](./screenshots/Diagram.png "Diagram")
+
+Document info in Diagram Page: 
+![Document info](./screenshots/DiagramInfo.png "Document info")
+
+Document info in Map page: 
 ![Document info](./screenshots/DocumentModal.png "Document info")
 Document info: (urban planner)
 ![Document info](./screenshots/DocumentInfoIsLogged1.png "Document info logged in")
