@@ -7,7 +7,7 @@ import { cleanup } from "../../src/db/cleanup";
 import { setup } from "../../src/db/setup";
 import { app } from "../../index";
 import request from 'supertest';
-import { Role } from "../../../common_models/user"
+import { Role } from "../../src/models/user"
 
 const baseURL = "/kiruna/scale"
 

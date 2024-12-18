@@ -3,7 +3,7 @@ import { TypeController } from "../../src/controllers/typeController";
 import { app } from "../../index";
 import request from 'supertest';
 import Authenticator from "../../src/routers/auth";
-import { User } from "../../../common_models/user";
+import { User } from "../../src/models/user";
 import Type from "../../src/models/type";
 import { TypeNotFoundError } from "../../src/errors/type";
 import exp from "constants";

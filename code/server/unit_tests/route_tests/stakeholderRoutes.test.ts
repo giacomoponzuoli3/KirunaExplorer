@@ -3,7 +3,7 @@ import  StakeholderController  from "../../src/controllers/stakeholderController
 import { app } from "../../index";
 import request from 'supertest';
 import Authenticator from "../../src/routers/auth";
-import { User } from "../../../common_models/user";
+import { User } from "../../src/models/user";
 import { Stakeholder } from "../../src/models/stakeholder"
 import {StakeholderNotFoundError} from "../../src/errors/stakeholder";
 

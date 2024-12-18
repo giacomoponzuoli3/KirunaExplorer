@@ -1,6 +1,6 @@
 import { describe, beforeEach, test, expect, jest } from "@jest/globals"
 import UserController from "../../src/controllers/userController"
-import { User } from '../../../common_models/user';
+import { User } from '../../src/models/user';
 import { app } from "../../index";
 import request from 'supertest';
 import Authenticator from "../../src/routers/auth"
@@ -230,6 +230,22 @@ describe('authRoutes', () => {
 
             expect(response.status).toBe(401);
 
+        });
+
+        test('It should return 503 if there is an error', async () => {
+
+            jest.spyOn(auth, 'login').mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
+
+            const response = await request(app).post(baseURL + "/")
+                .send({
+                    username: "urban_planner",
+                    password: "admin"
+                });
+
+            expect(response.status).toBe(503);
+            expect(response.body.error).toBe('Internal Server Error');
         });
 
     });

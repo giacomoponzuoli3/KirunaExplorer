@@ -3,7 +3,7 @@ import { ScaleController } from "../../src/controllers/scaleController";
 import { app } from "../../index";
 import request from 'supertest';
 import Authenticator from "../../src/routers/auth";
-import { User } from "../../../common_models/user";
+import { User } from "../../src/models/user";
 import Scale from "../../src/models/scale";
 import { ScaleNotFoundError } from "../../src/errors/scale";
 

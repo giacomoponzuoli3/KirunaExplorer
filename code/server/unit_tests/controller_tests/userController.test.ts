@@ -1,5 +1,5 @@
 import { describe, afterEach, test, expect, jest } from "@jest/globals"
-import { User } from "../../../common_models/user";
+import { User } from "../../src/models/user";
 import { UserDAO } from "../../src/dao/userDAO"
 import { UserAlreadyExistsError, UserNotFoundError } from "../../src/errors/user";
 import  UserController  from "../../src/controllers/userController";

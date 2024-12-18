@@ -8,7 +8,7 @@ import { DocLink } from "../../src/models/document_link"
 import { Database } from "sqlite3";
 import Link from "../../src/models/link"
 import { DocumentNotFoundError } from "../../src/errors/document";
-import Resources from "../../../common_models/original_resources"
+import Resources from "../../src/models/original_resources"
 
 jest.mock("../../src/db/db.ts");
 

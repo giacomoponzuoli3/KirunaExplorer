@@ -4,7 +4,7 @@ import { LinkController } from '../../src/controllers/linkController'
 import Link from "../../src/models/link"
 import { app } from "../../index";
 import Authenticator from "../../src/routers/auth"
-import { User } from "../../../common_models/user"
+import { User } from "../../src/models/user"
 import { LinkNotFoundError } from "../../src/errors/link"
 
 const baseURL = '/kiruna/link'

@@ -7,8 +7,8 @@ import Link from "../../src/models/link"
 import { app } from "../../index";
 import request from 'supertest';
 import Authenticator from "../../src/routers/auth"
-import { User } from "../../../common_models/user"
-import Resources from "../../../common_models/original_resources"
+import { User } from '../../src/models/user';
+import Resources from "../../src/models/original_resources"
 
 const baseURL = "/kiruna/doc"
 

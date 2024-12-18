@@ -1,13 +1,13 @@
 import { describe, afterAll, beforeAll, beforeEach, test, expect, jest } from "@jest/globals"
 import UserController from "../../src/controllers/userController"
-import { User } from '../../../common_models/user';
+import { User } from '../../src/models/user';
 import { app } from "../../index";
 import request from 'supertest';
 import db from "../../src/db/db"
 import { Database } from "sqlite3";
 import { cleanup } from "../../src/db/cleanup";
 import { setup } from "../../src/db/setup";
-import { Role } from "../../../common_models/user"
+import { Role } from "../../src/models/user"
 
 
 const baseURL = "/kiruna/sessions"

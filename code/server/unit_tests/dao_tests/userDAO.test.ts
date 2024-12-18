@@ -1,6 +1,6 @@
 import { describe, afterEach, test, expect, jest } from "@jest/globals"
 import db from "../../src/db/db"
-import { User } from "../../../common_models/user";
+import { User } from "../../src/models/user";
 import crypto from "crypto"
 import { Database } from "sqlite3";
 import { UserDAO } from "../../src/dao/userDAO"
@@ -125,6 +125,17 @@ describe('userDAO', () => {
             });
 
             await expect(dao.getIsUserAuthenticated("urban_planner", "admin")).rejects.toThrow('Database error');
+
+            expect(db.get).toHaveBeenCalled();
+        });
+
+        test('It should reject if there is a generic error', async () => {
+
+            jest.spyOn(db, 'get').mockImplementation((sql, params, callback) => {
+                throw new Error('Unexpected error');
+            });
+
+            await expect(dao.getIsUserAuthenticated("urban_planner", "admin")).rejects.toThrow('Unexpected error');
 
             expect(db.get).toHaveBeenCalled();
         });
