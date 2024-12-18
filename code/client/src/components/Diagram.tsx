@@ -361,7 +361,7 @@ const Diagram = (props: any) => {
         data: {
           label: props.getDocumentIcon(doc.type, 5), // Usa la funzione per ottenere l'icona
           doc, 
-          isSelected: false,
+          isSelected: doc.id.toString() === selectedNode?.id,
           x,
           y
         },
@@ -377,12 +377,12 @@ const Diagram = (props: any) => {
   };
 
   function refreshSelectedDocument(document: DocCoordinates) {
-    if(selectedDocumentCoordinates){
-      const coord = selectedDocumentCoordinates?.coordinates
-      document.coordinates = coord;
+    if(selectedDocumentCoordinates && selectedDocumentCoordinates !== document){
+      const docc = selectedDocumentCoordinates
+      document.coordinates = docc.coordinates;
+      setIsReload(true)
+      setSelectedDocumentCoordinates(document)
     }
-    setSelectedDocumentCoordinates(document)
-    setIsReload(true);
   }
         
   const onNodeClick: NodeMouseHandler = (event, node) => {
@@ -406,7 +406,7 @@ const Diagram = (props: any) => {
       },
     }));
     setNodes(updatedNodes)
-  }, [selectedNode, documents]); 
+  }, [selectedNode]); 
         
   useEffect(() => {
     if(nodes.length === 0) allDocuments().then();
