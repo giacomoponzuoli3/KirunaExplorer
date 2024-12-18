@@ -277,7 +277,7 @@ function DocumentsTable(props: any){
             :documentsArray.filter((doc) => doc.type === type)
         return filterDocuments
       } 
-      if (type === "All Types") {
+      if (type === "All Types" || type=="") {
         filterDocuments = (stakeholderName && stakeholderName != "All Stakeholders" && stakeholderName!='')?
           documentsArray.filter((doc) =>  doc.stakeHolders.some((stakeholder) => stakeholder.name === stakeholderName))
           :documentsArray
