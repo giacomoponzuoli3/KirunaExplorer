@@ -253,9 +253,9 @@ Document info in Diagram Page:
 ![Document info](./screenshots/DiagramInfo.png "Document info")
 
 Document info in Map page: 
-![Document info](./screenshots/DocumentModal.png "Document info")
+![Document info](./screenshots/MapInfo.png "Document info")
 Document info: (urban planner)
-![Document info](./screenshots/DocumentInfoIsLogged1.png "Document info logged in")
+![Document info](./screenshots/MapInfoUrban.png "Document info logged in")
 
 Connections:
 ![Connections](./screenshots/Connections.png "Connections")
@@ -265,8 +265,16 @@ Connections: (urban planner)
 Login page:
 ![Login page](./screenshots/Login.png "Login page")
 
-New document modal:
-![New document](./screenshots/NewDocumentModal1.png "New document")
+New document modal: (step1)
+![New document](./screenshots/AddStep1.png "New document")
+New document modal: (step2)
+![New document](./screenshots/AddStep2.png "New document")
+New document modal: (step3)
+![New document](./screenshots/AddStep3.png "New document")
+New document modal: (step4)
+![New document](./screenshots/AddStep4.png "New document")
+New document modal: (step5)
+![New document](./screenshots/AddStep5.png "New document")
 
 New document geo-referencing modal:
 ![New document geo-referencing](./screenshots/GeorefrenceModal1.png "New document geo-referencing")
@@ -287,9 +295,9 @@ Update connection modal:
 ![Update connection](./screenshots/UpdateConnection.png "Update connection")
 
 Documents Page:
-![Documents](./screenshots/DocumentUser.png "Documents")
+![Documents](./screenshots/DocumentList.png "Documents")
 Documents Page: (urban planner)
-![Documents logged in](./screenshots/Documents1.png "Documents logged in")
+![Documents logged in](./screenshots/DocumentsListUrban.png "Documents logged in")
 
 Resources Page:
 ![Resources](./screenshots/Resources.png "Resources")
