@@ -488,7 +488,7 @@ const Diagram = (props: any) => {
         getDocumentIcon={props.getDocumentIcon} 
         user={props.user}
         geoJsonData={props.geoJsonData}
-        refreshDocumentsCoordinates={props.refreshDocumentsCoordinates}
+        refreshDocumentsCoordinates={() => {props.refreshDocumentsCoordinates(); setIsReload(true);}}
         scaleOptions={props.scaleOptions}
         typeOptions={props.typeOptions}
         onCreateScale={props.onCreateScale}
