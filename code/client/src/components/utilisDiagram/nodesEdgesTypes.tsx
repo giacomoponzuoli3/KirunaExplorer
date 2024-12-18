@@ -14,8 +14,8 @@ const Tooltip = ({ title, x, y }: { title: string; x: number; y: number}) => {
     <div
       style={{
         position: 'absolute',
-        top: y, // Adjust position above the node
-        left: x,
+        top: y + "px", // Adjust position above the node
+        left: x + "px",
         transform: 'translateX(-50%)',
         whiteSpace: 'nowrap',
         backgroundColor: 'rgba(0, 123, 255, 0.9)',
@@ -46,7 +46,7 @@ const IconNode = ({ data, }: any) => {
       // Set the tooltip position above the node (adjust as needed)
       setTooltipPosition({
         x: rect.left + rect.width / 2, // Center the tooltip horizontally
-        y: rect.top + 420, // Position above the node, you can adjust the `-20` as needed
+        y: data.y + 120 // Position above the node, you can adjust the `-20` as needed
       });
     }
   }, [isHovered]);
