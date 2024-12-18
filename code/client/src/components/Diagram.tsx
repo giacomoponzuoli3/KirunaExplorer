@@ -474,8 +474,6 @@ const Diagram = (props: any) => {
         border: "none", 
         transform: 'none',
         position: 'relative', // Aggiungi questa proprietà per controllare il posizionamento degli altri componenti
-        overflowX: 'auto', // Allow horizontal scrolling for overflow content
-        whiteSpace: 'nowrap' // Ensure no wrapping of scale text
       }} 
       className="diagram-svg-fix"
     >
@@ -552,25 +550,6 @@ const Diagram = (props: any) => {
             </ViewportPortal>}
         </ReactFlow>
       )}
-      {/*isLegendVisible && (
-            <div 
-              style={{
-                position: 'absolute',
-                top: '50px',
-                right: '10px',
-                zIndex: 20,
-                padding: '10px',
-                backgroundColor: 'white',
-                border: '1px solid black',
-                borderRadius: '5px',
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                flexDirection: 'column',
-                gap: '10px'
-              }}
-            >
-              <EdgeLegend />
-            </div>
-          )*/}
       {isLegendVisible && (
             <div 
               style={{
