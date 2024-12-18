@@ -232,6 +232,22 @@ describe('authRoutes', () => {
 
         });
 
+        test('It should return 503 if there is an error', async () => {
+
+            jest.spyOn(auth, 'login').mockImplementation(() => {
+                throw new Error('Unexpected Error');
+            });
+
+            const response = await request(app).post(baseURL + "/")
+                .send({
+                    username: "urban_planner",
+                    password: "admin"
+                });
+
+            expect(response.status).toBe(503);
+            expect(response.body.error).toBe('Internal Server Error');
+        });
+
     });
 
 

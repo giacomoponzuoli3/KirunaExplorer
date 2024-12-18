@@ -107,7 +107,6 @@ export async function setup() {
 
         console.log("All tables created successfully.");
     } catch (err) {
-        console.error(err.message);
         throw err; // Propagate the error to handle it at a higher level
     }
 }

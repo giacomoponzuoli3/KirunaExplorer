@@ -60,12 +60,5 @@ class DocCoordinates {
  * Represents the type of document.
  * The values present in this enum are the only valid values for the type of document.
  */
-enum Type {
-    INFORMATIVE = "Informative document",
-    PRESCRIPTIVE = "Prescriptive document",
-    DESIGN = "Design document",
-    TECHNICAL = "Technical document",
-    MATERIAL = "Material effect"
-}
 
-export { DocCoordinates, Type}
+export { DocCoordinates }

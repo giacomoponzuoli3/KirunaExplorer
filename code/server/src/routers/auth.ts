@@ -132,19 +132,6 @@ class Authenticator {
     }
 
     /**
-     * Middleware function to check if the user is a resident.
-     * 
-     * @param req - The request object.
-     * @param res - The response object.
-     * @param next - The next middleware function.
-     * If the user is authenticated and is a resident, it calls the next middleware function. Otherwise, it returns a 401 error response.
-     */
-    isResident(req: any, res: any, next: any) {
-        if (req.isAuthenticated() && Utility.isResident(req.user)) return next()
-        return res.status(403).json({ error: "User is not a resident", status: 403 })
-    }
-
-    /**
      * Middleware function to check if the user is an urban planner.
      * 
      * @param req - The request object.
@@ -155,19 +142,6 @@ class Authenticator {
     isPlanner(req: any, res: any, next: any) {
         if (req.isAuthenticated() && Utility.isPlanner(req.user)) return next()
         return res.status(403).json({ error: "User is not an urban planner", status: 403 })
-    }
-
-    /**
-     * Middleware function to check if the user is an urban developer.
-     * 
-     * @param req - The request object.
-     * @param res - The response object.
-     * @param next - The next middleware function.
-     * If the user is authenticated and is an urban developer, it calls the next middleware function. Otherwise, it returns a 401 error response.
-     */
-    isDeveloper(req: any, res: any, next: any) {
-        if (req.isAuthenticated() && Utility.isDeveloper(req.user)) return next()
-        return res.status(403).json({ error: "User is not an urban developer", status: 403 })
     }
 
 }

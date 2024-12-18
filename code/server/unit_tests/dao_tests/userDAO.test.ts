@@ -128,6 +128,17 @@ describe('userDAO', () => {
 
             expect(db.get).toHaveBeenCalled();
         });
+
+        test('It should reject if there is a generic error', async () => {
+
+            jest.spyOn(db, 'get').mockImplementation((sql, params, callback) => {
+                throw new Error('Unexpected error');
+            });
+
+            await expect(dao.getIsUserAuthenticated("urban_planner", "admin")).rejects.toThrow('Unexpected error');
+
+            expect(db.get).toHaveBeenCalled();
+        });
     });
 
     describe('getUserByUsername', () => {
