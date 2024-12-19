@@ -377,12 +377,12 @@ const Diagram = (props: any) => {
   };
 
   function refreshSelectedDocument(document: DocCoordinates) {
-    if(selectedDocumentCoordinates && selectedDocumentCoordinates !== document){
+    if(selectedDocumentCoordinates){
       const docc = selectedDocumentCoordinates
       document.coordinates = docc.coordinates;
       setIsReload(true)
-      setSelectedDocumentCoordinates(document)
     }
+    setSelectedDocumentCoordinates(document)
   }
         
   const onNodeClick: NodeMouseHandler = (event, node) => {
